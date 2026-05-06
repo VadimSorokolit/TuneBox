@@ -1,0 +1,31 @@
+switch_case_alignment:
+  indented_cases: true
+
+line_length:
+  warning: 140
+  error: 200
+  ignores_comments: true
+  ignores_urls: true
+
+vertical_whitespace:
+  max_empty_lines: 1
+
+type_body_length:
+  warning: 600
+  error: 700
+
+cyclomatic_complexity:
+  warning: 20
+  error: 30
+
+function_body_length:
+  warning: 100
+  error: 150
+
+file_length:
+  warning: 700
+  error: 900
+
+function_parameter_count:
+  warning: 4
+  error: 12

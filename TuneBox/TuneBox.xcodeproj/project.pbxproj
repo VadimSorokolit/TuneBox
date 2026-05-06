@@ -1,0 +1,715 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		5B84C0172FAB349000ACE75A /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5B84C0162FAB349000ACE75A /* CombineMoya */; };
+		5B84C0192FAB349000ACE75A /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 5B84C0182FAB349000ACE75A /* Moya */; };
+		5B84C01C2FAB353200ACE75A /* CustomAlerts in Frameworks */ = {isa = PBXBuildFile; productRef = 5B84C01B2FAB353200ACE75A /* CustomAlerts */; };
+		5B84C0252FAB368D00ACE75A /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 5B84C0242FAB367B00ACE75A /* .swiftlint.yml */; };
+		5BD579A02FAB25E300503BA2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5BD5799C2FAB25E300503BA2 /* Assets.xcassets */; };
+		5BD579A12FAB25E300503BA2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD5799D2FAB25E300503BA2 /* ContentView.swift */; };
+		5BD579A22FAB25E300503BA2 /* TuneBoxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD5799E2FAB25E300503BA2 /* TuneBoxApp.swift */; };
+		5BD579A52FAB25EE00503BA2 /* TuneBoxTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD579A32FAB25EE00503BA2 /* TuneBoxTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		5BD579802FAB25C000503BA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5BD5796A2FAB25BF00503BA2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5BD579712FAB25BF00503BA2;
+			remoteInfo = TuneBox;
+		};
+		5BD5798A2FAB25C000503BA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5BD5796A2FAB25BF00503BA2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5BD579712FAB25BF00503BA2;
+			remoteInfo = TuneBox;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		5B84C0242FAB367B00ACE75A /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
+		5BD579722FAB25BF00503BA2 /* TuneBox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TuneBox.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5BD5797F2FAB25C000503BA2 /* TuneBoxTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TuneBoxTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5BD579892FAB25C000503BA2 /* TuneBoxUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TuneBoxUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5BD5799C2FAB25E300503BA2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5BD5799D2FAB25E300503BA2 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		5BD5799E2FAB25E300503BA2 /* TuneBoxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneBoxApp.swift; sourceTree = "<group>"; };
+		5BD579A32FAB25EE00503BA2 /* TuneBoxTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneBoxTests.swift; sourceTree = "<group>"; };
+		5BD579AB2FAB27A000503BA2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		5BD5796F2FAB25BF00503BA2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5B84C0192FAB349000ACE75A /* Moya in Frameworks */,
+				5B84C0172FAB349000ACE75A /* CombineMoya in Frameworks */,
+				5B84C01C2FAB353200ACE75A /* CustomAlerts in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5BD5797C2FAB25C000503BA2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5BD579862FAB25C000503BA2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		5BD579692FAB25BF00503BA2 = {
+			isa = PBXGroup;
+			children = (
+				5B84C0242FAB367B00ACE75A /* .swiftlint.yml */,
+				5BD5799F2FAB25E300503BA2 /* TuneBox */,
+				5BD579A42FAB25EE00503BA2 /* TuneBoxTests */,
+				5BD579732FAB25BF00503BA2 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		5BD579732FAB25BF00503BA2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5BD579722FAB25BF00503BA2 /* TuneBox.app */,
+				5BD5797F2FAB25C000503BA2 /* TuneBoxTests.xctest */,
+				5BD579892FAB25C000503BA2 /* TuneBoxUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5BD5799F2FAB25E300503BA2 /* TuneBox */ = {
+			isa = PBXGroup;
+			children = (
+				5BD579A62FAB262A00503BA2 /* App */,
+				5BD579A92FAB272E00503BA2 /* Features */,
+				5BD579A82FAB26F800503BA2 /* Services */,
+				5BD579A72FAB26C800503BA2 /* Resources */,
+				5BD579AA2FAB275400503BA2 /* SupportingFiles */,
+			);
+			path = TuneBox;
+			sourceTree = "<group>";
+		};
+		5BD579A42FAB25EE00503BA2 /* TuneBoxTests */ = {
+			isa = PBXGroup;
+			children = (
+				5BD579A32FAB25EE00503BA2 /* TuneBoxTests.swift */,
+			);
+			path = TuneBoxTests;
+			sourceTree = "<group>";
+		};
+		5BD579A62FAB262A00503BA2 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				5BD5799E2FAB25E300503BA2 /* TuneBoxApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		5BD579A72FAB26C800503BA2 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				5BD5799C2FAB25E300503BA2 /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		5BD579A82FAB26F800503BA2 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		5BD579A92FAB272E00503BA2 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				5BD5799D2FAB25E300503BA2 /* ContentView.swift */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		5BD579AA2FAB275400503BA2 /* SupportingFiles */ = {
+			isa = PBXGroup;
+			children = (
+				5BD579AB2FAB27A000503BA2 /* Info.plist */,
+			);
+			path = SupportingFiles;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		5BD579712FAB25BF00503BA2 /* TuneBox */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5BD579932FAB25C000503BA2 /* Build configuration list for PBXNativeTarget "TuneBox" */;
+			buildPhases = (
+				5BD5796E2FAB25BF00503BA2 /* Sources */,
+				5BD5796F2FAB25BF00503BA2 /* Frameworks */,
+				5BD579702FAB25BF00503BA2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5B4762772FAB37D90069E41A /* PBXTargetDependency */,
+			);
+			name = TuneBox;
+			packageProductDependencies = (
+				5B84C0162FAB349000ACE75A /* CombineMoya */,
+				5B84C0182FAB349000ACE75A /* Moya */,
+				5B84C01B2FAB353200ACE75A /* CustomAlerts */,
+			);
+			productName = TuneBox;
+			productReference = 5BD579722FAB25BF00503BA2 /* TuneBox.app */;
+			productType = "com.apple.product-type.application";
+		};
+		5BD5797E2FAB25C000503BA2 /* TuneBoxTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5BD579962FAB25C000503BA2 /* Build configuration list for PBXNativeTarget "TuneBoxTests" */;
+			buildPhases = (
+				5BD5797B2FAB25C000503BA2 /* Sources */,
+				5BD5797C2FAB25C000503BA2 /* Frameworks */,
+				5BD5797D2FAB25C000503BA2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5BD579812FAB25C000503BA2 /* PBXTargetDependency */,
+			);
+			name = TuneBoxTests;
+			packageProductDependencies = (
+			);
+			productName = TuneBoxTests;
+			productReference = 5BD5797F2FAB25C000503BA2 /* TuneBoxTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		5BD579882FAB25C000503BA2 /* TuneBoxUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5BD579992FAB25C000503BA2 /* Build configuration list for PBXNativeTarget "TuneBoxUITests" */;
+			buildPhases = (
+				5BD579852FAB25C000503BA2 /* Sources */,
+				5BD579862FAB25C000503BA2 /* Frameworks */,
+				5BD579872FAB25C000503BA2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5BD5798B2FAB25C000503BA2 /* PBXTargetDependency */,
+			);
+			name = TuneBoxUITests;
+			packageProductDependencies = (
+			);
+			productName = TuneBoxUITests;
+			productReference = 5BD579892FAB25C000503BA2 /* TuneBoxUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		5BD5796A2FAB25BF00503BA2 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2640;
+				LastUpgradeCheck = 2640;
+				TargetAttributes = {
+					5BD579712FAB25BF00503BA2 = {
+						CreatedOnToolsVersion = 26.4.1;
+					};
+					5BD5797E2FAB25C000503BA2 = {
+						CreatedOnToolsVersion = 26.4.1;
+						TestTargetID = 5BD579712FAB25BF00503BA2;
+					};
+					5BD579882FAB25C000503BA2 = {
+						CreatedOnToolsVersion = 26.4.1;
+						TestTargetID = 5BD579712FAB25BF00503BA2;
+					};
+				};
+			};
+			buildConfigurationList = 5BD5796D2FAB25BF00503BA2 /* Build configuration list for PBXProject "TuneBox" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 5BD579692FAB25BF00503BA2;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				5B84C0152FAB349000ACE75A /* XCRemoteSwiftPackageReference "moya" */,
+				5B84C01A2FAB353200ACE75A /* XCRemoteSwiftPackageReference "CustomAlerts" */,
+				5B4762752FAB378B0069E41A /* XCRemoteSwiftPackageReference "swiftlint" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 5BD579732FAB25BF00503BA2 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				5BD579712FAB25BF00503BA2 /* TuneBox */,
+				5BD5797E2FAB25C000503BA2 /* TuneBoxTests */,
+				5BD579882FAB25C000503BA2 /* TuneBoxUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		5BD579702FAB25BF00503BA2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5B84C0252FAB368D00ACE75A /* .swiftlint.yml in Resources */,
+				5BD579A02FAB25E300503BA2 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5BD5797D2FAB25C000503BA2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5BD579872FAB25C000503BA2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		5BD5796E2FAB25BF00503BA2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5BD579A12FAB25E300503BA2 /* ContentView.swift in Sources */,
+				5BD579A22FAB25E300503BA2 /* TuneBoxApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5BD5797B2FAB25C000503BA2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5BD579A52FAB25EE00503BA2 /* TuneBoxTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5BD579852FAB25C000503BA2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		5B4762772FAB37D90069E41A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 5B4762762FAB37D90069E41A /* SwiftLintBuildToolPlugin */;
+		};
+		5BD579812FAB25C000503BA2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5BD579712FAB25BF00503BA2 /* TuneBox */;
+			targetProxy = 5BD579802FAB25C000503BA2 /* PBXContainerItemProxy */;
+		};
+		5BD5798B2FAB25C000503BA2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5BD579712FAB25BF00503BA2 /* TuneBox */;
+			targetProxy = 5BD5798A2FAB25C000503BA2 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		5BD579912FAB25C000503BA2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = D28SS25G7Y;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		5BD579922FAB25C000503BA2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = D28SS25G7Y;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		5BD579942FAB25C000503BA2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = D28SS25G7Y;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TuneBox/SupportingFiles/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.TuneBox;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		5BD579952FAB25C000503BA2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = D28SS25G7Y;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TuneBox/SupportingFiles/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.TuneBox;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		5BD579972FAB25C000503BA2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = D28SS25G7Y;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.TuneBoxTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TuneBox.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TuneBox";
+			};
+			name = Debug;
+		};
+		5BD579982FAB25C000503BA2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = D28SS25G7Y;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.TuneBoxTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TuneBox.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TuneBox";
+			};
+			name = Release;
+		};
+		5BD5799A2FAB25C000503BA2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = D28SS25G7Y;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.TuneBoxUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = TuneBox;
+			};
+			name = Debug;
+		};
+		5BD5799B2FAB25C000503BA2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = D28SS25G7Y;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.TuneBoxUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = TuneBox;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		5BD5796D2FAB25BF00503BA2 /* Build configuration list for PBXProject "TuneBox" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5BD579912FAB25C000503BA2 /* Debug */,
+				5BD579922FAB25C000503BA2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5BD579932FAB25C000503BA2 /* Build configuration list for PBXNativeTarget "TuneBox" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5BD579942FAB25C000503BA2 /* Debug */,
+				5BD579952FAB25C000503BA2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5BD579962FAB25C000503BA2 /* Build configuration list for PBXNativeTarget "TuneBoxTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5BD579972FAB25C000503BA2 /* Debug */,
+				5BD579982FAB25C000503BA2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5BD579992FAB25C000503BA2 /* Build configuration list for PBXNativeTarget "TuneBoxUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5BD5799A2FAB25C000503BA2 /* Debug */,
+				5BD5799B2FAB25C000503BA2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		5B4762752FAB378B0069E41A /* XCRemoteSwiftPackageReference "swiftlint" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/swiftlint";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.63.2;
+			};
+		};
+		5B84C0152FAB349000ACE75A /* XCRemoteSwiftPackageReference "moya" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/moya/moya";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 15.0.3;
+			};
+		};
+		5B84C01A2FAB353200ACE75A /* XCRemoteSwiftPackageReference "CustomAlerts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/VadimSorokolit/CustomAlerts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.10.21;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		5B4762762FAB37D90069E41A /* SwiftLintBuildToolPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5B4762752FAB378B0069E41A /* XCRemoteSwiftPackageReference "swiftlint" */;
+			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+		5B84C0162FAB349000ACE75A /* CombineMoya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5B84C0152FAB349000ACE75A /* XCRemoteSwiftPackageReference "moya" */;
+			productName = CombineMoya;
+		};
+		5B84C0182FAB349000ACE75A /* Moya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5B84C0152FAB349000ACE75A /* XCRemoteSwiftPackageReference "moya" */;
+			productName = Moya;
+		};
+		5B84C01B2FAB353200ACE75A /* CustomAlerts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5B84C01A2FAB353200ACE75A /* XCRemoteSwiftPackageReference "CustomAlerts" */;
+			productName = CustomAlerts;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 5BD5796A2FAB25BF00503BA2 /* Project object */;
+}
