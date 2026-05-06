@@ -10,6 +10,11 @@ import os
 import Alamofire
 import Moya
 
+/**
+ - Note:
+ API Docs: - https://developer.jamendo.com/v3.0/docs
+ */
+
 private struct Constants {
     struct API {
         static let baseURL = "https://api.jamendo.com/v3.0"
