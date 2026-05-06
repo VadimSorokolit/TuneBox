@@ -11,17 +11,41 @@ import Alamofire
 import Moya
 
 private struct Constants {
+    struct API {
+        static let baseURL = "https://api.jamendo.com/v3.0"
+        static let storageURL = "https://prod-1.storage.jamendo.com"
+        static let defaultPath = "/tracks"
+        static let downloadPath = "/download/track/%d/mp32/"
+    }
+    
+    struct Params {
+        static let clientID = "client_id"
+        static let tags = "tags"
+        static let limit = "limit"
+        static let order = "order"
+        static let search = "search"
+        static let offset = "offset"
+    }
+    
+    struct Values {
+        static let popularityTotal = "popularity_total"
+    }
+    
+    static let mockAPIKey = "88888888"
     static let googleBaseURL = "google.com"
-    static let paginationLimit: Int = 20
+    static let apiKeyEnvName = "APIKey"
+    static let invalidURLMessage: String = "Invalid baseURL:"
+    static let warningMessage: String = "Using mock API key"
     
     static var apiKey: String {
-        if let key = ProcessInfo.processInfo.environment["APIKey"] {
+        if let key = ProcessInfo.processInfo.environment[Constants.apiKeyEnvName] {
             return key
         } else {
-            AppLogger.api.warning("Using mock API key")
-            return "88888888"
+            AppLogger.api.warning("\(Constants.warningMessage)")
+            return Constants.mockAPIKey
         }
     }
+    
 }
 
 enum TuneBoxRouter {
@@ -40,13 +64,13 @@ extension TuneBoxRouter: TargetType {
         
         switch self {
             case .getSongSize:
-                urlString = "https://prod-1.storage.jamendo.com"
+                urlString = Constants.API.storageURL
             default:
-                urlString = "https://api.jamendo.com/v3.0"
+                urlString = Constants.API.baseURL
         }
         
         guard let url = URL(string: urlString) ?? URL(string: Constants.googleBaseURL) else {
-            fatalError("Invalid baseURL: \(urlString)")
+            fatalError("\(Constants.invalidURLMessage) \(urlString)")
         }
         
         return url
@@ -55,10 +79,10 @@ extension TuneBoxRouter: TargetType {
     var path: String {
         switch self {
             case .getSongSize(let id):
-                return "/download/track/\(id)/mp32/"
+                return String(format: Constants.API.downloadPath, id)
                 
             case .getTracksByGenre, .getPopularTracks, .searchTracks:
-                return "/tracks"
+                return Constants.API.defaultPath
         }
     }
     
@@ -76,9 +100,9 @@ extension TuneBoxRouter: TargetType {
             case let .getTracksByGenre(genre, limit):
                 return .requestParameters(
                     parameters: [
-                        "client_id": Constants.apiKey,
-                        "tags": genre,
-                        "limit": limit
+                        Constants.Params.clientID: Constants.apiKey,
+                        Constants.Params.tags: genre,
+                        Constants.Params.limit: limit
                     ],
                     encoding: URLEncoding.default
                 )
@@ -86,9 +110,9 @@ extension TuneBoxRouter: TargetType {
             case let .getPopularTracks(limit):
                 return .requestParameters(
                     parameters: [
-                        "client_id": Constants.apiKey,
-                        "order": "popularity_total",
-                        "limit": limit
+                        Constants.Params.clientID: Constants.apiKey,
+                        Constants.Params.order: Constants.Values.popularityTotal,
+                        Constants.Params.limit: limit
                     ],
                     encoding: URLEncoding.default
                 )
@@ -96,10 +120,10 @@ extension TuneBoxRouter: TargetType {
             case let .searchTracks(query, limit, offset):
                 return .requestParameters(
                     parameters: [
-                        "client_id": Constants.apiKey,
-                        "search": query,
-                        "limit": limit,
-                        "offset": offset
+                        Constants.Params.clientID: Constants.apiKey,
+                        Constants.Params.search: query,
+                        Constants.Params.limit: limit,
+                        Constants.Params.offset: offset
                     ],
                     encoding: URLEncoding.default
                 )
