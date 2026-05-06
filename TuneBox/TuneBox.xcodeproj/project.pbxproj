@@ -9,8 +9,10 @@
 /* Begin PBXBuildFile section */
 		5B47627A2FAB3DC30069E41A /* TuneBoxRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4762792FAB3DB80069E41A /* TuneBoxRouter.swift */; };
 		5B47627E2FAB49B00069E41A /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B47627D2FAB49AF0069E41A /* AppLogger.swift */; };
-		5B84C0172FAB349000ACE75A /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5B84C0162FAB349000ACE75A /* CombineMoya */; };
-		5B84C0192FAB349000ACE75A /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 5B84C0182FAB349000ACE75A /* Moya */; };
+		5B4762812FAB5C570069E41A /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5B4762802FAB5C570069E41A /* CombineMoya */; };
+		5B4762832FAB5C570069E41A /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 5B4762822FAB5C570069E41A /* Moya */; };
+		5B4762852FAB5C570069E41A /* ReactiveMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5B4762842FAB5C570069E41A /* ReactiveMoya */; };
+		5B4762872FAB5C570069E41A /* RxMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5B4762862FAB5C570069E41A /* RxMoya */; };
 		5B84C01C2FAB353200ACE75A /* CustomAlerts in Frameworks */ = {isa = PBXBuildFile; productRef = 5B84C01B2FAB353200ACE75A /* CustomAlerts */; };
 		5B84C0252FAB368D00ACE75A /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 5B84C0242FAB367B00ACE75A /* .swiftlint.yml */; };
 		5BD579A02FAB25E300503BA2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5BD5799C2FAB25E300503BA2 /* Assets.xcassets */; };
@@ -55,9 +57,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5B84C0192FAB349000ACE75A /* Moya in Frameworks */,
-				5B84C0172FAB349000ACE75A /* CombineMoya in Frameworks */,
+				5B4762872FAB5C570069E41A /* RxMoya in Frameworks */,
+				5B4762812FAB5C570069E41A /* CombineMoya in Frameworks */,
+				5B4762852FAB5C570069E41A /* ReactiveMoya in Frameworks */,
 				5B84C01C2FAB353200ACE75A /* CustomAlerts in Frameworks */,
+				5B4762832FAB5C570069E41A /* Moya in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -201,9 +205,11 @@
 			);
 			name = TuneBox;
 			packageProductDependencies = (
-				5B84C0162FAB349000ACE75A /* CombineMoya */,
-				5B84C0182FAB349000ACE75A /* Moya */,
 				5B84C01B2FAB353200ACE75A /* CustomAlerts */,
+				5B4762802FAB5C570069E41A /* CombineMoya */,
+				5B4762822FAB5C570069E41A /* Moya */,
+				5B4762842FAB5C570069E41A /* ReactiveMoya */,
+				5B4762862FAB5C570069E41A /* RxMoya */,
 			);
 			productName = TuneBox;
 			productReference = 5BD579722FAB25BF00503BA2 /* TuneBox.app */;
@@ -282,9 +288,9 @@
 			mainGroup = 5BD579692FAB25BF00503BA2;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				5B84C0152FAB349000ACE75A /* XCRemoteSwiftPackageReference "moya" */,
 				5B84C01A2FAB353200ACE75A /* XCRemoteSwiftPackageReference "CustomAlerts" */,
 				5B4762752FAB378B0069E41A /* XCRemoteSwiftPackageReference "swiftlint" */,
+				5B47627F2FAB5C570069E41A /* XCRemoteSwiftPackageReference "moya" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5BD579732FAB25BF00503BA2 /* Products */;
@@ -702,7 +708,7 @@
 				minimumVersion = 0.63.2;
 			};
 		};
-		5B84C0152FAB349000ACE75A /* XCRemoteSwiftPackageReference "moya" */ = {
+		5B47627F2FAB5C570069E41A /* XCRemoteSwiftPackageReference "moya" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/moya/moya";
 			requirement = {
@@ -726,15 +732,25 @@
 			package = 5B4762752FAB378B0069E41A /* XCRemoteSwiftPackageReference "swiftlint" */;
 			productName = "plugin:SwiftLintBuildToolPlugin";
 		};
-		5B84C0162FAB349000ACE75A /* CombineMoya */ = {
+		5B4762802FAB5C570069E41A /* CombineMoya */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 5B84C0152FAB349000ACE75A /* XCRemoteSwiftPackageReference "moya" */;
+			package = 5B47627F2FAB5C570069E41A /* XCRemoteSwiftPackageReference "moya" */;
 			productName = CombineMoya;
 		};
-		5B84C0182FAB349000ACE75A /* Moya */ = {
+		5B4762822FAB5C570069E41A /* Moya */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 5B84C0152FAB349000ACE75A /* XCRemoteSwiftPackageReference "moya" */;
+			package = 5B47627F2FAB5C570069E41A /* XCRemoteSwiftPackageReference "moya" */;
 			productName = Moya;
+		};
+		5B4762842FAB5C570069E41A /* ReactiveMoya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5B47627F2FAB5C570069E41A /* XCRemoteSwiftPackageReference "moya" */;
+			productName = ReactiveMoya;
+		};
+		5B4762862FAB5C570069E41A /* RxMoya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5B47627F2FAB5C570069E41A /* XCRemoteSwiftPackageReference "moya" */;
+			productName = RxMoya;
 		};
 		5B84C01B2FAB353200ACE75A /* CustomAlerts */ = {
 			isa = XCSwiftPackageProductDependency;
