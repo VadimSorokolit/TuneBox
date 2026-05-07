@@ -16,6 +16,8 @@
 		5B586CB12FAB98EE00BCEAD2 /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB02FAB98EE00BCEAD2 /* NetworkService.swift */; };
 		5B586CB52FAC618500BCEAD2 /* StorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB42FAC618400BCEAD2 /* StorageService.swift */; };
 		5B586CB72FAC678700BCEAD2 /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB62FAC678600BCEAD2 /* Track.swift */; };
+		5B586CBA2FAC842200BCEAD2 /* Resolver+Injection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB92FAC842100BCEAD2 /* Resolver+Injection.swift */; };
+		5B586CBD2FAC846900BCEAD2 /* Resolver in Frameworks */ = {isa = PBXBuildFile; productRef = 5B586CBC2FAC846900BCEAD2 /* Resolver */; };
 		5B84C01C2FAB353200ACE75A /* CustomAlerts in Frameworks */ = {isa = PBXBuildFile; productRef = 5B84C01B2FAB353200ACE75A /* CustomAlerts */; };
 		5B84C0252FAB368D00ACE75A /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 5B84C0242FAB367B00ACE75A /* .swiftlint.yml */; };
 		5BD579A02FAB25E300503BA2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5BD5799C2FAB25E300503BA2 /* Assets.xcassets */; };
@@ -47,6 +49,7 @@
 		5B586CB02FAB98EE00BCEAD2 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
 		5B586CB42FAC618400BCEAD2 /* StorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageService.swift; sourceTree = "<group>"; };
 		5B586CB62FAC678600BCEAD2 /* Track.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
+		5B586CB92FAC842100BCEAD2 /* Resolver+Injection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Resolver+Injection.swift"; sourceTree = "<group>"; };
 		5B84C0242FAB367B00ACE75A /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		5BD579722FAB25BF00503BA2 /* TuneBox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TuneBox.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5BD5797F2FAB25C000503BA2 /* TuneBoxTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TuneBoxTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -63,6 +66,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5B586CBD2FAC846900BCEAD2 /* Resolver in Frameworks */,
 				5B4762872FAB5C570069E41A /* RxMoya in Frameworks */,
 				5B4762812FAB5C570069E41A /* CombineMoya in Frameworks */,
 				5B4762852FAB5C570069E41A /* ReactiveMoya in Frameworks */,
@@ -129,6 +133,14 @@
 			path = StorageService;
 			sourceTree = "<group>";
 		};
+		5B586CB82FAC841100BCEAD2 /* DI */ = {
+			isa = PBXGroup;
+			children = (
+				5B586CB92FAC842100BCEAD2 /* Resolver+Injection.swift */,
+			);
+			path = DI;
+			sourceTree = "<group>";
+		};
 		5BD579692FAB25BF00503BA2 = {
 			isa = PBXGroup;
 			children = (
@@ -154,6 +166,7 @@
 			children = (
 				5BD579A62FAB262A00503BA2 /* App */,
 				5B4762782FAB3DA30069E41A /* API */,
+				5B586CB82FAC841100BCEAD2 /* DI */,
 				5BD579A92FAB272E00503BA2 /* Features */,
 				5BD579A82FAB26F800503BA2 /* Services */,
 				5B47627B2FAB497F0069E41A /* Core */,
@@ -235,6 +248,7 @@
 				5B4762822FAB5C570069E41A /* Moya */,
 				5B4762842FAB5C570069E41A /* ReactiveMoya */,
 				5B4762862FAB5C570069E41A /* RxMoya */,
+				5B586CBC2FAC846900BCEAD2 /* Resolver */,
 			);
 			productName = TuneBox;
 			productReference = 5BD579722FAB25BF00503BA2 /* TuneBox.app */;
@@ -316,6 +330,7 @@
 				5B84C01A2FAB353200ACE75A /* XCRemoteSwiftPackageReference "CustomAlerts" */,
 				5B4762752FAB378B0069E41A /* XCRemoteSwiftPackageReference "swiftlint" */,
 				5B47627F2FAB5C570069E41A /* XCRemoteSwiftPackageReference "moya" */,
+				5B586CBB2FAC846900BCEAD2 /* XCRemoteSwiftPackageReference "Resolver" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5BD579732FAB25BF00503BA2 /* Products */;
@@ -362,6 +377,7 @@
 			files = (
 				5B586CB52FAC618500BCEAD2 /* StorageService.swift in Sources */,
 				5BD579A12FAB25E300503BA2 /* ContentView.swift in Sources */,
+				5B586CBA2FAC842200BCEAD2 /* Resolver+Injection.swift in Sources */,
 				5B586CB72FAC678700BCEAD2 /* Track.swift in Sources */,
 				5B586CB12FAB98EE00BCEAD2 /* NetworkService.swift in Sources */,
 				5B47627A2FAB3DC30069E41A /* TuneBoxRouter.swift in Sources */,
@@ -744,6 +760,14 @@
 				minimumVersion = 15.0.3;
 			};
 		};
+		5B586CBB2FAC846900BCEAD2 /* XCRemoteSwiftPackageReference "Resolver" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hmlongco/Resolver";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.5.1;
+			};
+		};
 		5B84C01A2FAB353200ACE75A /* XCRemoteSwiftPackageReference "CustomAlerts" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/VadimSorokolit/CustomAlerts";
@@ -779,6 +803,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5B47627F2FAB5C570069E41A /* XCRemoteSwiftPackageReference "moya" */;
 			productName = RxMoya;
+		};
+		5B586CBC2FAC846900BCEAD2 /* Resolver */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5B586CBB2FAC846900BCEAD2 /* XCRemoteSwiftPackageReference "Resolver" */;
+			productName = Resolver;
 		};
 		5B84C01B2FAB353200ACE75A /* CustomAlerts */ = {
 			isa = XCSwiftPackageProductDependency;

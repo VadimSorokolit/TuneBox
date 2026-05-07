@@ -12,7 +12,24 @@ protocol NetworkServicing: AnyObject {
 //    func getTracksByGenre(genre: String, limit: Int) async throws -> [Track]
 //    func getPopularTracks(limit: Int) async throws -> [Track]
 //    func searchTracks(query: String, limit: Int, offset: Int) async throws -> [Track]
-//    func getTrackSize(id: Int) async throws -> Int
+    func getTrackSize(id: Int) async throws -> Int
 }
 
-class NetworkService: NetworkServicing {}
+class NetworkService: NetworkServicing {
+    
+    // MARK: - Properties. Private
+    
+    private let provider: MoyaProvider<TuneBoxRouter>
+    
+    // MARK: - Initializer
+    
+    init(provider: MoyaProvider<TuneBoxRouter>) {
+        self.provider = provider
+    }
+    
+    // MARK: - Methods. Public
+
+    func getTrackSize(id: Int) async throws -> Int {
+        return 0
+    }
+}
