@@ -7,7 +7,6 @@
 
 import Foundation
 import os
-import Alamofire
 import Moya
 
 /**
@@ -37,7 +36,7 @@ private struct Constants {
     }
 
     static let mockAPIKey = "88888888"
-    static let googleBaseURL = "google.com"
+    static let fallbackBaseURL = "google.com"
     static let apiKeyEnvName = "APIKey"
     static let invalidURLMessage = "Invalid baseURL:"
     static let warningMessage = "Using mock API key"
@@ -55,7 +54,7 @@ private struct Constants {
 enum TuneBoxRouter {
     case getTracksByGenre(genre: String, limit: Int)
     case getPopularTracks(limit: Int)
-    case getSongSize(id: Int)
+    case getTrackSize(id: Int)
     case searchTracks(query: String, limit: Int, offset: Int)
 }
 
@@ -90,7 +89,7 @@ extension TuneBoxRouter: TargetType {
                     Params.offset: offset
                 ]
 
-            case .getSongSize:
+            case .getTrackSize:
                 return [:]
         }
     }
@@ -99,14 +98,14 @@ extension TuneBoxRouter: TargetType {
         let urlString: String
 
         switch self {
-            case .getSongSize:
+            case .getTrackSize:
                 urlString = API.storageURL
 
             default:
                 urlString = API.baseURL
         }
 
-        guard let url = URL(string: urlString) ?? URL(string: Constants.googleBaseURL) else {
+        guard let url = URL(string: urlString) ?? URL(string: Constants.fallbackBaseURL) else {
             fatalError("\(Constants.invalidURLMessage) \(urlString)")
         }
 
@@ -115,7 +114,7 @@ extension TuneBoxRouter: TargetType {
 
     var path: String {
         switch self {
-            case .getSongSize(let id):
+            case .getTrackSize(let id):
                 return String(format: API.downloadPath, id)
 
             case .getTracksByGenre, .getPopularTracks, .searchTracks:
@@ -125,7 +124,7 @@ extension TuneBoxRouter: TargetType {
 
     var method: Moya.Method {
         switch self {
-            case .getSongSize:
+            case .getTrackSize:
                 return .head
 
             default:
@@ -135,7 +134,7 @@ extension TuneBoxRouter: TargetType {
 
     var task: Task {
         switch self {
-            case .getSongSize:
+            case .getTrackSize:
                 return .requestPlain
 
             default:

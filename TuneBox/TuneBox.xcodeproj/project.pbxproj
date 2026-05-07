@@ -14,6 +14,8 @@
 		5B4762852FAB5C570069E41A /* ReactiveMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5B4762842FAB5C570069E41A /* ReactiveMoya */; };
 		5B4762872FAB5C570069E41A /* RxMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5B4762862FAB5C570069E41A /* RxMoya */; };
 		5B586CB12FAB98EE00BCEAD2 /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB02FAB98EE00BCEAD2 /* NetworkService.swift */; };
+		5B586CB52FAC618500BCEAD2 /* StorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB42FAC618400BCEAD2 /* StorageService.swift */; };
+		5B586CB72FAC678700BCEAD2 /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB62FAC678600BCEAD2 /* Track.swift */; };
 		5B84C01C2FAB353200ACE75A /* CustomAlerts in Frameworks */ = {isa = PBXBuildFile; productRef = 5B84C01B2FAB353200ACE75A /* CustomAlerts */; };
 		5B84C0252FAB368D00ACE75A /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 5B84C0242FAB367B00ACE75A /* .swiftlint.yml */; };
 		5BD579A02FAB25E300503BA2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5BD5799C2FAB25E300503BA2 /* Assets.xcassets */; };
@@ -43,6 +45,8 @@
 		5B4762792FAB3DB80069E41A /* TuneBoxRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneBoxRouter.swift; sourceTree = "<group>"; };
 		5B47627D2FAB49AF0069E41A /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
 		5B586CB02FAB98EE00BCEAD2 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
+		5B586CB42FAC618400BCEAD2 /* StorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageService.swift; sourceTree = "<group>"; };
+		5B586CB62FAC678600BCEAD2 /* Track.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
 		5B84C0242FAB367B00ACE75A /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		5BD579722FAB25BF00503BA2 /* TuneBox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TuneBox.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5BD5797F2FAB25C000503BA2 /* TuneBoxTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TuneBoxTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -87,6 +91,7 @@
 		5B4762782FAB3DA30069E41A /* API */ = {
 			isa = PBXGroup;
 			children = (
+				5B586CB62FAC678600BCEAD2 /* Track.swift */,
 				5B4762792FAB3DB80069E41A /* TuneBoxRouter.swift */,
 			);
 			path = API;
@@ -106,6 +111,22 @@
 				5B47627D2FAB49AF0069E41A /* AppLogger.swift */,
 			);
 			path = Logging;
+			sourceTree = "<group>";
+		};
+		5B586CB22FAC610400BCEAD2 /* NetworkService */ = {
+			isa = PBXGroup;
+			children = (
+				5B586CB02FAB98EE00BCEAD2 /* NetworkService.swift */,
+			);
+			path = NetworkService;
+			sourceTree = "<group>";
+		};
+		5B586CB32FAC611E00BCEAD2 /* StorageService */ = {
+			isa = PBXGroup;
+			children = (
+				5B586CB42FAC618400BCEAD2 /* StorageService.swift */,
+			);
+			path = StorageService;
 			sourceTree = "<group>";
 		};
 		5BD579692FAB25BF00503BA2 = {
@@ -169,7 +190,8 @@
 		5BD579A82FAB26F800503BA2 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				5B586CB02FAB98EE00BCEAD2 /* NetworkService.swift */,
+				5B586CB22FAC610400BCEAD2 /* NetworkService */,
+				5B586CB32FAC611E00BCEAD2 /* StorageService */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -338,7 +360,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5B586CB52FAC618500BCEAD2 /* StorageService.swift in Sources */,
 				5BD579A12FAB25E300503BA2 /* ContentView.swift in Sources */,
+				5B586CB72FAC678700BCEAD2 /* Track.swift in Sources */,
 				5B586CB12FAB98EE00BCEAD2 /* NetworkService.swift in Sources */,
 				5B47627A2FAB3DC30069E41A /* TuneBoxRouter.swift in Sources */,
 				5B47627E2FAB49B00069E41A /* AppLogger.swift in Sources */,
@@ -534,7 +558,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -572,7 +596,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
