@@ -16,7 +16,11 @@ extension Resolver: @retroactive ResolverRegistering {
 
     private static func registerNetworkService() {
         self.register {
-            let provider = resolve(MoyaProvider<TuneBoxRouter>.self)
+            MoyaProvider<TuneBoxRouter>()
+        }
+
+        self.register {
+            let provider = self.resolve(MoyaProvider<TuneBoxRouter>.self)
 
             return NetworkService(
                 provider: provider

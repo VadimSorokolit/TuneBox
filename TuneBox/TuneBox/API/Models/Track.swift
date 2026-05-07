@@ -8,6 +8,7 @@
 import Foundation
 
 struct Track: Identifiable, Codable, Hashable {
+    // API
     let id: String
     let imageURL: URL?
     let trackName: String
@@ -15,6 +16,7 @@ struct Track: Identifiable, Codable, Hashable {
     let albumName: String
     let releaseDate: Date?
     let downloadURL: URL?
+    // Custom
     var size: Int?
 
     enum CodingKeys: String, CodingKey {

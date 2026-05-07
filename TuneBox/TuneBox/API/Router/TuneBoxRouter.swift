@@ -25,10 +25,10 @@ private struct Constants {
     struct Params {
         static let clientID = "client_id"
         static let tags = "tags"
-        static let limit = "limit"
         static let order = "order"
         static let search = "search"
-        static let offset = "offset"
+        static let page = "limit"
+        static let perPage = "offset"
     }
 
     struct Values {
@@ -71,22 +71,22 @@ extension TuneBoxRouter: TargetType {
                 return [
                     Params.clientID: Constants.apiKey,
                     Params.tags: genre,
-                    Params.limit: limit
+                    Params.page: limit
                 ]
 
             case let .getPopularTracks(limit):
                 return [
                     Params.clientID: Constants.apiKey,
                     Params.order: Constants.Values.popularityTotal,
-                    Params.limit: limit
+                    Params.page: limit
                 ]
 
             case let .searchTracks(query, limit, offset):
                 return [
                     Params.clientID: Constants.apiKey,
                     Params.search: query,
-                    Params.limit: limit,
-                    Params.offset: offset
+                    Params.page: limit,
+                    Params.perPage: offset
                 ]
 
             case .getTrackSize:
