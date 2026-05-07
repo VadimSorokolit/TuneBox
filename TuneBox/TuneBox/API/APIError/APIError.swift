@@ -13,6 +13,7 @@ enum APIError: LocalizedError {
     case network(Error)
     case decoding(Error)
     case requestEncoding(Error)
+    case server(String)
     case serverStatusCode(Int)
     case invalidURL
     case notFound
@@ -42,6 +43,8 @@ enum APIError: LocalizedError {
                 return "Invalid Content-Length value"
             case .unknown:
                 return "Unknown error"
+            case .server(let message):
+                return message
         }
     }
 

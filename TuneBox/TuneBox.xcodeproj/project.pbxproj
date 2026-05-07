@@ -20,6 +20,7 @@
 		5B586CBD2FAC846900BCEAD2 /* Resolver in Frameworks */ = {isa = PBXBuildFile; productRef = 5B586CBC2FAC846900BCEAD2 /* Resolver */; };
 		5B586CC32FAC912500BCEAD2 /* MoyaProvider+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CC22FAC912400BCEAD2 /* MoyaProvider+Async.swift */; };
 		5B586CC72FACA8E300BCEAD2 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CC62FACA8E200BCEAD2 /* APIError.swift */; };
+		5B586CCC2FACB61500BCEAD2 /* TracksResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CCB2FACB61400BCEAD2 /* TracksResponse.swift */; };
 		5B84C01C2FAB353200ACE75A /* CustomAlerts in Frameworks */ = {isa = PBXBuildFile; productRef = 5B84C01B2FAB353200ACE75A /* CustomAlerts */; };
 		5B84C0252FAB368D00ACE75A /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 5B84C0242FAB367B00ACE75A /* .swiftlint.yml */; };
 		5BD579A02FAB25E300503BA2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5BD5799C2FAB25E300503BA2 /* Assets.xcassets */; };
@@ -54,6 +55,7 @@
 		5B586CB92FAC842100BCEAD2 /* Resolver+Injection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Resolver+Injection.swift"; sourceTree = "<group>"; };
 		5B586CC22FAC912400BCEAD2 /* MoyaProvider+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MoyaProvider+Async.swift"; sourceTree = "<group>"; };
 		5B586CC62FACA8E200BCEAD2 /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
+		5B586CCB2FACB61400BCEAD2 /* TracksResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TracksResponse.swift; sourceTree = "<group>"; };
 		5B84C0242FAB367B00ACE75A /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		5BD579722FAB25BF00503BA2 /* TuneBox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TuneBox.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5BD5797F2FAB25C000503BA2 /* TuneBoxTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TuneBoxTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -149,7 +151,8 @@
 		5B586CBE2FAC87A100BCEAD2 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				5B586CB62FAC678600BCEAD2 /* Track.swift */,
+				5B586CCA2FACB60A00BCEAD2 /* TracksResponse */,
+				5B586CC92FACB60600BCEAD2 /* Entities */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -176,6 +179,22 @@
 				5B586CC62FACA8E200BCEAD2 /* APIError.swift */,
 			);
 			path = APIError;
+			sourceTree = "<group>";
+		};
+		5B586CC92FACB60600BCEAD2 /* Entities */ = {
+			isa = PBXGroup;
+			children = (
+				5B586CB62FAC678600BCEAD2 /* Track.swift */,
+			);
+			path = Entities;
+			sourceTree = "<group>";
+		};
+		5B586CCA2FACB60A00BCEAD2 /* TracksResponse */ = {
+			isa = PBXGroup;
+			children = (
+				5B586CCB2FACB61400BCEAD2 /* TracksResponse.swift */,
+			);
+			path = TracksResponse;
 			sourceTree = "<group>";
 		};
 		5BD579692FAB25BF00503BA2 = {
@@ -420,6 +439,7 @@
 				5B586CB72FAC678700BCEAD2 /* Track.swift in Sources */,
 				5B586CB12FAB98EE00BCEAD2 /* NetworkService.swift in Sources */,
 				5B586CC72FACA8E300BCEAD2 /* APIError.swift in Sources */,
+				5B586CCC2FACB61500BCEAD2 /* TracksResponse.swift in Sources */,
 				5B47627A2FAB3DC30069E41A /* TuneBoxRouter.swift in Sources */,
 				5B47627E2FAB49B00069E41A /* AppLogger.swift in Sources */,
 				5BD579A22FAB25E300503BA2 /* TuneBoxApp.swift in Sources */,

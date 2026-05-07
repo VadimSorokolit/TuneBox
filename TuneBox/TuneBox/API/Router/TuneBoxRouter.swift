@@ -27,8 +27,8 @@ private struct Constants {
         static let tags = "tags"
         static let order = "order"
         static let search = "search"
-        static let page = "limit"
-        static let perPage = "offset"
+        static let limit = "limit"
+        static let offset = "offset"
     }
 
     struct Values {
@@ -52,8 +52,8 @@ private struct Constants {
 }
 
 enum TuneBoxRouter {
-    case getTracksByGenre(genre: String, limit: Int)
-    case getPopularTracks(limit: Int)
+    case getTracksByGenre(genre: String, perPage: Int)
+    case getPopularTracks(page: Int, perPage: Int)
     case getTrackSize(id: Int)
     case searchTracks(query: String, limit: Int, offset: Int)
 }
@@ -71,22 +71,27 @@ extension TuneBoxRouter: TargetType {
                 return [
                     Params.clientID: Constants.apiKey,
                     Params.tags: genre,
-                    Params.page: limit
+                    Params.limit: limit
                 ]
 
-            case let .getPopularTracks(limit):
+            case let .getPopularTracks(page, perPage):
+                let safePage = max(page, 1)
+                let safePerPage = max(perPage, 1)
+                let offset = (safePage - 1) * safePerPage
+
                 return [
                     Params.clientID: Constants.apiKey,
                     Params.order: Constants.Values.popularityTotal,
-                    Params.page: limit
+                    Params.limit: safePerPage,
+                    Params.offset: offset
                 ]
 
             case let .searchTracks(query, limit, offset):
                 return [
                     Params.clientID: Constants.apiKey,
                     Params.search: query,
-                    Params.page: limit,
-                    Params.perPage: offset
+                    Params.limit: limit,
+                    Params.offset: offset
                 ]
 
             case .getTrackSize:
