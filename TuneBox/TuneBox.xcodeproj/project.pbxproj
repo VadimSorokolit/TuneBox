@@ -95,8 +95,8 @@
 		5B4762782FAB3DA30069E41A /* API */ = {
 			isa = PBXGroup;
 			children = (
-				5B586CB62FAC678600BCEAD2 /* Track.swift */,
-				5B4762792FAB3DB80069E41A /* TuneBoxRouter.swift */,
+				5B586CBE2FAC87A100BCEAD2 /* Models */,
+				5B586CBF2FAC87AF00BCEAD2 /* Router */,
 			);
 			path = API;
 			sourceTree = "<group>";
@@ -141,6 +141,36 @@
 			path = DI;
 			sourceTree = "<group>";
 		};
+		5B586CBE2FAC87A100BCEAD2 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				5B586CB62FAC678600BCEAD2 /* Track.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		5B586CBF2FAC87AF00BCEAD2 /* Router */ = {
+			isa = PBXGroup;
+			children = (
+				5B4762792FAB3DB80069E41A /* TuneBoxRouter.swift */,
+			);
+			path = Router;
+			sourceTree = "<group>";
+		};
+		5B586CC02FAC87F800BCEAD2 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+		5B586CC12FAC880500BCEAD2 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		5BD579692FAB25BF00503BA2 = {
 			isa = PBXGroup;
 			children = (
@@ -170,6 +200,7 @@
 				5BD579A92FAB272E00503BA2 /* Features */,
 				5BD579A82FAB26F800503BA2 /* Services */,
 				5B47627B2FAB497F0069E41A /* Core */,
+				5B586CC12FAC880500BCEAD2 /* Extensions */,
 				5BD579A72FAB26C800503BA2 /* Resources */,
 				5BD579AA2FAB275400503BA2 /* SupportingFiles */,
 			);
@@ -195,6 +226,7 @@
 		5BD579A72FAB26C800503BA2 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				5B586CC02FAC87F800BCEAD2 /* Fonts */,
 				5BD5799C2FAB25E300503BA2 /* Assets.xcassets */,
 			);
 			path = Resources;
