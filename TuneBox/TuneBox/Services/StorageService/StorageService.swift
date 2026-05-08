@@ -24,8 +24,9 @@ enum StorageError: LocalizedError {
 protocol StorageServicing {
     func getFreeStorage() -> Double?
     func checkEnoughFreeStorage(requiredGB: Double) throws
-    func getDirectorySizeInBytes(from url: URL) throws -> Int64
-    func getDirectorySizeInMB(from url: URL) throws -> Double
+    func getTracksFolderURL() throws -> URL
+    func getDirectorySizeInBytes() throws -> Int64
+    func getDirectorySizeInMB() async throws -> Double
     func deleteDownloadedTrack(id: String) throws
     func deleteAllTracks() throws
 }
@@ -47,8 +48,14 @@ final class StorageService: StorageServicing {
         }
     }
 
-    func getDirectorySizeInBytes(from url: URL) throws -> Int64 {
+    func getTracksFolderURL() throws -> URL {
+        try self.makeTracksDirectoryIfNeeded()
+    }
+
+    func getDirectorySizeInBytes() throws -> Int64 {
+        let url = try self.getTracksFolderURL()
         let directoryURL = try self.resolveDirectoryURL(from: url)
+
         guard let enumerator = FileManager.default.enumerator(
             at: directoryURL,
             includingPropertiesForKeys: [.isRegularFileKey, .fileSizeKey]
@@ -67,8 +74,9 @@ final class StorageService: StorageServicing {
         return totalSize
     }
 
-    func getDirectorySizeInMB(from url: URL) throws -> Double {
-        let bytes = try self.getDirectorySizeInBytes(from: url)
+    func getDirectorySizeInMB() throws -> Double {
+        let bytes = try self.getDirectorySizeInBytes()
+
         return Double(bytes) / Constants.bytesInMegabyte
     }
 
