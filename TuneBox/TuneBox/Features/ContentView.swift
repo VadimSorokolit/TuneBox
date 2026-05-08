@@ -42,7 +42,7 @@ struct ContentView: View {
 
                         Task {
                             do {
-                                let popularTracks = try await networkService.getPopularTracks(page: 3, perPage: 20)
+                                let popularTracks = try await networkService.getPopularTracks(page: 1, perPage: 20)
                                 tracks.append(contentsOf: popularTracks)
                                 print(tracks.count)
                                 if let track = tracks.first {
@@ -52,8 +52,12 @@ struct ContentView: View {
                                             print("✅")
                                             print(url)
                                             do {
-                                                let mb = try storageService.getDirectorySizeInMB(from: url)
-                                                print(mb)
+//                                                try storageService.deleteDownloadedTrack(id: track.id)
+//                                                print(tracks.count)
+//                                                try storageService.deleteAllTracks()
+//                                                print(tracks.count)
+                                                let size = try storageService.getDirectorySizeInMB(from: url)
+                                                print(size)
                                             } catch {
                                                 print("Error")
                                             }

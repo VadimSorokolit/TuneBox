@@ -63,15 +63,25 @@ final class NetworkService: NetworkServicing {
                 for: .cachesDirectory,
                 in: .userDomainMask
             )[0]
+            .appendingPathComponent(GlobalConstants.tracksDirectory)
+
+            if !FileManager.default.fileExists(atPath: destinationDirectory.path) {
+                try FileManager.default.createDirectory(
+                    at: destinationDirectory,
+                    withIntermediateDirectories: true
+                )
+            }
+
             let destinationURL = destinationDirectory
-                .appendingPathComponent("track_\(track.id)")
-                .appendingPathExtension(Constants.audioFileExtension)
+                .appendingPathComponent("\(GlobalConstants.downloadedFilePrefix)\(track.id)")
+                .appendingPathExtension(GlobalConstants.audioFileExtension)
 
             if FileManager.default.fileExists(atPath: destinationURL.path) {
                 try FileManager.default.removeItem(at: destinationURL)
             }
 
             try FileManager.default.moveItem(at: temporaryURL, to: destinationURL)
+
             return destinationURL
         } catch {
             throw APIError.from(error)
@@ -117,7 +127,6 @@ final class NetworkService: NetworkServicing {
     private enum Constants {
         static let successStatus = "success"
         static let trackContentLengthHeader = "Content-Length"
-        static let audioFileExtension = "mp3"
     }
 
     private let requestHandler: (TuneBoxRouter) async throws -> Response

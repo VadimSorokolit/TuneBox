@@ -26,6 +26,8 @@ protocol StorageServicing {
     func checkEnoughFreeStorage(requiredGB: Double) throws
     func getDirectorySizeInBytes(from url: URL) throws -> Int64
     func getDirectorySizeInMB(from url: URL) throws -> Double
+    func deleteDownloadedTrack(id: String) throws
+    func deleteAllTracks() throws
 }
 
 final class StorageService: StorageServicing {
@@ -70,6 +72,28 @@ final class StorageService: StorageServicing {
         return Double(bytes) / Constants.bytesInMegabyte
     }
 
+    func deleteDownloadedTrack(id: String) throws {
+        let trackURL = try self.makeDownloadedTrackURL(id: id)
+
+        guard FileManager.default.fileExists(atPath: trackURL.path) else {
+            return
+        }
+
+        try FileManager.default.removeItem(at: trackURL)
+    }
+
+    func deleteAllTracks() throws {
+        let tracksDirectory = try self.makeTracksDirectoryIfNeeded()
+        let fileURLs = try FileManager.default.contentsOfDirectory(
+            at: tracksDirectory,
+            includingPropertiesForKeys: nil
+        )
+
+        for fileURL in fileURLs {
+            try FileManager.default.removeItem(at: fileURL)
+        }
+    }
+
     // MARK: - Properties. Private
 
     private enum Constants {
@@ -98,5 +122,30 @@ final class StorageService: StorageServicing {
     private func resolveDirectoryURL(from url: URL) throws -> URL {
         let values = try url.resourceValues(forKeys: [.isDirectoryKey])
         return values.isDirectory == true ? url : url.deletingLastPathComponent()
+    }
+
+    private func makeDownloadedTrackURL(id: String) throws -> URL {
+        let tracksDirectory = try self.makeTracksDirectoryIfNeeded()
+
+        return tracksDirectory
+            .appendingPathComponent("\(GlobalConstants.downloadedFilePrefix)\(id)")
+            .appendingPathExtension(GlobalConstants.audioFileExtension)
+    }
+
+    private func makeTracksDirectoryIfNeeded() throws -> URL {
+        let cachesDirectory = FileManager.default.urls(
+            for: .cachesDirectory,
+            in: .userDomainMask
+        )[0]
+        let tracksDirectory = cachesDirectory.appendingPathComponent(GlobalConstants.tracksDirectory)
+
+        if !FileManager.default.fileExists(atPath: tracksDirectory.path) {
+            try FileManager.default.createDirectory(
+                at: tracksDirectory,
+                withIntermediateDirectories: true
+            )
+        }
+
+        return tracksDirectory
     }
 }
