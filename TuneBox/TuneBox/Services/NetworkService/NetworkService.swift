@@ -12,7 +12,6 @@ protocol NetworkServicing: AnyObject {
     func getTracksByGenre(genre: String?, page: Int, perPage: Int) async throws -> [Track]
     func getPopularTracks(page: Int, perPage: Int) async throws -> [Track]
     func searchTracks(query: String, page: Int, perPage: Int) async throws -> [Track]
-    func getTrackSize(id: Int) async throws -> Int
 }
 
 final class NetworkService: NetworkServicing {
@@ -24,7 +23,7 @@ final class NetworkService: NetworkServicing {
             let response = try await self.requestHandler(.getTracksByGenre(genre: genre, page: page, perPage: perPage))
             let decoded = try self.decodeResponse(TracksResponse.self, from: response)
 
-            return decoded.results
+            return await self.enrichTracksWithSize(decoded.results)
         } catch {
             throw APIError.from(error)
         }
@@ -35,7 +34,7 @@ final class NetworkService: NetworkServicing {
             let response = try await self.requestHandler(.getPopularTracks(page: page, perPage: perPage))
             let decoded = try self.decodeResponse(TracksResponse.self, from: response)
 
-            return decoded.results
+            return await self.enrichTracksWithSize(decoded.results)
         } catch {
             throw APIError.from(error)
         }
@@ -46,13 +45,13 @@ final class NetworkService: NetworkServicing {
             let response = try await self.requestHandler(.searchTracks(query: query, page: page, perPage: perPage))
             let decoded = try self.decodeResponse(TracksResponse.self, from: response)
 
-            return decoded.results
+            return await self.enrichTracksWithSize(decoded.results)
         } catch {
             throw APIError.from(error)
         }
     }
 
-    func getTrackSize(id: Int) async throws -> Int {
+    private func getTrackSize(id: Int) async throws -> Int {
         do {
             let response = try await self.requestHandler(.getTrackSize(id: id))
 
@@ -96,6 +95,39 @@ final class NetworkService: NetworkServicing {
     private let requestHandler: (TuneBoxRouter) async throws -> Response
 
     // MARK: - Methods. Private
+
+    private func enrichTracksWithSize(_ tracks: [Track]) async -> [Track] {
+        await withTaskGroup(of: (Int, Int?).self) { group in
+            for (index, track) in tracks.enumerated() {
+                group.addTask { [weak self] in
+                    guard
+                        let self,
+                        let trackID = Int(track.id)
+                    else {
+                        return (index, nil)
+                    }
+
+                    do {
+                        let size = try await self.getTrackSize(id: trackID)
+                        return (index, size)
+                    } catch {
+                        return (index, nil)
+                    }
+                }
+            }
+
+            var trackSizes = Array(repeating: Optional<Int>.none, count: tracks.count)
+            for await (index, size) in group {
+                trackSizes[index] = size
+            }
+
+            return tracks.enumerated().map { index, track in
+                var updatedTrack = track
+                updatedTrack.size = trackSizes[index]
+                return updatedTrack
+            }
+        }
+    }
 
     private func decodeResponse<T: Decodable>(_ type: T.Type, from response: Response) throws -> T {
         let decoded = try response.map(T.self)

@@ -24,6 +24,7 @@ struct ContentView: View {
     struct LoadViewModifier: ViewModifier {
         @Injected var networkService: NetworkServicing
         @Injected var storageService: StorageServicing
+        @State private var tracks: [Track] = []
 
         func body(content: Content) -> some View {
             content
@@ -38,8 +39,19 @@ struct ContentView: View {
 //                    }
                     do {
                         try storageService.checkEnoughFreeStorage(requiredGB: 330)
-                        let space = storageService.getFreeStorage()
-                        print(space)
+
+                        Task {
+                            do {
+                                let popularTracks = try await networkService.getPopularTracks(page: 1, perPage: 20)
+                                tracks.append(contentsOf: popularTracks)
+                                print(tracks.count)
+                                if let track = tracks.first {
+                                    print(track.size)
+                                }
+                            } catch {
+                                print(APIError.from(error).localizedDescription)
+                            }
+                        }
                     } catch {
                         print("❌")
                     }
