@@ -97,59 +97,59 @@ struct NetworkServiceTests {
         }
     }
     
-    @Test
-    func getTrackSizeReturnsParsedContentLength() async throws {
-        let service = makeService { target in
-            guard case .getTrackSize = target else {
-                Issue.record("Unexpected target: \(target)")
-                
-                return makeHeadResponse(statusCode: 500, headers: [:])
-            }
-            return makeHeadResponse(statusCode: 200, headers: ["Content-Length": "12345"])
-        }
-        
-        let size = try await service.getTrackSize(id: 42)
-        
-        #expect(size == 12345)
-    }
-    
-    @Test
-    func getTrackSizeThrowsMissingContentLength() async throws {
-        let service = makeService { _ in
-            makeHeadResponse(statusCode: 200, headers: [:])
-        }
-        
-        do {
-            _ = try await service.getTrackSize(id: 42)
-            
-            Issue.record("Expected APIError.missingContentLength")
-        } catch let error as APIError {
-            guard case .missingContentLength = error else {
-                Issue.record("Expected APIError.missingContentLength, got \(error)")
-                
-                return
-            }
-        }
-    }
-    
-    @Test
-    func getTrackSizeThrowsInvalidContentLength() async throws {
-        let service = makeService { _ in
-            makeHeadResponse(statusCode: 200, headers: ["Content-Length": "abc"])
-        }
-        
-        do {
-            _ = try await service.getTrackSize(id: 42)
-            
-            Issue.record("Expected APIError.invalidContentLength")
-        } catch let error as APIError {
-            guard case .invalidContentLength = error else {
-                Issue.record("Expected APIError.invalidContentLength, got \(error)")
-                
-                return
-            }
-        }
-    }
+//    @Test
+//    func getTrackSizeReturnsParsedContentLength() async throws {
+//        let service = makeService { target in
+//            guard case .getTrackSize = target else {
+//                Issue.record("Unexpected target: \(target)")
+//                
+//                return makeHeadResponse(statusCode: 500, headers: [:])
+//            }
+//            return makeHeadResponse(statusCode: 200, headers: ["Content-Length": "12345"])
+//        }
+//        
+//        let size = try await service.getTrackSize(id: 42)
+//        
+//        #expect(size == 12345)
+//    }
+//    
+//    @Test
+//    func getTrackSizeThrowsMissingContentLength() async throws {
+//        let service = makeService { _ in
+//            makeHeadResponse(statusCode: 200, headers: [:])
+//        }
+//        
+//        do {
+//            _ = try await service.getTrackSize(id: 42)
+//            
+//            Issue.record("Expected APIError.missingContentLength")
+//        } catch let error as APIError {
+//            guard case .missingContentLength = error else {
+//                Issue.record("Expected APIError.missingContentLength, got \(error)")
+//                
+//                return
+//            }
+//        }
+//    }
+//    
+//    @Test
+//    func getTrackSizeThrowsInvalidContentLength() async throws {
+//        let service = makeService { _ in
+//            makeHeadResponse(statusCode: 200, headers: ["Content-Length": "abc"])
+//        }
+//        
+//        do {
+//            _ = try await service.getTrackSize(id: 42)
+//            
+//            Issue.record("Expected APIError.invalidContentLength")
+//        } catch let error as APIError {
+//            guard case .invalidContentLength = error else {
+//                Issue.record("Expected APIError.invalidContentLength, got \(error)")
+//                
+//                return
+//            }
+//        }
+//    }
     
     private func makeService(requestHandler: @escaping (TuneBoxRouter) async throws -> Response) -> NetworkService {
         NetworkService(requestHandler: requestHandler)

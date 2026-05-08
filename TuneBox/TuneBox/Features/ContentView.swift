@@ -42,11 +42,19 @@ struct ContentView: View {
 
                         Task {
                             do {
-                                let popularTracks = try await networkService.getPopularTracks(page: 1, perPage: 20)
+                                let popularTracks = try await networkService.getPopularTracks(page: 3, perPage: 20)
                                 tracks.append(contentsOf: popularTracks)
                                 print(tracks.count)
                                 if let track = tracks.first {
-                                    print(track.size)
+                                    Task {
+                                        do {
+                                            let url = try await networkService.downloadTrack(track)
+                                            print("✅")
+                                            print(url)
+                                        } catch {
+                                            print(APIError.from(error).localizedDescription)
+                                        }
+                                    }
                                 }
                             } catch {
                                 print(APIError.from(error).localizedDescription)

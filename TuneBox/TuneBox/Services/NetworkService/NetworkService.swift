@@ -12,6 +12,7 @@ protocol NetworkServicing: AnyObject {
     func getTracksByGenre(genre: String?, page: Int, perPage: Int) async throws -> [Track]
     func getPopularTracks(page: Int, perPage: Int) async throws -> [Track]
     func searchTracks(query: String, page: Int, perPage: Int) async throws -> [Track]
+    func downloadTrack(_ track: Track) async throws -> URL
 }
 
 final class NetworkService: NetworkServicing {
@@ -46,6 +47,32 @@ final class NetworkService: NetworkServicing {
             let decoded = try self.decodeResponse(TracksResponse.self, from: response)
 
             return await self.enrichTracksWithSize(decoded.results)
+        } catch {
+            throw APIError.from(error)
+        }
+    }
+
+    func downloadTrack(_ track: Track) async throws -> URL {
+        guard let remoteURL = track.downloadURL else {
+            throw APIError.invalidURL
+        }
+
+        do {
+            let (temporaryURL, _) = try await URLSession.shared.download(from: remoteURL)
+            let destinationDirectory = FileManager.default.urls(
+                for: .cachesDirectory,
+                in: .userDomainMask
+            )[0]
+            let destinationURL = destinationDirectory
+                .appendingPathComponent("track_\(track.id)")
+                .appendingPathExtension(Constants.audioFileExtension)
+
+            if FileManager.default.fileExists(atPath: destinationURL.path) {
+                try FileManager.default.removeItem(at: destinationURL)
+            }
+
+            try FileManager.default.moveItem(at: temporaryURL, to: destinationURL)
+            return destinationURL
         } catch {
             throw APIError.from(error)
         }
@@ -90,6 +117,7 @@ final class NetworkService: NetworkServicing {
     private enum Constants {
         static let successStatus = "success"
         static let trackContentLengthHeader = "Content-Length"
+        static let audioFileExtension = "mp3"
     }
 
     private let requestHandler: (TuneBoxRouter) async throws -> Response
