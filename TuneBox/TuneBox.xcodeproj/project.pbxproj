@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5B0F630F2FADDB9E006F3555 /* StorageServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0F630E2FADDB9D006F3555 /* StorageServiceTests.swift */; };
 		5B47627A2FAB3DC30069E41A /* TuneBoxRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4762792FAB3DB80069E41A /* TuneBoxRouter.swift */; };
 		5B47627E2FAB49B00069E41A /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B47627D2FAB49AF0069E41A /* AppLogger.swift */; };
 		5B4762812FAB5C570069E41A /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5B4762802FAB5C570069E41A /* CombineMoya */; };
@@ -26,7 +27,7 @@
 		5BD579A02FAB25E300503BA2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5BD5799C2FAB25E300503BA2 /* Assets.xcassets */; };
 		5BD579A12FAB25E300503BA2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD5799D2FAB25E300503BA2 /* ContentView.swift */; };
 		5BD579A22FAB25E300503BA2 /* TuneBoxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD5799E2FAB25E300503BA2 /* TuneBoxApp.swift */; };
-		5BD579A52FAB25EE00503BA2 /* TuneBoxTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD579A32FAB25EE00503BA2 /* TuneBoxTests.swift */; };
+		5BD579A52FAB25EE00503BA2 /* NetworkServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD579A32FAB25EE00503BA2 /* NetworkServiceTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +48,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5B0F630E2FADDB9D006F3555 /* StorageServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageServiceTests.swift; sourceTree = "<group>"; };
 		5B4762792FAB3DB80069E41A /* TuneBoxRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneBoxRouter.swift; sourceTree = "<group>"; };
 		5B47627D2FAB49AF0069E41A /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
 		5B586CB02FAB98EE00BCEAD2 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
@@ -63,7 +65,7 @@
 		5BD5799C2FAB25E300503BA2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5BD5799D2FAB25E300503BA2 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		5BD5799E2FAB25E300503BA2 /* TuneBoxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneBoxApp.swift; sourceTree = "<group>"; };
-		5BD579A32FAB25EE00503BA2 /* TuneBoxTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneBoxTests.swift; sourceTree = "<group>"; };
+		5BD579A32FAB25EE00503BA2 /* NetworkServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkServiceTests.swift; sourceTree = "<group>"; };
 		5BD579AB2FAB27A000503BA2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -98,6 +100,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5B0F630C2FADDB49006F3555 /* NetworkServiceTests */ = {
+			isa = PBXGroup;
+			children = (
+				5BD579A32FAB25EE00503BA2 /* NetworkServiceTests.swift */,
+			);
+			path = NetworkServiceTests;
+			sourceTree = "<group>";
+		};
+		5B0F630D2FADDB63006F3555 /* StorageServiceTests */ = {
+			isa = PBXGroup;
+			children = (
+				5B0F630E2FADDB9D006F3555 /* StorageServiceTests.swift */,
+			);
+			path = StorageServiceTests;
+			sourceTree = "<group>";
+		};
 		5B4762782FAB3DA30069E41A /* API */ = {
 			isa = PBXGroup;
 			children = (
@@ -236,7 +254,8 @@
 		5BD579A42FAB25EE00503BA2 /* TuneBoxTests */ = {
 			isa = PBXGroup;
 			children = (
-				5BD579A32FAB25EE00503BA2 /* TuneBoxTests.swift */,
+				5B0F630C2FADDB49006F3555 /* NetworkServiceTests */,
+				5B0F630D2FADDB63006F3555 /* StorageServiceTests */,
 			);
 			path = TuneBoxTests;
 			sourceTree = "<group>";
@@ -450,7 +469,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5BD579A52FAB25EE00503BA2 /* TuneBoxTests.swift in Sources */,
+				5B0F630F2FADDB9E006F3555 /* StorageServiceTests.swift in Sources */,
+				5BD579A52FAB25EE00503BA2 /* NetworkServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

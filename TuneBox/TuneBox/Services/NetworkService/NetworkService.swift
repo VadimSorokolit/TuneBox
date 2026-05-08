@@ -21,7 +21,7 @@ class NetworkService: NetworkServicing {
 
     func getTracksByGenre(genre: String?, page: Int, perPage: Int) async throws -> [Track] {
         do {
-            let response = try await self.provider.request(.getTracksByGenre(genre: genre, page: page, perPage: perPage))
+            let response = try await self.requestHandler(.getTracksByGenre(genre: genre, page: page, perPage: perPage))
             let decoded: TracksResponse = try self.decodeResponse(TracksResponse.self, from: response)
 
             return decoded.results
@@ -32,9 +32,9 @@ class NetworkService: NetworkServicing {
 
     func getPopularTracks(page: Int, perPage: Int) async throws -> [Track] {
         do {
-            let response = try await self.provider.request(.getPopularTracks(page: page, perPage: perPage))
+            let response = try await self.requestHandler(.getPopularTracks(page: page, perPage: perPage))
             let decoded = try self.decodeResponse(TracksResponse.self, from: response)
-            
+
             return decoded.results
         } catch {
             throw APIError.from(error)
@@ -43,7 +43,7 @@ class NetworkService: NetworkServicing {
 
     func searchTracks(query: String, page: Int, perPage: Int) async throws -> [Track] {
         do {
-            let response = try await self.provider.request(.searchTracks(query: query, page: page, perPage: perPage))
+            let response = try await self.requestHandler(.searchTracks(query: query, page: page, perPage: perPage))
             let decoded = try self.decodeResponse(TracksResponse.self, from: response)
 
             return decoded.results
@@ -54,7 +54,7 @@ class NetworkService: NetworkServicing {
 
     func getTrackSize(id: Int) async throws -> Int {
         do {
-            let response = try await self.provider.request(.getTrackSize(id: id))
+            let response = try await self.requestHandler(.getTrackSize(id: id))
 
             guard (200 ... 299).contains(response.statusCode) else {
                 throw APIError.serverStatusCode(response.statusCode)
@@ -77,7 +77,13 @@ class NetworkService: NetworkServicing {
     // MARK: - Initializer
 
     init(provider: MoyaProvider<TuneBoxRouter>) {
-        self.provider = provider
+        self.requestHandler = { target in
+            try await provider.request(target)
+        }
+    }
+
+    init(requestHandler: @escaping (TuneBoxRouter) async throws -> Response) {
+        self.requestHandler = requestHandler
     }
 
     // MARK: - Properties. Private
@@ -87,7 +93,7 @@ class NetworkService: NetworkServicing {
         static let trackContentLengthHeader = "Content-Length"
     }
 
-    private let provider: MoyaProvider<TuneBoxRouter>
+    private let requestHandler: (TuneBoxRouter) async throws -> Response
 
     // MARK: - Methods. Private
 
