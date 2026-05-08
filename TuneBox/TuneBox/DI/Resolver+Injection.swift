@@ -12,6 +12,7 @@ extension Resolver: @retroactive ResolverRegistering {
 
     public static func registerAllServices() {
         self.registerNetworkService()
+        self.registerStorageService()
     }
 
     private static func registerNetworkService() {
@@ -22,9 +23,14 @@ extension Resolver: @retroactive ResolverRegistering {
         self.register {
             let provider = self.resolve(MoyaProvider<TuneBoxRouter>.self)
 
-            return NetworkService(
-                provider: provider
-            ) as NetworkServicing
+            return NetworkService(provider: provider) as NetworkServicing
+        }
+        .scope(.application)
+    }
+
+    private static func registerStorageService() {
+        self.register {
+            StorageService() as StorageServicing
         }
         .scope(.application)
     }

@@ -15,7 +15,7 @@ protocol NetworkServicing: AnyObject {
     func getTrackSize(id: Int) async throws -> Int
 }
 
-class NetworkService: NetworkServicing {
+final class NetworkService: NetworkServicing {
 
     // MARK: - Methods. Public
 

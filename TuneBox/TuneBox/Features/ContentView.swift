@@ -23,18 +23,21 @@ struct ContentView: View {
 
     struct LoadViewModifier: ViewModifier {
         @Injected var networkService: NetworkServicing
+        @Injected var storageService: StorageServicing
 
         func body(content: Content) -> some View {
             content
                 .onAppear {
-                    Task {
-                        do {
-                            let size = try await networkService.getTrackSize(id: 623192)
-                            print(size)
-                        } catch {
-                            print(APIError.from(error).localizedDescription)
-                        }
-                    }
+//                    Task {
+//                        do {
+//                            let size = try await networkService.getTrackSize(id: 623192)
+//                            print(size)
+//                        } catch {
+//                            print(APIError.from(error).localizedDescription)
+//                        }
+//                    }
+                    let space = storageService.getFreeStorage()
+                    print(space)
                 }
         }
     }
