@@ -33,13 +33,8 @@ class NetworkService: NetworkServicing {
     func getPopularTracks(page: Int, perPage: Int) async throws -> [Track] {
         do {
             let response = try await self.provider.request(.getPopularTracks(page: page, perPage: perPage))
-
-            let decoded = try response.map(TracksResponse.self)
-
-            guard decoded.headers.status == "success" else {
-                throw APIError.server(decoded.headers.errorMessage ?? "Unknown server error")
-            }
-
+            let decoded = try self.decodeResponse(TracksResponse.self, from: response)
+            
             return decoded.results
         } catch {
             throw APIError.from(error)
