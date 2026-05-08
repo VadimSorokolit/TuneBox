@@ -22,7 +22,7 @@ final class NetworkService: NetworkServicing {
     func getTracksByGenre(genre: String?, page: Int, perPage: Int) async throws -> [Track] {
         do {
             let response = try await self.requestHandler(.getTracksByGenre(genre: genre, page: page, perPage: perPage))
-            let decoded: TracksResponse = try self.decodeResponse(TracksResponse.self, from: response)
+            let decoded = try self.decodeResponse(TracksResponse.self, from: response)
 
             return decoded.results
         } catch {

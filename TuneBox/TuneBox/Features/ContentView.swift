@@ -36,8 +36,13 @@ struct ContentView: View {
 //                            print(APIError.from(error).localizedDescription)
 //                        }
 //                    }
-                    let space = storageService.getFreeStorage()
-                    print(space)
+                    do {
+                        try storageService.checkEnoughFreeStorage(requiredGB: 330)
+                        let space = storageService.getFreeStorage()
+                        print(space)
+                    } catch {
+                        print("❌")
+                    }
                 }
         }
     }

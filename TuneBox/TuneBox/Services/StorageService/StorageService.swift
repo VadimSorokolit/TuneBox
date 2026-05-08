@@ -46,11 +46,11 @@ final class StorageService: StorageServicing {
     // MARK: - Properties. Private
 
     private enum Constants {
-        static let bytesInGigabyte: Double =  1_000_000_000
+        static let bytesInGigabyte: Double = 1e9
     }
-    
+
     // MARK: - Methods. Private
-    
+
     func getFreeStorage() -> Double? {
         guard
             let attributes = try? FileManager.default.attributesOfFileSystem(
