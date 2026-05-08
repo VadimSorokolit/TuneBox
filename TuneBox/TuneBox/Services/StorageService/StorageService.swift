@@ -24,6 +24,8 @@ enum StorageError: LocalizedError {
 protocol StorageServicing {
     func getFreeStorage() -> Double?
     func checkEnoughFreeStorage(requiredGB: Double) throws
+    func getDirectorySizeInBytes(from url: URL) throws -> Int64
+    func getDirectorySizeInMB(from url: URL) throws -> Double
 }
 
 final class StorageService: StorageServicing {
@@ -43,10 +45,36 @@ final class StorageService: StorageServicing {
         }
     }
 
+    func getDirectorySizeInBytes(from url: URL) throws -> Int64 {
+        let directoryURL = try self.resolveDirectoryURL(from: url)
+        guard let enumerator = FileManager.default.enumerator(
+            at: directoryURL,
+            includingPropertiesForKeys: [.isRegularFileKey, .fileSizeKey]
+        ) else {
+            return 0
+        }
+
+        var totalSize: Int64 = 0
+        for case let fileURL as URL in enumerator {
+            let values = try fileURL.resourceValues(forKeys: [.isRegularFileKey, .fileSizeKey])
+            if values.isRegularFile == true {
+                totalSize += Int64(values.fileSize ?? 0)
+            }
+        }
+
+        return totalSize
+    }
+
+    func getDirectorySizeInMB(from url: URL) throws -> Double {
+        let bytes = try self.getDirectorySizeInBytes(from: url)
+        return Double(bytes) / Constants.bytesInMegabyte
+    }
+
     // MARK: - Properties. Private
 
     private enum Constants {
         static let bytesInGigabyte: Double = 1e9
+        static let bytesInMegabyte: Double = 1e6
     }
 
     // MARK: - Methods. Private
@@ -65,5 +93,10 @@ final class StorageService: StorageServicing {
         let gigabytes = bytes / Constants.bytesInGigabyte
 
         return gigabytes
+    }
+
+    private func resolveDirectoryURL(from url: URL) throws -> URL {
+        let values = try url.resourceValues(forKeys: [.isDirectoryKey])
+        return values.isDirectory == true ? url : url.deletingLastPathComponent()
     }
 }

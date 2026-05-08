@@ -51,6 +51,12 @@ struct ContentView: View {
                                             let url = try await networkService.downloadTrack(track)
                                             print("✅")
                                             print(url)
+                                            do {
+                                                let mb = try storageService.getDirectorySizeInMB(from: url)
+                                                print(mb)
+                                            } catch {
+                                                print("Error")
+                                            }
                                         } catch {
                                             print(APIError.from(error).localizedDescription)
                                         }
