@@ -13,7 +13,7 @@ struct TracksResponse: Decodable {
 struct ResponseHeaders: Decodable {
     let status: String
     let code: Int
-    let errorMessage: String
+    let errorMessage: String?
 
     enum CodingKeys: String, CodingKey {
         case status

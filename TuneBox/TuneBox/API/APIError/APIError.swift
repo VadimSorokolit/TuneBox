@@ -23,6 +23,12 @@ enum APIError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
+                /**
+                 - Note:
+                 API Docs: - https://developer.jamendo.com/v3.0/response-codes
+                 */
+            case .server(let message):
+                return message
             case .noInternet:
                 return "No internet connection"
             case .network(let error):
@@ -43,8 +49,6 @@ enum APIError: LocalizedError {
                 return "Invalid Content-Length value"
             case .unknown:
                 return "Unknown error"
-            case .server(let message):
-                return message
         }
     }
 
