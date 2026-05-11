@@ -25,9 +25,18 @@ struct ContentView: View {
         @Injected var networkService: NetworkServicing
         @Injected var storageService: StorageServicing
         @State private var tracks: [Track] = []
+        @State private var downloadedSizeMB: Double = 0
 
         func body(content: Content) -> some View {
             content
+                .onReceive(
+                    NotificationCenter.default.publisher(for: .trackDownloadDidFinish)
+                        .receive(on: RunLoop.main)
+                ) { _ in
+                    Task {
+                        await self.updateDownloadedSize()
+                    }
+                }
                 .onAppear {
 //                    Task {
 //                        do {
@@ -56,8 +65,7 @@ struct ContentView: View {
 //                                                print(tracks.count)
 //                                                try storageService.deleteAllTracks()
 //                                                print(tracks.count)
-                                                let size = try await storageService.getDirectorySizeInMB()
-                                                print(size)
+                                                await self.updateDownloadedSize()
                                             } catch {
                                                 print("Error")
                                             }
@@ -74,6 +82,18 @@ struct ContentView: View {
                         print("❌")
                     }
                 }
+        }
+
+        private func updateDownloadedSize() async {
+            do {
+                let size = try await storageService.getDirectorySizeInMB()
+                await MainActor.run {
+                    downloadedSizeMB = size
+                }
+                print(size)
+            } catch {
+                print(error.localizedDescription)
+            }
         }
     }
 }

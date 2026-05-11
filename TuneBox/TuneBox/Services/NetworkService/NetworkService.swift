@@ -292,6 +292,14 @@ extension NetworkService: URLSessionDownloadDelegate {
                 trackID: trackID
             )
             result = .success(destinationURL)
+            NotificationCenter.default.post(
+                name: .trackDownloadDidFinish,
+                object: nil,
+                userInfo: [
+                    "trackID": trackID,
+                    "url": destinationURL
+                ]
+            )
         } catch {
             result = .failure(error)
         }

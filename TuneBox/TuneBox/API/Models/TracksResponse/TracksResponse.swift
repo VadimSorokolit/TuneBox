@@ -2,7 +2,7 @@
 //  TracksResponse.swift
 //  TuneBox
 //
-//  Created by Nintendo on 07.05.2026.
+//  Created by Vadim Sorokolit on 07.05.2026.
 //
 
 struct TracksResponse: Decodable {
