@@ -31,13 +31,13 @@ protocol TransferStorageStateProviding: AnyObject {
 protocol DownloadManaging: AnyObject {
     func getPopularTracks(page: Int, perPage: Int) async
     func startDownload(_ track: Track) async throws
+    func pauseDownload(trackID: String) async
+    func resumeDownload(trackID: String) async throws
     func deleteDownloadedTrack(id: String)
     func deleteAllTracks()
 }
 
-typealias TransferManaging = TransferStateProviding
-                             & TransferStorageStateProviding
-                             & DownloadManaging
+protocol TransferManaging: TransferStateProviding, TransferStorageStateProviding, DownloadManaging {}
 
 @MainActor
 @Observable
@@ -70,7 +70,6 @@ final class TransferViewModel: TransferManaging {
         do {
             let tracks = try await self.networkService.getPopularTracks(page: page, perPage: perPage)
             self.tracks = tracks
-            self.errorMessage = nil
         } catch {
             let message = error.localizedDescription
             self.errorMessage = message
@@ -101,7 +100,6 @@ final class TransferViewModel: TransferManaging {
             if let index = self.tracks.firstIndex(where: { $0.id == track.id }) {
                 self.tracks[index].isDownloaded = true
             }
-            self.errorMessage = nil
         } catch {
             let message = error.localizedDescription
             self.errorMessage = message
@@ -110,10 +108,29 @@ final class TransferViewModel: TransferManaging {
         }
     }
 
+    func pauseDownload(trackID: String) async {
+        await self.networkService.pauseDownload(trackID: trackID)
+    }
+
+    func resumeDownload(trackID: String) async throws {
+        if let track = self.tracks.first(where: { $0.id == trackID }), let size = track.size {
+            let requiredGB = Double(size) / GlobalConstants.bytesInGigabyte
+            let available = self.storageService.getFreeStorage() ?? 0
+
+            guard available >= requiredGB else {
+                let message = "Not enough free space on device"
+                self.errorMessage = message
+                self.logTransferWarning(message)
+                return
+            }
+        }
+
+        try await self.networkService.resumeDownload(trackID: trackID)
+    }
+
     func deleteDownloadedTrack(id: String) {
         do {
             try self.storageService.deleteDownloadedTrack(id: id)
-            self.errorMessage = nil
         } catch {
             let message = error.localizedDescription
             self.errorMessage = message
@@ -124,7 +141,6 @@ final class TransferViewModel: TransferManaging {
     func deleteAllTracks() {
         do {
             try self.storageService.deleteAllTracks()
-            self.errorMessage = nil
         } catch {
             let message = error.localizedDescription
             self.errorMessage = message
@@ -136,7 +152,6 @@ final class TransferViewModel: TransferManaging {
         do {
             try self.storageService.checkEnoughFreeStorage(requiredGB: Double(plan.rawValue))
             self.reservedSpace = plan
-            self.errorMessage = nil
         } catch let storageError as StorageError {
             let message = storageError.errorDescription ?? storageError.localizedDescription
             self.errorMessage = message

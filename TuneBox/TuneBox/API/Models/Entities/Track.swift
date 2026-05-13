@@ -20,9 +20,20 @@ struct Track: Identifiable, Decodable, Hashable {
     let download: String?
 
     // MARK: - Custom Properties
-
+    
     var size: Int?
     var isDownloaded: Bool = false
+    var downloadingSize: Int = 0
+    var downloadingProgress: Double {
+        guard let size,
+              size > 0,
+              downloadingSize > 0
+        else {
+            return 0.0
+        }
+        
+        return Double(size / downloadingSize)
+    }
 
     // MARK: - Computed Properties
 
