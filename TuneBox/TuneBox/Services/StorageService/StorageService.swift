@@ -141,19 +141,6 @@ final class StorageService: StorageServicing {
     }
 
     private func makeTracksDirectoryIfNeeded() throws -> URL {
-        let cachesDirectory = FileManager.default.urls(
-            for: .cachesDirectory,
-            in: .userDomainMask
-        )[0]
-        let tracksDirectory = cachesDirectory.appendingPathComponent(GlobalConstants.tracksDirectory)
-
-        if !FileManager.default.fileExists(atPath: tracksDirectory.path) {
-            try FileManager.default.createDirectory(
-                at: tracksDirectory,
-                withIntermediateDirectories: true
-            )
-        }
-
-        return tracksDirectory
+        try GlobalConstants.makeTracksDirectoryURL()
     }
 }

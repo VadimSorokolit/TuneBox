@@ -248,18 +248,7 @@ final class NetworkService: NSObject, NetworkServicing {
     }
 
     private func moveDownloadedFile(from temporaryURL: URL, trackID: String) throws -> URL {
-        let destinationDirectory = FileManager.default.urls(
-            for: .cachesDirectory,
-            in: .userDomainMask
-        )[0]
-            .appendingPathComponent(GlobalConstants.tracksDirectory)
-
-        if !FileManager.default.fileExists(atPath: destinationDirectory.path) {
-            try FileManager.default.createDirectory(
-                at: destinationDirectory,
-                withIntermediateDirectories: true
-            )
-        }
+        let destinationDirectory = try GlobalConstants.makeTracksDirectoryURL()
 
         let destinationURL = destinationDirectory
             .appendingPathComponent("\(GlobalConstants.downloadedFilePrefix)\(trackID)")

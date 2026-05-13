@@ -22,78 +22,13 @@ struct ContentView: View {
     }
 
     struct LoadViewModifier: ViewModifier {
-        @Injected var networkService: NetworkServicing
-        @Injected var storageService: StorageServicing
-        @State private var tracks: [Track] = []
-        @State private var downloadedSizeMB: Double = 0
+        @Injected var viewModel: TransferViewModel
 
         func body(content: Content) -> some View {
             content
-                .onReceive(
-                    NotificationCenter.default.publisher(for: .trackDownloadDidFinish)
-                        .receive(on: RunLoop.main)
-                ) { _ in
-                    Task {
-                        await self.updateDownloadedSize()
-                    }
-                }
                 .onAppear {
-//                    Task {
-//                        do {
-//                            let size = try await networkService.getTrackSize(id: 623192)
-//                            print(size)
-//                        } catch {
-//                            print(APIError.from(error).localizedDescription)
-//                        }
-//                    }
-                    do {
-                        try storageService.checkEnoughFreeStorage(requiredGB: 330)
-
-                        Task {
-                            do {
-                                let popularTracks = try await networkService.getPopularTracks(page: 10, perPage: 20)
-                                tracks.append(contentsOf: popularTracks)
-                                print(tracks.count)
-                                if let track = tracks.first {
-                                    Task {
-                                        do {
-                                            try await networkService.startDownload(track)
-                                            print("✅")
-
-                                            do {
-//                                                try storageService.deleteDownloadedTrack(id: track.id)
-//                                                print(tracks.count)
-//                                                try storageService.deleteAllTracks()
-//                                                print(tracks.count)
-                                                await self.updateDownloadedSize()
-                                            } catch {
-                                                print("Error")
-                                            }
-                                        } catch {
-                                            print(APIError.from(error).localizedDescription)
-                                        }
-                                    }
-                                }
-                            } catch {
-                                print(APIError.from(error).localizedDescription)
-                            }
-                        }
-                    } catch {
-                        print("❌")
-                    }
+                    viewModel.applyReservedSpace(viewModel.reservedSpace)
                 }
-        }
-
-        private func updateDownloadedSize() async {
-            do {
-                let size = try await storageService.getDirectorySizeInMB()
-                await MainActor.run {
-                    downloadedSizeMB = size
-                }
-                print(size)
-            } catch {
-                print(error.localizedDescription)
-            }
         }
     }
 }

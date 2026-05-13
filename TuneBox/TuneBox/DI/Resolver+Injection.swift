@@ -13,6 +13,7 @@ extension Resolver: @retroactive ResolverRegistering {
     public static func registerAllServices() {
         self.registerNetworkService()
         self.registerStorageService()
+        self.registerViewModels()
     }
 
     private static func registerNetworkService() {
@@ -25,12 +26,20 @@ extension Resolver: @retroactive ResolverRegistering {
 
             return NetworkService(provider: provider) as NetworkServicing
         }
-        .scope(.application)
     }
 
     private static func registerStorageService() {
         self.register {
             StorageService() as StorageServicing
+        }
+    }
+
+    private static func registerViewModels() {
+        self.register {
+            TransferViewModel(
+                networkService: self.resolve(NetworkServicing.self),
+                storageService: self.resolve(StorageServicing.self)
+            )
         }
         .scope(.application)
     }
