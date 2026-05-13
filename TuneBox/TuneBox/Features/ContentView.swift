@@ -26,8 +26,13 @@ struct ContentView: View {
 
         func body(content: Content) -> some View {
             content
-                .onAppear {
+                .task {
                     viewModel.applyReservedSpace(viewModel.reservedSpace)
+                    await viewModel.getPopularTracks(page: 1, perPage: 10)
+                    print(viewModel.tracks.count)
+                    if let track = viewModel.tracks.first {
+                        await viewModel.startDownload(track)
+                    }
                 }
         }
     }

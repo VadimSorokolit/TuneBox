@@ -8,9 +8,9 @@
 import Foundation
 
 struct Track: Identifiable, Decodable, Hashable {
-    
+
     // MARK: - API Properties
-    
+
     let id: String
     let image: String?
     let trackName: String
@@ -18,19 +18,19 @@ struct Track: Identifiable, Decodable, Hashable {
     let albumName: String
     let releaseDate: String?
     let download: String?
-    
-    // MARK: Custom Properties
-    
+
+    // MARK: - Custom Properties
+
     var size: Int?
     var isDownloaded: Bool = false
-    
-    // MARK:  Computed Properties
-    
+
+    // MARK: - Computed Properties
+
     var imageURL: URL? {
         guard let image, !image.isEmpty else {
             return nil
         }
-        
+
         return URL(string: image)
     }
 
@@ -38,12 +38,12 @@ struct Track: Identifiable, Decodable, Hashable {
         guard let download, !download.isEmpty else {
             return nil
         }
-        
+
         return URL(string: download)
     }
-    
+
     // MARK: - Coding Keys
-    
+
     enum CodingKeys: String, CodingKey {
         case id
         case image

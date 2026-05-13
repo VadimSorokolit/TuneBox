@@ -77,7 +77,7 @@ final class StorageService: StorageServicing {
     func getDirectorySizeInMB() throws -> Double {
         let bytes = try self.getDirectorySizeInBytes()
 
-        return Double(bytes) / Constants.bytesInMegabyte
+        return Double(bytes) / GlobalConstants.bytesInMegabyte
     }
 
     func deleteDownloadedTrack(id: String) throws {
@@ -104,11 +104,6 @@ final class StorageService: StorageServicing {
 
     // MARK: - Properties. Private
 
-    private enum Constants {
-        static let bytesInGigabyte: Double = 1e9
-        static let bytesInMegabyte: Double = 1e6
-    }
-
     // MARK: - Methods. Private
 
     func getFreeStorage() -> Double? {
@@ -122,7 +117,7 @@ final class StorageService: StorageServicing {
         }
 
         let bytes = freeSize.doubleValue
-        let gigabytes = bytes / Constants.bytesInGigabyte
+        let gigabytes = bytes / GlobalConstants.bytesInGigabyte
 
         return gigabytes
     }

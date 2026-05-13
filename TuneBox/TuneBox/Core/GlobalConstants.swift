@@ -12,6 +12,9 @@ private enum FileError: Error {
 import Foundation
 
 enum GlobalConstants {
+    static let bytesInGigabyte: Double = 1e9
+    static let bytesInMegabyte: Double = 1e6
+
     static let tracksDirectory = "Tracks"
     static let audioFileExtension = "mp3"
     static let downloadedFilePrefix = "track"
@@ -32,7 +35,7 @@ enum GlobalConstants {
                 withIntermediateDirectories: true
             )
         }
-        
+
         print(tracksURL)
         return tracksURL
     }
