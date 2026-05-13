@@ -20,7 +20,7 @@ struct Track: Identifiable, Decodable, Hashable {
     let download: String?
 
     // MARK: - Custom Properties
-    
+
     var size: Int?
     var isDownloaded: Bool = false
     var downloadingSize: Int = 0
@@ -31,7 +31,7 @@ struct Track: Identifiable, Decodable, Hashable {
         else {
             return 0.0
         }
-        
+
         return Double(size / downloadingSize)
     }
 

@@ -9,7 +9,7 @@ import SwiftUI
 import Resolver
 
 struct ContentView: View {
-    @Injected private var viewModel: TransferViewModel
+    @Injected private var viewModel: TransferManaging
 
     var body: some View {
         VStack(spacing: 16) {
@@ -18,33 +18,33 @@ struct ContentView: View {
                 .foregroundStyle(.tint)
             Text("Hello, world!")
 
-            if let track = viewModel.tracks.first {
                 HStack(spacing: 12) {
                     Button("Start") {
                         Task {
-                            try? await viewModel.startDownload(track)
+                            try? await viewModel.startDownload(viewModel.tracks.first!)
                         }
                     }
+
                     Button("Pause") {
                         Task {
-                            await viewModel.pauseDownload(trackID: track.id)
+                            await viewModel.pauseDownload(trackID: viewModel.tracks.first!.id)
                         }
                     }
+
                     Button("Resume") {
                         Task {
-                            try? await viewModel.resumeDownload(trackID: track.id)
+                            try? await viewModel.resumeDownload(trackID: viewModel.tracks.first!.id)
                         }
                     }
                 }
                 .buttonStyle(.bordered)
-            }
         }
         .padding()
         .modifier(LoadViewModifier())
     }
 
     struct LoadViewModifier: ViewModifier {
-        @Injected var viewModel: TransferViewModel
+        @Injected var viewModel: TransferManaging
 
         func body(content: Content) -> some View {
             content

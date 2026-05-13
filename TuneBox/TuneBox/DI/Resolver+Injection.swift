@@ -39,7 +39,7 @@ extension Resolver: @retroactive ResolverRegistering {
             TransferViewModel(
                 networkService: self.resolve(NetworkServicing.self),
                 storageService: self.resolve(StorageServicing.self)
-            )
+            ) as TransferManaging
         }
         .scope(.application)
     }
