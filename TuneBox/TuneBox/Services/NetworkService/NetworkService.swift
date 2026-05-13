@@ -8,6 +8,12 @@
 import Foundation
 import Moya
 
+enum TrackDownloadNotificationUserInfoKey {
+    static let trackID = "trackID"
+    static let totalBytesWritten = "totalBytesWritten"
+    static let totalBytesExpectedToWrite = "totalBytesExpectedToWrite"
+}
+
 protocol NetworkServicing: AnyObject {
     func getTracksByGenre(genre: String?, page: Int, perPage: Int) async throws -> [Track]
     func getPopularTracks(page: Int, perPage: Int) async throws -> [Track]
@@ -264,6 +270,28 @@ final class NetworkService: NSObject, NetworkServicing {
 }
 
 extension NetworkService: URLSessionDownloadDelegate {
+
+    func urlSession(
+        _ session: URLSession,
+        downloadTask: URLSessionDownloadTask,
+        didWriteData bytesWritten: Int64,
+        totalBytesWritten: Int64,
+        totalBytesExpectedToWrite: Int64
+    ) {
+        guard let trackID = downloadTask.taskDescription else {
+            return
+        }
+
+        NotificationCenter.default.post(
+            name: .trackDownloadProgress,
+            object: nil,
+            userInfo: [
+                TrackDownloadNotificationUserInfoKey.trackID: trackID,
+                TrackDownloadNotificationUserInfoKey.totalBytesWritten: totalBytesWritten,
+                TrackDownloadNotificationUserInfoKey.totalBytesExpectedToWrite: totalBytesExpectedToWrite
+            ]
+        )
+    }
 
     func urlSession(
         _ session: URLSession,

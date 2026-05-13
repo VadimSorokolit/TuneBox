@@ -27,5 +27,5 @@ file_length:
   error: 900
 
 function_parameter_count:
-  warning: 4
+  warning: 5
   error: 12

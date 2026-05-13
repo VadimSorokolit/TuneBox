@@ -10,5 +10,6 @@ import Foundation
 extension Notification.Name {
 
     static let trackDownloadDidFinish = Notification.Name("trackDownloadDidFinish")
+    static let trackDownloadProgress = Notification.Name("trackDownloadProgress")
 
 }
