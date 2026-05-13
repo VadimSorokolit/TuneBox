@@ -102,8 +102,6 @@ final class StorageService: StorageServicing {
         }
     }
 
-    // MARK: - Properties. Private
-
     // MARK: - Methods. Private
 
     func getFreeStorage() -> Double? {
