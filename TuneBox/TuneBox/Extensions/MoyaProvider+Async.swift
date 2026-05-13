@@ -27,6 +27,8 @@ extension MoyaProvider {
         do {
             return try decoder.decode(T.self, from: response.data)
         } catch {
+            let message = error.localizedDescription
+            AppLogger.network.warning("JSON decode failed: \(message, privacy: .public)")
             throw MoyaError.objectMapping(error, response)
         }
     }

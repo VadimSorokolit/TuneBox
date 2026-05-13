@@ -36,7 +36,7 @@ enum GlobalConstants {
             )
         }
 
-        print(tracksURL)
+        AppLogger.storage.debug("Tracks directory ready: \(tracksURL.path)")
         return tracksURL
     }
 }
