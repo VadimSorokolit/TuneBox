@@ -51,10 +51,11 @@ struct ContentView: View {
                 .task {
                     viewModel.applyReservedSpace(viewModel.reservedSpace)
                     await viewModel.getPopularTracks(page: 2, perPage: 10)
+                    print(viewModel.tracks.count)
 
-//                    if let track = viewModel.tracks.first {
-//                        viewModel.deleteDownloadedTrack(id: track.id)
-//                    }
+                    if let track = viewModel.tracks.first {
+                        viewModel.deleteDownloadedTrack(id: track.id)
+                    }
                 }
         }
     }

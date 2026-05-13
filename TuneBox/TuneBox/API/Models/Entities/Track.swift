@@ -26,13 +26,13 @@ struct Track: Identifiable, Decodable, Hashable {
     var downloadingSize: Int = 0
     var downloadingProgress: Double {
         guard let size,
-              size > 0,
-              downloadingSize > 0
+                size > 0,
+                downloadingSize > 0
         else {
             return 0.0
         }
 
-        return Double(size / downloadingSize)
+        return min(1.0, Double(downloadingSize) / Double(size))
     }
 
     // MARK: - Computed Properties
