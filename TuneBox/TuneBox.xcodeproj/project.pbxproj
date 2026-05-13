@@ -8,6 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		5B0F630F2FADDB9E006F3555 /* StorageServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0F630E2FADDB9D006F3555 /* StorageServiceTests.swift */; };
+		5B3FEB3D2FB4539C00DC1562 /* TransferViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB3C2FB4539A00DC1562 /* TransferViewModel.swift */; };
+		5B3FEB432FB4545200DC1562 /* BrowsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB422FB4544B00DC1562 /* BrowsView.swift */; };
+		5B3FEB472FB4548600DC1562 /* DownloadsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB462FB4547E00DC1562 /* DownloadsView.swift */; };
+		5B3FEB4A2FB454AE00DC1562 /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB492FB454AB00DC1562 /* PlayerView.swift */; };
+		5B3FEB4D2FB454C900DC1562 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB4C2FB454C400DC1562 /* SettingsView.swift */; };
 		5B47627A2FAB3DC30069E41A /* TuneBoxRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4762792FAB3DB80069E41A /* TuneBoxRouter.swift */; };
 		5B47627E2FAB49B00069E41A /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B47627D2FAB49AF0069E41A /* AppLogger.swift */; };
 		5B4762812FAB5C570069E41A /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5B4762802FAB5C570069E41A /* CombineMoya */; };
@@ -52,6 +57,11 @@
 
 /* Begin PBXFileReference section */
 		5B0F630E2FADDB9D006F3555 /* StorageServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageServiceTests.swift; sourceTree = "<group>"; };
+		5B3FEB3C2FB4539A00DC1562 /* TransferViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferViewModel.swift; sourceTree = "<group>"; };
+		5B3FEB422FB4544B00DC1562 /* BrowsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowsView.swift; sourceTree = "<group>"; };
+		5B3FEB462FB4547E00DC1562 /* DownloadsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsView.swift; sourceTree = "<group>"; };
+		5B3FEB492FB454AB00DC1562 /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
+		5B3FEB4C2FB454C400DC1562 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		5B4762792FAB3DB80069E41A /* TuneBoxRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneBoxRouter.swift; sourceTree = "<group>"; };
 		5B47627D2FAB49AF0069E41A /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
 		5B586CB02FAB98EE00BCEAD2 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
@@ -120,6 +130,86 @@
 				5B0F630E2FADDB9D006F3555 /* StorageServiceTests.swift */,
 			);
 			path = StorageServiceTests;
+			sourceTree = "<group>";
+		};
+		5B3FEB3A2FB4538100DC1562 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				5B3FEB3B2FB4539300DC1562 /* ViewModels */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		5B3FEB3B2FB4539300DC1562 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				5B3FEB3C2FB4539A00DC1562 /* TransferViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		5B3FEB3E2FB453C100DC1562 /* Brows */ = {
+			isa = PBXGroup;
+			children = (
+				5B3FEB442FB4545C00DC1562 /* Views */,
+			);
+			path = Brows;
+			sourceTree = "<group>";
+		};
+		5B3FEB3F2FB453C400DC1562 /* Downloads */ = {
+			isa = PBXGroup;
+			children = (
+				5B3FEB452FB4547600DC1562 /* Views */,
+			);
+			path = Downloads;
+			sourceTree = "<group>";
+		};
+		5B3FEB402FB453C800DC1562 /* Player */ = {
+			isa = PBXGroup;
+			children = (
+				5B3FEB482FB454A300DC1562 /* Views */,
+			);
+			path = Player;
+			sourceTree = "<group>";
+		};
+		5B3FEB412FB453CB00DC1562 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				5B3FEB4B2FB454BE00DC1562 /* Views */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		5B3FEB442FB4545C00DC1562 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				5B3FEB422FB4544B00DC1562 /* BrowsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		5B3FEB452FB4547600DC1562 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				5B3FEB462FB4547E00DC1562 /* DownloadsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		5B3FEB482FB454A300DC1562 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				5B3FEB492FB454AB00DC1562 /* PlayerView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		5B3FEB4B2FB454BE00DC1562 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				5B3FEB4C2FB454C400DC1562 /* SettingsView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 		5B4762782FAB3DA30069E41A /* API */ = {
@@ -298,6 +388,11 @@
 			isa = PBXGroup;
 			children = (
 				5BD5799D2FAB25E300503BA2 /* ContentView.swift */,
+				5B3FEB3E2FB453C100DC1562 /* Brows */,
+				5B3FEB3F2FB453C400DC1562 /* Downloads */,
+				5B3FEB402FB453C800DC1562 /* Player */,
+				5B3FEB412FB453CB00DC1562 /* Settings */,
+				5B3FEB3A2FB4538100DC1562 /* Shared */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -462,10 +557,14 @@
 			files = (
 				5B586CB52FAC618500BCEAD2 /* StorageService.swift in Sources */,
 				5BD579A12FAB25E300503BA2 /* ContentView.swift in Sources */,
+				5B3FEB472FB4548600DC1562 /* DownloadsView.swift in Sources */,
+				5B3FEB432FB4545200DC1562 /* BrowsView.swift in Sources */,
 				5B9CE54B2FB32589001BE37F /* AppDelegate.swift in Sources */,
 				5B586CBA2FAC842200BCEAD2 /* Resolver+Injection.swift in Sources */,
 				5B586CC32FAC912500BCEAD2 /* MoyaProvider+Async.swift in Sources */,
 				5B586CB72FAC678700BCEAD2 /* Track.swift in Sources */,
+				5B3FEB3D2FB4539C00DC1562 /* TransferViewModel.swift in Sources */,
+				5B3FEB4A2FB454AE00DC1562 /* PlayerView.swift in Sources */,
 				5B586CB12FAB98EE00BCEAD2 /* NetworkService.swift in Sources */,
 				5B586CC72FACA8E300BCEAD2 /* APIError.swift in Sources */,
 				5B586CCC2FACB61500BCEAD2 /* TracksResponse.swift in Sources */,
@@ -474,6 +573,7 @@
 				5B8860A52FB1CF910056BE9A /* NotificationNames+Extension.swift in Sources */,
 				5B88609E2FAE184C0056BE9A /* GlobalConstants.swift in Sources */,
 				5BD579A22FAB25E300503BA2 /* TuneBoxApp.swift in Sources */,
+				5B3FEB4D2FB454C900DC1562 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
