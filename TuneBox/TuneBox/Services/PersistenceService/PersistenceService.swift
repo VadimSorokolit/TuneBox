@@ -12,15 +12,21 @@ protocol PersistenceServicing {
     func getTracks() throws -> [TrackEntity]
     func upsert(track: TrackEntity) throws
     func delete(track: TrackEntity) throws
-    func deleteAll() throws
+    func clearStorage() throws
 }
 
 final class PersistenceService: PersistenceServicing {
 
+    private let modelContainer: ModelContainer
     private let modelContext: ModelContext
 
-    init(modelContext: ModelContext) {
-        self.modelContext = modelContext
+    init() throws {
+        let schema = Schema([TrackEntity.self])
+        let config = ModelConfiguration(isStoredInMemoryOnly: false)
+        let container = try ModelContainer(for: schema, configurations: [config])
+
+        self.modelContainer = container
+        self.modelContext = container.mainContext
     }
 
     func getTracks() throws -> [TrackEntity] {
@@ -36,38 +42,22 @@ final class PersistenceService: PersistenceServicing {
         }
     }
 
-    func upsert(track: TrackEntity) throws {
-        do {
-            let id = track.id
+    func upsert(track entity: TrackEntity) throws {
+        let id = entity.id
 
-            let descriptor = FetchDescriptor<TrackEntity>(
-                predicate: #Predicate<TrackEntity> { track in
-                    track.id == id
-                }
-            )
+        let descriptor = FetchDescriptor<TrackEntity>(
+            predicate: #Predicate { $0.id == id }
+        )
 
-            if let existing = try modelContext.fetch(descriptor).first {
-                existing.image = track.image
-                existing.trackName = track.trackName
-                existing.artistName = track.artistName
-                existing.albumName = track.albumName
-                existing.releaseDate = track.releaseDate
-                existing.download = track.download
-                existing.size = track.size
-                existing.isDownloaded = track.isDownloaded
-                existing.downloadingSize = track.downloadingSize
-            } else {
-                modelContext.insert(track)
-            }
-
-            try modelContext.save()
-
-        } catch {
-            AppLogger.storage.error("Upsert failed: \(error.localizedDescription)")
-            throw error
+        if let existing = try self.modelContext.fetch(descriptor).first {
+            existing.update(from: entity)
+        } else {
+            self.modelContext.insert(entity)
         }
+
+        try self.modelContext.save()
     }
-    
+
     func delete(track: TrackEntity) throws {
         do {
             self.modelContext.delete(track)
@@ -78,7 +68,7 @@ final class PersistenceService: PersistenceServicing {
         }
     }
 
-    func deleteAll() throws {
+    func clearStorage() throws {
         do {
             try self.modelContext.delete(model: TrackEntity.self)
             try self.modelContext.save()

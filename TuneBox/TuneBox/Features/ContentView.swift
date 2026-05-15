@@ -27,7 +27,7 @@ struct ContentView: View {
 
                     Button("Pause") {
                         Task {
-                            await viewModel.pauseDownload(trackID: viewModel.tracks.first!.id)
+                            await viewModel.stopDownload(trackID: viewModel.tracks.first!.id)
                         }
                     }
 
@@ -49,13 +49,13 @@ struct ContentView: View {
         func body(content: Content) -> some View {
             content
                 .task {
-                    viewModel.applyReservedSpace(viewModel.reservedSpace)
-                    await viewModel.getPopularTracks(page: 2, perPage: 10)
+                    await viewModel.loadFirst()
+//                    await viewModel .loadNext()
+//                    viewModel.deleteAllTracks()
                     print(viewModel.tracks.count)
-
-                    if let track = viewModel.tracks.first {
-                        viewModel.deleteDownloadedTrack(id: track.id)
-                    }
+//                    if let track = viewModel.tracks.first {
+//                        viewModel.deleteDownloadedTrack(id: track.id)
+//                    }
                 }
         }
     }

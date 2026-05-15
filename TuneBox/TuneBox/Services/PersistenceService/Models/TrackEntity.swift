@@ -50,6 +50,21 @@ final class TrackEntity {
 
 extension TrackEntity {
 
+    convenience init(track: Track) {
+        self.init(
+            id: track.id,
+            image: track.image,
+            trackName: track.trackName,
+            artistName: track.artistName,
+            albumName: track.albumName,
+            releaseDate: track.releaseDate,
+            download: track.download,
+            size: track.size,
+            isDownloaded: track.isDownloaded,
+            downloadingSize: track.downloadingSize
+        )
+    }
+
     func update(from track: Track) {
         self.image = track.image
         self.trackName = track.trackName
@@ -60,6 +75,18 @@ extension TrackEntity {
         self.size = track.size
         self.isDownloaded = track.isDownloaded
         self.downloadingSize = track.downloadingSize
+    }
+
+    func update(from entity: TrackEntity) {
+        self.image = entity.image
+        self.trackName = entity.trackName
+        self.artistName = entity.artistName
+        self.albumName = entity.albumName
+        self.releaseDate = entity.releaseDate
+        self.download = entity.download
+        self.size = entity.size
+        self.isDownloaded = entity.isDownloaded
+        self.downloadingSize = entity.downloadingSize
     }
 
 }

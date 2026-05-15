@@ -13,6 +13,7 @@ extension Resolver: @retroactive ResolverRegistering {
     public static func registerAllServices() {
         self.registerNetworkService()
         self.registerStorageService()
+        self.registerPersistenceService()
         self.registerViewModels()
     }
 
@@ -31,6 +32,16 @@ extension Resolver: @retroactive ResolverRegistering {
     private static func registerStorageService() {
         self.register {
             StorageService() as StorageServicing
+        }
+    }
+
+    private static func registerPersistenceService() {
+        self.register {
+            do {
+                return try PersistenceService() as PersistenceServicing
+            } catch {
+                fatalError("Failed to create PersistenceService: \(error)")
+            }
         }
     }
 

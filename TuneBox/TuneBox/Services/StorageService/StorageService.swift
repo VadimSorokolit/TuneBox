@@ -28,7 +28,7 @@ protocol StorageServicing {
     func getDirectorySizeInBytes() throws -> Int64
     func getDirectorySizeInMB() async throws -> Double
     func deleteDownloadedTrack(id: String) throws
-    func deleteAllTracks() throws
+    func clearStorage() throws
 }
 
 final class StorageService: StorageServicing {
@@ -90,7 +90,7 @@ final class StorageService: StorageServicing {
         try FileManager.default.removeItem(at: trackURL)
     }
 
-    func deleteAllTracks() throws {
+    func clearStorage() throws {
         let tracksDirectory = try self.makeTracksDirectoryIfNeeded()
         let fileURLs = try FileManager.default.contentsOfDirectory(
             at: tracksDirectory,

@@ -22,12 +22,27 @@ enum SimultaneouslyLoadingTraks: Int {
 
 }
 
+protocol TransferDownloadManaging: AnyObject {
+    func startDownload(_ track: Track) async throws
+    func stopDownload(trackID: String) async
+    func resumeDownload(trackID: String) async throws
+    func deleteDownloadedTrack(id: String)
+//    func deleteAllTracks()
+}
+
+protocol TransferPersistenceServicing {
+//    func fetchEntities() throws -> [TrackEntity]
+//    func upsert(entity: TrackEntity) throws
+//    func deleteEntity(id: String) throws
+//    func deleteAllEntities() throws
+}
+
 protocol TransferStateProviding: AnyObject {
+    var page: Int { get set }
     var tracks: [Track] { get set }
     var downloadingTrackIDs: Set<String> { get set }
     var isLoading: Bool { get set }
     var errorMessage: String? { get set }
-
 }
 
 protocol TransferStorageStateProviding: AnyObject {
@@ -38,16 +53,15 @@ protocol TransferStorageStateProviding: AnyObject {
     func applyReservedSpace(_ plan: ReservedSpace)
 }
 
-protocol DownloadManaging: AnyObject {
-    func getPopularTracks(page: Int, perPage: Int) async
-    func startDownload(_ track: Track) async throws
-    func pauseDownload(trackID: String) async
-    func resumeDownload(trackID: String) async throws
-    func deleteDownloadedTrack(id: String)
+protocol TransferManaging:
+    TransferDownloadManaging,
+    TransferStateProviding,
+    TransferStorageStateProviding,
+    TransferPersistenceServicing {
+    func loadFirst() async
+    func loadNext() async
     func deleteAllTracks()
 }
-
-protocol TransferManaging: TransferStateProviding, TransferStorageStateProviding, DownloadManaging {}
 
 @MainActor
 @Observable
@@ -55,6 +69,7 @@ final class TransferViewModel: TransferManaging {
 
     // MARK: Properties. Public
 
+    var page: Int = 0
     var tracks: [Track] = []
     var isLoading: Bool = false
     var errorMessage: String?
@@ -68,14 +83,45 @@ final class TransferViewModel: TransferManaging {
 
     // MARK: - Methods. Public
 
-    func getPopularTracks(page: Int, perPage: Int) async {
+    func loadFirst() async {
+        guard self.isLoading == false else {
+            return
+        }
+
+        self.isLoading = true
+        defer {
+            self.isLoading = false
+        }
+
         do {
-            let tracks = try await self.networkService.getPopularTracks(page: page, perPage: perPage)
-            self.tracks = tracks
+            let entities = try persistenceService.getTracks()
+
+            if entities.isEmpty {
+                self.tracks = []
+                self.page = 0
+                try await self.loadTracks(page: 0)
+            } else {
+                self.tracks = entities.map { Track(entity: $0) }
+            }
         } catch {
-            let message = error.localizedDescription
-            self.errorMessage = message
-            self.logTransferWarning(message)
+            self.handleError(error)
+        }
+    }
+
+    func loadNext() async {
+        guard self.isLoading == false else {
+            return
+        }
+
+        self.isLoading = true
+        defer {
+            self.isLoading = false
+        }
+
+        do {
+            try await self.loadTracks(page: self.page + 1)
+        } catch {
+            self.handleError(error)
         }
     }
 
@@ -118,7 +164,7 @@ final class TransferViewModel: TransferManaging {
         }
     }
 
-    func pauseDownload(trackID: String) async {
+    func stopDownload(trackID: String) async {
         await self.networkService.stopDownload(trackID: trackID)
 
         if let track = self.tracks.first(where: { $0.id == trackID }) {
@@ -156,11 +202,14 @@ final class TransferViewModel: TransferManaging {
 
     func deleteAllTracks() {
         do {
-            try self.storageService.deleteAllTracks()
+            _  = try persistenceService.clearStorage()
+            do {
+                try self.storageService.clearStorage()
+            } catch {
+                self.handleError(error)
+            }
         } catch {
-            let message = error.localizedDescription
-            self.errorMessage = message
-            self.logTransferWarning(message)
+            self.handleError(error)
         }
     }
 
@@ -231,12 +280,40 @@ final class TransferViewModel: TransferManaging {
 
     // MARK: - Properties. Private
 
+    let perPage: Int = 20
     private let networkService: NetworkServicing
     private let persistenceService: PersistenceServicing
     private let storageService: StorageServicing
     private let downloadObserverTokens = TransferDownloadObserverTokens()
 
     // MARK: - Methods. Private
+
+    private func loadTracks(page: Int) async throws {
+        let tracks = try await self.networkService.getPopularTracks(
+            page: page,
+            perPage: self.perPage
+        )
+
+        self.tracks.append(contentsOf: tracks)
+        self.page = page
+
+        do {
+            let entities = try self.persistenceService.getTracks()
+            let newTracks = entities.filter { entity in
+                !tracks.contains(where: { $0.id == entity.id })
+            }
+
+            for track in newTracks {
+                do {
+                    try self.persistenceService.upsert(track: track)
+                } catch {
+                    self.handleError(error)
+                }
+            }
+        } catch {
+            self.handleError(error)
+        }
+    }
 
     private func applyDownloadProgress(trackID: String, totalBytesWritten: Int64) {
         guard let index = self.tracks.firstIndex(where: { $0.id == trackID }) else {
@@ -256,6 +333,12 @@ final class TransferViewModel: TransferManaging {
 
     private func logTransferWarning(_ message: String) {
         AppLogger.transfer.warning("\(message)")
+    }
+
+    private func handleError(_ error: Error) {
+        let message = error.localizedDescription
+        self.errorMessage = message
+        self.logTransferWarning(message)
     }
 }
 
