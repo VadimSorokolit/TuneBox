@@ -19,6 +19,7 @@ final class TrackEntity {
     var albumName: String
     var releaseDate: String?
     var download: String?
+    var waveformData: Data?
     var size: Int?
     var isDownloaded: Bool
     var downloadingSize: Int
@@ -31,6 +32,7 @@ final class TrackEntity {
         albumName: String,
         releaseDate: String?,
         download: String?,
+        waveformData: Data?,
         size: Int? = nil,
         isDownloaded: Bool = false,
         downloadingSize: Int = 0
@@ -42,6 +44,7 @@ final class TrackEntity {
         self.albumName = albumName
         self.releaseDate = releaseDate
         self.download = download
+        self.waveformData = waveformData
         self.size = size
         self.isDownloaded = isDownloaded
         self.downloadingSize = downloadingSize
@@ -59,6 +62,7 @@ extension TrackEntity {
             albumName: track.albumName,
             releaseDate: track.releaseDate,
             download: track.download,
+            waveformData: WaveformMapper.encode(track.waveform),
             size: track.size,
             isDownloaded: track.isDownloaded,
             downloadingSize: track.downloadingSize
@@ -72,6 +76,7 @@ extension TrackEntity {
         self.albumName = track.albumName
         self.releaseDate = track.releaseDate
         self.download = track.download
+        self.waveformData = WaveformMapper.encode(track.waveform)
         self.size = track.size
         self.isDownloaded = track.isDownloaded
         self.downloadingSize = track.downloadingSize
@@ -84,6 +89,7 @@ extension TrackEntity {
         self.albumName = entity.albumName
         self.releaseDate = entity.releaseDate
         self.download = entity.download
+        self.waveformData = entity.waveformData
         self.size = entity.size
         self.isDownloaded = entity.isDownloaded
         self.downloadingSize = entity.downloadingSize
