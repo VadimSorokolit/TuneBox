@@ -20,7 +20,7 @@ protocol NetworkServicing: AnyObject {
     func searchTracks(query: String, page: Int, perPage: Int) async throws -> [Track]
     func downloadTrack(_ track: Track) async throws -> URL
     func startDownload(_ track: Track) async throws
-    func pauseDownload(trackID: String) async
+    func stopDownload(trackID: String) async
     func resumeDownload(trackID: String) async throws
     func cancelDownload(trackID: String) async
 }
@@ -101,12 +101,12 @@ final class NetworkService: NSObject, NetworkServicing {
         }
     }
 
-    func pauseDownload(trackID: String) async {
+    func stopDownload(trackID: String) async {
         guard let task = await self.downloadStore.task(for: trackID) else {
             return
         }
 
-        await self.downloadStore.markPauseRequested(for: trackID)
+        await self.downloadStore.stopRequested(for: trackID)
         let data: Data? = await withCheckedContinuation { continuation in
             task.cancel { resumeData in
                 continuation.resume(returning: resumeData)

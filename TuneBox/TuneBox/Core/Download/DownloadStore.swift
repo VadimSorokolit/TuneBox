@@ -12,7 +12,7 @@ actor DownloadStore {
     private var trackIDByTaskIdentifier: [Int: String] = [:]
     private var resumeDataByTrackID: [String: Data] = [:]
     private var continuationsByTrackID: [String: CheckedContinuation<URL, Error>] = [:]
-    private var pauseRequestedTrackIDs: Set<String> = []
+    private var stopRequestedTrackIDs: Set<String> = []
 
     func storeTask(_ task: URLSessionDownloadTask, for trackID: String) {
         self.tasksByTrackID[trackID] = task
@@ -59,11 +59,11 @@ actor DownloadStore {
         self.continuationsByTrackID.removeValue(forKey: trackID)
     }
 
-    func markPauseRequested(for trackID: String) {
-        self.pauseRequestedTrackIDs.insert(trackID)
+    func stopRequested(for trackID: String) {
+        self.stopRequestedTrackIDs.insert(trackID)
     }
 
     func consumePauseRequested(for trackID: String) -> Bool {
-        self.pauseRequestedTrackIDs.remove(trackID) != nil
+        self.stopRequestedTrackIDs.remove(trackID) != nil
     }
 }

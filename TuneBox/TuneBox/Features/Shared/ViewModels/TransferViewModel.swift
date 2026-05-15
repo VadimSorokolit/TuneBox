@@ -119,7 +119,7 @@ final class TransferViewModel: TransferManaging {
     }
 
     func pauseDownload(trackID: String) async {
-        await self.networkService.pauseDownload(trackID: trackID)
+        await self.networkService.stopDownload(trackID: trackID)
 
         if let track = self.tracks.first(where: { $0.id == trackID }) {
             let bytes = track.downloadingSize

@@ -24,6 +24,7 @@ struct Track: Identifiable, Decodable, Hashable {
     var size: Int?
     var isDownloaded: Bool = false
     var downloadingSize: Int = 0
+
     var downloadingProgress: Double {
         guard let size,
                 size > 0,
@@ -64,4 +65,24 @@ struct Track: Identifiable, Decodable, Hashable {
         case releaseDate = "releasedate"
         case download = "audiodownload"
     }
+}
+
+extension Track {
+
+    init(entity: TrackEntity) {
+        self.init(
+            id: entity.id,
+            image: entity.image,
+            trackName: entity.trackName,
+            artistName: entity.artistName,
+            albumName: entity.albumName,
+            releaseDate: entity.releaseDate,
+            download: entity.download,
+            size: entity.size,
+            isDownloaded: entity.isDownloaded,
+            downloadingSize: entity.downloadingSize
+
+        )
+    }
+
 }
