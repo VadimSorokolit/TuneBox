@@ -2,7 +2,7 @@
 //  TrackEntity.swift
 //  TuneBox
 //
-//  Created by Nintendo on 15.05.2026.
+//  Created by Vadim Sorokolit on 15.05.2026.
 //
 
 import Foundation
@@ -12,6 +12,7 @@ import SwiftData
 final class TrackEntity {
     @Attribute(.unique)
     var id: String
+
     var image: String?
     var trackName: String
     var artistName: String

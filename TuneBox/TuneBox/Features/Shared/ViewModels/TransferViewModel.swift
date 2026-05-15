@@ -185,8 +185,13 @@ final class TransferViewModel: TransferManaging {
 
     // MARK: - Initializer
 
-    init(networkService: NetworkServicing, storageService: StorageServicing) {
+    init(
+        networkService: NetworkServicing,
+        persistenceService: PersistenceServicing,
+        storageService: StorageServicing
+    ) {
         self.networkService = networkService
+        self.persistenceService = persistenceService
         self.storageService = storageService
 
         let mainQueue = OperationQueue.main
@@ -227,6 +232,7 @@ final class TransferViewModel: TransferManaging {
     // MARK: - Properties. Private
 
     private let networkService: NetworkServicing
+    private let persistenceService: PersistenceServicing
     private let storageService: StorageServicing
     private let downloadObserverTokens = TransferDownloadObserverTokens()
 

@@ -38,6 +38,7 @@ extension Resolver: @retroactive ResolverRegistering {
         self.register {
             TransferViewModel(
                 networkService: self.resolve(NetworkServicing.self),
+                persistenceService: self.resolve(PersistenceServicing.self),
                 storageService: self.resolve(StorageServicing.self)
             ) as TransferManaging
         }
