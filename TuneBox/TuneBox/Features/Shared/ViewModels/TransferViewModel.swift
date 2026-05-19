@@ -59,6 +59,7 @@ protocol TransferManaging:
     TransferPersistenceServicing {
     func loadFirst() async
     func loadNext() async
+    func startDownload(_ track: Track) async
     func deleteAllTracks()
 }
 

@@ -21,7 +21,7 @@ struct ContentView: View {
                 HStack(spacing: 12) {
                     Button("Start") {
                         Task {
-                            try? await viewModel.startDownload(viewModel.tracks.first!)
+                            await viewModel.startDownload(viewModel.tracks.first!)
                         }
                     }
 
@@ -56,11 +56,14 @@ struct ContentView: View {
 //                      viewModel.deleteDownloadedTrack(id: "1214935")
 //                    await viewModel .loadNext()
 //                    await viewModel.loadFirst()
+//                    for track in viewModel.tracks {
+//                        await viewModel.startDownload(track)
+//                    }
 //                    let track = viewModel.getTrack(id: "1214935")
 //                    let tracks = viewModel.tracks.filter { $0.isDownloaded == true }
 //                    print(tracks.count)
 //                    await viewModel.resumeDownload(trackId: "1214935")
-                    viewModel.deleteAllTracks()
+//                    viewModel.deleteAllTracks()
 //                    print(track?.isRemoved)
 //                    if let track = viewModel.tracks.first {
 //                        viewModel.deleteDownloadedTrack(id: track.id)

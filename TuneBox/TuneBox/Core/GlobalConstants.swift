@@ -29,14 +29,22 @@ enum GlobalConstants {
 
         let tracksURL = base.appendingPathComponent(self.tracksDirectory, isDirectory: true)
 
-        if !FileManager.default.fileExists(atPath: tracksURL.path) {
-            try FileManager.default.createDirectory(
-                at: tracksURL,
-                withIntermediateDirectories: true
-            )
+        var isDirectory: ObjCBool = false
+        if FileManager.default.fileExists(atPath: tracksURL.path, isDirectory: &isDirectory) {
+            guard isDirectory.boolValue else {
+                throw FileError.missingDirectory
+            }
+            
+            AppLogger.storage.debug("Tracks directory is already exists: \(tracksURL.path)")
+            return tracksURL
         }
 
-        AppLogger.storage.debug("Tracks directory ready: \(tracksURL.path)")
+        try FileManager.default.createDirectory(
+            at: tracksURL,
+            withIntermediateDirectories: true
+        )
+
+        AppLogger.storage.debug("Tracks directory created: \(tracksURL.path)")
         return tracksURL
     }
 }
