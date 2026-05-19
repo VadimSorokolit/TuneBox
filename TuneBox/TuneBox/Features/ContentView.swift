@@ -58,6 +58,9 @@ struct ContentView: View {
 //                    await viewModel.loadFirst()
 //                    for track in viewModel.tracks {
 //                        await viewModel.startDownload(track)
+//                        print(track.downloadState)
+//                        print(track.downloadingSize)
+//                        print(track.fileState)
 //                    }
 //                    let track = viewModel.getTrack(id: "1214935")
 //                    let tracks = viewModel.tracks.filter { $0.isDownloaded == true }

@@ -126,7 +126,7 @@ final class TransferViewModel: TransferManaging {
     func startDownload(_ track: Track) async {
         let currentTrack = self.tracks.first(where: { $0.id == track.id }) ?? track
 
-        guard self.checkFreeStorageSpace(for: currentTrack) else {
+        guard self.hasEnoughFreeSpace(for: currentTrack) else {
             return
         }
 
@@ -139,7 +139,9 @@ final class TransferViewModel: TransferManaging {
             _ = try await self.networkService.downloadTrack(track)
 
             if let index = self.tracks.firstIndex(where: { $0.id == track.id }) {
-                self.tracks[index].isDownloaded = true
+                self.tracks[index].downloadState = .completed
+                self.tracks[index].fileState = .exists
+
                 try self.persistenceService.upsert(track: TrackEntity(track: self.tracks[index]))
             }
         }
@@ -148,28 +150,43 @@ final class TransferViewModel: TransferManaging {
     func stopDownload(trackId: String) async {
         await self.networkService.stopDownload(trackId: trackId)
 
-        if let track = self.tracks.first(where: { $0.id == trackId }) {
+        if let index = self.tracks.firstIndex(where: { $0.id == trackId }) {
+            self.tracks[index].downloadState = .paused
+            self.tracks[index].fileState = .exists
+
             do {
-                try self.persistenceService.upsert(track: TrackEntity(track: track))
+                try self.persistenceService.upsert(track: TrackEntity(track: self.tracks[index]))
             } catch {
                 self.handleError(error)
             }
 
-            let bytes = track.downloadingSize
+            let bytes = self.tracks[index].downloadingSize
             let readable = ByteCountFormatter.string(fromByteCount: Int64(bytes), countStyle: .file)
             self.logTransferWarning("Paused track \(trackId): \(readable) (\(bytes) B)")
         }
     }
 
     func resumeDownload(trackId: String) async {
-        let track = self.tracks.first(where: { $0.id == trackId })
+        if let index = self.tracks.firstIndex(where: { $0.id == trackId }) {
+            if self.hasEnoughFreeSpace(for: self.tracks[index]) == false {
+                return
+            }
 
-        if let track, self.checkFreeStorageSpace(for: track) == false {
-            return
-        }
+            await self.performDownload(trackId: trackId) {
+                do {
+                    try await self.networkService.resumeDownload(trackId: trackId)
 
-        await self.performDownload(trackId: trackId) {
-            try await self.networkService.resumeDownload(trackId: trackId)
+                    self.tracks[index].downloadState = .downloading
+
+                    do {
+                        try self.persistenceService.upsert(track: TrackEntity(track: self.tracks[index]))
+                    } catch {
+                        self.handleError(error)
+                    }
+                } catch {
+                    self.handleError(error)
+                }
+            }
         }
     }
 
@@ -178,11 +195,15 @@ final class TransferViewModel: TransferManaging {
             try self.storageService.deleteDownloadedTrack(id: id)
 
             if let index = self.tracks.firstIndex(where: { $0.id == id }) {
-                self.tracks[index].isDownloaded = false
+                self.tracks[index].downloadState = .idle
+                self.tracks[index].fileState = .removed
+                self.tracks[index].downloadingSize = 0
             }
 
             if let entity = self.getTrack(id: id) {
-                entity.isRemoved = true
+                entity.downloadState = DownloadState.idle.rawValue
+                entity.fileState = FileStorageState.removed.rawValue
+                entity.downloadingSize = 0
                 try self.persistenceService.upsert(track: entity)
             } else if let index = self.tracks.firstIndex(where: { $0.id == id }) {
                 try self.persistenceService.upsert(track: TrackEntity(track: self.tracks[index]))
@@ -329,7 +350,7 @@ final class TransferViewModel: TransferManaging {
         }
     }
 
-    private func checkFreeStorageSpace(for track: Track) -> Bool {
+    private func hasEnoughFreeSpace(for track: Track) -> Bool {
         guard let size = track.size else {
             return true
         }
@@ -360,7 +381,7 @@ final class TransferViewModel: TransferManaging {
             return
         }
 
-        self.tracks[index].downloadingSize = 0
+        self.tracks[index].downloadingSize = self.tracks[index].size ?? 0
     }
 
     private func logTransferWarning(_ message: String) {

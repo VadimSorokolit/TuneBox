@@ -19,6 +19,19 @@ enum WaveformMapper {
     }
 }
 
+enum DownloadState: String, Hashable {
+    case idle
+    case downloading
+    case paused
+    case completed
+}
+
+enum FileStorageState: String, Hashable {
+    case none
+    case exists
+    case removed
+}
+
 struct Waveform: Codable, Hashable {
     let peaks: [Int]
 }
@@ -39,9 +52,9 @@ struct Track: Identifiable, Decodable, Hashable {
     // MARK: - Custom Properties
 
     var size: Int?
-    var isDownloaded: Bool = false
-    var isRemoved: Bool = false
+    var downloadState: DownloadState = .idle
     var downloadingSize: Int = 0
+    var fileState: FileStorageState = .none
 
     var downloadingProgress: Double {
         guard let size,
@@ -52,6 +65,34 @@ struct Track: Identifiable, Decodable, Hashable {
         }
 
         return min(1.0, Double(downloadingSize) / Double(size))
+    }
+
+    init(
+        id: String,
+        image: String?,
+        trackName: String,
+        artistName: String,
+        albumName: String,
+        releaseDate: String?,
+        download: String?,
+        waveform: Waveform?,
+        size: Int? = nil,
+        trackDownloadState: DownloadState = .idle,
+        downloadingSize: Int = 0,
+        fileState: FileStorageState = .none
+    ) {
+        self.id = id
+        self.image = image
+        self.trackName = trackName
+        self.artistName = artistName
+        self.albumName = albumName
+        self.releaseDate = releaseDate
+        self.download = download
+        self.waveform = waveform
+        self.size = size
+        self.downloadState = trackDownloadState
+        self.downloadingSize = downloadingSize
+        self.fileState = fileState
     }
 
     init(from decoder: Decoder) throws {
@@ -117,9 +158,9 @@ extension Track {
         self.download = entity.download
         self.waveform = WaveformMapper.decode(entity.waveformData)
         self.size = entity.size
-        self.isDownloaded = entity.isDownloaded
+        self.downloadState = DownloadState(rawValue: entity.downloadState) ?? .idle
         self.downloadingSize = entity.downloadingSize
-        self.isRemoved = entity.isRemoved
+        self.fileState = FileStorageState(rawValue: entity.fileState) ?? .none
     }
 
 }
