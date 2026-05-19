@@ -34,7 +34,7 @@ enum GlobalConstants {
             guard isDirectory.boolValue else {
                 throw FileError.missingDirectory
             }
-            
+
             AppLogger.storage.debug("Tracks directory is already exists: \(tracksURL.path)")
             return tracksURL
         }

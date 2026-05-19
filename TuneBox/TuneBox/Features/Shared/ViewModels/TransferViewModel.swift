@@ -297,6 +297,15 @@ final class TransferViewModel: TransferManaging {
         }
     }
 
+    private func getTrack(id: String) -> TrackEntity? {
+        do {
+            return try self.persistenceService.getTrack(id: id)
+        } catch {
+            self.handleError(error)
+            return nil
+        }
+    }
+
     private func performDownload(
         trackId: String,
         operation: () async throws -> Void
@@ -336,15 +345,6 @@ final class TransferViewModel: TransferManaging {
         }
 
         return true
-    }
-
-    private func getTrack(id: String) -> TrackEntity? {
-        do {
-            return try self.persistenceService.getTrack(id: id)
-        } catch {
-            self.handleError(error)
-            return nil
-        }
     }
 
     private func applyDownloadProgress(trackID: String, totalBytesWritten: Int64) {
