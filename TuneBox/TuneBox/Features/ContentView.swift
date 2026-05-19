@@ -13,36 +13,44 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-
-                HStack(spacing: 12) {
-                    Button("Start") {
-                        Task {
-                            await viewModel.startDownload(viewModel.tracks.first!)
+            if !viewModel.tracks.isEmpty {
+                ForEach(viewModel.tracks) { track in
+                    BrowsTrackCell(
+                        id: track.id,
+                        progress: track.downloadingProgress,
+                        state: cellState(from: track),
+                        onTap: {
+                            Task {
+                                switch track.downloadState {
+                                    case .idle:
+                                        await viewModel.startDownload(track)
+                                    case .paused:
+                                        await viewModel.resumeDownload(trackId: track.id)
+                                    case .downloading:
+                                        await viewModel.stopDownload(trackId: track.id)
+                                    case .completed:
+                                        viewModel.deleteDownloadedTrack(id: track.id)
+                                }
+                            }
                         }
-                    }
-
-                    Button("Pause") {
-                        Task {
-                            await viewModel.stopDownload(trackId: viewModel.tracks.first!.id)
-                        }
-                    }
-
-                    Button("Resume") {
-                        Task {
-                            await viewModel.resumeDownload(
-                                trackId: viewModel.tracks.first!.id
-                            )
-                        }
-                    }
+                    )
                 }
-                .buttonStyle(.bordered)
+            }
         }
-        .padding()
         .modifier(LoadViewModifier())
+    }
+
+    private func cellState(from track: Track) -> CellState {
+        switch track.downloadState {
+            case .idle:
+                return .idle
+            case .downloading:
+                return .downloading
+            case .paused:
+                return .paused
+            case .completed:
+                return .completed
+        }
     }
 
     struct LoadViewModifier: ViewModifier {
@@ -55,7 +63,11 @@ struct ContentView: View {
 //                    viewModel.deleteDownloadedTrack(id: "1214935")
 //                      viewModel.deleteDownloadedTrack(id: "1214935")
 //                    await viewModel .loadNext()
-//                    await viewModel.loadFirst()
+                    await viewModel.loadFirst()
+//                    let tracks = viewModel.tracks.filter { $0.downloadState == .paused }
+//                    for track in tracks {
+//                        await viewModel.startDownload(track)
+//                    }
 //                    for track in viewModel.tracks {
 //                        await viewModel.startDownload(track)
 //                        print(track.downloadState)

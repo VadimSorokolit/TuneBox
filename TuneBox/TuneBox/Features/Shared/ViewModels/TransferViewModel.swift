@@ -19,7 +19,6 @@ enum SimultaneouslyLoadingTraks: Int {
     case three = 3
     case four = 4
     case five = 5
-
 }
 
 protocol TransferDownloadManaging: AnyObject {
@@ -124,25 +123,39 @@ final class TransferViewModel: TransferManaging {
     }
 
     func startDownload(_ track: Track) async {
-        let currentTrack = self.tracks.first(where: { $0.id == track.id }) ?? track
+        if let index = self.tracks.firstIndex(where: { $0.id == track.id }) {
+            guard self.hasEnoughFreeSpace(for: self.tracks[index]) else {
+                return
+            }
 
-        guard self.hasEnoughFreeSpace(for: currentTrack) else {
-            return
-        }
+            if self.tracks[index].downloadingSize != 0 {
+                await self.resumeDownload(trackId: self.tracks[index].id)
+                return
+            }
 
-        if currentTrack.downloadingSize != 0 {
-            await self.resumeDownload(trackId: currentTrack.id)
-            return
-        }
+            await self.performDownload(trackId: track.id) {
+                self.tracks[index].downloadState = .downloading
 
-        await self.performDownload(trackId: track.id) {
-            _ = try await self.networkService.downloadTrack(track)
+                do {
+                    try self.persistenceService.upsert(track: TrackEntity(track: self.tracks[index]))
+                } catch {
+                    self.handleError(error)
+                }
 
-            if let index = self.tracks.firstIndex(where: { $0.id == track.id }) {
+                do {
+                    _ = try await self.networkService.downloadTrack(track)
+                } catch {
+                    self.handleError(error)
+                }
+
                 self.tracks[index].downloadState = .completed
                 self.tracks[index].fileState = .exists
 
-                try self.persistenceService.upsert(track: TrackEntity(track: self.tracks[index]))
+                do {
+                    try self.persistenceService.upsert(track: TrackEntity(track: self.tracks[index]))
+                } catch {
+                    self.handleError(error)
+                }
             }
         }
     }
@@ -291,7 +304,7 @@ final class TransferViewModel: TransferManaging {
 
     // MARK: - Properties. Private
 
-    let perPage: Int = 20
+    let perPage: Int = 8
     private let networkService: NetworkServicing
     private let persistenceService: PersistenceServicing
     private let storageService: FileManagerServicing
