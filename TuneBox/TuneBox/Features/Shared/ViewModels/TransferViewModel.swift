@@ -30,7 +30,7 @@ protocol TransferDownloadManaging: AnyObject {
 //    func deleteAllTracks()
 }
 
-protocol TransferPersistenceServicing {
+protocol TransferPersistenceServicing: AnyObject {
 //    func fetchEntities() throws -> [TrackEntity]
 //    func upsert(entity: TrackEntity) throws
 //    func deleteEntity(id: String) throws
@@ -60,6 +60,7 @@ protocol TransferManaging:
     TransferPersistenceServicing {
     func loadFirst() async
     func loadNext() async
+    func getTrack(id: String) -> TrackEntity?
     func deleteAllTracks()
 }
 
@@ -94,11 +95,9 @@ final class TransferViewModel: TransferManaging {
         }
 
         do {
-            let entities = try persistenceService.getTracks()
+            let entities = try self.persistenceService.getTracks()
 
             if entities.isEmpty {
-                self.tracks = []
-                self.page = 0
                 try await self.loadTracks(page: 0)
             } else {
                 self.tracks = entities.map { Track(entity: $0) }
@@ -125,7 +124,7 @@ final class TransferViewModel: TransferManaging {
         }
     }
 
-    func startDownload(_ track: Track) async throws {
+    func startDownload(_ track: Track) async {
         if let size = track.size {
             let requiredGB = Double(size) / GlobalConstants.bytesInGigabyte
             let available = self.storageService.getFreeStorage() ?? 0
@@ -157,10 +156,7 @@ final class TransferViewModel: TransferManaging {
             if let index = self.tracks.firstIndex(where: { $0.id == track.id }) {
                 self.tracks[index].downloadingSize = 0
             }
-            let message = error.localizedDescription
-            self.errorMessage = message
-            self.logTransferWarning(message)
-            throw error
+            self.handleError(error)
         }
     }
 
@@ -170,7 +166,7 @@ final class TransferViewModel: TransferManaging {
         if let track = self.tracks.first(where: { $0.id == trackID }) {
             let bytes = track.downloadingSize
             let readable = ByteCountFormatter.string(fromByteCount: Int64(bytes), countStyle: .file)
-            AppLogger.transfer.info("Paused track \(trackID): \(readable) (\(bytes) B)")
+            self.logTransferWarning("Paused track \(trackID): \(readable) (\(bytes) B)")
         }
     }
 
@@ -182,7 +178,6 @@ final class TransferViewModel: TransferManaging {
             guard available >= requiredGB else {
                 let message = "Not enough free space on device"
                 self.errorMessage = message
-                self.logTransferWarning(message)
                 return
             }
         }
@@ -193,12 +188,32 @@ final class TransferViewModel: TransferManaging {
     func deleteDownloadedTrack(id: String) {
         do {
             try self.storageService.deleteDownloadedTrack(id: id)
+
+            if let index = self.tracks.firstIndex(where: { $0.id == id }) {
+                self.tracks[index].isDownloaded = false
+            }
+
+            if let entity = self.getTrack(id: id) {
+                entity.isDownloaded = false
+                try self.persistenceService.upsert(track: entity)
+            } else if let index = self.tracks.firstIndex(where: { $0.id == id }) {
+                try self.persistenceService.upsert(track: TrackEntity(track: self.tracks[index]))
+            }
         } catch {
-            let message = error.localizedDescription
-            self.errorMessage = message
-            self.logTransferWarning(message)
+            self.handleError(error)
         }
     }
+
+    func getTrack(id: String) -> TrackEntity? {
+        do {
+            return try self.persistenceService.getTrack(id: id)
+        } catch {
+            self.handleError(error)
+            return nil
+        }
+    }
+
+    // MARK: - Only for testing!
 
     func deleteAllTracks() {
         do {
@@ -297,21 +312,12 @@ final class TransferViewModel: TransferManaging {
         self.tracks.append(contentsOf: tracks)
         self.page = page
 
-        do {
-            let entities = try self.persistenceService.getTracks()
-            let newTracks = entities.filter { entity in
-                !tracks.contains(where: { $0.id == entity.id })
+        for track in tracks {
+            do {
+                try self.persistenceService.upsert(track: TrackEntity(track: track))
+            } catch {
+                self.handleError(error)
             }
-
-            for track in newTracks {
-                do {
-                    try self.persistenceService.upsert(track: track)
-                } catch {
-                    self.handleError(error)
-                }
-            }
-        } catch {
-            self.handleError(error)
         }
     }
 

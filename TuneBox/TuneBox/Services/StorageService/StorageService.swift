@@ -21,7 +21,7 @@ enum StorageError: LocalizedError {
     }
 }
 
-protocol StorageServicing {
+protocol StorageServicing: AnyObject {
     func getFreeStorage() -> Double?
     func checkEnoughFreeStorage(requiredGB: Double) throws
     func getTracksFolderURL() throws -> URL

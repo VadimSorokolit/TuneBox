@@ -49,7 +49,9 @@ struct ContentView: View {
         func body(content: Content) -> some View {
             content
                 .task {
-                    await viewModel.loadFirst()
+                    
+//                    viewModel.deleteDownloadedTrack(id: "1214935")
+//                      viewModel.deleteDownloadedTrack(id: "1214935")
 //                    await viewModel .loadNext()
 //                    viewModel.deleteAllTracks()
                     print(viewModel.tracks.count)

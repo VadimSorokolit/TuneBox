@@ -8,8 +8,9 @@
 import Foundation
 import SwiftData
 
-protocol PersistenceServicing {
+protocol PersistenceServicing: AnyObject {
     func getTracks() throws -> [TrackEntity]
+    func getTrack(id: String) throws -> TrackEntity?
     func upsert(track: TrackEntity) throws
     func delete(track: TrackEntity) throws
     func clearStorage() throws
@@ -38,6 +39,20 @@ final class PersistenceService: PersistenceServicing {
             return try self.modelContext.fetch(descriptor)
         } catch {
             AppLogger.storage.error("Failed to fetch tracks: \(error.localizedDescription)")
+            throw error
+        }
+    }
+
+    func getTrack(id: String) throws -> TrackEntity? {
+        let trackID = id
+        let descriptor = FetchDescriptor<TrackEntity>(
+            predicate: #Predicate { $0.id == trackID }
+        )
+
+        do {
+            return try self.modelContext.fetch(descriptor).first
+        } catch {
+            AppLogger.storage.error("Failed to fetch track \(id): \(error.localizedDescription)")
             throw error
         }
     }
