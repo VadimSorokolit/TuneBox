@@ -24,7 +24,7 @@
 		5B4762852FAB5C570069E41A /* ReactiveMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5B4762842FAB5C570069E41A /* ReactiveMoya */; };
 		5B4762872FAB5C570069E41A /* RxMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5B4762862FAB5C570069E41A /* RxMoya */; };
 		5B586CB12FAB98EE00BCEAD2 /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB02FAB98EE00BCEAD2 /* NetworkService.swift */; };
-		5B586CB52FAC618500BCEAD2 /* StorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB42FAC618400BCEAD2 /* StorageService.swift */; };
+		5B586CB52FAC618500BCEAD2 /* FileManagerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB42FAC618400BCEAD2 /* FileManagerService.swift */; };
 		5B586CB72FAC678700BCEAD2 /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB62FAC678600BCEAD2 /* Track.swift */; };
 		5B586CBA2FAC842200BCEAD2 /* Resolver+Injection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB92FAC842100BCEAD2 /* Resolver+Injection.swift */; };
 		5B586CBD2FAC846900BCEAD2 /* Resolver in Frameworks */ = {isa = PBXBuildFile; productRef = 5B586CBC2FAC846900BCEAD2 /* Resolver */; };
@@ -73,7 +73,7 @@
 		5B4762792FAB3DB80069E41A /* TuneBoxRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneBoxRouter.swift; sourceTree = "<group>"; };
 		5B47627D2FAB49AF0069E41A /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
 		5B586CB02FAB98EE00BCEAD2 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
-		5B586CB42FAC618400BCEAD2 /* StorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageService.swift; sourceTree = "<group>"; };
+		5B586CB42FAC618400BCEAD2 /* FileManagerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerService.swift; sourceTree = "<group>"; };
 		5B586CB62FAC678600BCEAD2 /* Track.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
 		5B586CB92FAC842100BCEAD2 /* Resolver+Injection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Resolver+Injection.swift"; sourceTree = "<group>"; };
 		5B586CC22FAC912400BCEAD2 /* MoyaProvider+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MoyaProvider+Async.swift"; sourceTree = "<group>"; };
@@ -285,7 +285,7 @@
 		5B586CB32FAC611E00BCEAD2 /* StorageService */ = {
 			isa = PBXGroup;
 			children = (
-				5B586CB42FAC618400BCEAD2 /* StorageService.swift */,
+				5B586CB42FAC618400BCEAD2 /* FileManagerService.swift */,
 			);
 			path = StorageService;
 			sourceTree = "<group>";
@@ -591,7 +591,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5B586CB52FAC618500BCEAD2 /* StorageService.swift in Sources */,
+				5B586CB52FAC618500BCEAD2 /* FileManagerService.swift in Sources */,
 				5BD579A12FAB25E300503BA2 /* ContentView.swift in Sources */,
 				5B3FEB472FB4548600DC1562 /* DownloadsView.swift in Sources */,
 				5B3FEB432FB4545200DC1562 /* BrowsView.swift in Sources */,

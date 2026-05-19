@@ -24,10 +24,9 @@ enum SimultaneouslyLoadingTraks: Int {
 
 protocol TransferDownloadManaging: AnyObject {
     func startDownload(_ track: Track) async throws
-    func stopDownload(trackID: String) async
-    func resumeDownload(trackID: String) async throws
+    func stopDownload(trackId: String) async
+    func resumeDownload(trackId: String) async
     func deleteDownloadedTrack(id: String)
-//    func deleteAllTracks()
 }
 
 protocol TransferPersistenceServicing: AnyObject {
@@ -40,7 +39,7 @@ protocol TransferPersistenceServicing: AnyObject {
 protocol TransferStateProviding: AnyObject {
     var page: Int { get set }
     var tracks: [Track] { get set }
-    var downloadingTrackIDs: Set<String> { get set }
+    var downloadingTrackIds: Set<String> { get set }
     var isLoading: Bool { get set }
     var errorMessage: String? { get set }
 }
@@ -60,7 +59,6 @@ protocol TransferManaging:
     TransferPersistenceServicing {
     func loadFirst() async
     func loadNext() async
-    func getTrack(id: String) -> TrackEntity?
     func deleteAllTracks()
 }
 
@@ -74,7 +72,7 @@ final class TransferViewModel: TransferManaging {
     var tracks: [Track] = []
     var isLoading: Bool = false
     var errorMessage: String?
-    var downloadingTrackIDs: Set<String> = []
+    var downloadingTrackIds: Set<String> = []
     var simultaneouslyLoadingTraks: Int = SimultaneouslyLoadingTraks.two.rawValue
     var reservedSpace: ReservedSpace = ReservedSpace.oneGB
 
@@ -125,64 +123,65 @@ final class TransferViewModel: TransferManaging {
     }
 
     func startDownload(_ track: Track) async {
-        if let size = track.size {
-            let requiredGB = Double(size) / GlobalConstants.bytesInGigabyte
-            let available = self.storageService.getFreeStorage() ?? 0
+        let currentTrack = self.tracks.first(where: { $0.id == track.id }) ?? track
 
-            guard available >= requiredGB else {
-                let message = "Not enough free space on device"
-                self.errorMessage = message
-                self.logTransferWarning(message)
-                return
-            }
+        guard self.checkFreeStorageSpace(for: currentTrack) else {
+            return
         }
 
-        self.downloadingTrackIDs.insert(track.id)
+        if currentTrack.downloadingSize != 0 {
+            await self.resumeDownload(trackId: currentTrack.id)
+        }
+
+        self.downloadingTrackIds.insert(track.id)
         defer {
-            self.downloadingTrackIDs.remove(track.id)
-        }
-
-        if let index = self.tracks.firstIndex(where: { $0.id == track.id }) {
-            self.tracks[index].downloadingSize = 0
+            self.downloadingTrackIds.remove(track.id)
         }
 
         do {
             _ = try await self.networkService.downloadTrack(track)
+
             if let index = self.tracks.firstIndex(where: { $0.id == track.id }) {
                 self.tracks[index].isDownloaded = true
-                self.tracks[index].downloadingSize = 0
+                do {
+                    try self.persistenceService.upsert(track: TrackEntity(track: self.tracks[index]))
+                } catch {
+                    self.handleError(error)
+                }
             }
         } catch {
-            if let index = self.tracks.firstIndex(where: { $0.id == track.id }) {
-                self.tracks[index].downloadingSize = 0
-            }
             self.handleError(error)
         }
     }
 
-    func stopDownload(trackID: String) async {
-        await self.networkService.stopDownload(trackID: trackID)
+    func stopDownload(trackId: String) async {
+        await self.networkService.stopDownload(trackId: trackId)
 
-        if let track = self.tracks.first(where: { $0.id == trackID }) {
+        if let track = self.tracks.first(where: { $0.id == trackId }) {
+            do {
+                try self.persistenceService.upsert(track: TrackEntity(track: track))
+            } catch {
+                self.handleError(error)
+            }
+
             let bytes = track.downloadingSize
             let readable = ByteCountFormatter.string(fromByteCount: Int64(bytes), countStyle: .file)
-            self.logTransferWarning("Paused track \(trackID): \(readable) (\(bytes) B)")
+            self.logTransferWarning("Paused track \(trackId): \(readable) (\(bytes) B)")
         }
     }
 
-    func resumeDownload(trackID: String) async throws {
-        if let track = self.tracks.first(where: { $0.id == trackID }), let size = track.size {
-            let requiredGB = Double(size) / GlobalConstants.bytesInGigabyte
-            let available = self.storageService.getFreeStorage() ?? 0
+    func resumeDownload(trackId: String) async {
+        let track = self.tracks.first(where: { $0.id == trackId })
 
-            guard available >= requiredGB else {
-                let message = "Not enough free space on device"
-                self.errorMessage = message
-                return
-            }
+        if let track, self.checkFreeStorageSpace(for: track) == false {
+            return
         }
 
-        try await self.networkService.resumeDownload(trackID: trackID)
+        do {
+            try await self.networkService.resumeDownload(trackId: trackId)
+        } catch {
+            self.handleError(error)
+        }
     }
 
     func deleteDownloadedTrack(id: String) {
@@ -194,7 +193,7 @@ final class TransferViewModel: TransferManaging {
             }
 
             if let entity = self.getTrack(id: id) {
-                entity.isDownloaded = false
+                entity.isRemoved = true
                 try self.persistenceService.upsert(track: entity)
             } else if let index = self.tracks.firstIndex(where: { $0.id == id }) {
                 try self.persistenceService.upsert(track: TrackEntity(track: self.tracks[index]))
@@ -204,16 +203,7 @@ final class TransferViewModel: TransferManaging {
         }
     }
 
-    func getTrack(id: String) -> TrackEntity? {
-        do {
-            return try self.persistenceService.getTrack(id: id)
-        } catch {
-            self.handleError(error)
-            return nil
-        }
-    }
-
-    // MARK: - Only for testing!
+    // MARK: - Only for testing!!!
 
     func deleteAllTracks() {
         do {
@@ -236,14 +226,10 @@ final class TransferViewModel: TransferManaging {
         do {
             try self.storageService.checkEnoughFreeStorage(requiredGB: Double(plan.rawValue))
             self.reservedSpace = plan
-        } catch let storageError as StorageError {
-            let message = storageError.errorDescription ?? storageError.localizedDescription
-            self.errorMessage = message
-            self.logTransferWarning(message)
+        } catch let error as FileManagerError {
+            self.handleError(error)
         } catch {
-            let message = error.localizedDescription
-            self.errorMessage = message
-            self.logTransferWarning(message)
+            self.handleError(error)
         }
     }
 
@@ -252,7 +238,7 @@ final class TransferViewModel: TransferManaging {
     init(
         networkService: NetworkServicing,
         persistenceService: PersistenceServicing,
-        storageService: StorageServicing
+        storageService: FileManagerServicing
     ) {
         self.networkService = networkService
         self.persistenceService = persistenceService
@@ -298,7 +284,7 @@ final class TransferViewModel: TransferManaging {
     let perPage: Int = 20
     private let networkService: NetworkServicing
     private let persistenceService: PersistenceServicing
-    private let storageService: StorageServicing
+    private let storageService: FileManagerServicing
     private let downloadObserverTokens = TransferDownloadObserverTokens()
 
     // MARK: - Methods. Private
@@ -318,6 +304,33 @@ final class TransferViewModel: TransferManaging {
             } catch {
                 self.handleError(error)
             }
+        }
+    }
+
+    private func checkFreeStorageSpace(for track: Track) -> Bool {
+        guard let size = track.size else {
+            return true
+        }
+
+        let requiredGB = Double(size) / GlobalConstants.bytesInGigabyte
+        let available = self.storageService.getFreeStorage() ?? 0
+
+        guard available >= requiredGB else {
+            let message = "Not enough free space on device"
+            self.errorMessage = message
+            self.logTransferWarning(message)
+            return false
+        }
+
+        return true
+    }
+
+    private func getTrack(id: String) -> TrackEntity? {
+        do {
+            return try self.persistenceService.getTrack(id: id)
+        } catch {
+            self.handleError(error)
+            return nil
         }
     }
 

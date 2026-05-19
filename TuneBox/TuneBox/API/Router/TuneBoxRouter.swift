@@ -23,7 +23,7 @@ private struct Constants {
     }
 
     struct Params {
-        static let clientID = "client_id"
+        static let clientId = "client_id"
         static let tags = "tags"
         static let order = "order"
         static let search = "search"
@@ -74,7 +74,7 @@ extension TuneBoxRouter: TargetType {
                 )
 
                 var params: [String: Any] = [
-                    Params.clientID: Constants.apiKey,
+                    Params.clientId: Constants.apiKey,
                     Params.limit: pagination.limit,
                     Params.offset: pagination.offset
                 ]
@@ -92,7 +92,7 @@ extension TuneBoxRouter: TargetType {
                 )
 
                 return [
-                    Params.clientID: Constants.apiKey,
+                    Params.clientId: Constants.apiKey,
                     Params.order: Constants.Values.popularityTotal,
                     Params.limit: pagination.limit,
                     Params.offset: pagination.offset
@@ -105,7 +105,7 @@ extension TuneBoxRouter: TargetType {
                 )
 
                 return [
-                    Params.clientID: Constants.apiKey,
+                    Params.clientId: Constants.apiKey,
                     Params.search: query,
                     Params.limit: pagination.limit,
                     Params.offset: pagination.offset

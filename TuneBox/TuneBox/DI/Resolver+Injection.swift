@@ -31,7 +31,7 @@ extension Resolver: @retroactive ResolverRegistering {
 
     private static func registerStorageService() {
         self.register {
-            StorageService() as StorageServicing
+            FileManagerService() as FileManagerServicing
         }
     }
 
@@ -50,7 +50,7 @@ extension Resolver: @retroactive ResolverRegistering {
             TransferViewModel(
                 networkService: self.resolve(NetworkServicing.self),
                 persistenceService: self.resolve(PersistenceServicing.self),
-                storageService: self.resolve(StorageServicing.self)
+                storageService: self.resolve(FileManagerServicing.self)
             ) as TransferManaging
         }
         .scope(.application)

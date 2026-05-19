@@ -22,6 +22,7 @@ final class TrackEntity {
     var waveformData: Data?
     var size: Int?
     var isDownloaded: Bool
+    var isRemoved: Bool = false
     var downloadingSize: Int
 
     init(
@@ -35,6 +36,7 @@ final class TrackEntity {
         waveformData: Data?,
         size: Int? = nil,
         isDownloaded: Bool = false,
+        isRemoved: Bool = false,
         downloadingSize: Int = 0
     ) {
         self.id = id
@@ -47,6 +49,7 @@ final class TrackEntity {
         self.waveformData = waveformData
         self.size = size
         self.isDownloaded = isDownloaded
+        self.isRemoved = isRemoved
         self.downloadingSize = downloadingSize
     }
 }
@@ -65,6 +68,7 @@ extension TrackEntity {
             waveformData: WaveformMapper.encode(track.waveform),
             size: track.size,
             isDownloaded: track.isDownloaded,
+            isRemoved: track.isRemoved,
             downloadingSize: track.downloadingSize
         )
     }
@@ -79,6 +83,7 @@ extension TrackEntity {
         self.waveformData = WaveformMapper.encode(track.waveform)
         self.size = track.size
         self.isDownloaded = track.isDownloaded
+        self.isDownloaded = track.isRemoved
         self.downloadingSize = track.downloadingSize
     }
 
@@ -92,6 +97,7 @@ extension TrackEntity {
         self.waveformData = entity.waveformData
         self.size = entity.size
         self.isDownloaded = entity.isDownloaded
+        self.isRemoved = entity.isRemoved
         self.downloadingSize = entity.downloadingSize
     }
 

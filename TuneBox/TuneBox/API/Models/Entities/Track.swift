@@ -40,7 +40,7 @@ struct Track: Identifiable, Decodable, Hashable {
 
     var size: Int?
     var isDownloaded: Bool = false
-    var isDeleted: Bool = false
+    var isRemoved: Bool = false
     var downloadingSize: Int = 0
 
     var downloadingProgress: Double {
@@ -119,7 +119,7 @@ extension Track {
         self.size = entity.size
         self.isDownloaded = entity.isDownloaded
         self.downloadingSize = entity.downloadingSize
-        self.isDeleted = entity.isDeleted
+        self.isRemoved = entity.isRemoved
     }
 
 }

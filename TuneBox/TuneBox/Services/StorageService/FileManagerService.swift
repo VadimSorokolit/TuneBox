@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum StorageError: LocalizedError {
+enum FileManagerError: LocalizedError {
     case unavailable
     case notEnoughSpace(requiredGB: Double, availableGB: Double)
 
@@ -21,7 +21,7 @@ enum StorageError: LocalizedError {
     }
 }
 
-protocol StorageServicing: AnyObject {
+protocol FileManagerServicing: AnyObject {
     func getFreeStorage() -> Double?
     func checkEnoughFreeStorage(requiredGB: Double) throws
     func getTracksFolderURL() throws -> URL
@@ -31,17 +31,17 @@ protocol StorageServicing: AnyObject {
     func clearStorage() throws
 }
 
-final class StorageService: StorageServicing {
+final class FileManagerService: FileManagerServicing {
 
     // MARK: Methods. Public
 
     func checkEnoughFreeStorage(requiredGB: Double) throws {
         guard let freeStorage = self.getFreeStorage() else {
-            throw StorageError.unavailable
+            throw FileManagerError.unavailable
         }
 
         guard freeStorage >= requiredGB else {
-            throw StorageError.notEnoughSpace(
+            throw FileManagerError.notEnoughSpace(
                 requiredGB: requiredGB,
                 availableGB: freeStorage
             )

@@ -20,8 +20,8 @@ protocol NetworkServicing: AnyObject {
     func searchTracks(query: String, page: Int, perPage: Int) async throws -> [Track]
     func downloadTrack(_ track: Track) async throws -> URL
     func startDownload(_ track: Track) async throws
-    func stopDownload(trackID: String) async
-    func resumeDownload(trackID: String) async throws
+    func stopDownload(trackId: String) async
+    func resumeDownload(trackId: String) async throws
     func cancelDownload(trackID: String) async
 }
 
@@ -101,30 +101,30 @@ final class NetworkService: NSObject, NetworkServicing {
         }
     }
 
-    func stopDownload(trackID: String) async {
-        guard let task = await self.downloadStore.task(for: trackID) else {
+    func stopDownload(trackId: String) async {
+        guard let task = await self.downloadStore.task(for: trackId) else {
             return
         }
 
-        await self.downloadStore.stopRequested(for: trackID)
+        await self.downloadStore.stopRequested(for: trackId)
         let data: Data? = await withCheckedContinuation { continuation in
             task.cancel { resumeData in
                 continuation.resume(returning: resumeData)
             }
         }
-        await self.downloadStore.saveResumeData(data, for: trackID)
-        await self.downloadStore.clearTask(for: trackID)
+        await self.downloadStore.saveResumeData(data, for: trackId)
+        await self.downloadStore.clearTask(for: trackId)
     }
 
-    func resumeDownload(trackID: String) async throws {
-        guard let resumeData = await self.downloadStore.resumeData(for: trackID) else {
-            throw APIError.server("No paused download for track \(trackID)")
+    func resumeDownload(trackId: String) async throws {
+        guard let resumeData = await self.downloadStore.resumeData(for: trackId) else {
+            throw APIError.server("No paused download for track \(trackId)")
         }
 
         let task = self.urlSession.downloadTask(withResumeData: resumeData)
-        task.taskDescription = trackID
-        await self.downloadStore.storeTask(task, for: trackID)
-        await self.downloadStore.clearResumeData(for: trackID)
+        task.taskDescription = trackId
+        await self.downloadStore.storeTask(task, for: trackId)
+        await self.downloadStore.clearResumeData(for: trackId)
 
         task.resume()
     }

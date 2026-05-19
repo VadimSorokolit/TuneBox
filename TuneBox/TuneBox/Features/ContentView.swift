@@ -27,13 +27,15 @@ struct ContentView: View {
 
                     Button("Pause") {
                         Task {
-                            await viewModel.stopDownload(trackID: viewModel.tracks.first!.id)
+                            await viewModel.stopDownload(trackId: viewModel.tracks.first!.id)
                         }
                     }
 
                     Button("Resume") {
                         Task {
-                            try? await viewModel.resumeDownload(trackID: viewModel.tracks.first!.id)
+                            await viewModel.resumeDownload(
+                                trackId: viewModel.tracks.first!.id
+                            )
                         }
                     }
                 }
@@ -49,12 +51,17 @@ struct ContentView: View {
         func body(content: Content) -> some View {
             content
                 .task {
-                    
+
 //                    viewModel.deleteDownloadedTrack(id: "1214935")
 //                      viewModel.deleteDownloadedTrack(id: "1214935")
 //                    await viewModel .loadNext()
-//                    viewModel.deleteAllTracks()
-                    print(viewModel.tracks.count)
+//                    await viewModel.loadFirst()
+//                    let track = viewModel.getTrack(id: "1214935")
+//                    let tracks = viewModel.tracks.filter { $0.isDownloaded == true }
+//                    print(tracks.count)
+//                    await viewModel.resumeDownload(trackId: "1214935")
+                    viewModel.deleteAllTracks()
+//                    print(track?.isRemoved)
 //                    if let track = viewModel.tracks.first {
 //                        viewModel.deleteDownloadedTrack(id: track.id)
 //                    }
