@@ -131,26 +131,16 @@ final class TransferViewModel: TransferManaging {
 
         if currentTrack.downloadingSize != 0 {
             await self.resumeDownload(trackId: currentTrack.id)
+            return
         }
 
-        self.downloadingTrackIds.insert(track.id)
-        defer {
-            self.downloadingTrackIds.remove(track.id)
-        }
-
-        do {
+        await self.performDownload(trackId: track.id) {
             _ = try await self.networkService.downloadTrack(track)
 
             if let index = self.tracks.firstIndex(where: { $0.id == track.id }) {
                 self.tracks[index].isDownloaded = true
-                do {
-                    try self.persistenceService.upsert(track: TrackEntity(track: self.tracks[index]))
-                } catch {
-                    self.handleError(error)
-                }
+                try self.persistenceService.upsert(track: TrackEntity(track: self.tracks[index]))
             }
-        } catch {
-            self.handleError(error)
         }
     }
 
@@ -177,10 +167,8 @@ final class TransferViewModel: TransferManaging {
             return
         }
 
-        do {
+        await self.performDownload(trackId: trackId) {
             try await self.networkService.resumeDownload(trackId: trackId)
-        } catch {
-            self.handleError(error)
         }
     }
 
@@ -285,6 +273,7 @@ final class TransferViewModel: TransferManaging {
     private let networkService: NetworkServicing
     private let persistenceService: PersistenceServicing
     private let storageService: FileManagerServicing
+    private let downloadSlotLimiter = TransferDownloadSlotLimiter()
     private let downloadObserverTokens = TransferDownloadObserverTokens()
 
     // MARK: - Methods. Private
@@ -304,6 +293,29 @@ final class TransferViewModel: TransferManaging {
             } catch {
                 self.handleError(error)
             }
+        }
+    }
+
+    private func performDownload(
+        trackId: String,
+        operation: () async throws -> Void
+    ) async {
+        await self.downloadSlotLimiter.acquire(limit: self.simultaneouslyLoadingTraks)
+
+        defer {
+            self.downloadSlotLimiter.release()
+        }
+
+        self.downloadingTrackIds.insert(trackId)
+
+        defer {
+            self.downloadingTrackIds.remove(trackId)
+        }
+
+        do {
+            try await operation()
+        } catch {
+            self.handleError(error)
         }
     }
 
@@ -358,19 +370,5 @@ final class TransferViewModel: TransferManaging {
         let message = error.localizedDescription
         self.errorMessage = message
         self.logTransferWarning(message)
-    }
-}
-
-private final class TransferDownloadObserverTokens: @unchecked Sendable {
-    var progressToken: NSObjectProtocol?
-    var finishedToken: NSObjectProtocol?
-
-    deinit {
-        if let progressToken {
-            NotificationCenter.default.removeObserver(progressToken)
-        }
-        if let finishedToken {
-            NotificationCenter.default.removeObserver(finishedToken)
-        }
     }
 }

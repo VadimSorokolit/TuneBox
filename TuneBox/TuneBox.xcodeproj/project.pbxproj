@@ -12,6 +12,8 @@
 		5B11C3372FB500AC0089BAD2 /* DownloadStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11C3362FB500AB0089BAD2 /* DownloadStore.swift */; };
 		5B11C33B2FB719A80089BAD2 /* TrackEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11C33A2FB719A60089BAD2 /* TrackEntity.swift */; };
 		5B11C3412FB728390089BAD2 /* PersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11C3402FB728380089BAD2 /* PersistenceService.swift */; };
+		5B2CF45E2FBC7AA400C5BA4C /* TransferDownloadSlotLimiter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2CF45D2FBC7AA300C5BA4C /* TransferDownloadSlotLimiter.swift */; };
+		5B2CF4612FBC7C6B00C5BA4C /* TransferDownloadObserverTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2CF4602FBC7C6900C5BA4C /* TransferDownloadObserverTokens.swift */; };
 		5B3FEB3D2FB4539C00DC1562 /* TransferViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB3C2FB4539A00DC1562 /* TransferViewModel.swift */; };
 		5B3FEB432FB4545200DC1562 /* BrowsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB422FB4544B00DC1562 /* BrowsView.swift */; };
 		5B3FEB472FB4548600DC1562 /* DownloadsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB462FB4547E00DC1562 /* DownloadsView.swift */; };
@@ -65,6 +67,8 @@
 		5B11C3362FB500AB0089BAD2 /* DownloadStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadStore.swift; sourceTree = "<group>"; };
 		5B11C33A2FB719A60089BAD2 /* TrackEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackEntity.swift; sourceTree = "<group>"; };
 		5B11C3402FB728380089BAD2 /* PersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceService.swift; sourceTree = "<group>"; };
+		5B2CF45D2FBC7AA300C5BA4C /* TransferDownloadSlotLimiter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferDownloadSlotLimiter.swift; sourceTree = "<group>"; };
+		5B2CF4602FBC7C6900C5BA4C /* TransferDownloadObserverTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferDownloadObserverTokens.swift; sourceTree = "<group>"; };
 		5B3FEB3C2FB4539A00DC1562 /* TransferViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferViewModel.swift; sourceTree = "<group>"; };
 		5B3FEB422FB4544B00DC1562 /* BrowsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowsView.swift; sourceTree = "<group>"; };
 		5B3FEB462FB4547E00DC1562 /* DownloadsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsView.swift; sourceTree = "<group>"; };
@@ -166,6 +170,22 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		5B2CF45C2FBC7A8E00C5BA4C /* Concurrency */ = {
+			isa = PBXGroup;
+			children = (
+				5B2CF45D2FBC7AA300C5BA4C /* TransferDownloadSlotLimiter.swift */,
+			);
+			path = Concurrency;
+			sourceTree = "<group>";
+		};
+		5B2CF45F2FBC7C3700C5BA4C /* Notifications */ = {
+			isa = PBXGroup;
+			children = (
+				5B2CF4602FBC7C6900C5BA4C /* TransferDownloadObserverTokens.swift */,
+			);
+			path = Notifications;
+			sourceTree = "<group>";
+		};
 		5B3FEB3A2FB4538100DC1562 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
@@ -259,7 +279,9 @@
 		5B47627B2FAB497F0069E41A /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				5B2CF45C2FBC7A8E00C5BA4C /* Concurrency */,
 				5B11C3332FB4FF830089BAD2 /* Download */,
+				5B2CF45F2FBC7C3700C5BA4C /* Notifications */,
 				5B88609D2FAE18450056BE9A /* GlobalConstants.swift */,
 				5B47627C2FAB499A0069E41A /* Logging */,
 			);
@@ -597,6 +619,7 @@
 				5B3FEB432FB4545200DC1562 /* BrowsView.swift in Sources */,
 				5B9CE54B2FB32589001BE37F /* AppDelegate.swift in Sources */,
 				5B586CBA2FAC842200BCEAD2 /* Resolver+Injection.swift in Sources */,
+				5B2CF4612FBC7C6B00C5BA4C /* TransferDownloadObserverTokens.swift in Sources */,
 				5B11C3352FB500320089BAD2 /* DownloadCoordinator.swift in Sources */,
 				5B586CC32FAC912500BCEAD2 /* MoyaProvider+Async.swift in Sources */,
 				5B11C3372FB500AC0089BAD2 /* DownloadStore.swift in Sources */,
@@ -609,6 +632,7 @@
 				5B586CCC2FACB61500BCEAD2 /* TracksResponse.swift in Sources */,
 				5B47627A2FAB3DC30069E41A /* TuneBoxRouter.swift in Sources */,
 				5B47627E2FAB49B00069E41A /* AppLogger.swift in Sources */,
+				5B2CF45E2FBC7AA400C5BA4C /* TransferDownloadSlotLimiter.swift in Sources */,
 				5B8860A52FB1CF910056BE9A /* NotificationNames+Extension.swift in Sources */,
 				5B11C33B2FB719A80089BAD2 /* TrackEntity.swift in Sources */,
 				5B88609E2FAE184C0056BE9A /* GlobalConstants.swift in Sources */,
