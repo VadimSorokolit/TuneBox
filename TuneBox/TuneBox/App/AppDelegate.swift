@@ -16,17 +16,19 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         viewModel: TransferManaging
     ) {
         self.networkService = networkService
-        self.onSaveStateBeforeClose = { viewModel.saveStateBeforeClose() }
+        self.onSaveTransferState = {
+            viewModel.saveTransferState()
+        }
     }
 
     // MARK: - Methods. Public
 
     func applicationDidEnterBackground(_ application: UIApplication) {
-        self.onSaveStateBeforeClose?()
+        self.onSaveTransferState?()
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
-        self.onSaveStateBeforeClose?()
+        self.onSaveTransferState?()
     }
 
     func application(
@@ -40,5 +42,5 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     // MARK: - Properties. Private
 
     private weak var networkService: NetworkServicing?
-    private var onSaveStateBeforeClose: (() -> Void)?
+    private var onSaveTransferState: (() -> Void)?
 }

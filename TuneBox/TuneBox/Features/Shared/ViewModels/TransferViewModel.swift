@@ -61,7 +61,7 @@ protocol TransferManaging:
     func loadNext() async
     func startDownload(_ track: Track) async
     func deleteAllTracks()
-    func saveStateBeforeClose()
+    func saveTransferState()
     func restoreDownloadsOnForeground() async
 }
 
@@ -205,7 +205,7 @@ final class TransferViewModel: TransferManaging {
         self.persistTrack(at: index)
     }
 
-    func saveStateBeforeClose() {
+    func saveTransferState() {
         let now = Date()
         if let lastSave = self.lastSaveBeforeCloseAt, now.timeIntervalSince(lastSave) < 1 {
             return
