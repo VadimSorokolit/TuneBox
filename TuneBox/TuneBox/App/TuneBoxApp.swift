@@ -40,6 +40,7 @@ struct TuneBoxApp: App {
                             AppLogger.app.info("App is active")
 
                         case .inactive:
+                            viewModel.saveTransferState()
                             AppLogger.app.info("App is inactive")
 
                         case .background:

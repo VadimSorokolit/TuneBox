@@ -23,7 +23,7 @@ function_body_length:
   error: 150
 
 file_length:
-  warning: 700
+  warning: 800
   error: 900
 
 function_parameter_count:

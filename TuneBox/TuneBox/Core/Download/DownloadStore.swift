@@ -15,6 +15,10 @@ actor DownloadStore {
     private var relaunchSnapshotTrackIDs: Set<String> = []
 
     func storeTask(_ task: URLSessionDownloadTask, for trackID: String) {
+        if let previous = self.tasksByTrackID[trackID] {
+            self.trackIDByTaskIdentifier.removeValue(forKey: previous.taskIdentifier)
+        }
+
         self.tasksByTrackID[trackID] = task
         self.trackIDByTaskIdentifier[task.taskIdentifier] = trackID
     }
@@ -27,10 +31,22 @@ actor DownloadStore {
         self.trackIDByTaskIdentifier[task.taskIdentifier]
     }
 
+    func isCurrentTask(_ task: URLSessionTask, for trackID: String) -> Bool {
+        guard let stored = self.tasksByTrackID[trackID] else {
+            return false
+        }
+
+        return stored.taskIdentifier == task.taskIdentifier
+    }
+
     func clearTask(for trackID: String) {
         if let task = self.tasksByTrackID.removeValue(forKey: trackID) {
             self.trackIDByTaskIdentifier.removeValue(forKey: task.taskIdentifier)
         }
+    }
+
+    func clearTaskIdentifierMapping(for task: URLSessionTask) {
+        self.trackIDByTaskIdentifier.removeValue(forKey: task.taskIdentifier)
     }
 
     func saveResumeData(_ data: Data?, for trackID: String) {

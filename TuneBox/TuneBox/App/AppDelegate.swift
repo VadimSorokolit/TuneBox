@@ -16,19 +16,26 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         viewModel: TransferManaging
     ) {
         self.networkService = networkService
-        self.onSaveTransferState = {
-            viewModel.saveTransferState()
-        }
+        self.viewModel = viewModel
     }
 
     // MARK: - Methods. Public
 
     func applicationDidEnterBackground(_ application: UIApplication) {
-        self.onSaveTransferState?()
+        self.viewModel?.saveTransferState()
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
-        self.onSaveTransferState?()
+        guard let viewModel = self.viewModel else {
+            return
+        }
+
+        let semaphore = DispatchSemaphore(value: 0)
+        Task { @MainActor in
+            await viewModel.snapshotForTerminate()
+            semaphore.signal()
+        }
+        _ = semaphore.wait(timeout: .now() + 4.0)
     }
 
     func application(
@@ -42,5 +49,5 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     // MARK: - Properties. Private
 
     private weak var networkService: NetworkServicing?
-    private var onSaveTransferState: (() -> Void)?
+    private weak var viewModel: TransferManaging?
 }

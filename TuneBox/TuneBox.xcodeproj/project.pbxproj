@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		5B0F630F2FADDB9E006F3555 /* StorageServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0F630E2FADDB9D006F3555 /* StorageServiceTests.swift */; };
-		5B11C3352FB500320089BAD2 /* DownloadCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11C3342FB500310089BAD2 /* DownloadCoordinator.swift */; };
 		5B11C3372FB500AC0089BAD2 /* DownloadStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11C3362FB500AB0089BAD2 /* DownloadStore.swift */; };
 		5B11C33B2FB719A80089BAD2 /* TrackEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11C33A2FB719A60089BAD2 /* TrackEntity.swift */; };
 		5B11C3412FB728390089BAD2 /* PersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11C3402FB728380089BAD2 /* PersistenceService.swift */; };
@@ -16,6 +15,7 @@
 		5B2CF4612FBC7C6B00C5BA4C /* TransferDownloadObserverTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2CF4602FBC7C6900C5BA4C /* TransferDownloadObserverTokens.swift */; };
 		5B2CF4642FBCB3F600C5BA4C /* BrowsTrackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2CF4632FBCB3F500C5BA4C /* BrowsTrackCell.swift */; };
 		5B2CF4672FBD100100C5BA4D /* DownloadResumeStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2CF4682FBD100000C5BA4D /* DownloadResumeStorage.swift */; };
+		5B2CF4692FBD100200C5BA4E /* TransferQueueStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2CF46A2FBD100100C5BA4E /* TransferQueueStorage.swift */; };
 		5B3FEB3D2FB4539C00DC1562 /* TransferViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB3C2FB4539A00DC1562 /* TransferViewModel.swift */; };
 		5B3FEB432FB4545200DC1562 /* BrowsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB422FB4544B00DC1562 /* BrowsView.swift */; };
 		5B3FEB472FB4548600DC1562 /* DownloadsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB462FB4547E00DC1562 /* DownloadsView.swift */; };
@@ -66,7 +66,6 @@
 
 /* Begin PBXFileReference section */
 		5B0F630E2FADDB9D006F3555 /* StorageServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageServiceTests.swift; sourceTree = "<group>"; };
-		5B11C3342FB500310089BAD2 /* DownloadCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadCoordinator.swift; sourceTree = "<group>"; };
 		5B11C3362FB500AB0089BAD2 /* DownloadStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadStore.swift; sourceTree = "<group>"; };
 		5B11C33A2FB719A60089BAD2 /* TrackEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackEntity.swift; sourceTree = "<group>"; };
 		5B11C3402FB728380089BAD2 /* PersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceService.swift; sourceTree = "<group>"; };
@@ -74,6 +73,7 @@
 		5B2CF4602FBC7C6900C5BA4C /* TransferDownloadObserverTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferDownloadObserverTokens.swift; sourceTree = "<group>"; };
 		5B2CF4632FBCB3F500C5BA4C /* BrowsTrackCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowsTrackCell.swift; sourceTree = "<group>"; };
 		5B2CF4682FBD100000C5BA4D /* DownloadResumeStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadResumeStorage.swift; sourceTree = "<group>"; };
+		5B2CF46A2FBD100100C5BA4E /* TransferQueueStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferQueueStorage.swift; sourceTree = "<group>"; };
 		5B3FEB3C2FB4539A00DC1562 /* TransferViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferViewModel.swift; sourceTree = "<group>"; };
 		5B3FEB422FB4544B00DC1562 /* BrowsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowsView.swift; sourceTree = "<group>"; };
 		5B3FEB462FB4547E00DC1562 /* DownloadsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsView.swift; sourceTree = "<group>"; };
@@ -155,7 +155,7 @@
 			children = (
 				5B11C3362FB500AB0089BAD2 /* DownloadStore.swift */,
 				5B2CF4682FBD100000C5BA4D /* DownloadResumeStorage.swift */,
-				5B11C3342FB500310089BAD2 /* DownloadCoordinator.swift */,
+				5B2CF46A2FBD100100C5BA4E /* TransferQueueStorage.swift */,
 			);
 			path = Download;
 			sourceTree = "<group>";
@@ -646,10 +646,10 @@
 				5B9CE54B2FB32589001BE37F /* AppDelegate.swift in Sources */,
 				5B586CBA2FAC842200BCEAD2 /* Resolver+Injection.swift in Sources */,
 				5B2CF4612FBC7C6B00C5BA4C /* TransferDownloadObserverTokens.swift in Sources */,
-				5B11C3352FB500320089BAD2 /* DownloadCoordinator.swift in Sources */,
 				5B586CC32FAC912500BCEAD2 /* MoyaProvider+Async.swift in Sources */,
 				5B11C3372FB500AC0089BAD2 /* DownloadStore.swift in Sources */,
 				5B2CF4672FBD100100C5BA4D /* DownloadResumeStorage.swift in Sources */,
+				5B2CF4692FBD100200C5BA4E /* TransferQueueStorage.swift in Sources */,
 				5B2CF4642FBCB3F600C5BA4C /* BrowsTrackCell.swift in Sources */,
 				5B586CB72FAC678700BCEAD2 /* Track.swift in Sources */,
 				5B3FEB3D2FB4539C00DC1562 /* TransferViewModel.swift in Sources */,

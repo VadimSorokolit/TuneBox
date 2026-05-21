@@ -26,7 +26,10 @@ protocol NetworkServicing: AnyObject {
     func cancelDownload(trackID: String) async
     func restoreDownloadSession() async
     func activeDownloadTrackIDs() async -> Set<String>
+    func runningDownloadTrackIDs() async -> Set<String>
+    func waitForPendingCancellations(timeout: TimeInterval) async
     func snapshotResumeDataForRelaunch() async
+    func hasPersistedResumeData(trackId: String) async -> Bool
     func clearPersistedResumeData(trackId: String)
     func handleBackgroundCompletion(_ handler: @escaping () -> Void)
 }
@@ -74,7 +77,7 @@ final class NetworkService: NSObject, NetworkServicing {
         }
 
         do {
-            try self.startDownload(track, remoteURL: remoteURL)
+            try await self.startDownload(track, remoteURL: remoteURL)
         } catch {
             throw APIError.from(error)
         }
@@ -156,6 +159,50 @@ final class NetworkService: NSObject, NetworkServicing {
         await self.downloadStore.activeTrackIDs()
     }
 
+    func runningDownloadTrackIDs() async -> Set<String> {
+        let tasks: [URLSessionTask] = await withCheckedContinuation { continuation in
+            self.urlSession.getAllTasks { tasks in
+                continuation.resume(returning: tasks)
+            }
+        }
+
+        var running = Set<String>()
+
+        for task in tasks {
+            guard
+                task is URLSessionDownloadTask,
+                let trackID = task.taskDescription,
+                task.state == .running || task.state == .suspended
+            else {
+                continue
+            }
+
+            running.insert(trackID)
+        }
+
+        return running
+    }
+
+    func waitForPendingCancellations(timeout: TimeInterval) async {
+        let deadline = Date().addingTimeInterval(timeout)
+
+        while Date() < deadline {
+            let tasks: [URLSessionTask] = await withCheckedContinuation { continuation in
+                self.urlSession.getAllTasks { tasks in
+                    continuation.resume(returning: tasks)
+                }
+            }
+
+            let hasCanceling = tasks.contains { $0.state == .canceling }
+
+            if hasCanceling == false {
+                return
+            }
+
+            try? await Swift.Task.sleep(nanoseconds: 100_000_000)
+        }
+    }
+
     func snapshotResumeDataForRelaunch() async {
         let trackIDs = await self.downloadStore.activeTrackIDs()
 
@@ -176,6 +223,14 @@ final class NetworkService: NSObject, NetworkServicing {
             self.persistResumeData(data, for: trackID)
             await self.downloadStore.clearTask(for: trackID)
         }
+    }
+
+    func hasPersistedResumeData(trackId: String) async -> Bool {
+        if await self.downloadStore.resumeData(for: trackId) != nil {
+            return true
+        }
+
+        return DownloadResumeStorage.load(for: trackId) != nil
     }
 
     func clearPersistedResumeData(trackId: String) {
@@ -319,13 +374,10 @@ final class NetworkService: NSObject, NetworkServicing {
         }
     }
 
-    private func startDownload(_ track: Track, remoteURL: URL) throws {
+    private func startDownload(_ track: Track, remoteURL: URL) async throws {
         let task = self.urlSession.downloadTask(with: remoteURL)
         task.taskDescription = track.id
-        Swift.Task {
-            await self.downloadStore.storeTask(task, for: track.id)
-        }
-
+        await self.downloadStore.storeTask(task, for: track.id)
         task.resume()
     }
 
@@ -359,6 +411,22 @@ extension NetworkService: URLSessionDownloadDelegate {
         task: URLSessionTask,
         didCompleteWithError error: Error?
     ) {
+        let synchronouslySavedResumeData: Data? = {
+            guard let error = error as NSError? else {
+                return nil
+            }
+
+            guard let resumeData = error.userInfo[NSURLSessionDownloadTaskResumeData] as? Data else {
+                return nil
+            }
+
+            if let trackID = task.taskDescription {
+                self.persistResumeData(resumeData, for: trackID)
+            }
+
+            return resumeData
+        }()
+
         Swift.Task { [weak self] in
             guard let self else { return }
 
@@ -366,7 +434,13 @@ extension NetworkService: URLSessionDownloadDelegate {
                 return
             }
 
-            await self.downloadStore.clearTask(for: trackID)
+            let isCurrent = await self.downloadStore.isCurrentTask(task, for: trackID)
+
+            if isCurrent {
+                await self.downloadStore.clearTask(for: trackID)
+            } else {
+                await self.downloadStore.clearTaskIdentifierMapping(for: task)
+            }
 
             guard let error else {
                 return
@@ -379,6 +453,22 @@ extension NetworkService: URLSessionDownloadDelegate {
                 return
             }
 
+            if let resumeData = synchronouslySavedResumeData {
+                await self.downloadStore.saveResumeData(resumeData, for: trackID)
+            }
+
+            if self.isInterruptionError(error) {
+                NotificationCenter.default.post(
+                    name: .trackDownloadDidInterrupt,
+                    object: nil,
+                    userInfo: [
+                        TrackDownloadNotificationUserInfoKey.trackID: trackID
+                    ]
+                )
+
+                return
+            }
+
             NotificationCenter.default.post(
                 name: .trackDownloadDidFail,
                 object: nil,
@@ -388,6 +478,27 @@ extension NetworkService: URLSessionDownloadDelegate {
                 ]
             )
         }
+    }
+
+    private func isInterruptionError(_ error: Error) -> Bool {
+        let nsError = error as NSError
+
+        if nsError.domain == NSURLErrorDomain {
+            switch nsError.code {
+                case NSURLErrorCancelled,
+                     NSURLErrorNetworkConnectionLost,
+                     NSURLErrorNotConnectedToInternet,
+                     NSURLErrorTimedOut,
+                     NSURLErrorBackgroundSessionWasDisconnected,
+                     NSURLErrorBackgroundSessionInUseByAnotherProcess:
+                    return true
+
+                default:
+                    return false
+            }
+        }
+
+        return false
     }
 
     func urlSession(
