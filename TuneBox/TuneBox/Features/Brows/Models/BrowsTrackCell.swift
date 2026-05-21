@@ -13,6 +13,7 @@ enum CellState {
     case queued
     case paused
     case completed
+    case failed
 }
 
 struct BrowsTrackCell: View {
@@ -47,6 +48,8 @@ struct BrowsTrackCell: View {
                     .foregroundColor(buttonColor)
                     .clipShape(Capsule())
             }
+
+            if state == .idle {}
         }
         .background(
             RoundedRectangle(cornerRadius: 12)
@@ -69,6 +72,8 @@ struct BrowsTrackCell: View {
                 return "Resume"
             case .completed:
                 return "Delete"
+            case .failed:
+                return "Failed"
         }
     }
 
@@ -83,6 +88,8 @@ struct BrowsTrackCell: View {
             case .paused:
                 return .green
             case .completed:
+                return .black
+            case .failed:
                 return .red
         }
     }

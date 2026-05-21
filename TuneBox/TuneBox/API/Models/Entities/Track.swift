@@ -25,6 +25,7 @@ enum DownloadState: String, Hashable {
     case queued
     case paused
     case completed
+    case failed
 }
 
 enum FileStorageState: String, Hashable {

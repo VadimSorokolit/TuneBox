@@ -218,7 +218,7 @@ final class TransferViewModel: TransferManaging {
                 case .downloading, .queued:
                     self.persistTrack(at: index)
 
-                case .paused, .idle, .completed:
+                case .idle, .paused, .completed, .failed:
                     break
             }
         }
@@ -491,6 +491,7 @@ final class TransferViewModel: TransferManaging {
         do {
             try await self.networkService.startDownload(track)
         } catch {
+            self.markDownloadFailed(trackId: track.id)
             self.handleError(error)
             await self.finishActiveDownload(trackId: track.id)
         }
@@ -504,6 +505,7 @@ final class TransferViewModel: TransferManaging {
             self.tracks[index].downloadState = .downloading
             self.persistTrack(at: index)
         } catch {
+            self.markDownloadFailed(trackId: track.id)
             self.handleError(error)
             await self.finishActiveDownload(trackId: track.id)
         }
@@ -611,11 +613,7 @@ final class TransferViewModel: TransferManaging {
     }
 
     private func applyDownloadFailed(trackID: String, error: Any) {
-        guard let index = self.tracks.firstIndex(where: { $0.id == trackID }) else {
-            return
-        }
-
-        self.tracks[index].downloadState = .idle
+        self.markDownloadFailed(trackId: trackID)
 
         if let apiError = error as? APIError {
             self.handleError(apiError)
@@ -632,6 +630,18 @@ final class TransferViewModel: TransferManaging {
 
     private func logTransferWarning(_ message: String) {
         AppLogger.transfer.warning("\(message)")
+    }
+
+    private func markDownloadFailed(trackId: String) {
+        guard let index = self.tracks.firstIndex(where: { $0.id == trackId }) else {
+            return
+        }
+
+        self.tracks[index].downloadState = .failed
+        self.tracks[index].fileState = .none
+        self.tracks[index].downloadingSize = 0
+
+        self.persistTrack(at: index)
     }
 
     private func handleError(_ error: Error) {

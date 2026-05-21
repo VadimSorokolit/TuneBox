@@ -64,6 +64,8 @@ struct ContentView: View {
                                             viewModel.deleteDownloadedTrack(id: track.id)
                                         case .queued:
                                             viewModel.cancelQueuedDownload(trackId: track.id)
+                                        case .failed:
+                                            await viewModel.startDownload(track)
                                     }
                                 }
                             }
@@ -89,6 +91,8 @@ struct ContentView: View {
                 return .paused
             case .completed:
                 return .completed
+            case .failed:
+                return .failed
         }
     }
 
