@@ -33,7 +33,9 @@ final class PersistenceService: PersistenceServicing {
     func getTracks() throws -> [TrackEntity] {
         do {
             let descriptor = FetchDescriptor<TrackEntity>(
-                sortBy: [SortDescriptor(\.artistName)]
+                sortBy: [SortDescriptor(\.artistName),
+                         SortDescriptor(\.id)
+                        ]
             )
 
             return try self.modelContext.fetch(descriptor)
