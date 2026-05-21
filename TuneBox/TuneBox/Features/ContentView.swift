@@ -12,30 +12,65 @@ struct ContentView: View {
     @Injected private var viewModel: TransferManaging
 
     var body: some View {
-        VStack(spacing: 16) {
-            if !viewModel.tracks.isEmpty {
-                ForEach(viewModel.tracks) { track in
-                    BrowsTrackCell(
-                        id: track.id,
-                        progress: track.downloadingProgress,
-                        state: cellState(from: track),
-                        onTap: {
-                            Task {
-                                switch track.downloadState {
-                                    case .idle:
-                                        await viewModel.startDownload(track)
-                                    case .paused:
-                                        await viewModel.resumeDownload(trackId: track.id)
-                                    case .downloading:
-                                        await viewModel.stopDownload(trackId: track.id)
-                                    case .completed:
-                                        viewModel.deleteDownloadedTrack(id: track.id)
-                                    case .queued:
-                                        viewModel.cancelQueuedDownload(trackId: track.id)
+        VStack(spacing: 10) {
+            HStack {
+                Button(action: {
+                    Task {
+                        await viewModel.loadFirst()
+                    }
+                }, label: {
+                    Circle().fill(Color.yellow)
+                        .frame(width: 50, height: 50)
+                        .overlay(
+                            Image(systemName: "music.note")
+                                .frame(width: 30, height: 30)
+                                .foregroundStyle(Color.white)
+                        )
+                })
+
+                Spacer()
+
+                Button(action: {
+                    viewModel.resetTransferState()
+                }, label: {
+                    Circle().fill(Color.red)
+                        .frame(width: 50, height: 50)
+                        .overlay(
+                            Image(systemName: "trash")
+                                .frame(width: 30, height: 30)
+                                .foregroundStyle(Color.white)
+                        )
+                })
+            }
+            .padding(.horizontal)
+
+            VStack(spacing: 16) {
+                if !viewModel.tracks.isEmpty {
+                    ForEach(viewModel.tracks) { track in
+                        BrowsTrackCell(
+                            id: track.id,
+                            progress: track.downloadingProgress,
+                            state: cellState(from: track),
+                            onTap: {
+                                Task {
+                                    switch track.downloadState {
+                                        case .idle:
+                                            await viewModel.startDownload(track)
+                                        case .paused:
+                                            await viewModel.resumeDownload(trackId: track.id)
+                                        case .downloading:
+                                            await viewModel.stopDownload(trackId: track.id)
+                                        case .completed:
+                                            viewModel.deleteDownloadedTrack(id: track.id)
+                                        case .queued:
+                                            viewModel.cancelQueuedDownload(trackId: track.id)
+                                    }
                                 }
                             }
-                        }
-                    )
+                        )
+                    }
+                } else {
+                    EmptyView()
                 }
             }
         }
@@ -62,7 +97,7 @@ struct ContentView: View {
 
         func body(content: Content) -> some View {
             content
-                .task {
+//                .task {
 //                    await viewModel.loadFirst()
 //                    viewModel.deleteAllTracks()
 
@@ -87,7 +122,7 @@ struct ContentView: View {
 //                    if let track = viewModel.tracks.first {
 //                        viewModel.deleteDownloadedTrack(id: track.id)
 //                    }
-                }
+//                }
         }
     }
 }

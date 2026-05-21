@@ -60,7 +60,7 @@ protocol TransferManaging:
     func loadFirst() async
     func loadNext() async
     func startDownload(_ track: Track) async
-    func deleteAllTracks()
+    func resetTransferState()
     func saveTransferState()
     func restoreDownloadsOnForeground() async
 }
@@ -272,12 +272,14 @@ final class TransferViewModel: TransferManaging {
 
     // MARK: - Only for testing!!!
 
-    func deleteAllTracks() {
+    func resetTransferState() {
         self.downloadQueue.removeAll()
+
         do {
             _  = try persistenceService.clearStorage()
             do {
                 try self.storageService.clearStorage()
+                self.clearDownloadState()
             } catch {
                 self.handleError(error)
             }
@@ -445,6 +447,13 @@ final class TransferViewModel: TransferManaging {
                 default:
                     break
             }
+        }
+    }
+
+    private func clearDownloadState() {
+        for index in self.tracks.indices {
+            self.tracks[index].downloadingSize = 0
+            self.tracks[index].downloadState = .idle
         }
     }
 
