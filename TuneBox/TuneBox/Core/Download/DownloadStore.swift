@@ -12,6 +12,7 @@ actor DownloadStore {
     private var trackIDByTaskIdentifier: [Int: String] = [:]
     private var resumeDataByTrackID: [String: Data] = [:]
     private var stopRequestedTrackIDs: Set<String> = []
+    private var relaunchSnapshotTrackIDs: Set<String> = []
 
     func storeTask(_ task: URLSessionDownloadTask, for trackID: String) {
         self.tasksByTrackID[trackID] = task
@@ -52,5 +53,17 @@ actor DownloadStore {
 
     func consumePauseRequested(for trackID: String) -> Bool {
         self.stopRequestedTrackIDs.remove(trackID) != nil
+    }
+
+    func relaunchSnapshotRequested(for trackID: String) {
+        self.relaunchSnapshotTrackIDs.insert(trackID)
+    }
+
+    func consumeRelaunchSnapshotRequested(for trackID: String) -> Bool {
+        self.relaunchSnapshotTrackIDs.remove(trackID) != nil
+    }
+
+    func activeTrackIDs() -> Set<String> {
+        Set(self.tasksByTrackID.keys)
     }
 }

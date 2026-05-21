@@ -28,6 +28,7 @@ protocol FileManagerServicing: AnyObject {
     func getDirectorySizeInBytes() throws -> Int64
     func getDirectorySizeInMB() async throws -> Double
     func deleteDownloadedTrack(id: String) throws
+    func downloadedTrackExists(id: String) -> Bool
     func clearStorage() throws
 }
 
@@ -88,6 +89,14 @@ final class FileManagerService: FileManagerServicing {
         }
 
         try FileManager.default.removeItem(at: trackURL)
+    }
+
+    func downloadedTrackExists(id: String) -> Bool {
+        guard let trackURL = try? self.makeDownloadedTrackURL(id: id) else {
+            return false
+        }
+
+        return FileManager.default.fileExists(atPath: trackURL.path)
     }
 
     func clearStorage() throws {

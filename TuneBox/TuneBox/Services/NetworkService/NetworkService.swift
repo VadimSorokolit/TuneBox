@@ -24,6 +24,10 @@ protocol NetworkServicing: AnyObject {
     func stopDownload(trackId: String) async
     func resumeDownload(trackId: String) async throws
     func cancelDownload(trackID: String) async
+    func restoreDownloadSession() async
+    func activeDownloadTrackIDs() async -> Set<String>
+    func snapshotResumeDataForRelaunch() async
+    func clearPersistedResumeData(trackId: String)
     func handleBackgroundCompletion(_ handler: @escaping () -> Void)
 }
 
@@ -88,11 +92,12 @@ final class NetworkService: NSObject, NetworkServicing {
             }
         }
         await self.downloadStore.saveResumeData(data, for: trackId)
+        self.persistResumeData(data, for: trackId)
         await self.downloadStore.clearTask(for: trackId)
     }
 
     func resumeDownload(trackId: String) async throws {
-        guard let resumeData = await self.downloadStore.resumeData(for: trackId) else {
+        guard let resumeData = await self.resolveResumeData(for: trackId) else {
             throw APIError.server("No paused download for track \(trackId)")
         }
 
@@ -100,6 +105,7 @@ final class NetworkService: NSObject, NetworkServicing {
         task.taskDescription = trackId
         await self.downloadStore.storeTask(task, for: trackId)
         await self.downloadStore.clearResumeData(for: trackId)
+        DownloadResumeStorage.remove(for: trackId)
 
         task.resume()
     }
@@ -112,6 +118,68 @@ final class NetworkService: NSObject, NetworkServicing {
         task.cancel()
         await self.downloadStore.clearTask(for: trackID)
         await self.downloadStore.clearResumeData(for: trackID)
+        DownloadResumeStorage.remove(for: trackID)
+    }
+
+    func restoreDownloadSession() async {
+        let tasks = await withCheckedContinuation { continuation in
+            self.urlSession.getAllTasks { tasks in
+                continuation.resume(returning: tasks)
+            }
+        }
+
+        for task in tasks {
+            guard
+                let downloadTask = task as? URLSessionDownloadTask,
+                let trackID = downloadTask.taskDescription
+            else {
+                continue
+            }
+
+            await self.downloadStore.storeTask(downloadTask, for: trackID)
+
+            if downloadTask.state == .running, downloadTask.countOfBytesReceived > 0 {
+                NotificationCenter.default.post(
+                    name: .trackDownloadProgress,
+                    object: nil,
+                    userInfo: [
+                        TrackDownloadNotificationUserInfoKey.trackID: trackID,
+                        TrackDownloadNotificationUserInfoKey.totalBytesWritten: downloadTask.countOfBytesReceived,
+                        TrackDownloadNotificationUserInfoKey.totalBytesExpectedToWrite: downloadTask.countOfBytesExpectedToReceive
+                    ]
+                )
+            }
+        }
+    }
+
+    func activeDownloadTrackIDs() async -> Set<String> {
+        await self.downloadStore.activeTrackIDs()
+    }
+
+    func snapshotResumeDataForRelaunch() async {
+        let trackIDs = await self.downloadStore.activeTrackIDs()
+
+        for trackID in trackIDs {
+            guard let task = await self.downloadStore.task(for: trackID) else {
+                continue
+            }
+
+            await self.downloadStore.relaunchSnapshotRequested(for: trackID)
+
+            let data: Data? = await withCheckedContinuation { continuation in
+                task.cancel { resumeData in
+                    continuation.resume(returning: resumeData)
+                }
+            }
+
+            await self.downloadStore.saveResumeData(data, for: trackID)
+            self.persistResumeData(data, for: trackID)
+            await self.downloadStore.clearTask(for: trackID)
+        }
+    }
+
+    func clearPersistedResumeData(trackId: String) {
+        DownloadResumeStorage.remove(for: trackId)
     }
 
     private func getTrackSize(id: Int) async throws -> Int {
@@ -231,6 +299,26 @@ final class NetworkService: NSObject, NetworkServicing {
         return decoded
     }
 
+    private func resolveResumeData(for trackId: String) async -> Data? {
+        if let resumeData = await self.downloadStore.resumeData(for: trackId) {
+            return resumeData
+        }
+
+        return DownloadResumeStorage.load(for: trackId)
+    }
+
+    private func persistResumeData(_ data: Data?, for trackId: String) {
+        guard let data else {
+            return
+        }
+
+        do {
+            try DownloadResumeStorage.save(data, for: trackId)
+        } catch {
+            AppLogger.transfer.warning("Failed to persist resume data for \(trackId): \(error.localizedDescription)")
+        }
+    }
+
     private func startDownload(_ track: Track, remoteURL: URL) throws {
         let task = self.urlSession.downloadTask(with: remoteURL)
         task.taskDescription = track.id
@@ -285,8 +373,9 @@ extension NetworkService: URLSessionDownloadDelegate {
             }
 
             let isPaused = await self.downloadStore.consumePauseRequested(for: trackID)
+            let isRelaunchSnapshot = await self.downloadStore.consumeRelaunchSnapshotRequested(for: trackID)
 
-            if isPaused {
+            if isPaused || isRelaunchSnapshot {
                 return
             }
 
@@ -330,6 +419,8 @@ extension NetworkService: URLSessionDownloadDelegate {
                 from: location,
                 trackID: trackID
             )
+
+            DownloadResumeStorage.remove(for: trackID)
 
             NotificationCenter.default.post(
                 name: .trackDownloadDidFinish,

@@ -10,11 +10,12 @@ import Resolver
 
 @main
 struct TuneBoxApp: App {
-    @Injected var networkService: NetworkServicing
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @Injected var networkService: NetworkServicing
+    @Injected private var viewModel: TransferManaging
 
     init() {
-        appDelegate.configure(networkService: networkService)
+        appDelegate.configure(networkService: networkService, viewModel: viewModel)
     }
 
     var body: some Scene {
@@ -26,18 +27,23 @@ struct TuneBoxApp: App {
 
     private struct LoadViewModifer: ViewModifier {
         @Environment(\.scenePhase) private var scenePhase
+        @Injected private var viewModel: TransferManaging
 
         func body(content: Content) -> some View {
             content
                 .onChange(of: scenePhase) { _, newPhase in
                     switch newPhase {
                         case .active:
+                            Task { @MainActor in
+                                await viewModel.restoreDownloadsOnForeground()
+                            }
                             AppLogger.app.info("App is active")
 
                         case .inactive:
                             AppLogger.app.info("App is inactive")
 
                         case .background:
+                            viewModel.saveStateBeforeClose()
                             AppLogger.app.info("App moved to background")
 
                         @unknown default:
