@@ -65,6 +65,7 @@ struct ContentView: View {
                                         case .queued:
                                             viewModel.cancelQueuedDownload(trackId: track.id)
                                         case .failed:
+                                            viewModel.errorMessage = nil
                                             await viewModel.startDownload(track)
                                     }
                                 }
