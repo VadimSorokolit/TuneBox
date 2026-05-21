@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AVFoundation
 
 enum CellState {
     case idle
@@ -22,13 +23,39 @@ struct BrowsTrackCell: View {
     var state: CellState
     let onTap: () async -> Void
 
+    @State private var isPlaying = false
+
     var body: some View {
         HStack(spacing: 12) {
-            Text(id)
-                .font(.system(size: 12))
-                .lineLimit(1)
-                .frame(width: 90, alignment: .leading)
-                .padding(.leading, 10)
+            VStack(spacing: 10) {
+                Text(id)
+                    .font(.system(size: 12))
+                    .lineLimit(1)
+                    .frame(width: 90, alignment: .leading)
+                    .padding(.leading, 10)
+
+                if state == .completed {
+                    Button(action: {
+                        if isPlaying {
+                            AudioService.shared.pause()
+                        } else {
+                            AudioService.shared.play(trackId: id)
+                        }
+
+                        isPlaying = AudioService.shared.isPlaying
+                    }, label: {
+                        Circle()
+                            .frame(width: 40, height: 40)
+                            .foregroundStyle(Color.green)
+                            .overlay(
+                                Image(systemName: isPlaying
+                                      ? "pause.fill"
+                                      : "play.fill")
+                            )
+                            .foregroundStyle(Color.white)
+                    })
+                }
+            }
 
             ProgressView(value: progress)
                 .tint(buttonColor)

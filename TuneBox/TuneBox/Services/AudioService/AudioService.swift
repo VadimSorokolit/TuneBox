@@ -1,0 +1,276 @@
+//
+//  Untitled.swift
+//  TuneBox
+//
+//  Created by Nintendo on 21.05.2026.
+//
+
+import Foundation
+import AVFoundation
+import os
+
+protocol AudioServicing: AnyObject {
+    var currentTrackId: String? { get }
+    var isPlaying: Bool { get }
+    var duration: TimeInterval { get }
+    var currentTime: TimeInterval { get }
+    var volume: Float { get set }
+    var onStateChange: ((Bool) -> Void)? { get set }
+    var onProgress: ((Double) -> Void)? { get set }
+
+    func play(trackId: String, ext: String, loop: Bool)
+    func pause()
+    func resume()
+    func stop()
+    func toggle(trackId: String, ext: String, loop: Bool)
+    func seek(by deltaSeconds: TimeInterval)
+    func seek(to progress: Double)
+    func playEffect(name: String, ext: String)
+}
+
+final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
+
+    // MARK: - Properties. Public
+
+    static let shared: AudioService = AudioService()
+
+    private(set) var currentTrackId: String?
+    var onStateChange: ((Bool) -> Void)?
+    var onProgress: ((Double) -> Void)?
+
+    var isPlaying: Bool {
+        self.mainPlayer?.isPlaying ?? false
+    }
+
+    var duration: TimeInterval {
+        self.mainPlayer?.duration ?? 0
+    }
+
+    var currentTime: TimeInterval {
+        self.mainPlayer?.currentTime ?? 0
+    }
+
+    var volume: Float {
+        get {
+            self.storedVolume
+        }
+        set {
+            self.storedVolume = self.clampVolume(newValue)
+            self.mainPlayer?.volume = self.storedVolume
+        }
+    }
+
+    // MARK: - Initializer
+
+    private override init() {
+        super.init()
+
+        self.configureAudioSession()
+    }
+
+    // MARK: - Methods. Public
+
+    func play(trackId: String, ext: String = "mp3", loop: Bool = false) {
+        self.stopMainPlayer()
+
+        do {
+            let directoryURL = try GlobalConstants.makeTracksDirectoryURL()
+
+            let url = directoryURL
+                .appendingPathComponent("\(GlobalConstants.downloadedFilePrefix)\(trackId)")
+                .appendingPathExtension(ext)
+
+            try AVAudioSession.sharedInstance().setActive(true)
+
+            let player = try AVAudioPlayer(contentsOf: url)
+            player.prepareToPlay()
+            player.numberOfLoops = loop ? -1 : 0
+            player.volume = self.storedVolume
+            player.delegate = self
+
+            self.mainPlayer = player
+            self.currentTrackId = trackId
+
+            player.play()
+
+            self.notifyStateChange(true)
+            self.startProgressTimer()
+        } catch {
+            AppLogger.audio.error("Failed to play audio: \(String(describing: error))")
+        }
+    }
+
+    func pause() {
+        self.mainPlayer?.pause()
+        self.stopProgressTimer()
+        self.notifyStateChange(false)
+    }
+
+    func resume() {
+        guard self.mainPlayer != nil else {
+            return
+        }
+
+        self.mainPlayer?.play()
+        self.startProgressTimer()
+        self.notifyStateChange(true)
+    }
+
+    func stop() {
+        self.stopMainPlayer()
+        self.stopProgressTimer()
+        self.currentTrackId = nil
+        self.notifyStateChange(false)
+        self.notifyProgress(0)
+    }
+
+    func toggle(trackId: String, ext: String = "mp3", loop: Bool = false) {
+        if self.currentTrackId != trackId {
+            self.play(trackId: trackId, ext: ext, loop: loop)
+
+            return
+        }
+
+        guard let player = self.mainPlayer else {
+            self.play(trackId: trackId, ext: ext, loop: loop)
+
+            return
+        }
+
+        if self.isNearEnd(player) {
+            self.stop()
+
+            return
+        }
+
+        if self.isPlaying {
+            self.pause()
+        } else {
+            self.resume()
+        }
+    }
+
+    func seek(by deltaSeconds: TimeInterval) {
+        guard let player = self.mainPlayer, player.duration > 0 else {
+
+            return
+        }
+
+        let newTime = max(0, min(player.duration, player.currentTime + deltaSeconds))
+        player.currentTime = newTime
+
+        self.notifyProgress(newTime / player.duration)
+    }
+
+    func seek(to progress: Double) {
+        guard let player = self.mainPlayer, player.duration > 0 else {
+
+            return
+        }
+
+        let clamped = min(max(progress, 0), 1)
+        player.currentTime = clamped * player.duration
+
+        self.notifyProgress(clamped)
+    }
+
+    func playEffect(name: String, ext: String = "mp3") {
+        guard let url = Bundle.main.url(forResource: name, withExtension: ext) else {
+            AppLogger.audio.error("Effect file not found: \(name).\(ext)")
+
+            return
+        }
+
+        self.effectPlayer?.stop()
+        self.effectPlayer = nil
+
+        do {
+            let player = try AVAudioPlayer(contentsOf: url)
+            player.prepareToPlay()
+            player.play()
+
+            self.effectPlayer = player
+        } catch {
+            AppLogger.audio.error("Failed to play effect: \(String(describing: error))")
+        }
+    }
+
+    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        guard player === self.mainPlayer else {
+            return
+        }
+
+        self.stop()
+    }
+
+    func configureAudioSession() {
+        do {
+            let session = AVAudioSession.sharedInstance()
+            try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
+            try session.setActive(true)
+        } catch {
+            AppLogger.audio.error("Failed to configure audio session: \(String(describing: error))")
+        }
+    }
+
+    // MARK: - Properties. Private
+
+    private var mainPlayer: AVAudioPlayer?
+    private var effectPlayer: AVAudioPlayer?
+    private var progressTimer: Timer?
+    private var storedVolume: Float = 1.0
+    private static let progressInterval: TimeInterval = 0.1
+    private static let endThreshold: TimeInterval = 0.05
+
+    // MARK: - Methods. Private
+
+    private func stopMainPlayer() {
+        self.mainPlayer?.stop()
+        self.mainPlayer = nil
+    }
+
+    private func isNearEnd(_ player: AVAudioPlayer) -> Bool {
+        (player.duration - player.currentTime) <= Self.endThreshold
+    }
+
+    private func startProgressTimer() {
+        self.stopProgressTimer()
+
+        let timer = Timer(
+            timeInterval: Self.progressInterval,
+            repeats: true
+        ) { [weak self] _ in
+            guard let self = self,
+                  let player = self.mainPlayer,
+                  player.duration > 0 else {
+                return
+            }
+
+            self.notifyProgress(player.currentTime / player.duration)
+        }
+
+        self.progressTimer = timer
+        RunLoop.main.add(timer, forMode: .common)
+    }
+
+    private func stopProgressTimer() {
+        self.progressTimer?.invalidate()
+        self.progressTimer = nil
+    }
+
+    private func notifyStateChange(_ playing: Bool) {
+        DispatchQueue.main.async { [weak self] in
+            self?.onStateChange?(playing)
+        }
+    }
+
+    private func notifyProgress(_ progress: Double) {
+        DispatchQueue.main.async { [weak self] in
+            self?.onProgress?(progress)
+        }
+    }
+
+    private func clampVolume(_ value: Float) -> Float {
+        max(0, min(1, value))
+    }
+}

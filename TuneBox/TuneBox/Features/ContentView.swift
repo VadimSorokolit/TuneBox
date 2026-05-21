@@ -101,8 +101,8 @@ struct ContentView: View {
 
         func body(content: Content) -> some View {
             content
-//                .task {
-//                    await viewModel.loadFirst()
+                .task {
+                    await viewModel.loadFirst()
 //                    viewModel.deleteAllTracks()
 
 //                    viewModel.deleteDownloadedTrack(id: "1214935")
@@ -126,7 +126,7 @@ struct ContentView: View {
 //                    if let track = viewModel.tracks.first {
 //                        viewModel.deleteDownloadedTrack(id: track.id)
 //                    }
-//                }
+                }
         }
     }
 }
