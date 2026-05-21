@@ -27,6 +27,7 @@ extension Resolver: @retroactive ResolverRegistering {
 
             return NetworkService(provider: provider) as NetworkServicing
         }
+        .scope(.application)
     }
 
     private static func registerStorageService() {

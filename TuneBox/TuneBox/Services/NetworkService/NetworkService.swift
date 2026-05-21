@@ -24,6 +24,7 @@ protocol NetworkServicing: AnyObject {
     func stopDownload(trackId: String) async
     func resumeDownload(trackId: String) async throws
     func cancelDownload(trackID: String) async
+    func handleBackgroundCompletion(_ handler: @escaping () -> Void)
 }
 
 final class NetworkService: NSObject, NetworkServicing {
@@ -135,6 +136,10 @@ final class NetworkService: NSObject, NetworkServicing {
         }
     }
 
+    func handleBackgroundCompletion(_ handler: @escaping () -> Void) {
+        self.backgroundCompletionHandler = handler
+    }
+
     // MARK: - Initializer
 
     init(provider: MoyaProvider<TuneBoxRouter>) {
@@ -154,12 +159,25 @@ final class NetworkService: NSObject, NetworkServicing {
     private enum Constants {
         static let successStatus = "success"
         static let trackContentLengthHeader = "Content-Length"
+        static let urlSessionBackgroundIdentifier: String = "com.tunebox.background.downloads"
     }
 
+    private var backgroundCompletionHandler: (() -> Void)?
     private var requestHandler: (TuneBoxRouter) async throws -> Response
 
     private lazy var urlSession: URLSession = {
-        URLSession(configuration: .default, delegate: self, delegateQueue: nil)
+        let configuration = URLSessionConfiguration.background(
+            withIdentifier: Constants.urlSessionBackgroundIdentifier
+        )
+
+        configuration.sessionSendsLaunchEvents = true
+        configuration.isDiscretionary = false
+
+        return URLSession(
+            configuration: configuration,
+            delegate: self,
+            delegateQueue: nil
+        )
     }()
 
     private let downloadStore = DownloadStore()
@@ -241,26 +259,44 @@ final class NetworkService: NSObject, NetworkServicing {
 
 extension NetworkService: URLSessionDownloadDelegate {
 
+    func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
+        Swift.Task { @MainActor in
+            self.backgroundCompletionHandler?()
+            self.backgroundCompletionHandler = nil
+        }
+    }
+
     func urlSession(
         _ session: URLSession,
-        downloadTask: URLSessionDownloadTask,
-        didWriteData bytesWritten: Int64,
-        totalBytesWritten: Int64,
-        totalBytesExpectedToWrite: Int64
+        task: URLSessionTask,
+        didCompleteWithError error: Error?
     ) {
-        guard let trackID = downloadTask.taskDescription else {
-            return
-        }
+        Swift.Task { [weak self] in
+            guard let self else { return }
+            guard let trackID = await self.downloadStore.trackID(for: task) else {
+                return
+            }
 
-        NotificationCenter.default.post(
-            name: .trackDownloadProgress,
-            object: nil,
-            userInfo: [
-                TrackDownloadNotificationUserInfoKey.trackID: trackID,
-                TrackDownloadNotificationUserInfoKey.totalBytesWritten: totalBytesWritten,
-                TrackDownloadNotificationUserInfoKey.totalBytesExpectedToWrite: totalBytesExpectedToWrite
-            ]
-        )
+            await self.downloadStore.clearTask(for: trackID)
+
+            guard let error else {
+                return
+            }
+
+            let isPaused = await self.downloadStore.consumePauseRequested(for: trackID)
+            if isPaused {
+                return
+            }
+
+            NotificationCenter.default.post(
+                name: .trackDownloadDidFail,
+                object: nil,
+                userInfo: [
+                    TrackDownloadNotificationUserInfoKey.trackID: trackID,
+                    TrackDownloadNotificationUserInfoKey.error: APIError.from(error)
+                ]
+            )
+        }
     }
 
     func urlSession(
@@ -299,35 +335,24 @@ extension NetworkService: URLSessionDownloadDelegate {
 
     func urlSession(
         _ session: URLSession,
-        task: URLSessionTask,
-        didCompleteWithError error: Error?
+        downloadTask: URLSessionDownloadTask,
+        didWriteData bytesWritten: Int64,
+        totalBytesWritten: Int64,
+        totalBytesExpectedToWrite: Int64
     ) {
-        Swift.Task { [weak self] in
-            guard let self else { return }
-            guard let trackID = await self.downloadStore.trackID(for: task) else {
-                return
-            }
-
-            await self.downloadStore.clearTask(for: trackID)
-
-            guard let error else {
-                return
-            }
-
-            let isPaused = await self.downloadStore.consumePauseRequested(for: trackID)
-            if isPaused {
-                return
-            }
-
-            NotificationCenter.default.post(
-                name: .trackDownloadDidFail,
-                object: nil,
-                userInfo: [
-                    TrackDownloadNotificationUserInfoKey.trackID: trackID,
-                    TrackDownloadNotificationUserInfoKey.error: APIError.from(error)
-                ]
-            )
+        guard let trackID = downloadTask.taskDescription else {
+            return
         }
+
+        NotificationCenter.default.post(
+            name: .trackDownloadProgress,
+            object: nil,
+            userInfo: [
+                TrackDownloadNotificationUserInfoKey.trackID: trackID,
+                TrackDownloadNotificationUserInfoKey.totalBytesWritten: totalBytesWritten,
+                TrackDownloadNotificationUserInfoKey.totalBytesExpectedToWrite: totalBytesExpectedToWrite
+            ]
+        )
     }
 
 }
