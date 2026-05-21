@@ -25,6 +25,7 @@ protocol TransferDownloadManaging: AnyObject {
     func startDownload(_ track: Track) async throws
     func stopDownload(trackId: String) async
     func resumeDownload(trackId: String) async
+    func cancelQueuedDownload(trackId: String)
     func deleteDownloadedTrack(id: String)
 }
 
@@ -99,6 +100,8 @@ final class TransferViewModel: TransferManaging {
                 try await self.loadTracks(page: 0)
             } else {
                 self.tracks = entities.map { Track(entity: $0) }
+                self.restoreDownloadQueue()
+                await self.processDownloadQueue()
             }
         } catch {
             self.handleError(error)
@@ -123,45 +126,30 @@ final class TransferViewModel: TransferManaging {
     }
 
     func startDownload(_ track: Track) async {
-        if let index = self.tracks.firstIndex(where: { $0.id == track.id }) {
-            guard self.hasEnoughFreeSpace(for: self.tracks[index]) else {
-                return
-            }
-
-            if self.tracks[index].downloadingSize != 0 {
-                await self.resumeDownload(trackId: self.tracks[index].id)
-                return
-            }
-
-            await self.performDownload(trackId: track.id) {
-                self.tracks[index].downloadState = .downloading
-
-                do {
-                    try self.persistenceService.upsert(track: TrackEntity(track: self.tracks[index]))
-                } catch {
-                    self.handleError(error)
-                }
-
-                do {
-                    _ = try await self.networkService.downloadTrack(track)
-                } catch {
-                    self.handleError(error)
-                }
-
-                self.tracks[index].downloadState = .completed
-                self.tracks[index].fileState = .exists
-
-                do {
-                    try self.persistenceService.upsert(track: TrackEntity(track: self.tracks[index]))
-                } catch {
-                    self.handleError(error)
-                }
-            }
+        guard let index = self.tracks.firstIndex(where: { $0.id == track.id }) else {
+            return
         }
+
+        guard self.hasEnoughFreeSpace(for: self.tracks[index]) else {
+            return
+        }
+
+        if self.tracks[index].downloadingSize != 0 {
+            await self.resumeDownload(trackId: self.tracks[index].id)
+            return
+        }
+
+        if self.hasFreeDownloadSlot == false {
+            self.enqueueDownload(trackId: track.id, at: index)
+            return
+        }
+
+        await self.activateDownload(track: self.tracks[index], at: index)
     }
 
     func stopDownload(trackId: String) async {
         await self.networkService.stopDownload(trackId: trackId)
+        await self.finishActiveDownload(trackId: trackId)
 
         if let index = self.tracks.firstIndex(where: { $0.id == trackId }) {
             self.tracks[index].downloadState = .paused
@@ -180,27 +168,37 @@ final class TransferViewModel: TransferManaging {
     }
 
     func resumeDownload(trackId: String) async {
-        if let index = self.tracks.firstIndex(where: { $0.id == trackId }) {
-            if self.hasEnoughFreeSpace(for: self.tracks[index]) == false {
-                return
-            }
-
-            await self.performDownload(trackId: trackId) {
-                do {
-                    try await self.networkService.resumeDownload(trackId: trackId)
-
-                    self.tracks[index].downloadState = .downloading
-
-                    do {
-                        try self.persistenceService.upsert(track: TrackEntity(track: self.tracks[index]))
-                    } catch {
-                        self.handleError(error)
-                    }
-                } catch {
-                    self.handleError(error)
-                }
-            }
+        guard let index = self.tracks.firstIndex(where: { $0.id == trackId }) else {
+            return
         }
+
+        guard self.hasEnoughFreeSpace(for: self.tracks[index]) else {
+            return
+        }
+
+        if self.hasFreeDownloadSlot == false {
+            self.enqueueDownload(trackId: trackId, at: index)
+            return
+        }
+
+        await self.activateResumeDownload(track: self.tracks[index], at: index)
+    }
+
+    func cancelQueuedDownload(trackId: String) {
+        guard let index = self.tracks.firstIndex(where: { $0.id == trackId }) else {
+            return
+        }
+
+        guard self.tracks[index].downloadState == .queued else {
+            return
+        }
+
+        self.downloadQueue.removeAll { $0 == trackId }
+        self.tracks[index].downloadState = .idle
+        self.tracks[index].fileState = .none
+        self.tracks[index].downloadingSize = 0
+
+        self.persistTrack(at: index)
     }
 
     func deleteDownloadedTrack(id: String) {
@@ -229,6 +227,7 @@ final class TransferViewModel: TransferManaging {
     // MARK: - Only for testing!!!
 
     func deleteAllTracks() {
+        self.downloadQueue.removeAll()
         do {
             _  = try persistenceService.clearStorage()
             do {
@@ -291,13 +290,31 @@ final class TransferViewModel: TransferManaging {
             object: nil,
             queue: mainQueue
         ) { notification in
-            guard let trackID = notification.userInfo?["trackID"] as? String else {
+            guard let trackID = notification.userInfo?[TrackDownloadNotificationUserInfoKey.trackID] as? String else {
                 return
             }
 
             Task { @MainActor [weak self, trackID] in
                 guard let self else { return }
                 self.applyDownloadFinished(trackID: trackID)
+            }
+        }
+
+        self.downloadObserverTokens.failedToken = NotificationCenter.default.addObserver(
+            forName: .trackDownloadDidFail,
+            object: nil,
+            queue: mainQueue
+        ) { notification in
+            guard
+                let trackID = notification.userInfo?[TrackDownloadNotificationUserInfoKey.trackID] as? String,
+                let error = notification.userInfo?[TrackDownloadNotificationUserInfoKey.error]
+            else {
+                return
+            }
+
+            Task { @MainActor [weak self, trackID, error] in
+                guard let self else { return }
+                self.applyDownloadFailed(trackID: trackID, error: error)
             }
         }
     }
@@ -308,8 +325,8 @@ final class TransferViewModel: TransferManaging {
     private let networkService: NetworkServicing
     private let persistenceService: PersistenceServicing
     private let storageService: FileManagerServicing
-    private let downloadSlotLimiter = TransferDownloadSlotLimiter()
     private let downloadObserverTokens = TransferDownloadObserverTokens()
+    private var downloadQueue: [String] = []
 
     // MARK: - Methods. Private
 
@@ -340,24 +357,86 @@ final class TransferViewModel: TransferManaging {
         }
     }
 
-    private func performDownload(
-        trackId: String,
-        operation: () async throws -> Void
-    ) async {
-        await self.downloadSlotLimiter.acquire(limit: self.simultaneouslyLoadingTraks)
+    private var hasFreeDownloadSlot: Bool {
+        self.downloadingTrackIds.count < self.simultaneouslyLoadingTraks
+    }
 
-        defer {
-            self.downloadSlotLimiter.release()
+    private func restoreDownloadQueue() {
+        self.downloadQueue = self.tracks
+            .filter { $0.downloadState == .queued }
+            .map(\.id)
+    }
+
+    private func enqueueDownload(trackId: String, at index: Int) {
+        guard self.downloadQueue.contains(trackId) == false else {
+            return
         }
 
-        self.downloadingTrackIds.insert(trackId)
+        self.downloadQueue.append(trackId)
+        self.tracks[index].downloadState = .queued
+        self.persistTrack(at: index)
+    }
 
-        defer {
-            self.downloadingTrackIds.remove(trackId)
-        }
+    private func activateDownload(track: Track, at index: Int) async {
+        self.downloadingTrackIds.insert(track.id)
+        self.tracks[index].downloadState = .downloading
+        self.persistTrack(at: index)
 
         do {
-            try await operation()
+            try await self.networkService.startDownload(track)
+        } catch {
+            self.handleError(error)
+            await self.finishActiveDownload(trackId: track.id)
+        }
+    }
+
+    private func activateResumeDownload(track: Track, at index: Int) async {
+        self.downloadingTrackIds.insert(track.id)
+
+        do {
+            try await self.networkService.resumeDownload(trackId: track.id)
+            self.tracks[index].downloadState = .downloading
+            self.persistTrack(at: index)
+        } catch {
+            self.handleError(error)
+            await self.finishActiveDownload(trackId: track.id)
+        }
+    }
+
+    private func finishActiveDownload(trackId: String) async {
+        self.downloadingTrackIds.remove(trackId)
+        await self.processDownloadQueue()
+    }
+
+    private func processDownloadQueue() async {
+        while self.hasFreeDownloadSlot, self.downloadQueue.isEmpty == false {
+            let trackId = self.downloadQueue.removeFirst()
+
+            guard let index = self.tracks.firstIndex(where: { $0.id == trackId }) else {
+                continue
+            }
+
+            guard self.tracks[index].downloadState == .queued else {
+                continue
+            }
+
+            guard self.hasEnoughFreeSpace(for: self.tracks[index]) else {
+                self.tracks[index].downloadState = .idle
+                self.persistTrack(at: index)
+                continue
+            }
+
+            if self.tracks[index].downloadingSize != 0 {
+                await self.activateResumeDownload(track: self.tracks[index], at: index)
+            } else {
+                await self.activateDownload(track: self.tracks[index], at: index)
+            }
+        }
+    }
+
+    private func persistTrack(at index: Int) {
+        do {
+            try self.persistenceService.upsert(track: TrackEntity(track: self.tracks[index]))
         } catch {
             self.handleError(error)
         }
@@ -395,6 +474,38 @@ final class TransferViewModel: TransferManaging {
         }
 
         self.tracks[index].downloadingSize = self.tracks[index].size ?? 0
+        self.tracks[index].downloadState = .completed
+        self.tracks[index].fileState = .exists
+
+        do {
+            try self.persistenceService.upsert(track: TrackEntity(track: self.tracks[index]))
+        } catch {
+            self.handleError(error)
+        }
+
+        Task {
+            await self.finishActiveDownload(trackId: trackID)
+        }
+    }
+
+    private func applyDownloadFailed(trackID: String, error: Any) {
+        guard let index = self.tracks.firstIndex(where: { $0.id == trackID }) else {
+            return
+        }
+
+        self.tracks[index].downloadState = .idle
+
+        if let apiError = error as? APIError {
+            self.handleError(apiError)
+        } else if let localizedError = error as? Error {
+            self.handleError(localizedError)
+        } else {
+            self.handleError(APIError.unknown)
+        }
+
+        Task {
+            await self.finishActiveDownload(trackId: trackID)
+        }
     }
 
     private func logTransferWarning(_ message: String) {

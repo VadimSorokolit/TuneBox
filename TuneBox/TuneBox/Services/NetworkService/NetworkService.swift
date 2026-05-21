@@ -12,13 +12,14 @@ enum TrackDownloadNotificationUserInfoKey {
     static let trackID = "trackID"
     static let totalBytesWritten = "totalBytesWritten"
     static let totalBytesExpectedToWrite = "totalBytesExpectedToWrite"
+    static let destinationURL = "url"
+    static let error = "error"
 }
 
 protocol NetworkServicing: AnyObject {
     func getTracksByGenre(genre: String?, page: Int, perPage: Int) async throws -> [Track]
     func getPopularTracks(page: Int, perPage: Int) async throws -> [Track]
     func searchTracks(query: String, page: Int, perPage: Int) async throws -> [Track]
-    func downloadTrack(_ track: Track) async throws -> URL
     func startDownload(_ track: Track) async throws
     func stopDownload(trackId: String) async
     func resumeDownload(trackId: String) async throws
@@ -59,33 +60,6 @@ final class NetworkService: NSObject, NetworkServicing {
             return await self.enrichTracksWithSize(decoded.results)
         } catch {
             throw APIError.from(error)
-        }
-    }
-
-    func downloadTrack(_ track: Track) async throws -> URL {
-        guard let remoteURL = track.downloadURL else {
-            throw APIError.invalidURL
-        }
-
-        return try await withCheckedThrowingContinuation { continuation in
-            Swift.Task { [weak self] in
-                guard let self else {
-                    continuation.resume(throwing: APIError.unknown)
-                    return
-                }
-
-                await self.downloadStore.setContinuation(
-                    continuation,
-                    for: track.id
-                )
-
-                do {
-                    try self.startDownload(track, remoteURL: remoteURL)
-                } catch {
-                    await self.downloadStore.removeContinuation(for: track.id)
-                    continuation.resume(throwing: APIError.from(error))
-                }
-            }
         }
     }
 
@@ -137,10 +111,6 @@ final class NetworkService: NSObject, NetworkServicing {
         task.cancel()
         await self.downloadStore.clearTask(for: trackID)
         await self.downloadStore.clearResumeData(for: trackID)
-
-        if let continuation = await self.downloadStore.takeContinuation(for: trackID) {
-            continuation.resume(throwing: APIError.network(URLError(.cancelled)))
-        }
     }
 
     private func getTrackSize(id: Int) async throws -> Int {
@@ -302,37 +272,28 @@ extension NetworkService: URLSessionDownloadDelegate {
             return
         }
 
-        let result: Result<URL, Error>
         do {
             let destinationURL = try self.moveDownloadedFile(
                 from: location,
                 trackID: trackID
             )
-            result = .success(destinationURL)
             NotificationCenter.default.post(
                 name: .trackDownloadDidFinish,
                 object: nil,
                 userInfo: [
-                    "trackID": trackID,
-                    "url": destinationURL
+                    TrackDownloadNotificationUserInfoKey.trackID: trackID,
+                    TrackDownloadNotificationUserInfoKey.destinationURL: destinationURL
                 ]
             )
         } catch {
-            result = .failure(error)
-        }
-
-        Swift.Task { [weak self] in
-            guard let self else { return }
-            guard let continuation = await self.downloadStore.takeContinuation(for: trackID) else {
-                return
-            }
-
-            switch result {
-                case .success(let destinationURL):
-                    continuation.resume(returning: destinationURL)
-                case .failure(let error):
-                    continuation.resume(throwing: APIError.from(error))
-            }
+            NotificationCenter.default.post(
+                name: .trackDownloadDidFail,
+                object: nil,
+                userInfo: [
+                    TrackDownloadNotificationUserInfoKey.trackID: trackID,
+                    TrackDownloadNotificationUserInfoKey.error: APIError.from(error)
+                ]
+            )
         }
     }
 
@@ -358,9 +319,14 @@ extension NetworkService: URLSessionDownloadDelegate {
                 return
             }
 
-            if let continuation = await self.downloadStore.takeContinuation(for: trackID) {
-                continuation.resume(throwing: APIError.from(error))
-            }
+            NotificationCenter.default.post(
+                name: .trackDownloadDidFail,
+                object: nil,
+                userInfo: [
+                    TrackDownloadNotificationUserInfoKey.trackID: trackID,
+                    TrackDownloadNotificationUserInfoKey.error: APIError.from(error)
+                ]
+            )
         }
     }
 

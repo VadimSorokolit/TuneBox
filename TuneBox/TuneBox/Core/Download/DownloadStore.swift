@@ -11,7 +11,6 @@ actor DownloadStore {
     private var tasksByTrackID: [String: URLSessionDownloadTask] = [:]
     private var trackIDByTaskIdentifier: [Int: String] = [:]
     private var resumeDataByTrackID: [String: Data] = [:]
-    private var continuationsByTrackID: [String: CheckedContinuation<URL, Error>] = [:]
     private var stopRequestedTrackIDs: Set<String> = []
 
     func storeTask(_ task: URLSessionDownloadTask, for trackID: String) {
@@ -45,18 +44,6 @@ actor DownloadStore {
 
     func clearResumeData(for trackID: String) {
         self.resumeDataByTrackID.removeValue(forKey: trackID)
-    }
-
-    func setContinuation(_ continuation: CheckedContinuation<URL, Error>, for trackID: String) {
-        self.continuationsByTrackID[trackID] = continuation
-    }
-
-    func takeContinuation(for trackID: String) -> CheckedContinuation<URL, Error>? {
-        self.continuationsByTrackID.removeValue(forKey: trackID)
-    }
-
-    func removeContinuation(for trackID: String) {
-        self.continuationsByTrackID.removeValue(forKey: trackID)
     }
 
     func stopRequested(for trackID: String) {

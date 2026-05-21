@@ -30,6 +30,8 @@ struct ContentView: View {
                                         await viewModel.stopDownload(trackId: track.id)
                                     case .completed:
                                         viewModel.deleteDownloadedTrack(id: track.id)
+                                    case .queued:
+                                        viewModel.cancelQueuedDownload(trackId: track.id)
                                 }
                             }
                         }
@@ -46,6 +48,8 @@ struct ContentView: View {
                 return .idle
             case .downloading:
                 return .downloading
+            case .queued:
+                return .queued
             case .paused:
                 return .paused
             case .completed:
@@ -59,11 +63,12 @@ struct ContentView: View {
         func body(content: Content) -> some View {
             content
                 .task {
+                    await viewModel.loadFirst()
+//                    viewModel.deleteAllTracks()
 
 //                    viewModel.deleteDownloadedTrack(id: "1214935")
 //                      viewModel.deleteDownloadedTrack(id: "1214935")
 //                    await viewModel .loadNext()
-                    await viewModel.loadFirst()
 //                    let tracks = viewModel.tracks.filter { $0.downloadState == .paused }
 //                    for track in tracks {
 //                        await viewModel.startDownload(track)
@@ -78,7 +83,6 @@ struct ContentView: View {
 //                    let tracks = viewModel.tracks.filter { $0.isDownloaded == true }
 //                    print(tracks.count)
 //                    await viewModel.resumeDownload(trackId: "1214935")
-//                    viewModel.deleteAllTracks()
 //                    print(track?.isRemoved)
 //                    if let track = viewModel.tracks.first {
 //                        viewModel.deleteDownloadedTrack(id: track.id)

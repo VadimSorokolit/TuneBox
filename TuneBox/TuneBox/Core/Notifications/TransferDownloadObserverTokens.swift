@@ -10,6 +10,7 @@ import Foundation
 final class TransferDownloadObserverTokens: @unchecked Sendable {
     var progressToken: NSObjectProtocol?
     var finishedToken: NSObjectProtocol?
+    var failedToken: NSObjectProtocol?
 
     deinit {
         if let progressToken {
@@ -17,6 +18,9 @@ final class TransferDownloadObserverTokens: @unchecked Sendable {
         }
         if let finishedToken {
             NotificationCenter.default.removeObserver(finishedToken)
+        }
+        if let failedToken {
+            NotificationCenter.default.removeObserver(failedToken)
         }
     }
 }

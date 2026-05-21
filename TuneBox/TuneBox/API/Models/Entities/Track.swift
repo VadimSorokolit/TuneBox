@@ -22,6 +22,7 @@ enum WaveformMapper {
 enum DownloadState: String, Hashable {
     case idle
     case downloading
+    case queued
     case paused
     case completed
 }

@@ -10,6 +10,7 @@ import SwiftUI
 enum CellState {
     case idle
     case downloading
+    case queued
     case paused
     case completed
 }
@@ -62,6 +63,8 @@ struct BrowsTrackCell: View {
                 return "Download"
             case .downloading:
                 return "Pause"
+            case .queued:
+                return "Cancel"
             case .paused:
                 return "Resume"
             case .completed:
@@ -75,6 +78,8 @@ struct BrowsTrackCell: View {
                 return .blue
             case .downloading:
                 return .orange
+            case .queued:
+                return .purple
             case .paused:
                 return .green
             case .completed:
