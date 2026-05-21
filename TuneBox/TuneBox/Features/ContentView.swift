@@ -63,7 +63,7 @@ struct ContentView: View {
         func body(content: Content) -> some View {
             content
                 .task {
-//                    await viewModel.loadFirst()
+                    await viewModel.loadFirst()
 //                    viewModel.deleteAllTracks()
 
 //                    viewModel.deleteDownloadedTrack(id: "1214935")

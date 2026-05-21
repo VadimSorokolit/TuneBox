@@ -66,9 +66,16 @@ enum APIError: LocalizedError {
                     return .requestEncoding(error)
 
                 case .statusCode(let response):
-                    return response.statusCode == 404
-                    ? .notFound
-                    : .serverStatusCode(response.statusCode)
+                    switch response.statusCode {
+                        case 404:
+                            return .notFound
+
+                        case 500 ... 599:
+                            return .server("Server is unavailable")
+
+                        default:
+                            return .serverStatusCode(response.statusCode)
+                    }
 
                 case .underlying(let underlying, _):
                     return from(underlying)

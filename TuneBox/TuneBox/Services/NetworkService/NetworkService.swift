@@ -273,6 +273,7 @@ extension NetworkService: URLSessionDownloadDelegate {
     ) {
         Swift.Task { [weak self] in
             guard let self else { return }
+
             guard let trackID = await self.downloadStore.trackID(for: task) else {
                 return
             }
@@ -284,6 +285,7 @@ extension NetworkService: URLSessionDownloadDelegate {
             }
 
             let isPaused = await self.downloadStore.consumePauseRequested(for: trackID)
+
             if isPaused {
                 return
             }
@@ -308,11 +310,27 @@ extension NetworkService: URLSessionDownloadDelegate {
             return
         }
 
+        if let response = downloadTask.response as? HTTPURLResponse,
+           !(200 ... 299).contains(response.statusCode) {
+
+            NotificationCenter.default.post(
+                name: .trackDownloadDidFail,
+                object: nil,
+                userInfo: [
+                    TrackDownloadNotificationUserInfoKey.trackID: trackID,
+                    TrackDownloadNotificationUserInfoKey.error: APIError.serverStatusCode(response.statusCode)
+                ]
+            )
+
+            return
+        }
+
         do {
             let destinationURL = try self.moveDownloadedFile(
                 from: location,
                 trackID: trackID
             )
+
             NotificationCenter.default.post(
                 name: .trackDownloadDidFinish,
                 object: nil,
