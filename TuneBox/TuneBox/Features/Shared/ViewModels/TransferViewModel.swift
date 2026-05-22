@@ -100,8 +100,7 @@ final class TransferViewModel: TransferManaging {
             let entities = try self.persistenceService.getTracks()
 
             if entities.isEmpty {
-                let tracks = await self.loadTracks(page: 0)
-                self.tracks = tracks.map(TrackEntity.init)
+                self.tracks = await self.loadTracks(page: 0)
             } else {
                 self.tracks = entities
 
@@ -126,9 +125,7 @@ final class TransferViewModel: TransferManaging {
             self.isLoading = false
         }
 
-        let tracks = await self.loadTracks(page: self.page + 1)
-
-        let newEntityTracks = tracks.map(TrackEntity.init)
+        let newEntityTracks = await self.loadTracks(page: self.page + 1)
         self.tracks.append(contentsOf: newEntityTracks)
     }
 
@@ -228,7 +225,7 @@ final class TransferViewModel: TransferManaging {
             try self.storageService.deleteDownloadedTrack(id: track.id)
             track.downloadState = DownloadState.idle.rawValue
             track.fileState = FileStorageState.removed.rawValue
-                track.downloadingSize = 0
+            track.downloadingSize = 0
         } catch {
             self.handleError(error)
         }
@@ -264,7 +261,7 @@ final class TransferViewModel: TransferManaging {
         TransferQueueStorage.clear()
 
         do {
-            _ = try persistenceService.clearStorage()
+            try self.persistenceService.clearStorage()
 
             do {
                 try self.storageService.clearStorage()
@@ -372,15 +369,23 @@ final class TransferViewModel: TransferManaging {
 
     // MARK: - Methods. Private
 
-    private func loadTracks(page: Int) async -> [TrackDTO] {
+    private func loadTracks(page: Int) async -> [TrackEntity] {
         do {
-            let tracks = try await self.networkService.getPopularTracks(
+            let dtos = try await self.networkService.getPopularTracks(
                 page: page,
                 perPage: self.perPage
             )
             self.page = page
 
-            return tracks
+            let entities = dtos.map(TrackEntity.init)
+
+            do {
+                try self.persistenceService.insert(tracks: entities)
+            } catch {
+                self.handleError(error)
+            }
+
+            return entities
         } catch {
             self.handleError(error)
         }

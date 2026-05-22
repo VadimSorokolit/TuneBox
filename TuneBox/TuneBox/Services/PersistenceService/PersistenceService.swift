@@ -11,9 +11,11 @@ import SwiftData
 protocol PersistenceServicing: AnyObject {
     func getTracks() throws -> [TrackEntity]
     func getTrack(id: String) throws -> TrackEntity?
+    func insert(tracks: [TrackEntity]) throws
     func upsert(track: TrackEntity) throws
     func delete(track: TrackEntity) throws
     func clearStorage() throws
+    func save() throws
 }
 
 final class PersistenceService: PersistenceServicing {
@@ -59,6 +61,19 @@ final class PersistenceService: PersistenceServicing {
         }
     }
 
+    func insert(tracks: [TrackEntity]) throws {
+        for track in tracks {
+            self.modelContext.insert(track)
+        }
+
+        do {
+            try self.modelContext.save()
+        } catch {
+            AppLogger.storage.error("Failed to insert tracks: \(error.localizedDescription)")
+            throw error
+        }
+    }
+
     func upsert(track entity: TrackEntity) throws {
         let id = entity.id
 
@@ -73,6 +88,19 @@ final class PersistenceService: PersistenceServicing {
         }
 
         try self.modelContext.save()
+    }
+
+    func save() throws {
+        guard self.modelContext.hasChanges else {
+            return
+        }
+
+        do {
+            try self.modelContext.save()
+        } catch {
+            AppLogger.storage.error("Failed to save context: \(error.localizedDescription)")
+            throw error
+        }
     }
 
     func delete(track: TrackEntity) throws {
