@@ -50,24 +50,24 @@ struct ContentView: View {
 
             VStack(spacing: 5) {
                 if !viewModel.tracks.isEmpty {
-                    ForEach(viewModel.tracks) { track in
+                    ForEach(viewModel.tracks, id: \.id) { track in
                         BrowsTrackCell(
                             id: track.id,
                             progress: track.downloadingProgress,
                             state: cellState(from: track),
                             onTap: {
                                 Task {
-                                    switch track.downloadState {
+                                    switch DownloadState(rawValue: track.downloadState) ?? .idle {
                                         case .idle:
                                             await viewModel.startDownload(track)
                                         case .paused:
-                                            await viewModel.resumeDownload(trackId: track.id)
+                                            await viewModel.resumeDownload(track: track)
                                         case .downloading:
-                                            await viewModel.stopDownload(trackId: track.id)
+                                            await viewModel.stopDownload(track: track)
                                         case .completed:
-                                            viewModel.deleteDownloadedTrack(id: track.id)
+                                            viewModel.deleteDownloadedTrack(track: track)
                                         case .queued:
-                                            viewModel.cancelQueuedDownload(trackId: track.id)
+                                            viewModel.cancelQueuedDownload(track: track)
                                         case .failed:
                                             viewModel.errorMessage = nil
                                             await viewModel.startDownload(track)
@@ -98,18 +98,18 @@ struct ContentView: View {
         .modifier(LoadViewModifier())
     }
 
-    private func cellState(from track: Track) -> CellState {
-        switch track.downloadState {
+    private func cellState(from track: TrackEntity) -> CellState {
+        switch DownloadState(rawValue: track.downloadState) ?? .idle {
             case .idle:
                 return .idle
-            case .downloading:
-                return .downloading
-            case .queued:
-                return .queued
             case .paused:
                 return .paused
+            case .downloading:
+                return .downloading
             case .completed:
                 return .completed
+            case .queued:
+                return .queued
             case .failed:
                 return .failed
         }

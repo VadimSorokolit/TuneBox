@@ -17,10 +17,10 @@ enum TrackDownloadNotificationUserInfoKey {
 }
 
 protocol NetworkServicing: AnyObject {
-    func getTracksByGenre(genre: String?, page: Int, perPage: Int) async throws -> [Track]
-    func getPopularTracks(page: Int, perPage: Int) async throws -> [Track]
-    func searchTracks(query: String, page: Int, perPage: Int) async throws -> [Track]
-    func startDownload(_ track: Track) async throws
+    func getTracksByGenre(genre: String?, page: Int, perPage: Int) async throws -> [TrackDTO]
+    func getPopularTracks(page: Int, perPage: Int) async throws -> [TrackDTO]
+    func searchTracks(query: String, page: Int, perPage: Int) async throws -> [TrackDTO]
+    func startDownload(_ track: TrackEntity) async throws
     func stopDownload(trackId: String) async
     func resumeDownload(trackId: String) async throws
     func cancelDownload(trackID: String) async
@@ -39,7 +39,7 @@ final class NetworkService: NSObject, NetworkServicing {
 
     // MARK: - Methods. Public
 
-    func getTracksByGenre(genre: String?, page: Int, perPage: Int) async throws -> [Track] {
+    func getTracksByGenre(genre: String?, page: Int, perPage: Int) async throws -> [TrackDTO] {
         do {
             let response = try await self.requestHandler(.getTracksByGenre(genre: genre, page: page, perPage: perPage))
             let decoded = try self.decodeResponse(TracksResponse.self, from: response)
@@ -50,7 +50,7 @@ final class NetworkService: NSObject, NetworkServicing {
         }
     }
 
-    func getPopularTracks(page: Int, perPage: Int) async throws -> [Track] {
+    func getPopularTracks(page: Int, perPage: Int) async throws -> [TrackDTO] {
         do {
             let response = try await self.requestHandler(.getPopularTracks(page: page, perPage: perPage))
             let decoded = try self.decodeResponse(TracksResponse.self, from: response)
@@ -61,7 +61,7 @@ final class NetworkService: NSObject, NetworkServicing {
         }
     }
 
-    func searchTracks(query: String, page: Int, perPage: Int) async throws -> [Track] {
+    func searchTracks(query: String, page: Int, perPage: Int) async throws -> [TrackDTO] {
         do {
             let response = try await self.requestHandler(.searchTracks(query: query, page: page, perPage: perPage))
             let decoded = try self.decodeResponse(TracksResponse.self, from: response)
@@ -72,13 +72,14 @@ final class NetworkService: NSObject, NetworkServicing {
         }
     }
 
-    func startDownload(_ track: Track) async throws {
+    @MainActor
+    func startDownload(_ track: TrackEntity) async throws {
         guard let remoteURL = track.downloadURL else {
             throw APIError.invalidURL
         }
 
         do {
-            try await self.startDownload(track, remoteURL: remoteURL)
+            try await self.startDownload(trackID: track.id, remoteURL: remoteURL)
         } catch {
             throw APIError.from(error)
         }
@@ -107,8 +108,10 @@ final class NetworkService: NSObject, NetworkServicing {
 
         let task = self.urlSession.downloadTask(withResumeData: resumeData)
         task.taskDescription = trackId
+
         await self.downloadStore.storeTask(task, for: trackId)
         await self.downloadStore.clearResumeData(for: trackId)
+
         DownloadResumeStorage.remove(for: trackId)
 
         task.resume()
@@ -120,8 +123,10 @@ final class NetworkService: NSObject, NetworkServicing {
         }
 
         task.cancel()
+
         await self.downloadStore.clearTask(for: trackID)
         await self.downloadStore.clearResumeData(for: trackID)
+
         DownloadResumeStorage.remove(for: trackID)
     }
 
@@ -316,7 +321,7 @@ final class NetworkService: NSObject, NetworkServicing {
 
     // MARK: - Methods. Private
 
-    private func enrichTracksWithSize(_ tracks: [Track]) async -> [Track] {
+    private func enrichTracksWithSize(_ tracks: [TrackDTO]) async -> [TrackDTO] {
         await withTaskGroup(of: (Int, Int?).self) { group in
             for (index, track) in tracks.enumerated() {
                 group.addTask { [weak self] in
@@ -383,10 +388,12 @@ final class NetworkService: NSObject, NetworkServicing {
         }
     }
 
-    private func startDownload(_ track: Track, remoteURL: URL) async throws {
-        let task = self.urlSession.downloadTask(with: remoteURL)
-        task.taskDescription = track.id
-        await self.downloadStore.storeTask(task, for: track.id)
+    private func startDownload(trackID: String, remoteURL: URL) async throws {
+        let task = urlSession.downloadTask(with: remoteURL)
+        task.taskDescription = trackID
+
+        await downloadStore.storeTask(task, for: trackID)
+
         task.resume()
     }
 

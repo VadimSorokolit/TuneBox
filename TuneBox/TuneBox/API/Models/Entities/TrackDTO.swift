@@ -38,7 +38,7 @@ struct Waveform: Codable, Hashable {
     let peaks: [Int]
 }
 
-struct Track: Identifiable, Decodable, Hashable {
+struct TrackDTO: Identifiable, Decodable, Hashable {
 
     // MARK: - API Properties
 
@@ -148,7 +148,7 @@ struct Track: Identifiable, Decodable, Hashable {
     }
 }
 
-extension Track {
+extension TrackDTO {
 
     init(entity: TrackEntity) {
         self.id = entity.id

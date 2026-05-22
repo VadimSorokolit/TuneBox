@@ -22,11 +22,11 @@ enum SimultaneouslyLoadingTraks: Int {
 }
 
 protocol TransferDownloadManaging: AnyObject {
-    func startDownload(_ track: Track) async throws
-    func stopDownload(trackId: String) async
-    func resumeDownload(trackId: String) async
-    func cancelQueuedDownload(trackId: String)
-    func deleteDownloadedTrack(id: String)
+    func startDownload(_ track: TrackEntity) async
+    func stopDownload(track: TrackEntity) async
+    func resumeDownload(track: TrackEntity) async
+    func cancelQueuedDownload(track: TrackEntity)
+    func deleteDownloadedTrack(track: TrackEntity)
 }
 
 protocol TransferPersistenceServicing: AnyObject {
@@ -38,7 +38,7 @@ protocol TransferPersistenceServicing: AnyObject {
 
 protocol TransferStateProviding: AnyObject {
     var page: Int { get set }
-    var tracks: [Track] { get set }
+    var tracks: [TrackEntity] { get set }
     var downloadingTrackIds: Set<String> { get set }
     var isLoading: Bool { get set }
     var errorMessage: String? { get set }
@@ -59,7 +59,7 @@ protocol TransferManaging:
     TransferPersistenceServicing {
     func loadFirst() async
     func loadNext() async
-    func startDownload(_ track: Track) async
+    func startDownload(_ track: TrackEntity) async
     func resetTransferState()
     func saveTransferState()
     func snapshotForTerminate() async
@@ -73,7 +73,7 @@ final class TransferViewModel: TransferManaging {
     // MARK: Properties. Public
 
     var page: Int = 0
-    var tracks: [Track] = []
+    var tracks: [TrackEntity] = []
     var isLoading: Bool = false
     var errorMessage: String?
     var downloadingTrackIds: Set<String> = []
@@ -100,9 +100,11 @@ final class TransferViewModel: TransferManaging {
             let entities = try self.persistenceService.getTracks()
 
             if entities.isEmpty {
-                try await self.loadTracks(page: 0)
+                let tracks = await self.loadTracks(page: 0)
+                self.tracks = tracks.map(TrackEntity.init)
             } else {
-                self.tracks = entities.map { Track(entity: $0) }
+                self.tracks = entities
+
                 self.seedPersistedProgressBaseline()
                 await self.networkService.restoreDownloadSession()
                 await self.networkService.waitForPendingCancellations(timeout: 2.5)
@@ -124,14 +126,43 @@ final class TransferViewModel: TransferManaging {
             self.isLoading = false
         }
 
-        do {
-            try await self.loadTracks(page: self.page + 1)
-        } catch {
-            self.handleError(error)
-        }
+        let tracks = await self.loadTracks(page: self.page + 1)
+
+        let newEntityTracks = tracks.map(TrackEntity.init)
+        self.tracks.append(contentsOf: newEntityTracks)
     }
 
-    func startDownload(_ track: Track) async {
+    func startDownload(_ track: TrackEntity) async {
+        guard self.hasEnoughFreeSpace(for: track) else {
+            return
+        }
+
+        if track.downloadingSize != 0 {
+            await self.resumeDownload(track: track)
+            return
+        }
+
+        if self.hasFreeDownloadSlot == false {
+            self.enqueueDownload(track: track)
+            return
+        }
+
+        await self.activateDownload(track: track)
+    }
+
+    func stopDownload(track: TrackEntity) async {
+        await self.networkService.stopDownload(trackId: track.id)
+        await self.finishActiveDownload(trackId: track.id)
+
+        track.downloadState = DownloadState.paused.rawValue
+        track.fileState = FileStorageState.exists.rawValue
+
+        let bytes = track.downloadingSize
+        let readable = ByteCountFormatter.string(fromByteCount: Int64(bytes), countStyle: .file)
+        self.logTransferWarning("Paused track \(track.id): \(readable) (\(bytes) B)")
+    }
+
+    func resumeDownload(track: TrackEntity) async {
         guard let index = self.tracks.firstIndex(where: { $0.id == track.id }) else {
             return
         }
@@ -140,85 +171,28 @@ final class TransferViewModel: TransferManaging {
             return
         }
 
-        if self.tracks[index].downloadingSize != 0 {
-            await self.resumeDownload(trackId: self.tracks[index].id)
-            return
-        }
-
         if self.hasFreeDownloadSlot == false {
-            self.enqueueDownload(trackId: track.id, at: index)
+            self.enqueueDownload(track: track)
             return
         }
 
-        await self.activateDownload(track: self.tracks[index], at: index)
+        await self.activateResumeDownload(track: track)
     }
 
-    func stopDownload(trackId: String) async {
-        await self.networkService.stopDownload(trackId: trackId)
-        await self.finishActiveDownload(trackId: trackId)
-
-        if let index = self.tracks.firstIndex(where: { $0.id == trackId }) {
-            self.tracks[index].downloadState = .paused
-            self.tracks[index].fileState = .exists
-
-            do {
-                try self.persistenceService.upsert(track: TrackEntity(track: self.tracks[index]))
-            } catch {
-                self.handleError(error)
-            }
-
-            let bytes = self.tracks[index].downloadingSize
-            let readable = ByteCountFormatter.string(fromByteCount: Int64(bytes), countStyle: .file)
-            self.logTransferWarning("Paused track \(trackId): \(readable) (\(bytes) B)")
-        }
-    }
-
-    func resumeDownload(trackId: String) async {
-        guard let index = self.tracks.firstIndex(where: { $0.id == trackId }) else {
+    func cancelQueuedDownload(track: TrackEntity) {
+        guard track.downloadState == DownloadState.queued.rawValue else {
             return
         }
 
-        guard self.hasEnoughFreeSpace(for: self.tracks[index]) else {
-            return
-        }
+        self.downloadQueue.removeAll { $0 == track.id }
+        track.downloadState = DownloadState.idle.rawValue
+        track.fileState = FileStorageState.none.rawValue
+        track.downloadingSize = 0
 
-        if self.hasFreeDownloadSlot == false {
-            self.enqueueDownload(trackId: trackId, at: index)
-            return
-        }
-
-        await self.activateResumeDownload(track: self.tracks[index], at: index)
-    }
-
-    func cancelQueuedDownload(trackId: String) {
-        guard let index = self.tracks.firstIndex(where: { $0.id == trackId }) else {
-            return
-        }
-
-        guard self.tracks[index].downloadState == .queued else {
-            return
-        }
-
-        self.downloadQueue.removeAll { $0 == trackId }
-        self.tracks[index].downloadState = .idle
-        self.tracks[index].fileState = .none
-        self.tracks[index].downloadingSize = 0
-
-        self.persistTrack(at: index)
         self.persistDownloadSession()
     }
 
     func saveTransferState() {
-        for index in self.tracks.indices {
-            switch self.tracks[index].downloadState {
-                case .downloading, .queued:
-                    self.persistTrack(at: index)
-
-                case .idle, .paused, .completed, .failed:
-                    break
-            }
-        }
-
         self.persistDownloadSession()
     }
 
@@ -239,35 +213,22 @@ final class TransferViewModel: TransferManaging {
                 continue
             }
 
-            if self.tracks[index].downloadState != .downloading {
-                self.tracks[index].downloadState = .downloading
-                self.persistTrack(at: index)
+            if self.tracks[index].downloadState != DownloadState.downloading.rawValue {
+                self.tracks[index].downloadState = DownloadState.downloading.rawValue
             }
         }
 
         await self.processDownloadQueue()
     }
 
-    func deleteDownloadedTrack(id: String) {
-        self.networkService.clearPersistedResumeData(trackId: id)
+    func deleteDownloadedTrack(track: TrackEntity) {
+        self.networkService.clearPersistedResumeData(trackId: track.id)
 
         do {
-            try self.storageService.deleteDownloadedTrack(id: id)
-
-            if let index = self.tracks.firstIndex(where: { $0.id == id }) {
-                self.tracks[index].downloadState = .idle
-                self.tracks[index].fileState = .removed
-                self.tracks[index].downloadingSize = 0
-            }
-
-            if let entity = self.getTrack(id: id) {
-                entity.downloadState = DownloadState.idle.rawValue
-                entity.fileState = FileStorageState.removed.rawValue
-                entity.downloadingSize = 0
-                try self.persistenceService.upsert(track: entity)
-            } else if let index = self.tracks.firstIndex(where: { $0.id == id }) {
-                try self.persistenceService.upsert(track: TrackEntity(track: self.tracks[index]))
-            }
+            try self.storageService.deleteDownloadedTrack(id: track.id)
+            track.downloadState = DownloadState.idle.rawValue
+            track.fileState = FileStorageState.removed.rawValue
+                track.downloadingSize = 0
         } catch {
             self.handleError(error)
         }
@@ -411,22 +372,20 @@ final class TransferViewModel: TransferManaging {
 
     // MARK: - Methods. Private
 
-    private func loadTracks(page: Int) async throws {
-        let tracks = try await self.networkService.getPopularTracks(
-            page: page,
-            perPage: self.perPage
-        )
+    private func loadTracks(page: Int) async -> [TrackDTO] {
+        do {
+            let tracks = try await self.networkService.getPopularTracks(
+                page: page,
+                perPage: self.perPage
+            )
+            self.page = page
 
-        self.tracks.append(contentsOf: tracks)
-        self.page = page
-
-        for track in tracks {
-            do {
-                try self.persistenceService.upsert(track: TrackEntity(track: track))
-            } catch {
-                self.handleError(error)
-            }
+            return tracks
+        } catch {
+            self.handleError(error)
         }
+
+        return []
     }
 
     private func getTrack(id: String) -> TrackEntity? {
@@ -446,15 +405,11 @@ final class TransferViewModel: TransferManaging {
         let liveActive = await self.networkService.runningDownloadTrackIDs()
         let savedSession = TransferQueueStorage.load()
 
-        for index in self.tracks.indices {
-            let trackID = self.tracks[index].id
-
-            if self.storageService.downloadedTrackExists(id: trackID) {
-                self.tracks[index].downloadingSize = self.tracks[index].size ?? self.tracks[index].downloadingSize
-                self.tracks[index].downloadState = .completed
-                self.tracks[index].fileState = .exists
-                self.persistTrack(at: index)
-            }
+        for track in self.tracks
+        where self.storageService.downloadedTrackExists(id: track.id) {
+            track.downloadingSize = track.size ?? track.downloadingSize
+            track.downloadState = DownloadState.completed.rawValue
+            track.fileState = FileStorageState.exists.rawValue
         }
 
         var queuedInOrder: [String] = []
@@ -464,20 +419,19 @@ final class TransferViewModel: TransferManaging {
                 continue
             }
 
-            if self.tracks[index].downloadState == .completed {
+            if self.tracks[index].downloadState == DownloadState.completed.rawValue {
                 continue
             }
 
             if liveActive.contains(trackID) {
                 self.downloadingTrackIds.insert(trackID)
                 self.registerActiveDownload(trackID)
-                self.tracks[index].downloadState = .downloading
-                self.persistTrack(at: index)
+                self.tracks[index].downloadState = DownloadState.downloading.rawValue
+
                 continue
             }
 
-            self.tracks[index].downloadState = .queued
-            self.persistTrack(at: index)
+            self.tracks[index].downloadState = DownloadState.queued.rawValue
             queuedInOrder.append(trackID)
         }
 
@@ -486,31 +440,30 @@ final class TransferViewModel: TransferManaging {
                 continue
             }
 
-            if self.tracks[index].downloadState == .completed {
+            if self.tracks[index].downloadState == DownloadState.completed.rawValue {
                 continue
             }
 
-            self.tracks[index].downloadState = .queued
-            self.persistTrack(at: index)
+            self.tracks[index].downloadState = DownloadState.queued.rawValue
+
             queuedInOrder.append(trackID)
         }
 
-        for index in self.tracks.indices where self.tracks[index].downloadState == .queued {
+        for index in self.tracks.indices where self.tracks[index].downloadState == DownloadState.queued.rawValue {
             let trackID = self.tracks[index].id
             if queuedInOrder.contains(trackID) == false {
                 queuedInOrder.append(trackID)
             }
         }
 
-        for index in self.tracks.indices where self.tracks[index].downloadState == .downloading {
+        for index in self.tracks.indices where self.tracks[index].downloadState == DownloadState.downloading.rawValue {
             let trackID = self.tracks[index].id
 
             if liveActive.contains(trackID) {
                 continue
             }
 
-            self.tracks[index].downloadState = .queued
-            self.persistTrack(at: index)
+            self.tracks[index].downloadState = DownloadState.queued.rawValue
 
             if queuedInOrder.contains(trackID) == false {
                 queuedInOrder.insert(trackID, at: 0)
@@ -522,52 +475,49 @@ final class TransferViewModel: TransferManaging {
     }
 
     private func clearDownloadState() {
-        for index in self.tracks.indices {
-            self.tracks[index].downloadingSize = 0
-            self.tracks[index].downloadState = .idle
+        for track in self.tracks {
+            track.downloadingSize = 0
+            track.downloadState = DownloadState.idle.rawValue
         }
     }
 
     private func seedPersistedProgressBaseline() {
-        for track in self.tracks where track.downloadState == .downloading {
+        for track in self.tracks where track.downloadState == DownloadState.downloading.rawValue {
             self.lastPersistedProgressBytesByTrackID[track.id] = track.downloadingSize
         }
     }
 
-    private func enqueueDownload(trackId: String, at index: Int) {
-        guard self.downloadQueue.contains(trackId) == false else {
+    private func enqueueDownload(track: TrackEntity) {
+        guard self.downloadQueue.contains(track.id) == false else {
             return
         }
 
-        self.downloadQueue.append(trackId)
-        self.tracks[index].downloadState = .queued
-        self.persistTrack(at: index)
+        self.downloadQueue.append(track.id)
+        track.downloadState = DownloadState.queued.rawValue
         self.persistDownloadSession()
     }
 
-    private func activateDownload(track: Track, at index: Int) async {
+    private func activateDownload(track: TrackEntity) async {
         self.downloadingTrackIds.insert(track.id)
         self.registerActiveDownload(track.id)
-        self.tracks[index].downloadState = .downloading
-        self.lastPersistedProgressBytesByTrackID[track.id] = self.tracks[index].downloadingSize
-        self.persistTrack(at: index)
+        track.downloadState = DownloadState.downloading.rawValue
+        self.lastPersistedProgressBytesByTrackID[track.id] = track.downloadingSize
         self.persistDownloadSession()
 
         do {
             try await self.networkService.startDownload(track)
         } catch {
-            self.markDownloadFailed(trackId: track.id)
+            self.markDownloadFailed(track: track)
             self.handleError(error)
             await self.finishActiveDownload(trackId: track.id)
         }
     }
 
-    private func activateResumeDownload(track: Track, at index: Int) async {
+    private func activateResumeDownload(track: TrackEntity) async {
         self.downloadingTrackIds.insert(track.id)
         self.registerActiveDownload(track.id)
-        self.tracks[index].downloadState = .downloading
-        self.lastPersistedProgressBytesByTrackID[track.id] = self.tracks[index].downloadingSize
-        self.persistTrack(at: index)
+        track.downloadState = DownloadState.downloading.rawValue
+        self.lastPersistedProgressBytesByTrackID[track.id] = track.downloadingSize
         self.persistDownloadSession()
 
         do {
@@ -579,7 +529,7 @@ final class TransferViewModel: TransferManaging {
             do {
                 try await self.networkService.startDownload(track)
             } catch {
-                self.markDownloadFailed(trackId: track.id)
+                self.markDownloadFailed(track: track)
                 self.handleError(error)
                 await self.finishActiveDownload(trackId: track.id)
             }
@@ -601,22 +551,22 @@ final class TransferViewModel: TransferManaging {
                 continue
             }
 
-            guard self.tracks[index].downloadState == .queued else {
+            guard self.tracks[index].downloadState == DownloadState.queued.rawValue else {
                 continue
             }
 
             guard self.hasEnoughFreeSpace(for: self.tracks[index]) else {
-                self.tracks[index].downloadState = .idle
-                self.persistTrack(at: index)
+                self.tracks[index].downloadState = DownloadState.idle.rawValue
+
                 continue
             }
 
             let hasResumeData = await self.networkService.hasPersistedResumeData(trackId: trackId)
 
             if hasResumeData {
-                await self.activateResumeDownload(track: self.tracks[index], at: index)
+                await self.activateResumeDownload(track: self.tracks[index])
             } else {
-                await self.activateDownload(track: self.tracks[index], at: index)
+                await self.activateDownload(track: self.tracks[index])
             }
         }
 
@@ -644,15 +594,7 @@ final class TransferViewModel: TransferManaging {
         self.activeDownloadOrder.removeAll { $0 == trackID }
     }
 
-    private func persistTrack(at index: Int) {
-        do {
-            try self.persistenceService.upsert(track: TrackEntity(track: self.tracks[index]))
-        } catch {
-            self.handleError(error)
-        }
-    }
-
-    private func hasEnoughFreeSpace(for track: Track) -> Bool {
+    private func hasEnoughFreeSpace(for track: TrackEntity) -> Bool {
         guard let size = track.size else {
             return true
         }
@@ -681,7 +623,7 @@ final class TransferViewModel: TransferManaging {
 
         self.tracks[index].downloadingSize = displayedBytes
 
-        guard self.tracks[index].downloadState == .downloading else {
+        guard self.tracks[index].downloadState == DownloadState.downloading.rawValue else {
             return
         }
 
@@ -693,7 +635,6 @@ final class TransferViewModel: TransferManaging {
             return
         }
 
-        self.persistTrack(at: index)
         self.lastPersistedProgressBytesByTrackID[trackID] = displayedBytes
     }
 
@@ -703,14 +644,8 @@ final class TransferViewModel: TransferManaging {
         }
 
         self.tracks[index].downloadingSize = self.tracks[index].size ?? 0
-        self.tracks[index].downloadState = .completed
-        self.tracks[index].fileState = .exists
-
-        do {
-            try self.persistenceService.upsert(track: TrackEntity(track: self.tracks[index]))
-        } catch {
-            self.handleError(error)
-        }
+        self.tracks[index].downloadState = DownloadState.completed.rawValue
+        self.tracks[index].fileState = FileStorageState.exists.rawValue
 
         Task {
             await self.finishActiveDownload(trackId: trackID)
@@ -718,18 +653,21 @@ final class TransferViewModel: TransferManaging {
     }
 
     private func applyDownloadFailed(trackID: String, error: Any) {
-        self.markDownloadFailed(trackId: trackID)
+        let track = self.tracks.filter { $0.id == trackID }.first
+        if let track {
+            self.markDownloadFailed(track: track)
 
-        if let apiError = error as? APIError {
-            self.handleError(apiError)
-        } else if let localizedError = error as? Error {
-            self.handleError(localizedError)
-        } else {
-            self.handleError(APIError.unknown)
-        }
+            if let apiError = error as? APIError {
+                self.handleError(apiError)
+            } else if let localizedError = error as? Error {
+                self.handleError(localizedError)
+            } else {
+                self.handleError(APIError.unknown)
+            }
 
-        Task {
-            await self.finishActiveDownload(trackId: trackID)
+            Task {
+                await self.finishActiveDownload(trackId: trackID)
+            }
         }
     }
 
@@ -743,7 +681,7 @@ final class TransferViewModel: TransferManaging {
             return
         }
 
-        if self.tracks[index].downloadState == .paused {
+        if self.tracks[index].downloadState == DownloadState.paused.rawValue {
             self.persistDownloadSession()
             await self.processDownloadQueue()
             return
@@ -753,8 +691,8 @@ final class TransferViewModel: TransferManaging {
             self.downloadQueue.insert(trackID, at: 0)
         }
 
-        self.tracks[index].downloadState = .queued
-        self.persistTrack(at: index)
+        self.tracks[index].downloadState = DownloadState.queued.rawValue
+
         self.persistDownloadSession()
 
         await self.processDownloadQueue()
@@ -764,16 +702,10 @@ final class TransferViewModel: TransferManaging {
         AppLogger.transfer.warning("\(message)")
     }
 
-    private func markDownloadFailed(trackId: String) {
-        guard let index = self.tracks.firstIndex(where: { $0.id == trackId }) else {
-            return
-        }
-
-        self.tracks[index].downloadState = .failed
-        self.tracks[index].fileState = .none
-        self.tracks[index].downloadingSize = 0
-
-        self.persistTrack(at: index)
+    private func markDownloadFailed(track: TrackEntity) {
+        track.downloadState = DownloadState.failed.rawValue
+        track.fileState = FileStorageState.none.rawValue
+        track.downloadingSize = 0
     }
 
     private func handleError(_ error: Error) {

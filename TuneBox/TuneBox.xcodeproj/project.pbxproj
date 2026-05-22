@@ -29,7 +29,7 @@
 		5B4762872FAB5C570069E41A /* RxMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5B4762862FAB5C570069E41A /* RxMoya */; };
 		5B586CB12FAB98EE00BCEAD2 /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB02FAB98EE00BCEAD2 /* NetworkService.swift */; };
 		5B586CB52FAC618500BCEAD2 /* FileManagerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB42FAC618400BCEAD2 /* FileManagerService.swift */; };
-		5B586CB72FAC678700BCEAD2 /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB62FAC678600BCEAD2 /* Track.swift */; };
+		5B586CB72FAC678700BCEAD2 /* TrackDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB62FAC678600BCEAD2 /* TrackDTO.swift */; };
 		5B586CBA2FAC842200BCEAD2 /* Resolver+Injection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB92FAC842100BCEAD2 /* Resolver+Injection.swift */; };
 		5B586CBD2FAC846900BCEAD2 /* Resolver in Frameworks */ = {isa = PBXBuildFile; productRef = 5B586CBC2FAC846900BCEAD2 /* Resolver */; };
 		5B586CC32FAC912500BCEAD2 /* MoyaProvider+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CC22FAC912400BCEAD2 /* MoyaProvider+Async.swift */; };
@@ -83,7 +83,7 @@
 		5B47627D2FAB49AF0069E41A /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
 		5B586CB02FAB98EE00BCEAD2 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
 		5B586CB42FAC618400BCEAD2 /* FileManagerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerService.swift; sourceTree = "<group>"; };
-		5B586CB62FAC678600BCEAD2 /* Track.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
+		5B586CB62FAC678600BCEAD2 /* TrackDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackDTO.swift; sourceTree = "<group>"; };
 		5B586CB92FAC842100BCEAD2 /* Resolver+Injection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Resolver+Injection.swift"; sourceTree = "<group>"; };
 		5B586CC22FAC912400BCEAD2 /* MoyaProvider+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MoyaProvider+Async.swift"; sourceTree = "<group>"; };
 		5B586CC62FACA8E200BCEAD2 /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
@@ -373,7 +373,7 @@
 		5B586CC92FACB60600BCEAD2 /* Entities */ = {
 			isa = PBXGroup;
 			children = (
-				5B586CB62FAC678600BCEAD2 /* Track.swift */,
+				5B586CB62FAC678600BCEAD2 /* TrackDTO.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -651,7 +651,7 @@
 				5B2CF4672FBD100100C5BA4D /* DownloadResumeStorage.swift in Sources */,
 				5B2CF4692FBD100200C5BA4E /* TransferQueueStorage.swift in Sources */,
 				5B2CF4642FBCB3F600C5BA4C /* BrowsTrackCell.swift in Sources */,
-				5B586CB72FAC678700BCEAD2 /* Track.swift in Sources */,
+				5B586CB72FAC678700BCEAD2 /* TrackDTO.swift in Sources */,
 				5B3FEB3D2FB4539C00DC1562 /* TransferViewModel.swift in Sources */,
 				5B3FEB4A2FB454AE00DC1562 /* PlayerView.swift in Sources */,
 				5B586CB12FAB98EE00BCEAD2 /* NetworkService.swift in Sources */,

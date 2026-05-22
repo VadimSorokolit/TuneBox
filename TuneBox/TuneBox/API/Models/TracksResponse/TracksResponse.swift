@@ -7,7 +7,7 @@
 
 struct TracksResponse: Decodable {
     let headers: ResponseHeaders
-    let results: [Track]
+    let results: [TrackDTO]
 }
 
 struct ResponseHeaders: Decodable {

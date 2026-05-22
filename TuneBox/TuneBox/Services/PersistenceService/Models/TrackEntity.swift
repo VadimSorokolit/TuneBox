@@ -25,6 +25,35 @@ final class TrackEntity {
     var downloadingSize: Int = 0
     var fileState: String = FileStorageState.none.rawValue
 
+    // MARK: - Computed Properties
+
+    var imageURL: URL? {
+        guard let image, !image.isEmpty else {
+            return nil
+        }
+
+        return URL(string: image)
+    }
+
+    var downloadURL: URL? {
+        guard let download, !download.isEmpty else {
+            return nil
+        }
+
+        return URL(string: download)
+    }
+
+    var downloadingProgress: Double {
+        guard let size,
+                size > 0,
+                downloadingSize > 0
+        else {
+            return 0.0
+        }
+
+        return min(1.0, Double(downloadingSize) / Double(size))
+    }
+
     init(
         id: String,
         image: String?,
@@ -56,7 +85,7 @@ final class TrackEntity {
 
 extension TrackEntity {
 
-    convenience init(track: Track) {
+    convenience init(track: TrackDTO) {
         self.init(
             id: track.id,
             image: track.image,
@@ -73,7 +102,7 @@ extension TrackEntity {
         )
     }
 
-    func update(from track: Track) {
+    func update(from track: TrackDTO) {
         self.image = track.image
         self.trackName = track.trackName
         self.artistName = track.artistName
