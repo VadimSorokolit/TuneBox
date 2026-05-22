@@ -164,17 +164,17 @@
 			isa = PBXGroup;
 			children = (
 				5B11C3402FB728380089BAD2 /* PersistenceService.swift */,
-				5B11C3392FB719980089BAD2 /* Models */,
+				5B11C3392FB719980089BAD2 /* Entities */,
 			);
 			path = PersistenceService;
 			sourceTree = "<group>";
 		};
-		5B11C3392FB719980089BAD2 /* Models */ = {
+		5B11C3392FB719980089BAD2 /* Entities */ = {
 			isa = PBXGroup;
 			children = (
 				5B11C33A2FB719A60089BAD2 /* TrackEntity.swift */,
 			);
-			path = Models;
+			path = Entities;
 			sourceTree = "<group>";
 		};
 		5B2CF45C2FBC7A8E00C5BA4C /* Concurrency */ = {
@@ -339,8 +339,8 @@
 		5B586CBE2FAC87A100BCEAD2 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				5B586CCA2FACB60A00BCEAD2 /* TracksResponse */,
-				5B586CC92FACB60600BCEAD2 /* Entities */,
+				5B586CCB2FACB61400BCEAD2 /* TracksResponse.swift */,
+				5B586CB62FAC678600BCEAD2 /* TrackDTO.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -368,22 +368,6 @@
 				5B586CC62FACA8E200BCEAD2 /* APIError.swift */,
 			);
 			path = APIError;
-			sourceTree = "<group>";
-		};
-		5B586CC92FACB60600BCEAD2 /* Entities */ = {
-			isa = PBXGroup;
-			children = (
-				5B586CB62FAC678600BCEAD2 /* TrackDTO.swift */,
-			);
-			path = Entities;
-			sourceTree = "<group>";
-		};
-		5B586CCA2FACB60A00BCEAD2 /* TracksResponse */ = {
-			isa = PBXGroup;
-			children = (
-				5B586CCB2FACB61400BCEAD2 /* TracksResponse.swift */,
-			);
-			path = TracksResponse;
 			sourceTree = "<group>";
 		};
 		5BD0DAF82FBF6C4A00268A48 /* AudioService */ = {
