@@ -273,26 +273,6 @@ final class TransferViewModel: TransferManaging {
         }
     }
 
-    // MARK: - Only for testing!!!
-
-    func resetTransferState() {
-        self.downloadQueue.removeAll()
-        self.activeDownloadOrder.removeAll()
-        TransferQueueStorage.clear()
-
-        do {
-            _  = try persistenceService.clearStorage()
-            do {
-                try self.storageService.clearStorage()
-                self.clearDownloadState()
-            } catch {
-                self.handleError(error)
-            }
-        } catch {
-            self.handleError(error)
-        }
-    }
-
     func setSimultaneouslyLoadingLimit(_ limit: Int) {
         self.simultaneouslyLoadingTraks = limit
     }
@@ -303,6 +283,33 @@ final class TransferViewModel: TransferManaging {
             self.reservedSpace = plan
         } catch let error as FileManagerError {
             self.handleError(error)
+        } catch {
+            self.handleError(error)
+        }
+    }
+
+    // MARK: - Only for testing!!!
+
+    func resetTransferState() {
+        Task {
+            await self.networkService.cancelAllDownloads()
+        }
+
+        self.downloadQueue.removeAll()
+        self.activeDownloadOrder.removeAll()
+        self.downloadingTrackIds.removeAll()
+
+        TransferQueueStorage.clear()
+
+        do {
+            _ = try persistenceService.clearStorage()
+
+            do {
+                try self.storageService.clearStorage()
+                self.clearDownloadState()
+            } catch {
+                self.handleError(error)
+            }
         } catch {
             self.handleError(error)
         }

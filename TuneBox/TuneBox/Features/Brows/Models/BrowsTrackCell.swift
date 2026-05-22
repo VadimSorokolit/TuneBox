@@ -55,6 +55,13 @@ struct BrowsTrackCell: View {
                             .foregroundStyle(Color.white)
                     })
                 }
+
+                if state == .failed {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .resizable()
+                        .frame(width: 40, height: 40)
+                        .foregroundStyle(Color.red)
+                }
             }
 
             ProgressView(value: progress)

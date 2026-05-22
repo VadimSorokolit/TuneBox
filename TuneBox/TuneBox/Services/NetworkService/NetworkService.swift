@@ -24,6 +24,7 @@ protocol NetworkServicing: AnyObject {
     func stopDownload(trackId: String) async
     func resumeDownload(trackId: String) async throws
     func cancelDownload(trackID: String) async
+    func cancelAllDownloads() async
     func restoreDownloadSession() async
     func activeDownloadTrackIDs() async -> Set<String>
     func runningDownloadTrackIDs() async -> Set<String>
@@ -122,6 +123,14 @@ final class NetworkService: NSObject, NetworkServicing {
         await self.downloadStore.clearTask(for: trackID)
         await self.downloadStore.clearResumeData(for: trackID)
         DownloadResumeStorage.remove(for: trackID)
+    }
+
+    func cancelAllDownloads() async {
+        let trackIDs = await self.downloadStore.activeTrackIDs()
+
+        for trackID in trackIDs {
+            await self.cancelDownload(trackID: trackID)
+        }
     }
 
     func restoreDownloadSession() async {

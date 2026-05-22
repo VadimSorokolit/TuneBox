@@ -27,6 +27,12 @@ enum DownloadResumeStorage {
         return try? Data(contentsOf: fileURL)
     }
 
+    private static func resumeFileURL(for trackID: String) throws -> URL {
+        let directoryURL = try self.makeResumeDirectoryURL()
+
+        return directoryURL.appendingPathComponent(trackID, isDirectory: false)
+    }
+
     static func remove(for trackID: String) {
         guard let fileURL = try? self.resumeFileURL(for: trackID) else {
             return
@@ -35,10 +41,12 @@ enum DownloadResumeStorage {
         try? FileManager.default.removeItem(at: fileURL)
     }
 
-    private static func resumeFileURL(for trackID: String) throws -> URL {
-        let directoryURL = try self.makeResumeDirectoryURL()
+    static func removeAll() {
+        guard let directoryURL = try? self.makeResumeDirectoryURL() else {
+            return
+        }
 
-        return directoryURL.appendingPathComponent(trackID, isDirectory: false)
+        try? FileManager.default.removeItem(at: directoryURL)
     }
 
     private static func makeResumeDirectoryURL() throws -> URL {
