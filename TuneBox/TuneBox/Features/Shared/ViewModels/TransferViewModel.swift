@@ -399,7 +399,7 @@ final class TransferViewModel: TransferManaging {
 
     // MARK: - Properties. Private
 
-    let perPage: Int = 8
+    private let perPage: Int = 8
     private let networkService: NetworkServicing
     private let persistenceService: PersistenceServicing
     private let storageService: FileManagerServicing

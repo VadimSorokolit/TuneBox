@@ -22,50 +22,51 @@ struct BrowsTrackCell: View {
     let progress: Double
     var state: CellState
     let onTap: () async -> Void
-
-    @State private var isPlaying = false
+    let onPlayTap: () -> Void
+    let isPlaying: Bool
+    let imageHeight: CGFloat = 20.0
 
     var body: some View {
         HStack(spacing: 12) {
-            VStack(spacing: 10) {
+            HStack(spacing: 10) {
                 Text(id)
                     .font(.system(size: 12))
                     .lineLimit(1)
-                    .frame(width: 90, alignment: .leading)
+                    .frame(width: 60, alignment: .leading)
                     .padding(.leading, 10)
 
                 if state == .completed {
                     Button(action: {
-                        if isPlaying {
-                            AudioService.shared.pause()
-                        } else {
-                            AudioService.shared.play(trackId: id)
-                        }
-
-                        isPlaying = AudioService.shared.isPlaying
+                        onPlayTap()
                     }, label: {
                         Circle()
-                            .frame(width: 40, height: 40)
+                            .frame(width: imageHeight, height: imageHeight)
                             .foregroundStyle(Color.green)
                             .overlay(
                                 Image(systemName: isPlaying
                                       ? "pause.fill"
-                                      : "play.fill")
+                                      : "play.fill"
+                                     )
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: imageHeight - 10, height: imageHeight - 10)
+                                .foregroundStyle(Color.white)
                             )
-                            .foregroundStyle(Color.white)
                     })
-                }
-
-                if state == .failed {
+                } else if state == .failed {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .resizable()
-                        .frame(width: 40, height: 40)
+                        .frame(width: imageHeight, height: imageHeight)
                         .foregroundStyle(Color.red)
+                } else {
+                    Rectangle()
+                        .frame(width: imageHeight, height: imageHeight)
+                        .foregroundStyle(.clear)
                 }
             }
 
             ProgressView(value: progress)
-                .tint(buttonColor)
+                .tint(.green)
                 .frame(maxWidth: .infinity)
 
             Button {
@@ -85,13 +86,14 @@ struct BrowsTrackCell: View {
 
             if state == .idle {}
         }
+        .frame(height: 20)
+        .padding(.horizontal, 5)
+        .padding(.vertical, 5)
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .foregroundStyle(Color.gray.opacity(0.08))
 
         )
-        .padding(.horizontal)
-        .padding(.vertical, 10)
     }
 
     private var buttonTitle: String {
@@ -122,9 +124,9 @@ struct BrowsTrackCell: View {
             case .paused:
                 return .green
             case .completed:
-                return .black
-            case .failed:
                 return .red
+            case .failed:
+                return Color(red: 0.85, green: 0.35, blue: 0.35)
         }
     }
 }
@@ -135,21 +137,27 @@ struct BrowsTrackCell: View {
             id: "track_001",
             progress: 0.25,
             state: .downloading,
-            onTap: { print("pause tapped") }
+            onTap: { print("pause tapped") },
+            onPlayTap: {},
+            isPlaying: false
         )
 
         BrowsTrackCell(
             id: "track_002",
             progress: 0.0,
             state: .idle,
-            onTap: { print("download tapped") }
+            onTap: { print("download tapped") },
+            onPlayTap: {},
+            isPlaying: false
         )
 
         BrowsTrackCell(
             id: "track_003",
             progress: 1.0,
             state: .completed,
-            onTap: { print("delete tapped") }
+            onTap: { print("delete tapped") },
+            onPlayTap: {},
+            isPlaying: true
         )
     }
     .padding()

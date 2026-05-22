@@ -10,6 +10,8 @@ import Resolver
 
 struct ContentView: View {
     @Injected private var viewModel: TransferManaging
+    @State private var playingTrackId: String?
+    @State private var isPlaying = false
 
     var body: some View {
         VStack(spacing: 10) {
@@ -46,7 +48,7 @@ struct ContentView: View {
             }
             .padding(.horizontal)
 
-            VStack(spacing: 16) {
+            VStack(spacing: 5) {
                 if !viewModel.tracks.isEmpty {
                     ForEach(viewModel.tracks) { track in
                         BrowsTrackCell(
@@ -71,8 +73,22 @@ struct ContentView: View {
                                             await viewModel.startDownload(track)
                                     }
                                 }
-                            }
+                            },
+                            onPlayTap: {
+                                if playingTrackId == track.id && isPlaying {
+                                    AudioService.shared.pause()
+                                    isPlaying = false
+                                } else {
+                                    AudioService.shared.play(trackId: track.id)
+                                    playingTrackId = track.id
+                                    isPlaying = AudioService.shared.isPlaying
+                                }
+
+                            },
+                            isPlaying: playingTrackId == track.id
+                            && isPlaying
                         )
+                        .padding(.horizontal)
                     }
                 } else {
                     EmptyView()
