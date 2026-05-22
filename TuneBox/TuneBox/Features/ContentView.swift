@@ -27,6 +27,7 @@ struct ContentView: View {
                                 .foregroundStyle(Color.white)
                         )
                 })
+                .disabled(viewModel.tracks.isEmpty == false)
 
                 Spacer()
 
@@ -41,6 +42,7 @@ struct ContentView: View {
                                 .foregroundStyle(Color.white)
                         )
                 })
+                .disabled(viewModel.tracks.isEmpty)
             }
             .padding(.horizontal)
 

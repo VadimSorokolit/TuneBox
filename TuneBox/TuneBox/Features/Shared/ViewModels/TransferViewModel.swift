@@ -298,6 +298,7 @@ final class TransferViewModel: TransferManaging {
         self.downloadQueue.removeAll()
         self.activeDownloadOrder.removeAll()
         self.downloadingTrackIds.removeAll()
+        self.tracks.removeAll()
 
         TransferQueueStorage.clear()
 
