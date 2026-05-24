@@ -34,6 +34,22 @@ struct ContentView: View {
                 Spacer()
 
                 Button(action: {
+                    Task {
+                        await viewModel.loadNext()
+                    }
+                }, label: {
+                    Circle().fill(Color.blue)
+                        .frame(width: 50, height: 50)
+                        .overlay(
+                            Image(systemName: "music.note.list")
+                                .frame(width: 30, height: 30)
+                                .foregroundStyle(Color.white)
+                        )
+                })
+
+                Spacer()
+
+                Button(action: {
                     viewModel.resetTransferState()
                 }, label: {
                     Circle().fill(Color.red)

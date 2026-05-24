@@ -101,6 +101,7 @@ final class TransferViewModel: TransferManaging {
 
             if entities.isEmpty {
                 self.tracks = await self.loadTracks(page: 0)
+                self.page += 1
             } else {
                 self.tracks = entities
 
@@ -124,8 +125,7 @@ final class TransferViewModel: TransferManaging {
         defer {
             self.isLoading = false
         }
-
-        let newEntityTracks = await self.loadTracks(page: self.page + 1)
+        let newEntityTracks = await self.loadTracks(page: self.page)
         self.tracks.append(contentsOf: newEntityTracks)
     }
 
@@ -262,6 +262,7 @@ final class TransferViewModel: TransferManaging {
             do {
                 try self.storageService.clearStorage()
                 self.clearDownloadState()
+                self.page = 0
             } catch {
                 self.handleError(error)
             }

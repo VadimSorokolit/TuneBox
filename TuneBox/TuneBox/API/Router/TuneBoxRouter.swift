@@ -68,7 +68,7 @@ extension TuneBoxRouter: TargetType {
     private var params: [String: Any] {
         switch self {
             case let .getTracksByGenre(genre, page, perPage):
-                let pagination = makePagination(
+                let pagination = self.makePagination(
                     page: page,
                     perPage: perPage
                 )
@@ -117,9 +117,9 @@ extension TuneBoxRouter: TargetType {
     }
 
     private func makePagination(page: Int, perPage: Int) -> (limit: Int, offset: Int) {
-        let safePage = max(page, 1)
+        let safePage = max(page, 0)
         let safePerPage = max(perPage, 1)
-        let offset = (safePage - 1) * safePerPage
+        let offset = safePage * safePerPage
 
         return (safePerPage, offset)
     }
