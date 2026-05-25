@@ -1,7 +1,7 @@
-# TuneBox
+# TuneBox 🎵
 
 TuneBox is an iOS music streaming application built with SwiftUI.
-The app allows users to browse, search, and download tracks using the Jamendo API.
+The app allows users to browse, search, and download tracks using the [Jamendo API](https://developer.jamendo.com/v3.0).
 
 ## Features
 
