@@ -160,9 +160,9 @@ extension TrackDTO {
         self.download = entity.download
         self.waveform = WaveformMapper.decode(entity.waveformData)
         self.size = entity.size
-        self.downloadState = DownloadState(rawValue: entity.downloadState) ?? .idle
         self.downloadingSize = entity.downloadingSize
-        self.fileState = FileStorageState(rawValue: entity.fileState) ?? .none
+        self.downloadState = DownloadState(rawValue: entity.downloadState.rawValue) ?? .idle
+        self.fileState = FileStorageState(rawValue: entity.fileState.rawValue) ?? .none
     }
 
 }

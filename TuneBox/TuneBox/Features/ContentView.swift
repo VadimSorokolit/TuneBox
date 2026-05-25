@@ -73,7 +73,7 @@ struct ContentView: View {
                             state: cellState(from: track),
                             onTap: {
                                 Task {
-                                    switch DownloadState(rawValue: track.downloadState) ?? .idle {
+                                    switch track.downloadState {
                                         case .idle:
                                             await viewModel.startDownload(track)
                                         case .paused:
@@ -115,7 +115,7 @@ struct ContentView: View {
     }
 
     private func cellState(from track: TrackEntity) -> CellState {
-        switch DownloadState(rawValue: track.downloadState) ?? .idle {
+        switch track.downloadState {
             case .idle:
                 return .idle
             case .paused:
