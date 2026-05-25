@@ -63,7 +63,9 @@ protocol TransferManaging:
     func resetTransferState()
     func saveTransferState()
     func snapshotForTerminate() async
+    func handleBackgroundCompletion(_ handler: @escaping () -> Void)
     func restoreDownloadsOnForeground() async
+    func handleDownloadAction(for track: TrackEntity) async
 }
 
 @MainActor
@@ -238,6 +240,33 @@ final class TransferViewModel: TransferManaging {
             self.reservedSpace = plan
         } catch {
             self.handleError(error)
+        }
+    }
+
+    func handleBackgroundCompletion(_ handler: @escaping () -> Void) {
+        self.networkService.handleBackgroundCompletion(handler)
+    }
+
+    func handleDownloadAction(for track: TrackEntity) async {
+        switch track.downloadState {
+            case .idle:
+                await startDownload(track)
+
+            case .paused:
+                await resumeDownload(track: track)
+
+            case .downloading:
+                await stopDownload(track: track)
+
+            case .completed:
+                deleteDownloadedTrack(track: track)
+
+            case .queued:
+                cancelQueuedDownload(track: track)
+
+            case .failed:
+                errorMessage = nil
+                await startDownload(track)
         }
     }
 

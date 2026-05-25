@@ -38,6 +38,8 @@ struct Waveform: Codable, Hashable {
     let peaks: [Int]
 }
 
+/// Data Transfer Object used for decoding Jamendo API track response
+
 struct TrackDTO: Identifiable, Decodable, Hashable {
 
     // MARK: - API Properties

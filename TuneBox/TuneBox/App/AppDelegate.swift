@@ -6,33 +6,21 @@
 //
 
 import UIKit
+import Resolver
 
 class AppDelegate: NSObject, UIApplicationDelegate {
-
-    // MARK: - Initializer
-
-    func configure(
-        networkService: NetworkServicing,
-        viewModel: TransferManaging
-    ) {
-        self.networkService = networkService
-        self.viewModel = viewModel
-    }
 
     // MARK: - Methods. Public
 
     func applicationDidEnterBackground(_ application: UIApplication) {
-        self.viewModel?.saveTransferState()
+        self.viewModel.saveTransferState()
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
-        guard let viewModel = self.viewModel else {
-            return
-        }
-
         let semaphore = DispatchSemaphore(value: 0)
+
         Task { @MainActor in
-            await viewModel.snapshotForTerminate()
+            await self.viewModel.snapshotForTerminate()
             semaphore.signal()
         }
         _ = semaphore.wait(timeout: .now() + 4.0)
@@ -43,11 +31,10 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         handleEventsForBackgroundURLSession identifier: String,
         completionHandler: @escaping () -> Void
     ) {
-        self.networkService?.handleBackgroundCompletion(completionHandler)
+        self.viewModel.handleBackgroundCompletion(completionHandler)
     }
 
     // MARK: - Properties. Private
 
-    private weak var networkService: NetworkServicing?
-    private weak var viewModel: TransferManaging?
+    @Injected private var viewModel: TransferManaging
 }

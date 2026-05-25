@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import AVFoundation
 
 enum CellState {
     case idle
@@ -21,7 +20,7 @@ struct BrowsTrackCell: View {
     let id: String
     let progress: Double
     var state: CellState
-    let onTap: () async -> Void
+    let onTap: () -> Void
     let onPlayTap: () -> Void
     let isPlaying: Bool
     let imageHeight: CGFloat = 20.0
@@ -70,9 +69,7 @@ struct BrowsTrackCell: View {
                 .frame(maxWidth: .infinity)
 
             Button {
-                Task {
-                    await onTap()
-                }
+                onTap()
             } label: {
                 Text(buttonTitle)
                     .font(.system(size: 12))

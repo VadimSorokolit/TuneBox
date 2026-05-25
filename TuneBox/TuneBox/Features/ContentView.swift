@@ -9,16 +9,15 @@ import SwiftUI
 import Resolver
 
 struct ContentView: View {
-    @Injected private var viewModel: TransferManaging
-    @State private var playingTrackId: String?
-    @State private var isPlaying = false
+    @Injected private var transferViewModel: TransferManaging
+    @Injected private var playerViewModel: PlayerManaging
 
     var body: some View {
         VStack(spacing: 10) {
             HStack {
                 Button(action: {
                     Task {
-                        await viewModel.loadFirst()
+                        await transferViewModel.loadFirst()
                     }
                 }, label: {
                     Circle().fill(Color.yellow)
@@ -29,13 +28,13 @@ struct ContentView: View {
                                 .foregroundStyle(Color.white)
                         )
                 })
-                .disabled(viewModel.tracks.isEmpty == false)
+                .disabled(transferViewModel.tracks.isEmpty == false)
 
                 Spacer()
 
                 Button(action: {
                     Task {
-                        await viewModel.loadNext()
+                        await transferViewModel.loadNext()
                     }
                 }, label: {
                     Circle().fill(Color.blue)
@@ -50,7 +49,7 @@ struct ContentView: View {
                 Spacer()
 
                 Button(action: {
-                    viewModel.resetTransferState()
+                    transferViewModel.resetTransferState()
                 }, label: {
                     Circle().fill(Color.red)
                         .frame(width: 50, height: 50)
@@ -60,58 +59,35 @@ struct ContentView: View {
                                 .foregroundStyle(Color.white)
                         )
                 })
-                .disabled(viewModel.tracks.isEmpty)
+                .disabled(transferViewModel.tracks.isEmpty)
             }
             .padding(.horizontal)
 
             VStack(spacing: 5) {
-                if !viewModel.tracks.isEmpty {
-                    ForEach(viewModel.tracks, id: \.id) { track in
+                if !transferViewModel.tracks.isEmpty {
+                    ForEach(transferViewModel.tracks, id: \.persistentModelID) { track in
                         BrowsTrackCell(
                             id: track.id,
                             progress: track.downloadingProgress,
                             state: cellState(from: track),
                             onTap: {
                                 Task {
-                                    switch track.downloadState {
-                                        case .idle:
-                                            await viewModel.startDownload(track)
-                                        case .paused:
-                                            await viewModel.resumeDownload(track: track)
-                                        case .downloading:
-                                            await viewModel.stopDownload(track: track)
-                                        case .completed:
-                                            viewModel.deleteDownloadedTrack(track: track)
-                                        case .queued:
-                                            viewModel.cancelQueuedDownload(track: track)
-                                        case .failed:
-                                            viewModel.errorMessage = nil
-                                            await viewModel.startDownload(track)
-                                    }
+                                    await transferViewModel.handleDownloadAction(for: track)
                                 }
                             },
                             onPlayTap: {
-                                if playingTrackId == track.id && isPlaying {
-                                    AudioService.shared.pause()
-                                    isPlaying = false
-                                } else {
-                                    AudioService.shared.play(trackId: track.id)
-                                    playingTrackId = track.id
-                                    isPlaying = AudioService.shared.isPlaying
-                                }
-
+                                playerViewModel.handlePlayAction(for: track)
                             },
-                            isPlaying: playingTrackId == track.id
-                            && isPlaying
+                            isPlaying: playerViewModel.isPlaying(track)
                         )
                         .padding(.horizontal)
                     }
-                } else {
-                    EmptyView()
                 }
             }
         }
-        .modifier(LoadViewModifier())
+        .task {
+            await transferViewModel.loadFirst()
+        }
     }
 
     private func cellState(from track: TrackEntity) -> CellState {
@@ -131,39 +107,6 @@ struct ContentView: View {
         }
     }
 
-    struct LoadViewModifier: ViewModifier {
-        @Injected var viewModel: TransferManaging
-
-        func body(content: Content) -> some View {
-            content
-                .task {
-                    await viewModel.loadFirst()
-//                    viewModel.deleteAllTracks()
-
-//                    viewModel.deleteDownloadedTrack(id: "1214935")
-//                      viewModel.deleteDownloadedTrack(id: "1214935")
-//                    await viewModel .loadNext()
-//                    let tracks = viewModel.tracks.filter { $0.downloadState == .paused }
-//                    for track in tracks {
-//                        await viewModel.startDownload(track)
-//                    }
-//                    for track in viewModel.tracks {
-//                        await viewModel.startDownload(track)
-//                        print(track.downloadState)
-//                        print(track.downloadingSize)
-//                        print(track.fileState)
-//                    }
-//                    let track = viewModel.getTrack(id: "1214935")
-//                    let tracks = viewModel.tracks.filter { $0.isDownloaded == true }
-//                    print(tracks.count)
-//                    await viewModel.resumeDownload(trackId: "1214935")
-//                    print(track?.isRemoved)
-//                    if let track = viewModel.tracks.first {
-//                        viewModel.deleteDownloadedTrack(id: track.id)
-//                    }
-                }
-        }
-    }
 }
 
 #Preview {

@@ -49,9 +49,10 @@ final class PersistenceService: PersistenceServicing {
 
     func getTrack(id: String) throws -> TrackEntity? {
         let trackID = id
-        let descriptor = FetchDescriptor<TrackEntity>(
+        var descriptor = FetchDescriptor<TrackEntity>(
             predicate: #Predicate { $0.id == trackID }
         )
+        descriptor.fetchLimit = 1
 
         do {
             return try self.modelContext.fetch(descriptor).first
@@ -77,9 +78,10 @@ final class PersistenceService: PersistenceServicing {
     func upsert(track entity: TrackEntity) throws {
         let id = entity.id
 
-        let descriptor = FetchDescriptor<TrackEntity>(
+        var descriptor = FetchDescriptor<TrackEntity>(
             predicate: #Predicate { $0.id == id }
         )
+        descriptor.fetchLimit = 1
 
         if let existing = try self.modelContext.fetch(descriptor).first {
             existing.update(from: entity)
