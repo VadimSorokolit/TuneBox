@@ -35,6 +35,7 @@
 		5B586CC32FAC912500BCEAD2 /* MoyaProvider+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CC22FAC912400BCEAD2 /* MoyaProvider+Async.swift */; };
 		5B586CC72FACA8E300BCEAD2 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CC62FACA8E200BCEAD2 /* APIError.swift */; };
 		5B586CCC2FACB61500BCEAD2 /* TracksResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CCB2FACB61400BCEAD2 /* TracksResponse.swift */; };
+		5B83828E2FC4562A003625CD /* Int+zero.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B83828D2FC45629003625CD /* Int+zero.swift */; };
 		5B84C01C2FAB353200ACE75A /* CustomAlerts in Frameworks */ = {isa = PBXBuildFile; productRef = 5B84C01B2FAB353200ACE75A /* CustomAlerts */; };
 		5B84C0252FAB368D00ACE75A /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 5B84C0242FAB367B00ACE75A /* .swiftlint.yml */; };
 		5B88609E2FAE184C0056BE9A /* GlobalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B88609D2FAE18450056BE9A /* GlobalConstants.swift */; };
@@ -88,6 +89,7 @@
 		5B586CC22FAC912400BCEAD2 /* MoyaProvider+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MoyaProvider+Async.swift"; sourceTree = "<group>"; };
 		5B586CC62FACA8E200BCEAD2 /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
 		5B586CCB2FACB61400BCEAD2 /* TracksResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TracksResponse.swift; sourceTree = "<group>"; };
+		5B83828D2FC45629003625CD /* Int+zero.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+zero.swift"; sourceTree = "<group>"; };
 		5B84C0242FAB367B00ACE75A /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		5B88609D2FAE18450056BE9A /* GlobalConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalConstants.swift; sourceTree = "<group>"; };
 		5B8860A42FB1CF900056BE9A /* NotificationNames+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationNames+Extension.swift"; sourceTree = "<group>"; };
@@ -356,6 +358,7 @@
 		5B586CC12FAC880500BCEAD2 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				5B83828D2FC45629003625CD /* Int+zero.swift */,
 				5B8860A42FB1CF900056BE9A /* NotificationNames+Extension.swift */,
 				5B586CC22FAC912400BCEAD2 /* MoyaProvider+Async.swift */,
 			);
@@ -626,6 +629,7 @@
 				5BD579A12FAB25E300503BA2 /* ContentView.swift in Sources */,
 				5BD0DAF72FBF6BA000268A48 /* AudioService.swift in Sources */,
 				5B3FEB472FB4548600DC1562 /* DownloadsView.swift in Sources */,
+				5B83828E2FC4562A003625CD /* Int+zero.swift in Sources */,
 				5B3FEB432FB4545200DC1562 /* BrowsView.swift in Sources */,
 				5B9CE54B2FB32589001BE37F /* AppDelegate.swift in Sources */,
 				5B586CBA2FAC842200BCEAD2 /* Resolver+Injection.swift in Sources */,
