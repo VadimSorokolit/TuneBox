@@ -23,7 +23,7 @@ private struct Constants {
     }
 
     struct Params {
-        static let clientId = "client_id"
+        static let clientID = "client_id"
         static let tags = "tags"
         static let order = "order"
         static let search = "search"
@@ -52,10 +52,10 @@ private struct Constants {
 }
 
 enum TuneBoxRouter {
-    case getTracksByGenre(genre: String?, page: Int, perPage: Int)
-    case getPopularTracks(page: Int, perPage: Int)
+    case getTracksByGenre(genre: String?, limit: Int, offset: Int)
+    case getPopularTracks(limit: Int, offset: Int)
     case getTrackSize(id: Int)
-    case searchTracks(query: String, page: Int, perPage: Int)
+    case searchTracks(query: String, limit: Int, offset: Int)
 }
 
 // MARK: - TargetType Protocol
@@ -67,16 +67,11 @@ extension TuneBoxRouter: TargetType {
 
     private var params: [String: Any] {
         switch self {
-            case let .getTracksByGenre(genre, page, perPage):
-                let pagination = self.makePagination(
-                    page: page,
-                    perPage: perPage
-                )
-
+            case let .getTracksByGenre(genre, limit, offset):
                 var params: [String: Any] = [
-                    Params.clientId: Constants.apiKey,
-                    Params.limit: pagination.limit,
-                    Params.offset: pagination.offset
+                    Params.clientID: Constants.apiKey,
+                    Params.limit: limit,
+                    Params.offset: offset
                 ]
 
                 if let genre, !genre.isEmpty {
@@ -85,43 +80,25 @@ extension TuneBoxRouter: TargetType {
 
                 return params
 
-            case let .getPopularTracks(page, perPage):
-                let pagination = makePagination(
-                    page: page,
-                    perPage: perPage
-                )
-
+            case let .getPopularTracks(limit, offset):
                 return [
-                    Params.clientId: Constants.apiKey,
+                    Params.clientID: Constants.apiKey,
                     Params.order: Constants.Values.popularityTotal,
-                    Params.limit: pagination.limit,
-                    Params.offset: pagination.offset
+                    Params.limit: limit,
+                    Params.offset: offset
                 ]
 
-            case let .searchTracks(query, page, perPage):
-                let pagination = makePagination(
-                    page: page,
-                    perPage: perPage
-                )
-
+            case let .searchTracks(query, limit, offset):
                 return [
-                    Params.clientId: Constants.apiKey,
+                    Params.clientID: Constants.apiKey,
                     Params.search: query,
-                    Params.limit: pagination.limit,
-                    Params.offset: pagination.offset
+                    Params.limit: limit,
+                    Params.offset: offset
                 ]
 
             case .getTrackSize:
                 return [:]
         }
-    }
-
-    private func makePagination(page: Int, perPage: Int) -> (limit: Int, offset: Int) {
-        let safePage = max(page, 0)
-        let safePerPage = max(perPage, 1)
-        let offset = safePage * safePerPage
-
-        return (safePerPage, offset)
     }
 
     var baseURL: URL {

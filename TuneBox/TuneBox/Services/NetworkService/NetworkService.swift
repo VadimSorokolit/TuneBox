@@ -17,9 +17,9 @@ enum TrackDownloadNotificationUserInfoKey {
 }
 
 protocol NetworkServicing: AnyObject {
-    func getTracksByGenre(genre: String?, page: Int, perPage: Int) async throws -> [TrackDTO]
-    func getPopularTracks(page: Int, perPage: Int) async throws -> [TrackDTO]
-    func searchTracks(query: String, page: Int, perPage: Int) async throws -> [TrackDTO]
+    func getTracksByGenre(genre: String?, limit: Int, offset: Int) async throws -> [TrackDTO]
+    func getPopularTracks(limit: Int, offset: Int) async throws -> [TrackDTO]
+    func searchTracks(query: String, limit: Int, offset: Int) async throws -> [TrackDTO]
     func startDownload(_ track: TrackEntity) async throws
     func stopDownload(trackId: String) async
     func resumeDownload(trackId: String) async throws
@@ -39,9 +39,9 @@ final class NetworkService: NSObject, NetworkServicing {
 
     // MARK: - Methods. Public
 
-    func getTracksByGenre(genre: String?, page: Int, perPage: Int) async throws -> [TrackDTO] {
+    func getTracksByGenre(genre: String?, limit: Int, offset: Int) async throws -> [TrackDTO] {
         do {
-            let response = try await self.requestHandler(.getTracksByGenre(genre: genre, page: page, perPage: perPage))
+            let response = try await self.requestHandler(.getTracksByGenre(genre: genre, limit: limit, offset: offset))
             let decoded = try self.decodeResponse(TracksResponse.self, from: response)
 
             return await self.enrichTracksWithSize(decoded.results)
@@ -50,9 +50,9 @@ final class NetworkService: NSObject, NetworkServicing {
         }
     }
 
-    func getPopularTracks(page: Int, perPage: Int) async throws -> [TrackDTO] {
+    func getPopularTracks(limit: Int, offset: Int) async throws -> [TrackDTO] {
         do {
-            let response = try await self.requestHandler(.getPopularTracks(page: page, perPage: perPage))
+            let response = try await self.requestHandler(.getPopularTracks(limit: limit, offset: offset))
             let decoded = try self.decodeResponse(TracksResponse.self, from: response)
 
             return await self.enrichTracksWithSize(decoded.results)
@@ -61,9 +61,9 @@ final class NetworkService: NSObject, NetworkServicing {
         }
     }
 
-    func searchTracks(query: String, page: Int, perPage: Int) async throws -> [TrackDTO] {
+    func searchTracks(query: String, limit: Int, offset: Int) async throws -> [TrackDTO] {
         do {
-            let response = try await self.requestHandler(.searchTracks(query: query, page: page, perPage: perPage))
+            let response = try await self.requestHandler(.searchTracks(query: query, limit: limit, offset: offset))
             let decoded = try self.decodeResponse(TracksResponse.self, from: response)
 
             return await self.enrichTracksWithSize(decoded.results)

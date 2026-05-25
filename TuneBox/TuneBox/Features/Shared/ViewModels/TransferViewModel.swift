@@ -37,7 +37,7 @@ protocol TransferPersistenceServicing: AnyObject {
 }
 
 protocol TransferStateProviding: AnyObject {
-    var page: Int { get set }
+    var offset: Int { get set }
     var tracks: [TrackEntity] { get set }
     var downloadingTrackIds: Set<String> { get set }
     var isLoading: Bool { get set }
@@ -72,7 +72,7 @@ final class TransferViewModel: TransferManaging {
 
     // MARK: Properties. Public
 
-    var page: Int = 0
+    var offset: Int = 0
     var tracks: [TrackEntity] = []
     var isLoading: Bool = false
     var errorMessage: String?
@@ -100,8 +100,9 @@ final class TransferViewModel: TransferManaging {
             let entities = try self.persistenceService.getTracks()
 
             if entities.isEmpty {
-                self.tracks = await self.loadTracks(page: 0)
-                self.page += 1
+                self.offset = 0
+                self.tracks = await self.loadTracks(offset: self.offset)
+                self.offset += self.tracks.count
             } else {
                 self.tracks = entities
 
@@ -125,7 +126,7 @@ final class TransferViewModel: TransferManaging {
         defer {
             self.isLoading = false
         }
-        let newEntityTracks = await self.loadTracks(page: self.page)
+        let newEntityTracks = await self.loadTracks(offset: self.offset)
         self.tracks.append(contentsOf: newEntityTracks)
     }
 
@@ -262,7 +263,7 @@ final class TransferViewModel: TransferManaging {
             do {
                 try self.storageService.clearStorage()
                 self.clearDownloadState()
-                self.page = 0
+                self.offset = 0
             } catch {
                 self.handleError(error)
             }
@@ -354,7 +355,7 @@ final class TransferViewModel: TransferManaging {
 
     // MARK: - Properties. Private
 
-    private let perPage: Int = 8
+    private let limit: Int = 8
     private let networkService: NetworkServicing
     private let persistenceService: PersistenceServicing
     private let storageService: FileManagerServicing
@@ -366,13 +367,13 @@ final class TransferViewModel: TransferManaging {
 
     // MARK: - Methods. Private
 
-    private func loadTracks(page: Int) async -> [TrackEntity] {
+    private func loadTracks(offset: Int) async -> [TrackEntity] {
         do {
             let dtos = try await self.networkService.getPopularTracks(
-                page: page,
-                perPage: self.perPage
+                limit: self.limit,
+                offset: offset
             )
-            self.page = page
+            self.offset = offset
 
             let entities = dtos.map(TrackEntity.init)
 

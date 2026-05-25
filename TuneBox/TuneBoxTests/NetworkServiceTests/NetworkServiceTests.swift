@@ -52,8 +52,8 @@ struct NetworkServiceTests {
         }
         
         let tracks = try await service.getPopularTracks(
-            page: 1,
-            perPage: 20
+            limit: 20,
+            offset: 20
         )
         
         #expect(tracks.count == 2)
@@ -84,7 +84,7 @@ struct NetworkServiceTests {
         }
         
         do {
-            _ = try await service.getTracksByGenre(genre: "bad", page: 1, perPage: 20)
+            _ = try await service.getTracksByGenre(genre: "bad", limit: 20, offset: 20)
             Issue.record("Expected APIError.server")
         } catch let error as APIError {
             guard case .server(let message) = error else {
