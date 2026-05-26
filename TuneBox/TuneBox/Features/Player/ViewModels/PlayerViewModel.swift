@@ -32,7 +32,7 @@ final class PlayerViewModel: PlayerManaging {
         do {
             let url = try self.fileManagerService.makeDownloadedTrackURL(id: track.id)
 
-            self.playingTrackID = track.id
+            self.track = track
             self.audioService.toggle(trackId: track.id, url: url, loop: false)
         } catch {
             AppLogger.audio.error("Failed to make track URL: \(String(describing: error))")
@@ -40,7 +40,7 @@ final class PlayerViewModel: PlayerManaging {
     }
 
     func isPlaying(_ track: TrackEntity) -> Bool {
-        self.playingTrackID == track.id && self.isPlaying
+        self.track === track && self.isPlaying
     }
 
     // MARK: - Properties. Private
@@ -48,6 +48,6 @@ final class PlayerViewModel: PlayerManaging {
     private let audioService = AudioService.shared
     private let fileManagerService: FileManagerServicing
     private var isPlaying = false
-    private var playingTrackID: String?
+    private var track: TrackEntity?
     private var cancellables = Set<AnyCancellable>()
 }

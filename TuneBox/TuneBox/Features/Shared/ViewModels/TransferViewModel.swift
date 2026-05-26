@@ -190,7 +190,11 @@ final class TransferViewModel: TransferManaging {
 
     func deleteDownloadedTrack(track: TrackEntity) {
         self.networkService.clearPersistedResumeData(trackId: track.id)
-
+        
+        if AudioService.shared.currentTrackId == track.id {
+            AudioService.shared.stop()
+        }
+        
         do {
             try self.storageService.deleteDownloadedTrack(id: track.id)
             track.downloadState = .idle
@@ -249,6 +253,7 @@ final class TransferViewModel: TransferManaging {
         self.queuedDownloadTrackIDs.removeAll()
         self.activeDownloadTrackIDs.removeAll()
         self.inProgressTrackIDs.removeAll()
+        AudioService.shared.stop()
         self.tracks.removeAll()
 
         TransferQueueStorage.clear()
@@ -256,7 +261,6 @@ final class TransferViewModel: TransferManaging {
         do {
             try self.persistenceService.clearStorage()
             try self.storageService.clearStorage()
-
             self.clearDownloadState()
             self.offset = .zero
         } catch {
