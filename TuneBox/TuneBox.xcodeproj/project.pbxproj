@@ -13,7 +13,7 @@
 		5B11C3412FB728390089BAD2 /* PersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11C3402FB728380089BAD2 /* PersistenceService.swift */; };
 		5B2CF45E2FBC7AA400C5BA4C /* TransferDownloadSlotLimiter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2CF45D2FBC7AA300C5BA4C /* TransferDownloadSlotLimiter.swift */; };
 		5B2CF4612FBC7C6B00C5BA4C /* TransferDownloadObserverTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2CF4602FBC7C6900C5BA4C /* TransferDownloadObserverTokens.swift */; };
-		5B2CF4642FBCB3F600C5BA4C /* BrowsTrackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2CF4632FBCB3F500C5BA4C /* BrowsTrackCell.swift */; };
+		5B2CF4642FBCB3F600C5BA4C /* ContentView+TrackCel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2CF4632FBCB3F500C5BA4C /* ContentView+TrackCel.swift */; };
 		5B2CF4672FBD100100C5BA4D /* DownloadResumeStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2CF4682FBD100000C5BA4D /* DownloadResumeStorage.swift */; };
 		5B2CF4692FBD100200C5BA4E /* TransferQueueStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2CF46A2FBD100100C5BA4E /* TransferQueueStorage.swift */; };
 		5B3FEB3D2FB4539C00DC1562 /* TransferViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB3C2FB4539A00DC1562 /* TransferViewModel.swift */; };
@@ -45,6 +45,7 @@
 		5B8382AF2FC4D01C003625CD /* PersistenceManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382AE2FC4D01B003625CD /* PersistenceManaging.swift */; };
 		5B8382B12FC4D05E003625CD /* DownloadStateProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382B02FC4D05C003625CD /* DownloadStateProviding.swift */; };
 		5B8382B32FC4D0D8003625CD /* StorageStateProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382B22FC4D0D6003625CD /* StorageStateProviding.swift */; };
+		5B8382B52FC59381003625CD /* BrowsView+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382B42FC59380003625CD /* BrowsView+.swift */; };
 		5B84C01C2FAB353200ACE75A /* CustomAlerts in Frameworks */ = {isa = PBXBuildFile; productRef = 5B84C01B2FAB353200ACE75A /* CustomAlerts */; };
 		5B84C0252FAB368D00ACE75A /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 5B84C0242FAB367B00ACE75A /* .swiftlint.yml */; };
 		5B88609E2FAE184C0056BE9A /* GlobalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B88609D2FAE18450056BE9A /* GlobalConstants.swift */; };
@@ -81,7 +82,7 @@
 		5B11C3402FB728380089BAD2 /* PersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceService.swift; sourceTree = "<group>"; };
 		5B2CF45D2FBC7AA300C5BA4C /* TransferDownloadSlotLimiter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferDownloadSlotLimiter.swift; sourceTree = "<group>"; };
 		5B2CF4602FBC7C6900C5BA4C /* TransferDownloadObserverTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferDownloadObserverTokens.swift; sourceTree = "<group>"; };
-		5B2CF4632FBCB3F500C5BA4C /* BrowsTrackCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowsTrackCell.swift; sourceTree = "<group>"; };
+		5B2CF4632FBCB3F500C5BA4C /* ContentView+TrackCel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ContentView+TrackCel.swift"; sourceTree = "<group>"; };
 		5B2CF4682FBD100000C5BA4D /* DownloadResumeStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadResumeStorage.swift; sourceTree = "<group>"; };
 		5B2CF46A2FBD100100C5BA4E /* TransferQueueStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferQueueStorage.swift; sourceTree = "<group>"; };
 		5B3FEB3C2FB4539A00DC1562 /* TransferViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferViewModel.swift; sourceTree = "<group>"; };
@@ -108,6 +109,7 @@
 		5B8382AE2FC4D01B003625CD /* PersistenceManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceManaging.swift; sourceTree = "<group>"; };
 		5B8382B02FC4D05C003625CD /* DownloadStateProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadStateProviding.swift; sourceTree = "<group>"; };
 		5B8382B22FC4D0D6003625CD /* StorageStateProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageStateProviding.swift; sourceTree = "<group>"; };
+		5B8382B42FC59380003625CD /* BrowsView+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowsView+.swift"; sourceTree = "<group>"; };
 		5B84C0242FAB367B00ACE75A /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		5B88609D2FAE18450056BE9A /* GlobalConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalConstants.swift; sourceTree = "<group>"; };
 		5B8860A42FB1CF900056BE9A /* NotificationNames+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationNames+Extension.swift"; sourceTree = "<group>"; };
@@ -216,7 +218,7 @@
 		5B2CF4622FBCB3DC00C5BA4C /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				5B2CF4632FBCB3F500C5BA4C /* BrowsTrackCell.swift */,
+				5B8382B42FC59380003625CD /* BrowsView+.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -524,6 +526,7 @@
 		5BD579A92FAB272E00503BA2 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				5B2CF4632FBCB3F500C5BA4C /* ContentView+TrackCel.swift */,
 				5BD5799D2FAB25E300503BA2 /* ContentView.swift */,
 				5B3FEB3E2FB453C100DC1562 /* Brows */,
 				5B3FEB3F2FB453C400DC1562 /* Downloads */,
@@ -708,7 +711,7 @@
 				5B2CF4672FBD100100C5BA4D /* DownloadResumeStorage.swift in Sources */,
 				5B8382B32FC4D0D8003625CD /* StorageStateProviding.swift in Sources */,
 				5B2CF4692FBD100200C5BA4E /* TransferQueueStorage.swift in Sources */,
-				5B2CF4642FBCB3F600C5BA4C /* BrowsTrackCell.swift in Sources */,
+				5B2CF4642FBCB3F600C5BA4C /* ContentView+TrackCel.swift in Sources */,
 				5B8382A32FC4CB4D003625CD /* AudioServicing.swift in Sources */,
 				5B8382AD2FC4CFF1003625CD /* DownloadManaging.swift in Sources */,
 				5B586CB72FAC678700BCEAD2 /* TrackDTO.swift in Sources */,
@@ -728,6 +731,7 @@
 				5B8860A52FB1CF910056BE9A /* NotificationNames+Extension.swift in Sources */,
 				5B11C33B2FB719A80089BAD2 /* TrackEntity.swift in Sources */,
 				5B88609E2FAE184C0056BE9A /* GlobalConstants.swift in Sources */,
+				5B8382B52FC59381003625CD /* BrowsView+.swift in Sources */,
 				5BD579A22FAB25E300503BA2 /* TuneBoxApp.swift in Sources */,
 				5B3FEB4D2FB454C900DC1562 /* SettingsView.swift in Sources */,
 			);

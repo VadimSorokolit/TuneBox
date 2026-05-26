@@ -66,11 +66,9 @@ struct ContentView: View {
             VStack(spacing: 5) {
                 if !transferViewModel.tracks.isEmpty {
                     ForEach(transferViewModel.tracks, id: \.persistentModelID) { track in
-                        BrowsTrackCell(
-                            id: track.id,
-                            progress: track.downloadingProgress,
-                            state: cellState(from: track),
-                            onTap: {
+                        TrackCell(
+                            track: track,
+                            onDownloadTap: {
                                 Task {
                                     await transferViewModel.handleDownloadAction(for: track)
                                 }
@@ -87,23 +85,6 @@ struct ContentView: View {
         }
         .task {
             await transferViewModel.loadFirst()
-        }
-    }
-
-    private func cellState(from track: TrackEntity) -> CellState {
-        switch track.downloadState {
-            case .idle:
-                return .idle
-            case .paused:
-                return .paused
-            case .downloading:
-                return .downloading
-            case .completed:
-                return .completed
-            case .queued:
-                return .queued
-            case .failed:
-                return .failed
         }
     }
 

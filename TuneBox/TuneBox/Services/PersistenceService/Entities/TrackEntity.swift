@@ -98,8 +98,8 @@ final class TrackEntity {
         self.waveformData = waveformData
         self.size = size
         self.downloadingSize = downloadingSize
-        self.downloadState = downloadState
-        self.fileState = fileState
+        self.downloadStateRawValue = downloadStateRawValue
+        self.fileStateRawValue = fileStateRawValue
     }
 }
 
