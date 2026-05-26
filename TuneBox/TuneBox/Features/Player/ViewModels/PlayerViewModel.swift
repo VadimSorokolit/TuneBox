@@ -36,7 +36,7 @@ final class PlayerViewModel: PlayerManaging {
     }
 
     // MARK: - Properties. Private
-    
+
     private let audioService = AudioService.shared
     private var isPlaying = false
     private var playingTrackID: String?

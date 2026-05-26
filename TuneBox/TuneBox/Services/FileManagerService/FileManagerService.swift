@@ -1,5 +1,5 @@
 //
-//  StorageService.swift
+//  FileManagerService.swift
 //  TuneBox
 //
 //  Created by Vadim Sorokolit on 07.05.2026.
@@ -19,17 +19,6 @@ enum FileManagerError: LocalizedError {
                 return "Not enough free space. Required: \(requiredGB) GB, available: \(availableGB) GB."
         }
     }
-}
-
-protocol FileManagerServicing: AnyObject {
-    func getFreeStorage() -> Double?
-    func checkEnoughFreeStorage(requiredGB: Double) throws
-    func getTracksFolderURL() throws -> URL
-    func getDirectorySizeInBytes() throws -> Int64
-    func getDirectorySizeInMB() async throws -> Double
-    func deleteDownloadedTrack(id: String) throws
-    func downloadedTrackExists(id: String) -> Bool
-    func clearStorage() throws
 }
 
 final class FileManagerService: FileManagerServicing {

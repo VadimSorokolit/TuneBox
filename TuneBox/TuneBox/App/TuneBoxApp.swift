@@ -17,6 +17,11 @@ struct TuneBoxApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .overlay {
+                    if viewModel.isLoading {
+                        SpinnerView(isLoading: viewModel.isLoading)
+                    }
+                }
                 .onChange(of: scenePhase) { _, newPhase in
                     switch newPhase {
                         case .active:
