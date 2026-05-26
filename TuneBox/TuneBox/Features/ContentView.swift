@@ -49,7 +49,9 @@ struct ContentView: View {
                 Spacer()
 
                 Button(action: {
-                    transferViewModel.resetTransferState()
+                    Task {
+                        await transferViewModel.resetTransferState()
+                    }
                 }, label: {
                     Circle().fill(Color.red)
                         .frame(width: 50, height: 50)

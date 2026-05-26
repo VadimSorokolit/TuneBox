@@ -17,60 +17,60 @@ enum TrackDownloadNotificationUserInfoKey {
 }
 
 final class NetworkService: NSObject, NetworkServicing {
-    
+
     // MARK: - Methods. Public
-    
+
     func getTracksByGenre(genre: String?, limit: Int, offset: Int) async throws -> [TrackDTO] {
         do {
             let response = try await self.requestHandler(.getTracksByGenre(genre: genre, limit: limit, offset: offset))
             let decoded = try self.decodeResponse(TracksResponse.self, from: response)
-            
+
             return await self.updateTracksWithSizes(decoded.results)
         } catch {
             throw APIError.from(error)
         }
     }
-    
+
     func getPopularTracks(limit: Int, offset: Int) async throws -> [TrackDTO] {
         do {
             let response = try await self.requestHandler(.getPopularTracks(limit: limit, offset: offset))
             let decoded = try self.decodeResponse(TracksResponse.self, from: response)
-            
+
             return await self.updateTracksWithSizes(decoded.results)
         } catch {
             throw APIError.from(error)
         }
     }
-    
+
     func searchTracks(query: String, limit: Int, offset: Int) async throws -> [TrackDTO] {
         do {
             let response = try await self.requestHandler(.searchTracks(query: query, limit: limit, offset: offset))
             let decoded = try self.decodeResponse(TracksResponse.self, from: response)
-            
+
             return await self.updateTracksWithSizes(decoded.results)
         } catch {
             throw APIError.from(error)
         }
     }
-    
+
     @MainActor
     func startDownload(_ track: TrackEntity) async throws {
         guard let remoteURL = track.downloadURL else {
             throw APIError.invalidURL
         }
-        
+
         do {
             try await self.startDownload(trackID: track.id, remoteURL: remoteURL)
         } catch {
             throw APIError.from(error)
         }
     }
-    
+
     func stopDownload(trackId: String) async {
         guard let task = await self.downloadStore.task(for: trackId) else {
             return
         }
-        
+
         await self.downloadStore.stopRequested(for: trackId)
         let data: Data? = await withCheckedContinuation { continuation in
             task.cancel { resumeData in
@@ -81,51 +81,51 @@ final class NetworkService: NSObject, NetworkServicing {
         self.persistResumeData(data, for: trackId)
         await self.downloadStore.clearTask(for: trackId)
     }
-    
+
     func resumeDownload(trackId: String) async throws {
         guard let resumeData = await self.resolveResumeData(for: trackId) else {
             throw APIError.server("No paused download for track \(trackId)")
         }
-        
+
         let task = self.urlSession.downloadTask(withResumeData: resumeData)
         task.taskDescription = trackId
-        
+
         await self.downloadStore.storeTask(task, for: trackId)
         await self.downloadStore.clearResumeData(for: trackId)
-        
+
         DownloadResumeStorage.remove(for: trackId)
-        
+
         task.resume()
     }
-    
+
     func cancelDownload(trackID: String) async {
         guard let task = await self.downloadStore.task(for: trackID) else {
             return
         }
-        
+
         task.cancel()
-        
+
         await self.downloadStore.clearTask(for: trackID)
         await self.downloadStore.clearResumeData(for: trackID)
-        
+
         DownloadResumeStorage.remove(for: trackID)
     }
-    
+
     func cancelAllDownloads() async {
         let trackIDs = await self.downloadStore.activeTrackIDs()
-        
+
         for trackID in trackIDs {
             await self.cancelDownload(trackID: trackID)
         }
     }
-    
+
     func restoreDownloadSession() async {
         let tasks = await withCheckedContinuation { continuation in
             self.urlSession.getAllTasks { tasks in
                 continuation.resume(returning: tasks)
             }
         }
-        
+
         for task in tasks {
             guard
                 let downloadTask = task as? URLSessionDownloadTask,
@@ -133,9 +133,9 @@ final class NetworkService: NSObject, NetworkServicing {
             else {
                 continue
             }
-            
+
             await self.downloadStore.storeTask(downloadTask, for: trackID)
-            
+
             if downloadTask.state == .running, downloadTask.countOfBytesReceived > 0 {
                 NotificationCenter.default.post(
                     name: .trackDownloadProgress,
@@ -149,20 +149,20 @@ final class NetworkService: NSObject, NetworkServicing {
             }
         }
     }
-    
+
     func activeDownloadTrackIDs() async -> Set<String> {
         await self.downloadStore.activeTrackIDs()
     }
-    
+
     func runningDownloadTrackIDs() async -> Set<String> {
         let tasks: [URLSessionTask] = await withCheckedContinuation { continuation in
             self.urlSession.getAllTasks { tasks in
                 continuation.resume(returning: tasks)
             }
         }
-        
+
         var running = Set<String>()
-        
+
         for task in tasks {
             guard
                 task is URLSessionDownloadTask,
@@ -171,142 +171,142 @@ final class NetworkService: NSObject, NetworkServicing {
             else {
                 continue
             }
-            
+
             running.insert(trackID)
         }
-        
+
         return running
     }
-    
+
     func waitForPendingCancellations(timeout: TimeInterval) async {
         let deadline = Date().addingTimeInterval(timeout)
         let checkInterval: Duration = .seconds(0.1)
-        
+
         while Date() < deadline {
             if Swift.Task.isCancelled {
                 return
             }
-            
+
             let tasks: [URLSessionTask] = await withCheckedContinuation { continuation in
                 self.urlSession.getAllTasks { tasks in
                     continuation.resume(returning: tasks)
                 }
             }
-            
+
             let hasCancelingTasks = tasks.contains { $0.state == .canceling }
-            
+
             if hasCancelingTasks == false {
                 return
             }
-            
+
             try? await Swift.Task.sleep(for: checkInterval)
         }
     }
-    
+
     func snapshotResumeDataForRelaunch() async {
         let trackIDs = await self.downloadStore.activeTrackIDs()
-        
+
         for trackID in trackIDs {
             guard let task = await self.downloadStore.task(for: trackID) else {
                 continue
             }
-            
+
             await self.downloadStore.relaunchSnapshotRequested(for: trackID)
-            
+
             let data: Data? = await withCheckedContinuation { continuation in
                 task.cancel { resumeData in
                     continuation.resume(returning: resumeData)
                 }
             }
-            
+
             await self.downloadStore.saveResumeData(data, for: trackID)
             self.persistResumeData(data, for: trackID)
             await self.downloadStore.clearTask(for: trackID)
         }
     }
-    
+
     func hasPersistedResumeData(trackId: String) async -> Bool {
         if await self.downloadStore.resumeData(for: trackId) != nil {
             return true
         }
-        
+
         return DownloadResumeStorage.load(for: trackId) != nil
     }
-    
+
     func clearPersistedResumeData(trackId: String) {
         DownloadResumeStorage.remove(for: trackId)
     }
-    
+
     private func getTrackSize(id: Int) async throws -> Int {
         do {
             let response = try await self.requestHandler(.getTrackSize(id: id))
-            
+
             guard (200 ... 299).contains(response.statusCode) else {
                 throw APIError.serverStatusCode(response.statusCode)
             }
-            
+
             guard let contentLength = response.response?.value(forHTTPHeaderField: Constants.trackContentLengthHeader) else {
                 throw APIError.missingContentLength
             }
-            
+
             guard let trackSize = Int(contentLength) else {
                 throw APIError.invalidContentLength
             }
-            
+
             return trackSize
         } catch {
             throw APIError.from(error)
         }
     }
-    
+
     func setBackgroundCompletionHandler(_ handler: @escaping () -> Void) {
         self.backgroundCompletionHandler = handler
     }
-    
+
     // MARK: - Initializer
-    
+
     init(provider: MoyaProvider<TuneBoxRouter>) {
         self.requestHandler = { target in
             try await provider.request(target)
         }
         super.init()
     }
-    
+
     init(requestHandler: @escaping (TuneBoxRouter) async throws -> Response) {
         self.requestHandler = requestHandler
         super.init()
     }
-    
+
     // MARK: - Properties. Private
-    
+
     private enum Constants {
         static let successStatus = "success"
         static let trackContentLengthHeader = "Content-Length"
         static let urlSessionBackgroundIdentifier: String = "com.tunebox.background.downloads"
     }
-    
+
     private var backgroundCompletionHandler: (() -> Void)?
     private var requestHandler: (TuneBoxRouter) async throws -> Response
-    
+
     private lazy var urlSession: URLSession = {
         let configuration = URLSessionConfiguration.background(
             withIdentifier: Constants.urlSessionBackgroundIdentifier
         )
-        
+
         configuration.sessionSendsLaunchEvents = true
         configuration.isDiscretionary = false
-        
+
         return URLSession(
             configuration: configuration,
             delegate: self,
             delegateQueue: nil
         )
     }()
-    
+
     private let downloadStore = DownloadStore()
-    
+
     // MARK: - Methods. Private
-    
+
     private func updateTracksWithSizes(_ tracks: [TrackDTO]) async -> [TrackDTO] {
         await withTaskGroup(of: (Int, Int?).self) { group in
             for (index, track) in tracks.enumerated() {
@@ -314,38 +314,38 @@ final class NetworkService: NSObject, NetworkServicing {
                     if Swift.Task.isCancelled {
                         return (index, nil)
                     }
-                    
+
                     guard
                         let self,
                         let trackID = Int(track.id)
                     else {
                         return (index, nil)
                     }
-                    
+
                     do {
                         let size = try await self.getTrackSize(id: trackID)
-                        
+
                         if Swift.Task.isCancelled {
                             return (index, nil)
                         }
-                        
+
                         return (index, size)
                     } catch {
                         return (index, nil)
                     }
                 }
             }
-            
+
             var trackSizes = Array(repeating: Optional<Int>.none, count: tracks.count)
-            
+
             for await (index, size) in group {
                 if Swift.Task.isCancelled {
                     return tracks
                 }
-                
+
                 trackSizes[index] = size
             }
-            
+
             return tracks.enumerated().map { index, track in
                 var updatedTrack = track
                 updatedTrack.size = trackSizes[index]
@@ -353,10 +353,10 @@ final class NetworkService: NSObject, NetworkServicing {
             }
         }
     }
-    
+
     private func decodeResponse<T: Decodable>(_ type: T.Type, from response: Response) throws -> T {
         let decoded = try response.map(T.self)
-        
+
         if let response = decoded as? TracksResponse {
             guard response.headers.status == Constants.successStatus else {
                 throw APIError.server(
@@ -364,56 +364,56 @@ final class NetworkService: NSObject, NetworkServicing {
                 )
             }
         }
-        
+
         return decoded
     }
-    
+
     private func resolveResumeData(for trackId: String) async -> Data? {
         if let resumeData = await self.downloadStore.resumeData(for: trackId) {
             return resumeData
         }
-        
+
         return DownloadResumeStorage.load(for: trackId)
     }
-    
+
     private func persistResumeData(_ data: Data?, for trackId: String) {
         guard let data else {
             return
         }
-        
+
         do {
             try DownloadResumeStorage.save(data, for: trackId)
         } catch {
             AppLogger.transfer.warning("Failed to persist resume data for \(trackId): \(error.localizedDescription)")
         }
     }
-    
+
     private func startDownload(trackID: String, remoteURL: URL) async throws {
         let task = urlSession.downloadTask(with: remoteURL)
         task.taskDescription = trackID
-        
+
         await downloadStore.storeTask(task, for: trackID)
-        
+
         task.resume()
     }
-    
+
     private func storeDownloadedFile(from temporaryURL: URL, trackID: String) throws -> URL {
         try Swift.Task.checkCancellation()
-        
+
         let destinationDirectory = try GlobalConstants.makeTracksDirectoryURL()
-        
+
         let destinationURL = destinationDirectory
             .appendingPathComponent("\(GlobalConstants.downloadedFilePrefix)\(trackID)")
             .appendingPathExtension(GlobalConstants.audioFileExtension)
-        
+
         try Swift.Task.checkCancellation()
-        
+
         if FileManager.default.fileExists(atPath: destinationURL.path) {
             try FileManager.default.removeItem(at: destinationURL)
         }
-        
+
         try Swift.Task.checkCancellation()
-        
+
         try FileManager.default.moveItem(at: temporaryURL, to: destinationURL)
         return destinationURL
     }
