@@ -8,9 +8,9 @@
 import Foundation
 
 protocol DownloadStateProviding: AnyObject {
-    var offset: Int { get set }
-    var tracks: [TrackEntity] { get set }
-    var inProgressTrackIDs: Set<String> { get set }
-    var isLoading: Bool { get set }
-    var error: String? { get set }
+    var offset: Int { get }
+    var tracks: [TrackEntity] { get }
+    var inProgressTrackIDs: Set<String> { get }
+    var isLoading: Bool { get }
+    var error: String? { get }
 }

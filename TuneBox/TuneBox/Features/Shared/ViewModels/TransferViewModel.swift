@@ -24,7 +24,7 @@ enum SimultaneouslyLoadingCount: Int {
 protocol TransferManaging:
     DownloadManaging,
     DownloadStateProviding,
-    StorageStateProviding,
+    StorageManaging,
     PersistenceManaging {
     func loadFirst() async
     func loadNext() async
@@ -43,13 +43,13 @@ final class TransferViewModel: TransferManaging {
 
     // MARK: Properties. Public
 
-    var offset: Int = .zero
-    var tracks: [TrackEntity] = []
-    var isLoading: Bool = false
-    var error: String?
-    var inProgressTrackIDs: Set<String> = []
-    var simultaneouslyLoadingCount: Int = SimultaneouslyLoadingCount.two.rawValue
-    var reservedSpace: ReservedSpace = ReservedSpace.oneGB
+    private(set) var offset: Int = .zero
+    private(set) var tracks: [TrackEntity] = []
+    private(set) var isLoading: Bool = false
+    private(set) var error: String?
+    private(set) var inProgressTrackIDs: Set<String> = []
+    private(set) var simultaneouslyLoadingCount: Int = SimultaneouslyLoadingCount.two.rawValue
+    private(set) var reservedSpace: ReservedSpace = ReservedSpace.oneGB
 
     var availableSpace: Double? {
         self.storageService.getFreeStorage()
@@ -213,7 +213,7 @@ final class TransferViewModel: TransferManaging {
     }
 
     func handleBackgroundCompletion(_ handler: @escaping () -> Void) {
-        self.networkService.handleBackgroundCompletion(handler)
+        self.networkService.setBackgroundCompletionHandler(handler)
     }
 
     func handleDownloadAction(for track: TrackEntity) async {

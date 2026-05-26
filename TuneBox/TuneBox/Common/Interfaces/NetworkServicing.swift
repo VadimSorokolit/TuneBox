@@ -23,5 +23,5 @@ protocol NetworkServicing: AnyObject {
     func snapshotResumeDataForRelaunch() async
     func hasPersistedResumeData(trackId: String) async -> Bool
     func clearPersistedResumeData(trackId: String)
-    func handleBackgroundCompletion(_ handler: @escaping () -> Void)
+    func setBackgroundCompletionHandler(_ handler: @escaping () -> Void)
 }
