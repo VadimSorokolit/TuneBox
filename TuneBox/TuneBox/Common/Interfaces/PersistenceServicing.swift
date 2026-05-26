@@ -6,12 +6,15 @@
 //
 
 import Foundation
+import Combine
 
 protocol PersistenceServicing: AnyObject {
+    var storageDidChangePublisher: AnyPublisher<Void, Never> { get }
+
     func getTracks() throws -> [TrackEntity]
     func getTrack(id: String) throws -> TrackEntity?
     func insert(tracks: [TrackEntity]) throws
-    func upsert(track: TrackEntity) throws
+    func insert(track: TrackEntity) throws
     func delete(track: TrackEntity) throws
     func clearStorage() throws
     func save() throws

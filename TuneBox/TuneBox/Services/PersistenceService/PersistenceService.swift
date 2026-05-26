@@ -6,12 +6,19 @@
 //
 
 import Foundation
+import Combine
 import SwiftData
 
 final class PersistenceService: PersistenceServicing {
 
+    // MARK: - Properties. Private
+
+    private let storageDidChangeSubject = PassthroughSubject<Void, Never>()
+    private var cancellables = Set<AnyCancellable>()
     private let modelContainer: ModelContainer
     private let modelContext: ModelContext
+
+    // MARK: - Initializer
 
     init() throws {
         let schema = Schema([TrackEntity.self])
@@ -20,7 +27,17 @@ final class PersistenceService: PersistenceServicing {
 
         self.modelContainer = container
         self.modelContext = container.mainContext
+
+        self.subscribePublishers()
     }
+
+    // MARK: - Properties. Public
+
+    var storageDidChangePublisher: AnyPublisher<Void, Never> {
+        self.storageDidChangeSubject.eraseToAnyPublisher()
+    }
+
+    // MARK: - Methods. Public
 
     func getTracks() throws -> [TrackEntity] {
         do {
@@ -65,7 +82,7 @@ final class PersistenceService: PersistenceServicing {
         }
     }
 
-    func upsert(track entity: TrackEntity) throws {
+    func insert(track entity: TrackEntity) throws {
         let id = entity.id
 
         var descriptor = FetchDescriptor<TrackEntity>(
@@ -113,5 +130,14 @@ final class PersistenceService: PersistenceServicing {
             AppLogger.storage.error("Failed to delete all tracks: \(error.localizedDescription)")
             throw error
         }
+    }
+
+    private func subscribePublishers() {
+        NotificationCenter.default
+            .publisher(for: ModelContext.didSave, object: self.modelContext)
+            .sink { [weak self] _ in
+                self?.storageDidChangeSubject.send()
+            }
+            .store(in: &self.cancellables)
     }
 }
