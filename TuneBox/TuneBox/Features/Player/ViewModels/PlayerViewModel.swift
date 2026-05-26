@@ -6,29 +6,37 @@
 //
 
 import Foundation
-import Observation
-
-protocol PlayerManaging: AnyObject {
-    func handlePlayAction(for track: TrackEntity)
-    func isPlaying(_ track: TrackEntity) -> Bool
-}
+import Combine
 
 @Observable
 final class PlayerViewModel: PlayerManaging {
 
     // MARK: - Initializer
 
-    init() {
-        self.audioService.onStateChange = { [weak self] isPlaying in
-            self?.isPlaying = isPlaying
-        }
+    init(
+        fileManagerService: FileManagerServicing
+    ) {
+        self.fileManagerService = fileManagerService
+
+        self.audioService.stateChangePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isPlaying in
+                self?.isPlaying = isPlaying
+            }
+            .store(in: &self.cancellables)
     }
 
     // MARK: - Methods. Public
 
     func handlePlayAction(for track: TrackEntity) {
-        self.playingTrackID = track.id
-        self.audioService.toggle(trackId: track.id)
+        do {
+            let url = try self.fileManagerService.makeDownloadedTrackURL(id: track.id)
+
+            self.playingTrackID = track.id
+            self.audioService.toggle(trackId: track.id, url: url, loop: false)
+        } catch {
+            AppLogger.audio.error("Failed to make track URL: \(String(describing: error))")
+        }
     }
 
     func isPlaying(_ track: TrackEntity) -> Bool {
@@ -38,6 +46,8 @@ final class PlayerViewModel: PlayerManaging {
     // MARK: - Properties. Private
 
     private let audioService = AudioService.shared
+    private let fileManagerService: FileManagerServicing
     private var isPlaying = false
     private var playingTrackID: String?
+    private var cancellables = Set<AnyCancellable>()
 }

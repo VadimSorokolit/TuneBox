@@ -13,7 +13,8 @@ protocol FileManagerServicing: AnyObject {
     func getTracksFolderURL() throws -> URL
     func getDirectorySizeInBytes() throws -> Int64
     func getDirectorySizeInMB() async throws -> Double
-    func deleteDownloadedTrack(id: String) throws
     func downloadedTrackExists(id: String) -> Bool
+    func makeDownloadedTrackURL(id: String) throws -> URL
+    func deleteDownloadedTrack(id: String) throws
     func clearStorage() throws
 }

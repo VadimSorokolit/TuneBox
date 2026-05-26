@@ -70,6 +70,14 @@ final class FileManagerService: FileManagerServicing {
         return Double(bytes) / GlobalConstants.bytesInMegabyte
     }
 
+    func makeDownloadedTrackURL(id: String) throws -> URL {
+        let tracksDirectory = try self.makeTracksDirectoryIfNeeded()
+
+        return tracksDirectory
+            .appendingPathComponent("\(GlobalConstants.downloadedFilePrefix)\(id)")
+            .appendingPathExtension(AudioFileExtension.mp3.rawValue)
+    }
+
     func deleteDownloadedTrack(id: String) throws {
         let trackURL = try self.makeDownloadedTrackURL(id: id)
 
@@ -121,14 +129,6 @@ final class FileManagerService: FileManagerServicing {
     private func resolveDirectoryURL(from url: URL) throws -> URL {
         let values = try url.resourceValues(forKeys: [.isDirectoryKey])
         return values.isDirectory == true ? url : url.deletingLastPathComponent()
-    }
-
-    private func makeDownloadedTrackURL(id: String) throws -> URL {
-        let tracksDirectory = try self.makeTracksDirectoryIfNeeded()
-
-        return tracksDirectory
-            .appendingPathComponent("\(GlobalConstants.downloadedFilePrefix)\(id)")
-            .appendingPathExtension(GlobalConstants.audioFileExtension)
     }
 
     private func makeTracksDirectoryIfNeeded() throws -> URL {

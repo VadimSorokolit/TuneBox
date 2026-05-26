@@ -34,6 +34,7 @@ extension Resolver: @retroactive ResolverRegistering {
         self.register {
             FileManagerService() as FileManagerServicing
         }
+        .scope(.application)
     }
 
     private static func registerPersistenceService() {
@@ -57,9 +58,10 @@ extension Resolver: @retroactive ResolverRegistering {
         .scope(.application)
 
         self.register {
-            PlayerViewModel() as PlayerManaging
+            PlayerViewModel(
+                fileManagerService: self.resolve(FileManagerServicing.self)
+            ) as PlayerManaging
         }
-        .scope(.application)
     }
 
 }

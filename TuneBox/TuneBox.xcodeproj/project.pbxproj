@@ -47,6 +47,7 @@
 		5B8382B32FC4D0D8003625CD /* StorageManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382B22FC4D0D6003625CD /* StorageManaging.swift */; };
 		5B8382B52FC59381003625CD /* BrowsView+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382B42FC59380003625CD /* BrowsView+.swift */; };
 		5B8382B82FC5AEA9003625CD /* Notification+value.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382B72FC5AEA8003625CD /* Notification+value.swift */; };
+		5B8382BC2FC5D97F003625CD /* PlayerManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382BB2FC5D97E003625CD /* PlayerManaging.swift */; };
 		5B84C01C2FAB353200ACE75A /* CustomAlerts in Frameworks */ = {isa = PBXBuildFile; productRef = 5B84C01B2FAB353200ACE75A /* CustomAlerts */; };
 		5B84C0252FAB368D00ACE75A /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 5B84C0242FAB367B00ACE75A /* .swiftlint.yml */; };
 		5B88609E2FAE184C0056BE9A /* GlobalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B88609D2FAE18450056BE9A /* GlobalConstants.swift */; };
@@ -112,6 +113,7 @@
 		5B8382B22FC4D0D6003625CD /* StorageManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageManaging.swift; sourceTree = "<group>"; };
 		5B8382B42FC59380003625CD /* BrowsView+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowsView+.swift"; sourceTree = "<group>"; };
 		5B8382B72FC5AEA8003625CD /* Notification+value.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notification+value.swift"; sourceTree = "<group>"; };
+		5B8382BB2FC5D97E003625CD /* PlayerManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerManaging.swift; sourceTree = "<group>"; };
 		5B84C0242FAB367B00ACE75A /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		5B88609D2FAE18450056BE9A /* GlobalConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalConstants.swift; sourceTree = "<group>"; };
 		5B8860A42FB1CF900056BE9A /* NotificationNames+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationNames+Extension.swift"; sourceTree = "<group>"; };
@@ -422,6 +424,7 @@
 				5B8382A82FC4CF41003625CD /* NetworkServicing.swift */,
 				5B8382AE2FC4D01B003625CD /* PersistenceManaging.swift */,
 				5B8382AA2FC4CF84003625CD /* PersistenceServicing.swift */,
+				5B8382BB2FC5D97E003625CD /* PlayerManaging.swift */,
 				5B8382B22FC4D0D6003625CD /* StorageManaging.swift */,
 			);
 			path = Interfaces;
@@ -736,6 +739,7 @@
 				5B586CC72FACA8E300BCEAD2 /* APIError.swift in Sources */,
 				5B586CCC2FACB61500BCEAD2 /* TracksResponse.swift in Sources */,
 				5B47627A2FAB3DC30069E41A /* TuneBoxRouter.swift in Sources */,
+				5B8382BC2FC5D97F003625CD /* PlayerManaging.swift in Sources */,
 				5B47627E2FAB49B00069E41A /* AppLogger.swift in Sources */,
 				5B2CF45E2FBC7AA400C5BA4C /* TransferDownloadSlotLimiter.swift in Sources */,
 				5B8382AB2FC4CF88003625CD /* PersistenceServicing.swift in Sources */,

@@ -14,9 +14,8 @@ import Foundation
 enum GlobalConstants {
     static let bytesInGigabyte: Double = 1e9
     static let bytesInMegabyte: Double = 1e6
-
+    static let trackExtension: AudioFileExtension = .mp3
     static let tracksDirectory = "Tracks"
-    static let audioFileExtension = "mp3"
     static let downloadedFilePrefix = "track"
 
     static func makeTracksDirectoryURL() throws -> URL {

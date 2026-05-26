@@ -6,6 +6,13 @@
 //
 
 import Foundation
+import Combine
+
+enum AudioFileExtension: String {
+    case mp3
+    case wav
+    case m4a
+}
 
 protocol AudioServicing: AnyObject {
     var currentTrackId: String? { get }
@@ -13,15 +20,14 @@ protocol AudioServicing: AnyObject {
     var duration: TimeInterval { get }
     var currentTime: TimeInterval { get }
     var volume: Float { get set }
-    var onStateChange: ((Bool) -> Void)? { get set }
-    var onProgress: ((Double) -> Void)? { get set }
+    var stateChangePublisher: AnyPublisher<Bool, Never> { get }
+    var progressPublisher: AnyPublisher<Double, Never> { get }
 
-    func play(trackId: String, ext: String, loop: Bool)
+    func play(trackId: String, url: URL, loop: Bool)
     func pause()
     func resume()
     func stop()
-    func toggle(trackId: String, ext: String, loop: Bool)
+    func toggle(trackId: String, url: URL, loop: Bool)
     func seek(by deltaSeconds: TimeInterval)
     func seek(to progress: Double)
-    func playEffect(name: String, ext: String)
 }

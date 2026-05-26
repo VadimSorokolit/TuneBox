@@ -7,6 +7,7 @@
 
 import Foundation
 import AVFoundation
+import Combine
 import os
 
 final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
@@ -14,10 +15,15 @@ final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
     // MARK: - Properties. Public
 
     static let shared: AudioService = AudioService()
-
     private(set) var currentTrackId: String?
-    var onStateChange: ((Bool) -> Void)?
-    var onProgress: ((Double) -> Void)?
+
+    var stateChangePublisher: AnyPublisher<Bool, Never> {
+        self.stateChangeSubject.eraseToAnyPublisher()
+    }
+
+    var progressPublisher: AnyPublisher<Double, Never> {
+        self.progressSubject.eraseToAnyPublisher()
+    }
 
     var isPlaying: Bool {
         self.mainPlayer?.isPlaying ?? false
@@ -51,16 +57,10 @@ final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
 
     // MARK: - Methods. Public
 
-    func play(trackId: String, ext: String = "mp3", loop: Bool = false) {
+    func play(trackId: String, url: URL, loop: Bool = false) {
         self.stopMainPlayer()
 
         do {
-            let directoryURL = try GlobalConstants.makeTracksDirectoryURL()
-
-            let url = directoryURL
-                .appendingPathComponent("\(GlobalConstants.downloadedFilePrefix)\(trackId)")
-                .appendingPathExtension(ext)
-
             try AVAudioSession.sharedInstance().setActive(true)
 
             let player = try AVAudioPlayer(contentsOf: url)
@@ -88,11 +88,11 @@ final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
     }
 
     func resume() {
-        guard self.mainPlayer != nil else {
+        guard let player = self.mainPlayer else {
             return
         }
 
-        self.mainPlayer?.play()
+        player.play()
         self.startProgressTimer()
         self.notifyStateChange(true)
     }
@@ -105,15 +105,15 @@ final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
         self.notifyProgress(0)
     }
 
-    func toggle(trackId: String, ext: String = "mp3", loop: Bool = false) {
+    func toggle(trackId: String, url: URL, loop: Bool = false) {
         if self.currentTrackId != trackId {
-            self.play(trackId: trackId, ext: ext, loop: loop)
+            self.play(trackId: trackId, url: url, loop: loop)
 
             return
         }
 
         guard let player = self.mainPlayer else {
-            self.play(trackId: trackId, ext: ext, loop: loop)
+            self.play(trackId: trackId, url: url, loop: loop)
 
             return
         }
@@ -133,7 +133,6 @@ final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
 
     func seek(by deltaSeconds: TimeInterval) {
         guard let player = self.mainPlayer, player.duration > 0 else {
-
             return
         }
 
@@ -145,7 +144,6 @@ final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
 
     func seek(to progress: Double) {
         guard let player = self.mainPlayer, player.duration > 0 else {
-
             return
         }
 
@@ -155,9 +153,9 @@ final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
         self.notifyProgress(clamped)
     }
 
-    func playEffect(name: String, ext: String = "mp3") {
-        guard let url = Bundle.main.url(forResource: name, withExtension: ext) else {
-            AppLogger.audio.error("Effect file not found: \(name).\(ext)")
+    func playEffect(name: String, ext: AudioFileExtension = GlobalConstants.trackExtension) {
+        guard let url = Bundle.main.url(forResource: name, withExtension: ext.rawValue) else {
+            AppLogger.audio.error("Effect file not found: \(name).\(ext.rawValue)")
 
             return
         }
@@ -202,6 +200,8 @@ final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
     private var storedVolume: Float = 1.0
     private static let progressInterval: TimeInterval = 0.1
     private static let endThreshold: TimeInterval = 0.05
+    private let stateChangeSubject = PassthroughSubject<Bool, Never>()
+    private let progressSubject = PassthroughSubject<Double, Never>()
 
     // MARK: - Methods. Private
 
@@ -240,14 +240,14 @@ final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
     }
 
     private func notifyStateChange(_ playing: Bool) {
-        DispatchQueue.main.async { [weak self] in
-            self?.onStateChange?(playing)
+        DispatchQueue.main.async {
+            self.stateChangeSubject.send(playing)
         }
     }
 
     private func notifyProgress(_ progress: Double) {
-        DispatchQueue.main.async { [weak self] in
-            self?.onProgress?(progress)
+        DispatchQueue.main.async {
+            self.progressSubject.send(progress)
         }
     }
 

@@ -404,7 +404,7 @@ final class NetworkService: NSObject, NetworkServicing {
 
         let destinationURL = destinationDirectory
             .appendingPathComponent("\(GlobalConstants.downloadedFilePrefix)\(trackID)")
-            .appendingPathExtension(GlobalConstants.audioFileExtension)
+            .appendingPathExtension(GlobalConstants.trackExtension.rawValue)
 
         try Swift.Task.checkCancellation()
 
