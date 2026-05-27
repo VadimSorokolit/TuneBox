@@ -16,93 +16,16 @@ extension ContentView {
         let isPlaying: Bool
 
         @State private var displayedProgress: Double = 0
-        let imageHeight: CGFloat = 20.0
+
+        private let imageHeight: CGFloat = 20.0
 
         var body: some View {
             HStack(spacing: 12) {
-                HStack(spacing: 10) {
-                    Text(track.id)
-                        .font(.system(size: 12))
-                        .lineLimit(1)
-                        .frame(width: 60, alignment: .leading)
-                        .padding(.leading, 10)
+                leadingSection
 
-                    if track.downloadState == .completed {
-                        Button(action: {
-                            onPlayTap()
-                        }, label: {
-                            Circle()
-                                .frame(width: imageHeight, height: imageHeight)
-                                .foregroundStyle(Color.green)
-                                .overlay(
-                                    Image(systemName: isPlaying
-                                          ? "pause.fill"
-                                          : "play.fill"
-                                         )
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: imageHeight - 10, height: imageHeight - 10)
-                                    .foregroundStyle(Color.white)
-                                )
-                        })
-                    } else if track.downloadState == .failed {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .resizable()
-                            .frame(width: imageHeight, height: imageHeight)
-                            .foregroundStyle(Color.red)
-                    } else {
-                        Rectangle()
-                            .frame(width: imageHeight, height: imageHeight)
-                            .foregroundStyle(.clear)
-                    }
-                }
+                progressSection
 
-                GeometryReader { geometry in
-                    ZStack(alignment: .leading) {
-                        Capsule()
-                            .fill(Color.gray.opacity(0.2))
-
-                        Capsule()
-                            .fill(Color.green)
-                            .frame(width: geometry.size.width * displayedProgress)
-                    }
-                }
-                .frame(height: 4)
-                .frame(maxWidth: .infinity)
-                .onAppear {
-                    self.displayedProgress = self.track.downloadingProgress
-                }
-                .onChange(of: self.track.downloadingProgress) { _, newValue in
-                    if self.track.downloadState == .downloading {
-                        withAnimation(.linear(duration: 0.8)) {
-                            self.displayedProgress = newValue
-                        }
-                    } else {
-                        self.displayedProgress = newValue
-                    }
-                }
-                .onChange(of: self.track.downloadState) { _, newState in
-                    if newState == .idle || newState == .failed {
-                        self.displayedProgress = 0
-                    }
-
-                    if newState == .completed {
-                        self.displayedProgress = 1
-                    }
-                }
-
-                Button {
-                    onDownloadTap()
-                } label: {
-                    Text(buttonTitle)
-                        .font(.system(size: 12))
-                        .frame(minWidth: 70)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(buttonColor.opacity(0.15))
-                        .foregroundColor(buttonColor)
-                        .clipShape(Capsule())
-                }
+                actionButton
             }
             .frame(height: 20)
             .padding(.horizontal, 5)
@@ -113,18 +36,173 @@ extension ContentView {
             )
         }
 
+        private var leadingSection: some View {
+            HStack(spacing: 10) {
+
+                Text(track.id)
+                    .font(.system(size: 12))
+                    .lineLimit(1)
+                    .frame(width: 60, alignment: .leading)
+                    .padding(.leading, 10)
+
+                iconView
+            }
+        }
+
+        @ViewBuilder
+        private var progressSection: some View {
+            if shouldShowProgress {
+                GeometryReader { geometry in
+                    ZStack(alignment: .leading) {
+
+                        Capsule()
+                            .fill(Color.gray.opacity(0.2))
+
+                        Capsule()
+                            .fill(Color.green)
+                            .frame(
+                                width: geometry.size.width * displayedProgress
+                            )
+                    }
+                }
+                .frame(height: 4)
+                .frame(maxWidth: .infinity)
+                .onAppear {
+                    displayedProgress = track.downloadingProgress
+                }
+                .onChange(of: track.downloadingProgress) { _, newValue in
+                    guard track.downloadState == .downloading else {
+                        var transaction = Transaction()
+                        transaction.disablesAnimations = true
+
+                        withTransaction(transaction) {
+                            displayedProgress = newValue
+                        }
+
+                        return
+                    }
+
+                    withAnimation(.linear(duration: 0.8)) {
+                        displayedProgress = newValue
+                    }
+                }
+                .onChange(of: track.downloadState) { _, newState in
+                    var transaction = Transaction()
+                    transaction.disablesAnimations = true
+
+                    withTransaction(transaction) {
+                        switch newState {
+                            case .idle, .failed:
+                                displayedProgress = 0
+
+                            case .completed:
+                                displayedProgress = 1
+
+                            default:
+                                break
+                        }
+                    }
+                }
+            } else {
+                Rectangle()
+                    .fill(Color.clear)
+                    .frame(height: 4)
+                    .frame(maxWidth: .infinity)
+            }
+        }
+
+        private var actionButton: some View {
+            Button {
+                onDownloadTap()
+            } label: {
+                Text(buttonTitle)
+                    .font(.system(size: 12))
+                    .frame(minWidth: 70)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(buttonColor.opacity(0.15))
+                    .foregroundColor(buttonColor)
+                    .clipShape(Capsule())
+            }
+        }
+
+        @ViewBuilder
+        private var iconView: some View {
+            switch track.downloadState {
+                case .completed:
+                    Button(action: {
+                        onPlayTap()
+                    }, label: {
+                        Circle()
+                            .frame(
+                                width: imageHeight,
+                                height: imageHeight
+                            )
+                            .foregroundStyle(Color.green)
+                            .overlay(
+                                Image(
+                                    systemName: isPlaying
+                                    ? "pause.fill"
+                                    : "play.fill"
+                                )
+                                .resizable()
+                                .scaledToFit()
+                                .frame(
+                                    width: imageHeight - 10,
+                                    height: imageHeight - 10
+                                )
+                                .foregroundStyle(Color.white)
+                            )
+                    })
+
+                case .failed:
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .resizable()
+                        .frame(
+                            width: imageHeight,
+                            height: imageHeight
+                        )
+                        .foregroundStyle(Color.red)
+
+                default:
+                    Rectangle()
+                        .frame(
+                            width: imageHeight,
+                            height: imageHeight
+                        )
+                        .foregroundStyle(.clear)
+            }
+        }
+
+        private var shouldShowProgress: Bool {
+            switch track.downloadState {
+                case .downloading,
+                     .paused,
+                     .queued:
+                    return true
+
+                default:
+                    return false
+            }
+        }
+
         private var buttonTitle: String {
             switch track.downloadState {
                 case .idle:
                     return "Download"
+
                 case .downloading:
                     return "Pause"
+
                 case .queued:
                     return "Cancel"
+
                 case .paused:
                     return "Resume"
+
                 case .completed:
                     return "Delete"
+
                 case .failed:
                     return "Failed"
             }
@@ -134,78 +212,26 @@ extension ContentView {
             switch track.downloadState {
                 case .idle:
                     return .blue
+
                 case .downloading:
                     return .orange
+
                 case .queued:
                     return .purple
+
                 case .paused:
                     return .green
+
                 case .completed:
                     return .red
+
                 case .failed:
-                    return Color(red: 0.85, green: 0.35, blue: 0.35)
+                    return Color(
+                        red: 0.85,
+                        green: 0.35,
+                        blue: 0.35
+                    )
             }
         }
     }
-
-}
-
-#Preview {
-    func makeTrack(
-        id: String,
-        state: DownloadState,
-        size: Int? = 100,
-        downloadingSize: Int = 0,
-        download: String? = nil
-    ) -> TrackEntity {
-        TrackEntity(
-            id: id,
-            image: nil,
-            trackName: "Preview Track",
-            artistName: "Preview Artist",
-            albumName: "Preview Album",
-            releaseDate: nil,
-            download: download,
-            waveformData: nil,
-            size: size,
-            downloadingSize: downloadingSize,
-            downloadStateRawValue: state.rawValue
-        )
-    }
-
-    return VStack(spacing: 12) {
-        ContentView.TrackCell(
-            track: makeTrack(
-                id: "track_001",
-                state: .downloading,
-                downloadingSize: 45
-            ),
-            onDownloadTap: { print("pause tapped") },
-            onPlayTap: {},
-            isPlaying: false
-        )
-
-        ContentView.TrackCell(
-            track: makeTrack(
-                id: "track_002",
-                state: .idle
-            ),
-            onDownloadTap: { print("download tapped") },
-            onPlayTap: {},
-            isPlaying: false
-        )
-
-        ContentView.TrackCell(
-            track: makeTrack(
-                id: "track_003",
-                state: .completed,
-                downloadingSize: 100,
-                download: "local-file"
-            ),
-            onDownloadTap: { print("delete tapped") },
-            onPlayTap: { print("play tapped") },
-            isPlaying: true
-        )
-    }
-    .padding()
 }
