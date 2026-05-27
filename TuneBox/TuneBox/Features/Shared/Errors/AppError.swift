@@ -132,4 +132,8 @@ enum AppError: Error {
         }
     }
 
+    enum File: Error {
+        case missingDirectory
+    }
+
 }

@@ -13,11 +13,7 @@ final class PlayerViewModel: PlayerManaging {
 
     // MARK: - Initializer
 
-    init(
-        fileManagerService: FileManagerServicing
-    ) {
-        self.fileManagerService = fileManagerService
-
+    init() {
         self.audioService.stateChangeSubject
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isPlaying in
@@ -30,7 +26,7 @@ final class PlayerViewModel: PlayerManaging {
 
     func handlePlayAction(for track: TrackEntity) {
         do {
-            let url = try self.fileManagerService.makeDownloadedTrackURL(id: track.id)
+            let url = try FileManagerService.makeTracksDirectoryIfNeeded()
 
             self.track = track
             self.audioService.toggle(trackId: track.id, url: url, loop: false)
@@ -46,7 +42,6 @@ final class PlayerViewModel: PlayerManaging {
     // MARK: - Properties. Private
 
     private let audioService = AudioService.shared
-    private let fileManagerService: FileManagerServicing
     private var isPlaying = false
     private var track: TrackEntity?
     private var cancellables = Set<AnyCancellable>()

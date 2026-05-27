@@ -364,13 +364,22 @@ final class TransferViewModel: TransferManaging {
 
     // MARK: - Properties. Private
 
+    /**
+     Private implementation details don't need to be observed from outside.
+     Use `@ObservationIgnored` for mutable private properties that should not trigger view updates.
+     Note: `@Observable` already skips `let` constants automatically.
+     */
+
     private let limit: Int = 8
     private let networkService: NetworkServicing
     private let persistenceService: PersistenceServicing
     private let storageService: FileManagerServicing
     private let downloadObserverTokens = TransferDownloadObserverTokens()
+    @ObservationIgnored
     private var queuedDownloadTrackIDs: [String] = []
+    @ObservationIgnored
     private var activeDownloadTrackIDs: [String] = []
+    @ObservationIgnored
     private var lastPersistedProgressBytesByTrackID: [String: Int] = [:]
     private let progressPersistStepBytes = 65_536
 

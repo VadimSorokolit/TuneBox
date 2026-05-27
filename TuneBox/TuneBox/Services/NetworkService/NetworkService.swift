@@ -400,11 +400,7 @@ final class NetworkService: NSObject, NetworkServicing {
     private func storeDownloadedFile(from temporaryURL: URL, trackID: String) throws -> URL {
         try Swift.Task.checkCancellation()
 
-        let destinationDirectory = try GlobalConstants.makeTracksDirectoryURL()
-
-        let destinationURL = destinationDirectory
-            .appendingPathComponent("\(GlobalConstants.downloadedFilePrefix)\(trackID)")
-            .appendingPathExtension(GlobalConstants.trackExtension.rawValue)
+        let destinationURL = try FileManagerService.makeTracksDirectoryIfNeeded()
 
         try Swift.Task.checkCancellation()
 

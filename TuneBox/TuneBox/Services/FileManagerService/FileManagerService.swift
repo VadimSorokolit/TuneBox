@@ -11,6 +11,20 @@ final class FileManagerService: FileManagerServicing {
 
     // MARK: - Methods. Public
 
+    static func makeTracksDirectoryIfNeeded() throws -> URL {
+        if let url = FileManagerService.cachedTracksDirectoryURL {
+            AppLogger.storage.debug("Using cached tracks directory URL: \(url.path)")
+            return url
+        }
+
+        let url = try self.makeTracksDirectoryURL()
+        self.cachedTracksDirectoryURL = url
+
+        AppLogger.storage.debug("Cached tracks directory URL: \(url.path)")
+
+        return url
+    }
+
     func checkEnoughFreeStorage(requiredGB: Double) throws {
         guard let freeStorage = self.getFreeStorage() else {
             throw AppError.FileManager.unavailable
@@ -25,7 +39,7 @@ final class FileManagerService: FileManagerServicing {
     }
 
     func getTracksFolderURL() throws -> URL {
-        try self.makeTracksDirectoryIfNeeded()
+        try FileManagerService.makeTracksDirectoryIfNeeded()
     }
 
     func getDirectorySizeInMB() throws -> Double {
@@ -53,7 +67,7 @@ final class FileManagerService: FileManagerServicing {
     }
 
     func makeDownloadedTrackURL(id: String) throws -> URL {
-        let tracksDirectory = try self.makeTracksDirectoryIfNeeded()
+        let tracksDirectory = try FileManagerService.makeTracksDirectoryIfNeeded()
 
         return tracksDirectory
             .appendingPathComponent("\(id)")
@@ -79,7 +93,7 @@ final class FileManagerService: FileManagerServicing {
     }
 
     func clearStorage() throws {
-        let tracksDirectory = try self.makeTracksDirectoryIfNeeded()
+        let tracksDirectory = try FileManagerService.makeTracksDirectoryIfNeeded()
         let fileURLs = try FileManager.default.contentsOfDirectory(
             at: tracksDirectory,
             includingPropertiesForKeys: nil
@@ -96,7 +110,7 @@ final class FileManagerService: FileManagerServicing {
         static let bytesInMegabyte: Double = 1e6
     }
 
-    private var cachedTracksDirectoryURL: URL?
+    static private var cachedTracksDirectoryURL: URL?
 
     // MARK: - Methods. Private
 
@@ -121,17 +135,49 @@ final class FileManagerService: FileManagerServicing {
         return values.isDirectory == true ? url : url.deletingLastPathComponent()
     }
 
-    private func makeTracksDirectoryIfNeeded() throws -> URL {
-        if let url = self.cachedTracksDirectoryURL {
-            AppLogger.storage.debug("Using cached tracks directory URL: \(url.path)")
-            return url
+    static private func makeTracksDirectoryURL() throws -> URL {
+        guard let base = FileManager.default.urls(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask
+        ).first else {
+            throw AppError.File.missingDirectory
         }
 
-        let url = try GlobalConstants.makeTracksDirectoryURL()
-        self.cachedTracksDirectoryURL = url
+        let tracksDirectoryURL = base.appendingPathComponent(
+            "Tracks",
+            isDirectory: true
+        )
 
-        AppLogger.storage.debug("Cached tracks directory URL: \(url.path)")
+        var isDirectory: ObjCBool = false
 
-        return url
+        if FileManager.default.fileExists(
+            atPath: tracksDirectoryURL.path,
+            isDirectory: &isDirectory
+        ) {
+            guard isDirectory.boolValue else {
+                AppLogger.storage.error(
+                    "Tracks path exists but is not directory: \(tracksDirectoryURL.path)"
+                )
+
+                throw AppError.File.missingDirectory
+            }
+
+            AppLogger.storage.debug(
+                "Tracks directory already exists: \(tracksDirectoryURL.path)"
+            )
+
+            return tracksDirectoryURL
+        }
+
+        try FileManager.default.createDirectory(
+            at: tracksDirectoryURL,
+            withIntermediateDirectories: true
+        )
+
+        AppLogger.storage.debug(
+            "Tracks directory created: \(tracksDirectoryURL.path)"
+        )
+
+        return tracksDirectoryURL
     }
 }

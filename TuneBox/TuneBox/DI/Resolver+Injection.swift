@@ -58,9 +58,8 @@ extension Resolver: @retroactive ResolverRegistering {
         .scope(.application)
 
         self.register {
-            PlayerViewModel(
-                fileManagerService: self.resolve(FileManagerServicing.self)
-            ) as PlayerManaging
+            PlayerViewModel()
+            as PlayerManaging
         }
     }
 
