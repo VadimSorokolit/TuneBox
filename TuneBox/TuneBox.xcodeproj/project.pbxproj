@@ -13,7 +13,7 @@
 		5B11C3412FB728390089BAD2 /* PersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11C3402FB728380089BAD2 /* PersistenceService.swift */; };
 		5B2CF45E2FBC7AA400C5BA4C /* TransferDownloadSlotLimiter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2CF45D2FBC7AA300C5BA4C /* TransferDownloadSlotLimiter.swift */; };
 		5B2CF4612FBC7C6B00C5BA4C /* TransferDownloadObserverTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2CF4602FBC7C6900C5BA4C /* TransferDownloadObserverTokens.swift */; };
-		5B2CF4642FBCB3F600C5BA4C /* ContentView+TrackCel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2CF4632FBCB3F500C5BA4C /* ContentView+TrackCel.swift */; };
+		5B2CF4642FBCB3F600C5BA4C /* ContentView+TrackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2CF4632FBCB3F500C5BA4C /* ContentView+TrackCell.swift */; };
 		5B2CF4672FBD100100C5BA4D /* DownloadResumeStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2CF4682FBD100000C5BA4D /* DownloadResumeStorage.swift */; };
 		5B2CF4692FBD100200C5BA4E /* TransferQueueStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2CF46A2FBD100100C5BA4E /* TransferQueueStorage.swift */; };
 		5B3FEB3D2FB4539C00DC1562 /* TransferViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB3C2FB4539A00DC1562 /* TransferViewModel.swift */; };
@@ -84,7 +84,7 @@
 		5B11C3402FB728380089BAD2 /* PersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceService.swift; sourceTree = "<group>"; };
 		5B2CF45D2FBC7AA300C5BA4C /* TransferDownloadSlotLimiter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferDownloadSlotLimiter.swift; sourceTree = "<group>"; };
 		5B2CF4602FBC7C6900C5BA4C /* TransferDownloadObserverTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferDownloadObserverTokens.swift; sourceTree = "<group>"; };
-		5B2CF4632FBCB3F500C5BA4C /* ContentView+TrackCel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ContentView+TrackCel.swift"; sourceTree = "<group>"; };
+		5B2CF4632FBCB3F500C5BA4C /* ContentView+TrackCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ContentView+TrackCell.swift"; sourceTree = "<group>"; };
 		5B2CF4682FBD100000C5BA4D /* DownloadResumeStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadResumeStorage.swift; sourceTree = "<group>"; };
 		5B2CF46A2FBD100100C5BA4E /* TransferQueueStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferQueueStorage.swift; sourceTree = "<group>"; };
 		5B3FEB3C2FB4539A00DC1562 /* TransferViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferViewModel.swift; sourceTree = "<group>"; };
@@ -540,7 +540,7 @@
 		5BD579A92FAB272E00503BA2 /* Features */ = {
 			isa = PBXGroup;
 			children = (
-				5B2CF4632FBCB3F500C5BA4C /* ContentView+TrackCel.swift */,
+				5B2CF4632FBCB3F500C5BA4C /* ContentView+TrackCell.swift */,
 				5BD5799D2FAB25E300503BA2 /* ContentView.swift */,
 				5B3FEB3E2FB453C100DC1562 /* Brows */,
 				5B3FEB3F2FB453C400DC1562 /* Downloads */,
@@ -725,7 +725,7 @@
 				5B2CF4672FBD100100C5BA4D /* DownloadResumeStorage.swift in Sources */,
 				5B8382B32FC4D0D8003625CD /* StorageManaging.swift in Sources */,
 				5B2CF4692FBD100200C5BA4E /* TransferQueueStorage.swift in Sources */,
-				5B2CF4642FBCB3F600C5BA4C /* ContentView+TrackCel.swift in Sources */,
+				5B2CF4642FBCB3F600C5BA4C /* ContentView+TrackCell.swift in Sources */,
 				5B8382A32FC4CB4D003625CD /* AudioServicing.swift in Sources */,
 				5B8382AD2FC4CFF1003625CD /* DownloadManaging.swift in Sources */,
 				5B586CB72FAC678700BCEAD2 /* TrackDTO.swift in Sources */,

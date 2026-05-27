@@ -15,6 +15,7 @@ extension ContentView {
         let onPlayTap: () -> Void
         let isPlaying: Bool
 
+        @State private var displayedProgress: Double = 0
         let imageHeight: CGFloat = 20.0
 
         var body: some View {
@@ -56,9 +57,39 @@ extension ContentView {
                     }
                 }
 
-                ProgressView(value: track.downloadingProgress)
-                    .tint(.green)
-                    .frame(maxWidth: .infinity)
+                GeometryReader { geometry in
+                    ZStack(alignment: .leading) {
+                        Capsule()
+                            .fill(Color.gray.opacity(0.2))
+
+                        Capsule()
+                            .fill(Color.green)
+                            .frame(width: geometry.size.width * displayedProgress)
+                    }
+                }
+                .frame(height: 4)
+                .frame(maxWidth: .infinity)
+                .onAppear {
+                    self.displayedProgress = self.track.downloadingProgress
+                }
+                .onChange(of: self.track.downloadingProgress) { _, newValue in
+                    if self.track.downloadState == .downloading {
+                        withAnimation(.linear(duration: 0.8)) {
+                            self.displayedProgress = newValue
+                        }
+                    } else {
+                        self.displayedProgress = newValue
+                    }
+                }
+                .onChange(of: self.track.downloadState) { _, newState in
+                    if newState == .idle || newState == .failed {
+                        self.displayedProgress = 0
+                    }
+
+                    if newState == .completed {
+                        self.displayedProgress = 1
+                    }
+                }
 
                 Button {
                     onDownloadTap()
