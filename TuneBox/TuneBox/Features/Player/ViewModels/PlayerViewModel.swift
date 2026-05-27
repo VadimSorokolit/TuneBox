@@ -18,7 +18,7 @@ final class PlayerViewModel: PlayerManaging {
     ) {
         self.fileManagerService = fileManagerService
 
-        self.audioService.stateChangePublisher
+        self.audioService.stateChangeSubject
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isPlaying in
                 self?.isPlaying = isPlaying

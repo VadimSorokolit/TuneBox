@@ -27,7 +27,7 @@ final class NetworkService: NSObject, NetworkServicing {
 
             return await self.updateTracksWithSizes(decoded.results)
         } catch {
-            throw APIError.from(error)
+            throw AppError.API.from(error)
         }
     }
 
@@ -38,7 +38,7 @@ final class NetworkService: NSObject, NetworkServicing {
 
             return await self.updateTracksWithSizes(decoded.results)
         } catch {
-            throw APIError.from(error)
+            throw AppError.API.from(error)
         }
     }
 
@@ -49,20 +49,20 @@ final class NetworkService: NSObject, NetworkServicing {
 
             return await self.updateTracksWithSizes(decoded.results)
         } catch {
-            throw APIError.from(error)
+            throw AppError.API.from(error)
         }
     }
 
     @MainActor
     func startDownload(_ track: TrackEntity) async throws {
         guard let remoteURL = track.downloadURL else {
-            throw APIError.invalidURL
+            throw AppError.API.invalidURL
         }
 
         do {
             try await self.startDownload(trackID: track.id, remoteURL: remoteURL)
         } catch {
-            throw APIError.from(error)
+            throw AppError.API.from(error)
         }
     }
 
@@ -84,7 +84,7 @@ final class NetworkService: NSObject, NetworkServicing {
 
     func resumeDownload(trackId: String) async throws {
         guard let resumeData = await self.resolveResumeData(for: trackId) else {
-            throw APIError.server("No paused download for track \(trackId)")
+            throw AppError.API.server("No paused download for track \(trackId)")
         }
 
         let task = self.urlSession.downloadTask(withResumeData: resumeData)
@@ -242,20 +242,20 @@ final class NetworkService: NSObject, NetworkServicing {
             let response = try await self.requestHandler(.getTrackSize(id: id))
 
             guard (200 ... 299).contains(response.statusCode) else {
-                throw APIError.serverStatusCode(response.statusCode)
+                throw AppError.API.serverStatusCode(response.statusCode)
             }
 
             guard let contentLength = response.response?.value(forHTTPHeaderField: Constants.trackContentLengthHeader) else {
-                throw APIError.missingContentLength
+                throw AppError.API.missingContentLength
             }
 
             guard let trackSize = Int(contentLength) else {
-                throw APIError.invalidContentLength
+                throw AppError.API.invalidContentLength
             }
 
             return trackSize
         } catch {
-            throw APIError.from(error)
+            throw AppError.API.from(error)
         }
     }
 
@@ -359,8 +359,8 @@ final class NetworkService: NSObject, NetworkServicing {
 
         if let response = decoded as? TracksResponse {
             guard response.headers.status == Constants.successStatus else {
-                throw APIError.server(
-                    response.headers.errorMessage ?? APIError.unknown.localizedDescription
+                throw AppError.API.server(
+                    response.headers.errorMessage ?? AppError.API.unknown.localizedDescription
                 )
             }
         }
@@ -496,7 +496,7 @@ extension NetworkService: URLSessionDownloadDelegate {
                 object: nil,
                 userInfo: [
                     TrackDownloadNotificationUserInfoKey.trackID: trackID,
-                    TrackDownloadNotificationUserInfoKey.error: APIError.from(error)
+                    TrackDownloadNotificationUserInfoKey.error: AppError.API.from(error)
                 ]
             )
         }
@@ -540,7 +540,7 @@ extension NetworkService: URLSessionDownloadDelegate {
                 object: nil,
                 userInfo: [
                     TrackDownloadNotificationUserInfoKey.trackID: trackID,
-                    TrackDownloadNotificationUserInfoKey.error: APIError.serverStatusCode(response.statusCode)
+                    TrackDownloadNotificationUserInfoKey.error: AppError.API.serverStatusCode(response.statusCode)
                 ]
             )
 
@@ -569,7 +569,7 @@ extension NetworkService: URLSessionDownloadDelegate {
                 object: nil,
                 userInfo: [
                     TrackDownloadNotificationUserInfoKey.trackID: trackID,
-                    TrackDownloadNotificationUserInfoKey.error: APIError.from(error)
+                    TrackDownloadNotificationUserInfoKey.error: AppError.API.from(error)
                 ]
             )
         }

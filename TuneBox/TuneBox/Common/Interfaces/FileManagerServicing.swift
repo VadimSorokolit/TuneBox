@@ -11,7 +11,6 @@ protocol FileManagerServicing: AnyObject {
     func getFreeStorage() -> Double?
     func checkEnoughFreeStorage(requiredGB: Double) throws
     func getTracksFolderURL() throws -> URL
-    func getDirectorySizeInBytes() throws -> Int64
     func getDirectorySizeInMB() async throws -> Double
     func downloadedTrackExists(id: String) -> Bool
     func makeDownloadedTrackURL(id: String) throws -> URL

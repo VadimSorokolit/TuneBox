@@ -33,7 +33,7 @@
 		5B586CBA2FAC842200BCEAD2 /* Resolver+Injection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB92FAC842100BCEAD2 /* Resolver+Injection.swift */; };
 		5B586CBD2FAC846900BCEAD2 /* Resolver in Frameworks */ = {isa = PBXBuildFile; productRef = 5B586CBC2FAC846900BCEAD2 /* Resolver */; };
 		5B586CC32FAC912500BCEAD2 /* MoyaProvider+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CC22FAC912400BCEAD2 /* MoyaProvider+Async.swift */; };
-		5B586CC72FACA8E300BCEAD2 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CC62FACA8E200BCEAD2 /* APIError.swift */; };
+		5B586CC72FACA8E300BCEAD2 /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CC62FACA8E200BCEAD2 /* AppError.swift */; };
 		5B586CCC2FACB61500BCEAD2 /* TracksResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CCB2FACB61400BCEAD2 /* TracksResponse.swift */; };
 		5B8382912FC495F9003625CD /* PlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382902FC495F8003625CD /* PlayerViewModel.swift */; };
 		5B8382992FC4C9EE003625CD /* SpinnerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382982FC4C9ED003625CD /* SpinnerView.swift */; };
@@ -99,7 +99,7 @@
 		5B586CB62FAC678600BCEAD2 /* TrackDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackDTO.swift; sourceTree = "<group>"; };
 		5B586CB92FAC842100BCEAD2 /* Resolver+Injection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Resolver+Injection.swift"; sourceTree = "<group>"; };
 		5B586CC22FAC912400BCEAD2 /* MoyaProvider+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MoyaProvider+Async.swift"; sourceTree = "<group>"; };
-		5B586CC62FACA8E200BCEAD2 /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
+		5B586CC62FACA8E200BCEAD2 /* AppError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppError.swift; sourceTree = "<group>"; };
 		5B586CCB2FACB61400BCEAD2 /* TracksResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TracksResponse.swift; sourceTree = "<group>"; };
 		5B8382902FC495F8003625CD /* PlayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewModel.swift; sourceTree = "<group>"; };
 		5B8382982FC4C9ED003625CD /* SpinnerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerView.swift; sourceTree = "<group>"; };
@@ -230,6 +230,7 @@
 		5B3FEB3A2FB4538100DC1562 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				5B8382BE2FC6F1E5003625CD /* Errors */,
 				5B3FEB3B2FB4539300DC1562 /* ViewModels */,
 			);
 			path = Shared;
@@ -312,7 +313,6 @@
 		5B4762782FAB3DA30069E41A /* API */ = {
 			isa = PBXGroup;
 			children = (
-				5B586CC82FACA95D00BCEAD2 /* APIError */,
 				5B586CBE2FAC87A100BCEAD2 /* Models */,
 				5B586CBF2FAC87AF00BCEAD2 /* Router */,
 			);
@@ -367,14 +367,6 @@
 				5B586CC22FAC912400BCEAD2 /* MoyaProvider+Async.swift */,
 			);
 			path = Extensions;
-			sourceTree = "<group>";
-		};
-		5B586CC82FACA95D00BCEAD2 /* APIError */ = {
-			isa = PBXGroup;
-			children = (
-				5B586CC62FACA8E200BCEAD2 /* APIError.swift */,
-			);
-			path = APIError;
 			sourceTree = "<group>";
 		};
 		5B83828F2FC495EA003625CD /* ViewModels */ = {
@@ -455,6 +447,14 @@
 				5B8860A42FB1CF900056BE9A /* NotificationNames+Extension.swift */,
 			);
 			path = Notifications;
+			sourceTree = "<group>";
+		};
+		5B8382BE2FC6F1E5003625CD /* Errors */ = {
+			isa = PBXGroup;
+			children = (
+				5B586CC62FACA8E200BCEAD2 /* AppError.swift */,
+			);
+			path = Errors;
 			sourceTree = "<group>";
 		};
 		5BD0DAF82FBF6C4A00268A48 /* AudioService */ = {
@@ -736,7 +736,7 @@
 				5B586CB12FAB98EE00BCEAD2 /* NetworkService.swift in Sources */,
 				5B11C3412FB728390089BAD2 /* PersistenceService.swift in Sources */,
 				5B8382B82FC5AEA9003625CD /* Notification+value.swift in Sources */,
-				5B586CC72FACA8E300BCEAD2 /* APIError.swift in Sources */,
+				5B586CC72FACA8E300BCEAD2 /* AppError.swift in Sources */,
 				5B586CCC2FACB61500BCEAD2 /* TracksResponse.swift in Sources */,
 				5B47627A2FAB3DC30069E41A /* TuneBoxRouter.swift in Sources */,
 				5B8382BC2FC5D97F003625CD /* PlayerManaging.swift in Sources */,

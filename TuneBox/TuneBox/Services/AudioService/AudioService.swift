@@ -16,18 +16,8 @@ final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
 
     static let shared: AudioService = AudioService()
     private(set) var currentTrackId: String?
-
-    var stateChangePublisher: AnyPublisher<Bool, Never> {
-        self.stateChangeSubject.eraseToAnyPublisher()
-    }
-
-    var progressPublisher: AnyPublisher<Double, Never> {
-        self.progressSubject.eraseToAnyPublisher()
-    }
-
-    var isPlaying: Bool {
-        self.mainPlayer?.isPlaying ?? false
-    }
+    private(set) var stateChangeSubject = CurrentValueSubject<Bool, Never>(false)
+    private(set) var progressSubject = PassthroughSubject<Double, Never>()
 
     var duration: TimeInterval {
         self.mainPlayer?.duration ?? 0
@@ -124,7 +114,7 @@ final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
             return
         }
 
-        if self.isPlaying {
+        if self.stateChangeSubject.value == true {
             self.pause()
         } else {
             self.resume()
@@ -200,8 +190,6 @@ final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
     private var storedVolume: Float = 1.0
     private static let progressInterval: TimeInterval = 0.1
     private static let endThreshold: TimeInterval = 0.05
-    private let stateChangeSubject = PassthroughSubject<Bool, Never>()
-    private let progressSubject = PassthroughSubject<Double, Never>()
 
     // MARK: - Methods. Private
 
@@ -223,7 +211,9 @@ final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
         ) { [weak self] _ in
             guard let self = self,
                   let player = self.mainPlayer,
-                  player.duration > 0 else {
+                  player.duration > 0,
+                  self.stateChangeSubject.value  == true
+            else {
                 return
             }
 

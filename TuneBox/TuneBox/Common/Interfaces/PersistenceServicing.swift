@@ -14,7 +14,6 @@ protocol PersistenceServicing: AnyObject {
     func getTracks() throws -> [TrackEntity]
     func getTrack(id: String) throws -> TrackEntity?
     func insert(tracks: [TrackEntity]) throws
-    func insert(track: TrackEntity) throws
     func delete(track: TrackEntity) throws
     func clearStorage() throws
     func save() throws

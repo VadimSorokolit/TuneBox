@@ -7,31 +7,17 @@
 
 import Foundation
 
-enum FileManagerError: LocalizedError {
-    case unavailable
-    case notEnoughSpace(requiredGB: Double, availableGB: Double)
-
-    var errorDescription: String? {
-        switch self {
-            case .unavailable:
-                return "Unable to determine available storage."
-            case .notEnoughSpace(let requiredGB, let availableGB):
-                return "Not enough free space. Required: \(requiredGB) GB, available: \(availableGB) GB."
-        }
-    }
-}
-
 final class FileManagerService: FileManagerServicing {
 
-    // MARK: Methods. Public
+    // MARK: - Methods. Public
 
     func checkEnoughFreeStorage(requiredGB: Double) throws {
         guard let freeStorage = self.getFreeStorage() else {
-            throw FileManagerError.unavailable
+            throw AppError.FileManager.unavailable
         }
 
         guard freeStorage >= requiredGB else {
-            throw FileManagerError.notEnoughSpace(
+            throw AppError.FileManager.notEnoughSpace(
                 requiredGB: requiredGB,
                 availableGB: freeStorage
             )
@@ -42,7 +28,7 @@ final class FileManagerService: FileManagerServicing {
         try self.makeTracksDirectoryIfNeeded()
     }
 
-    func getDirectorySizeInBytes() throws -> Int64 {
+    func getDirectorySizeInMB() throws -> Double {
         let url = try self.getTracksFolderURL()
         let directoryURL = try self.resolveDirectoryURL(from: url)
 
@@ -61,20 +47,16 @@ final class FileManagerService: FileManagerServicing {
             }
         }
 
-        return totalSize
-    }
+        let bytes = totalSize
 
-    func getDirectorySizeInMB() throws -> Double {
-        let bytes = try self.getDirectorySizeInBytes()
-
-        return Double(bytes) / GlobalConstants.bytesInMegabyte
+        return Double(bytes) / Constants.bytesInMegabyte
     }
 
     func makeDownloadedTrackURL(id: String) throws -> URL {
         let tracksDirectory = try self.makeTracksDirectoryIfNeeded()
 
         return tracksDirectory
-            .appendingPathComponent("\(GlobalConstants.downloadedFilePrefix)\(id)")
+            .appendingPathComponent("\(id)")
             .appendingPathExtension(AudioFileExtension.mp3.rawValue)
     }
 
@@ -108,6 +90,14 @@ final class FileManagerService: FileManagerServicing {
         }
     }
 
+    // MARK: - Properties. Private
+
+    private enum Constants {
+        static let bytesInMegabyte: Double = 1e6
+    }
+
+    private var cachedTracksDirectoryURL: URL?
+
     // MARK: - Methods. Private
 
     func getFreeStorage() -> Double? {
@@ -132,6 +122,16 @@ final class FileManagerService: FileManagerServicing {
     }
 
     private func makeTracksDirectoryIfNeeded() throws -> URL {
-        try GlobalConstants.makeTracksDirectoryURL()
+        if let url = self.cachedTracksDirectoryURL {
+            AppLogger.storage.debug("Using cached tracks directory URL: \(url.path)")
+            return url
+        }
+
+        let url = try GlobalConstants.makeTracksDirectoryURL()
+        self.cachedTracksDirectoryURL = url
+
+        AppLogger.storage.debug("Cached tracks directory URL: \(url.path)")
+
+        return url
     }
 }

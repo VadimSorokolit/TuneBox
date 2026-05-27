@@ -190,11 +190,11 @@ final class TransferViewModel: TransferManaging {
 
     func deleteDownloadedTrack(track: TrackEntity) {
         self.networkService.clearPersistedResumeData(trackId: track.id)
-        
+
         if AudioService.shared.currentTrackId == track.id {
             AudioService.shared.stop()
         }
-        
+
         do {
             try self.storageService.deleteDownloadedTrack(id: track.id)
             track.downloadState = .idle
@@ -669,12 +669,12 @@ final class TransferViewModel: TransferManaging {
         if let track = self.track(byID: trackID) {
             self.markDownloadFailed(track: track)
 
-            if let apiError = error as? APIError {
+            if let apiError = error as? AppError.API {
                 self.handleError(apiError)
             } else if let localizedError = error as? Error {
                 self.handleError(localizedError)
             } else {
-                self.handleError(APIError.unknown)
+                self.handleError(AppError.API.unknown)
             }
 
             Task {

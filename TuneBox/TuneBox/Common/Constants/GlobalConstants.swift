@@ -13,37 +13,61 @@ import Foundation
 
 enum GlobalConstants {
     static let bytesInGigabyte: Double = 1e9
-    static let bytesInMegabyte: Double = 1e6
     static let trackExtension: AudioFileExtension = .mp3
-    static let tracksDirectory = "Tracks"
     static let downloadedFilePrefix = "track"
 
-    static func makeTracksDirectoryURL() throws -> URL {
-        guard let base = FileManager.default.urls(
-            for: .applicationSupportDirectory,
-            in: .userDomainMask
-        ).first else {
-            throw FileError.missingDirectory
-        }
-
-        let tracksURL = base.appendingPathComponent(self.tracksDirectory, isDirectory: true)
-
-        var isDirectory: ObjCBool = false
-        if FileManager.default.fileExists(atPath: tracksURL.path, isDirectory: &isDirectory) {
-            guard isDirectory.boolValue else {
+    private static var tracksDirectoryURL: URL {
+        get throws {
+            guard let base = FileManager.default.urls(
+                for: .applicationSupportDirectory,
+                in: .userDomainMask
+            ).first else {
                 throw FileError.missingDirectory
             }
 
-            AppLogger.storage.debug("Tracks directory is already exists: \(tracksURL.path)")
-            return tracksURL
+            let url = base.appendingPathComponent("Tracks", isDirectory: true)
+
+            AppLogger.storage.debug(
+                "Tracks directory URL resolved: \(url.path)"
+            )
+
+            return url
+        }
+    }
+
+    static func makeTracksDirectoryURL() throws -> URL {
+        let tracksDirectoryURL = try Self.tracksDirectoryURL
+
+        var isDirectory: ObjCBool = false
+
+        if FileManager.default.fileExists(
+            atPath: tracksDirectoryURL.path,
+            isDirectory: &isDirectory
+        ) {
+            guard isDirectory.boolValue else {
+                AppLogger.storage.error(
+                    "Tracks path exists but is not directory: \(tracksDirectoryURL.path)"
+                )
+
+                throw FileError.missingDirectory
+            }
+
+            AppLogger.storage.debug(
+                "Tracks directory already exists: \(tracksDirectoryURL.path)"
+            )
+
+            return tracksDirectoryURL
         }
 
         try FileManager.default.createDirectory(
-            at: tracksURL,
+            at: tracksDirectoryURL,
             withIntermediateDirectories: true
         )
 
-        AppLogger.storage.debug("Tracks directory created: \(tracksURL.path)")
-        return tracksURL
+        AppLogger.storage.debug(
+            "Tracks directory created: \(tracksDirectoryURL.path)"
+        )
+
+        return tracksDirectoryURL
     }
 }

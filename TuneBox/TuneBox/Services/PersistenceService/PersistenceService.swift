@@ -69,9 +69,21 @@ final class PersistenceService: PersistenceServicing {
         }
     }
 
-    func insert(tracks: [TrackEntity]) throws {
-        for track in tracks {
-            self.modelContext.insert(track)
+    func insert(tracks entities: [TrackEntity]) throws {
+        for entity in entities {
+            let id = entity.id
+            var descriptor = FetchDescriptor<TrackEntity>(
+
+                predicate: #Predicate { $0.id == id }
+
+            )
+            descriptor.fetchLimit = 1
+
+            if let existing = try self.modelContext.fetch(descriptor).first {
+                existing.update(from: entity)
+            } else {
+                self.modelContext.insert(entity)
+            }
         }
 
         do {
@@ -80,23 +92,6 @@ final class PersistenceService: PersistenceServicing {
             AppLogger.storage.error("Failed to insert tracks: \(error.localizedDescription)")
             throw error
         }
-    }
-
-    func insert(track entity: TrackEntity) throws {
-        let id = entity.id
-
-        var descriptor = FetchDescriptor<TrackEntity>(
-            predicate: #Predicate { $0.id == id }
-        )
-        descriptor.fetchLimit = 1
-
-        if let existing = try self.modelContext.fetch(descriptor).first {
-            existing.update(from: entity)
-        } else {
-            self.modelContext.insert(entity)
-        }
-
-        try self.modelContext.save()
     }
 
     func save() throws {
@@ -125,6 +120,7 @@ final class PersistenceService: PersistenceServicing {
     func clearStorage() throws {
         do {
             try self.modelContext.delete(model: TrackEntity.self)
+            AppLogger.storage.info("Successfully deleted all tracks")
             try self.modelContext.save()
         } catch {
             AppLogger.storage.error("Failed to delete all tracks: \(error.localizedDescription)")

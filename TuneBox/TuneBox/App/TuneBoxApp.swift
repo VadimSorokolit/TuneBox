@@ -19,7 +19,7 @@ struct TuneBoxApp: App {
             ContentView()
                 .overlay {
                     if viewModel.isLoading {
-                        SpinnerView(isLoading: viewModel.isLoading)
+                        SpinnerView()
                     }
                 }
                 .onChange(of: scenePhase) { _, newPhase in
