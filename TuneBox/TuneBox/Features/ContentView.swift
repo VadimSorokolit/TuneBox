@@ -14,56 +14,71 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            HStack {
+            VStack {
                 Button(action: {
                     Task {
-                        await transferViewModel.loadFirst()
+                        await transferViewModel.cancelAllDownloads()
                     }
                 }, label: {
-                    Circle().fill(Color.yellow)
+                    Circle().fill(Color.orange)
                         .frame(width: 50, height: 50)
                         .overlay(
-                            Image(systemName: "music.note")
-                                .frame(width: 30, height: 30)
-                                .foregroundStyle(Color.white)
-                        )
-                })
-                .disabled(transferViewModel.tracks.isEmpty == false)
-
-                Spacer()
-
-                Button(action: {
-                    Task {
-                        await transferViewModel.loadNext()
-                    }
-                }, label: {
-                    Circle().fill(Color.blue)
-                        .frame(width: 50, height: 50)
-                        .overlay(
-                            Image(systemName: "music.note.list")
-                                .frame(width: 30, height: 30)
-                                .foregroundStyle(Color.white)
+                            Image(systemName: "xmark")
+                                .foregroundStyle(.white)
                         )
                 })
 
-                Spacer()
+                HStack {
+                    Button(action: {
+                        Task {
+                            await transferViewModel.loadFirst()
+                        }
+                    }, label: {
+                        Circle().fill(Color.yellow)
+                            .frame(width: 50, height: 50)
+                            .overlay(
+                                Image(systemName: "music.note")
+                                    .frame(width: 30, height: 30)
+                                    .foregroundStyle(Color.white)
+                            )
+                    })
+                    .disabled(transferViewModel.tracks.isEmpty == false)
 
-                Button(action: {
-                    Task {
-                        await transferViewModel.resetTransferState()
-                    }
-                }, label: {
-                    Circle().fill(Color.red)
-                        .frame(width: 50, height: 50)
-                        .overlay(
-                            Image(systemName: "trash")
-                                .frame(width: 30, height: 30)
-                                .foregroundStyle(Color.white)
-                        )
-                })
-                .disabled(transferViewModel.tracks.isEmpty)
+                    Spacer()
+
+                    Button(action: {
+                        Task {
+                            await transferViewModel.loadNext()
+                        }
+                    }, label: {
+                        Circle().fill(Color.blue)
+                            .frame(width: 50, height: 50)
+                            .overlay(
+                                Image(systemName: "music.note.list")
+                                    .frame(width: 30, height: 30)
+                                    .foregroundStyle(Color.white)
+                            )
+                    })
+
+                    Spacer()
+
+                    Button(action: {
+                        Task {
+                            await transferViewModel.resetTransferState()
+                        }
+                    }, label: {
+                        Circle().fill(Color.red)
+                            .frame(width: 50, height: 50)
+                            .overlay(
+                                Image(systemName: "trash")
+                                    .frame(width: 30, height: 30)
+                                    .foregroundStyle(Color.white)
+                            )
+                    })
+                    .disabled(transferViewModel.tracks.isEmpty)
+                }
+                .padding(.horizontal)
             }
-            .padding(.horizontal)
 
             VStack(spacing: 5) {
                 if !transferViewModel.tracks.isEmpty {

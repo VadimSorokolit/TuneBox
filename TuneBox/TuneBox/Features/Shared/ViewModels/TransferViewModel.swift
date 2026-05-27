@@ -29,6 +29,7 @@ protocol TransferManaging:
     func loadFirst() async
     func loadNext() async
     func startDownload(_ track: TrackEntity) async
+    func cancelAllDownloads() async
     func resetTransferState() async
     func saveTransferState()
     func snapshotForTerminate() async
@@ -166,6 +167,33 @@ final class TransferViewModel: TransferManaging {
     func snapshotForTerminate() async {
         self.saveTransferState()
         await self.networkService.snapshotResumeDataForRelaunch()
+    }
+
+    func cancelAllDownloads() async {
+        await self.networkService.cancelAllDownloads()
+        self.inProgressTrackIDs.removeAll()
+        self.activeDownloadTrackIDs.removeAll()
+        self.queuedDownloadTrackIDs.removeAll()
+
+        for track in self.tracks {
+            switch track.downloadState {
+                case .downloading,
+                        .queued,
+                        .paused,
+                        .failed:
+
+                    track.downloadState = .idle
+                    track.downloadingSize = .zero
+                    track.fileState = .none
+
+                case .completed,
+                        .idle:
+
+                    break
+            }
+        }
+
+        TransferQueueStorage.clear()
     }
 
     func restoreDownloadsOnForeground() async {
