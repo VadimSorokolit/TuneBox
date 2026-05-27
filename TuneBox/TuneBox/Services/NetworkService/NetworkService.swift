@@ -396,23 +396,6 @@ final class NetworkService: NSObject, NetworkServicing {
 
         task.resume()
     }
-
-    private func storeDownloadedFile(from temporaryURL: URL, trackID: String) throws -> URL {
-        try Swift.Task.checkCancellation()
-
-        let destinationURL = try FileManagerService.makeTracksDirectoryIfNeeded()
-
-        try Swift.Task.checkCancellation()
-
-        if FileManager.default.fileExists(atPath: destinationURL.path) {
-            try FileManager.default.removeItem(at: destinationURL)
-        }
-
-        try Swift.Task.checkCancellation()
-
-        try FileManager.default.moveItem(at: temporaryURL, to: destinationURL)
-        return destinationURL
-    }
 }
 
 extension NetworkService: URLSessionDownloadDelegate {
@@ -544,7 +527,7 @@ extension NetworkService: URLSessionDownloadDelegate {
         }
 
         do {
-            let destinationURL = try self.storeDownloadedFile(
+            let destinationURL = try FileManagerService.storeDownloadedFile(
                 from: location,
                 trackID: trackID
             )

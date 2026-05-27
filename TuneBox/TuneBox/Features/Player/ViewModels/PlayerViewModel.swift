@@ -26,7 +26,7 @@ final class PlayerViewModel: PlayerManaging {
 
     func handlePlayAction(for track: TrackEntity) {
         do {
-            let url = try FileManagerService.makeTracksDirectoryIfNeeded()
+            let url = try FileManagerService.makeDownloadedTrackURL(id: track.id)
 
             self.track = track
             self.audioService.toggle(trackId: track.id, url: url, loop: false)

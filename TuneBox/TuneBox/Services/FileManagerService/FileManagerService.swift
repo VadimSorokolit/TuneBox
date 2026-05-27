@@ -11,18 +11,30 @@ final class FileManagerService: FileManagerServicing {
 
     // MARK: - Methods. Public
 
-    static func makeTracksDirectoryIfNeeded() throws -> URL {
-        if let url = FileManagerService.cachedTracksDirectoryURL {
-            AppLogger.storage.debug("Using cached tracks directory URL: \(url.path)")
-            return url
+    static func makeDownloadedTrackURL(id: String) throws -> URL {
+        let tracksDirectory = try self.makeTracksDirectoryIfNeeded()
+
+        return tracksDirectory
+            .appendingPathComponent("\(Constants.trackPrefix)\(id)")
+            .appendingPathExtension(AudioFileExtension.mp3.rawValue)
+    }
+
+    static func storeDownloadedFile(from temporaryURL: URL, trackID: String) throws -> URL {
+        try Swift.Task.checkCancellation()
+
+        let destinationURL = try FileManagerService.makeDownloadedTrackURL(id: trackID)
+
+        try Swift.Task.checkCancellation()
+
+        if FileManager.default.fileExists(atPath: destinationURL.path) {
+            try FileManager.default.removeItem(at: destinationURL)
         }
 
-        let url = try self.makeTracksDirectoryURL()
-        self.cachedTracksDirectoryURL = url
+        try Swift.Task.checkCancellation()
 
-        AppLogger.storage.debug("Cached tracks directory URL: \(url.path)")
+        try FileManager.default.moveItem(at: temporaryURL, to: destinationURL)
 
-        return url
+        return destinationURL
     }
 
     func checkEnoughFreeStorage(requiredGB: Double) throws {
@@ -38,12 +50,8 @@ final class FileManagerService: FileManagerServicing {
         }
     }
 
-    func getTracksFolderURL() throws -> URL {
-        try FileManagerService.makeTracksDirectoryIfNeeded()
-    }
-
     func getDirectorySizeInMB() throws -> Double {
-        let url = try self.getTracksFolderURL()
+        let url = try FileManagerService.makeTracksDirectoryIfNeeded()
         let directoryURL = try self.resolveDirectoryURL(from: url)
 
         guard let enumerator = FileManager.default.enumerator(
@@ -66,16 +74,8 @@ final class FileManagerService: FileManagerServicing {
         return Double(bytes) / Constants.bytesInMegabyte
     }
 
-    func makeDownloadedTrackURL(id: String) throws -> URL {
-        let tracksDirectory = try FileManagerService.makeTracksDirectoryIfNeeded()
-
-        return tracksDirectory
-            .appendingPathComponent("\(id)")
-            .appendingPathExtension(AudioFileExtension.mp3.rawValue)
-    }
-
     func deleteDownloadedTrack(id: String) throws {
-        let trackURL = try self.makeDownloadedTrackURL(id: id)
+        let trackURL = try FileManagerService.makeDownloadedTrackURL(id: id)
 
         guard FileManager.default.fileExists(atPath: trackURL.path) else {
             return
@@ -85,7 +85,7 @@ final class FileManagerService: FileManagerServicing {
     }
 
     func downloadedTrackExists(id: String) -> Bool {
-        guard let trackURL = try? self.makeDownloadedTrackURL(id: id) else {
+        guard let trackURL = try? FileManagerService.makeDownloadedTrackURL(id: id) else {
             return false
         }
 
@@ -108,11 +108,27 @@ final class FileManagerService: FileManagerServicing {
 
     private enum Constants {
         static let bytesInMegabyte: Double = 1e6
+        static let directoryName: String = "Tracks"
+        static let trackPrefix: String = "track"
     }
 
-    static private var cachedTracksDirectoryURL: URL?
+    private static var cachedTracksDirectoryURL: URL?
 
     // MARK: - Methods. Private
+
+    private static func makeTracksDirectoryIfNeeded() throws -> URL {
+        if let url = FileManagerService.cachedTracksDirectoryURL {
+            AppLogger.storage.debug("Using cached tracks directory URL: \(url.path)")
+            return url
+        }
+
+        let url = try self.makeTracksDirectoryURL()
+        FileManagerService.cachedTracksDirectoryURL = url
+
+        AppLogger.storage.debug("Cached tracks directory URL: \(url.path)")
+
+        return url
+    }
 
     func getFreeStorage() -> Double? {
         guard
@@ -135,7 +151,7 @@ final class FileManagerService: FileManagerServicing {
         return values.isDirectory == true ? url : url.deletingLastPathComponent()
     }
 
-    static private func makeTracksDirectoryURL() throws -> URL {
+    private static func makeTracksDirectoryURL() throws -> URL {
         guard let base = FileManager.default.urls(
             for: .applicationSupportDirectory,
             in: .userDomainMask
@@ -144,7 +160,7 @@ final class FileManagerService: FileManagerServicing {
         }
 
         let tracksDirectoryURL = base.appendingPathComponent(
-            "Tracks",
+            Constants.directoryName,
             isDirectory: true
         )
 
