@@ -10,7 +10,7 @@ import Resolver
 
 @main
 struct TuneBoxApp: App {
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @Environment(\.scenePhase) private var scenePhase
     @Injected private var viewModel: TransferManaging
 

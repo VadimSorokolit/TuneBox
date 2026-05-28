@@ -12,10 +12,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
     // MARK: - Methods. Public
 
-    func applicationDidEnterBackground(_ application: UIApplication) {
-        self.viewModel.saveTransferState()
-    }
-
     func applicationWillTerminate(_ application: UIApplication) {
         let semaphore = DispatchSemaphore(value: 0)
 
