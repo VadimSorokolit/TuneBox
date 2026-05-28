@@ -54,10 +54,8 @@ extension ContentView {
             if shouldShowProgress {
                 GeometryReader { geometry in
                     ZStack(alignment: .leading) {
-
                         Capsule()
                             .fill(Color.gray.opacity(0.2))
-                        
                         Capsule()
                             .fill(Color.green)
                             .frame(

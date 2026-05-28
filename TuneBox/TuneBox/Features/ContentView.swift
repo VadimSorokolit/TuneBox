@@ -103,6 +103,14 @@ struct ContentView: View {
         .task {
             await transferViewModel.loadFirst()
         }
+        // Only for test!!!
+        .onChange(of: transferViewModel.tracks) { _, tracks in
+            if tracks.isEmpty {
+                Task {
+                    await transferViewModel.loadFirst()
+                }
+            }
+        }
     }
 
 }
