@@ -57,52 +57,22 @@ extension ContentView {
 
                         Capsule()
                             .fill(Color.gray.opacity(0.2))
-
+                        
                         Capsule()
                             .fill(Color.green)
                             .frame(
-                                width: geometry.size.width * displayedProgress
+                                width: geometry.size.width * track.downloadingProgress
                             )
                     }
                 }
                 .frame(height: 4)
                 .frame(maxWidth: .infinity)
-                .onAppear {
-                    displayedProgress = track.downloadingProgress
-                }
-                .onChange(of: track.downloadingProgress) { _, newValue in
-                    guard track.downloadState == .downloading else {
-                        var transaction = Transaction()
-                        transaction.disablesAnimations = true
-
-                        withTransaction(transaction) {
-                            displayedProgress = newValue
-                        }
-
-                        return
-                    }
-
-                    withAnimation(.linear(duration: 0.8)) {
-                        displayedProgress = newValue
-                    }
-                }
-                .onChange(of: track.downloadState) { _, newState in
-                    var transaction = Transaction()
-                    transaction.disablesAnimations = true
-
-                    withTransaction(transaction) {
-                        switch newState {
-                            case .idle, .failed:
-                                displayedProgress = 0
-
-                            case .completed:
-                                displayedProgress = 1
-
-                            default:
-                                break
-                        }
-                    }
-                }
+                .animation(
+                    track.downloadState == .downloading
+                    ? .linear(duration: 0.2)
+                    : nil,
+                    value: track.downloadingProgress
+                )
             } else {
                 Rectangle()
                     .fill(Color.clear)

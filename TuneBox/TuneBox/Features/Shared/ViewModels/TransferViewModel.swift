@@ -58,50 +58,79 @@ final class TransferViewModel: TransferManaging {
 
     // MARK: - Methods. Public
 
-    func loadFirst() async {
-        guard self.isLoading == false else {
-            return
-        }
+    func loadFirst() {
+        self.loadTask?.cancel()
 
-        self.isLoading = true
-        defer {
-            self.isLoading = false
-        }
+        self.loadTask = Task { @MainActor in
+            self.isLoading = true
 
-        do {
-            let entities = try self.persistenceService.getTracks()
-
-            if entities.isEmpty {
-                self.offset = .zero
-                self.tracks = await self.loadTracks(offset: self.offset)
-                self.offset += self.tracks.count
-            } else {
-                self.tracks = entities
-
-                self.seedPersistedProgressBaseline()
-                await self.networkService.restoreDownloadSession()
-                await self.networkService.waitForPendingCancellations(timeout: 2.5)
-                await self.restoreInterruptedDownloads()
-                await self.processDownloadQueue()
+            defer {
+                self.isLoading = false
+                self.loadTask = nil
             }
-        } catch {
-            self.handleError(error)
+
+            do {
+                let entities = try self.persistenceService.getTracks()
+
+                try Task.checkCancellation()
+
+                if entities.isEmpty {
+                    self.offset = .zero
+
+                    let loadedTracks = await self.loadTracks(offset: 0)
+
+                    try Task.checkCancellation()
+
+                    self.tracks = loadedTracks
+                    self.offset = loadedTracks.count
+                } else {
+                    self.tracks = entities
+
+                    self.seedPersistedProgressBaseline()
+
+                    await self.networkService.restoreDownloadSession()
+                    await self.networkService.waitForPendingCancellations(timeout: 2.5)
+                    await self.restoreInterruptedDownloads()
+                    await self.processDownloadQueue()
+                }
+            } catch is CancellationError {
+                AppLogger.network.debug("Load cancelled")
+                return
+            } catch {
+                self.handleError(error)
+            }
         }
     }
 
-    func loadNext() async {
+    func loadNext() {
         guard self.isLoading == false else {
             return
         }
 
-        self.isLoading = true
-        defer {
-            self.isLoading = false
-        }
+        self.loadTask?.cancel()
 
-        let newEntityTracks = await self.loadTracks(offset: self.offset)
-        self.tracks.append(contentsOf: newEntityTracks)
-        self.offset += newEntityTracks.count
+        self.loadTask = Task { @MainActor in
+            self.isLoading = true
+
+            defer {
+                self.isLoading = false
+                self.loadTask = nil
+            }
+
+            do {
+                let newTracks = await self.loadTracks(offset: self.offset)
+
+                try Task.checkCancellation()
+
+                self.tracks.append(contentsOf: newTracks)
+                self.offset += newTracks.count
+            } catch is CancellationError {
+                AppLogger.network.debug("Load cancelled")
+                return
+            } catch {
+                self.handleError(error)
+            }
+        }
     }
 
     func startDownload(_ track: TrackEntity) async {
@@ -276,11 +305,15 @@ final class TransferViewModel: TransferManaging {
     // MARK: - Only for testing!!!
 
     func resetTransferState() async {
+        self.loadTask?.cancel()
+        self.loadTask = nil
+
         await self.networkService.cancelAllDownloads()
 
         self.queuedDownloadTrackIDs.removeAll()
         self.activeDownloadTrackIDs.removeAll()
         self.inProgressTrackIDs.removeAll()
+
         AudioService.shared.stop()
         self.tracks.removeAll()
 
@@ -289,8 +322,10 @@ final class TransferViewModel: TransferManaging {
         do {
             try self.persistenceService.clearStorage()
             try self.storageService.clearStorage()
+
             self.clearDownloadState()
             self.offset = .zero
+
         } catch {
             self.handleError(error)
         }
@@ -409,6 +444,8 @@ final class TransferViewModel: TransferManaging {
     private var activeDownloadTrackIDs: [String] = []
     @ObservationIgnored
     private var lastPersistedProgressBytesByTrackID: [String: Int] = [:]
+    @ObservationIgnored
+    private var loadTask: Task<Void, Never>?
     private let progressPersistStepBytes = 65_536
 
     private var hasFreeDownloadSlot: Bool {
