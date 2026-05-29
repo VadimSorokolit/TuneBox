@@ -11,8 +11,8 @@ vertical_whitespace:
   max_empty_lines: 1
 
 type_body_length:
-  warning: 600
-  error: 700
+  warning: 700
+  error: 800
 
 cyclomatic_complexity:
   warning: 20

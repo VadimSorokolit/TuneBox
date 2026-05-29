@@ -446,6 +446,10 @@ final class TransferViewModel: TransferManaging {
     private var lastPersistedProgressBytesByTrackID: [String: Int] = [:]
     @ObservationIgnored
     private var loadTask: Task<Void, Never>?
+    @ObservationIgnored
+    private var isProcessingDownloadQueue = false
+    @ObservationIgnored
+    private var pendingDownloadQueuePass = false
     private let progressPersistStepBytes = 65_536
 
     private var hasFreeDownloadSlot: Bool {
@@ -635,31 +639,53 @@ final class TransferViewModel: TransferManaging {
     }
 
     private func processDownloadQueue() async {
-        while self.hasFreeDownloadSlot, self.queuedDownloadTrackIDs.isEmpty == false {
-            let trackID = self.queuedDownloadTrackIDs.removeFirst()
-
-            if let track = self.track(byID: trackID) {
-                guard track.downloadState == .queued else {
-                    continue
-                }
-
-                guard self.hasEnoughFreeSpace(for: track) else {
-                    track.downloadState = .idle
-
-                    continue
-                }
-
-                let hasResumeData = await self.networkService.hasPersistedResumeData(trackId: trackID)
-
-                if hasResumeData {
-                    await self.activateResumeDownload(track: track)
-                } else {
-                    await self.activateDownload(track: track)
-                }
-            }
-
-            self.persistDownloadSession()
+        guard self.isProcessingDownloadQueue == false else {
+            self.pendingDownloadQueuePass = true
+            return
         }
+
+        self.isProcessingDownloadQueue = true
+
+        defer {
+            self.isProcessingDownloadQueue = false
+        }
+
+        repeat {
+            self.pendingDownloadQueuePass = false
+
+            let runningTrackIDs = await self.networkService.runningDownloadTrackIDs()
+
+            while self.hasFreeDownloadSlot, self.queuedDownloadTrackIDs.isEmpty == false {
+                let trackID = self.queuedDownloadTrackIDs.removeFirst()
+
+                guard runningTrackIDs.contains(trackID) == false,
+                      self.inProgressTrackIDs.contains(trackID) == false else {
+                    continue
+                }
+
+                if let track = self.track(byID: trackID) {
+                    guard track.downloadState == .queued else {
+                        continue
+                    }
+
+                    guard self.hasEnoughFreeSpace(for: track) else {
+                        track.downloadState = .idle
+
+                        continue
+                    }
+
+                    let hasResumeData = await self.networkService.hasPersistedResumeData(trackId: trackID)
+
+                    if hasResumeData {
+                        await self.activateResumeDownload(track: track)
+                    } else {
+                        await self.activateDownload(track: track)
+                    }
+                }
+
+                self.persistDownloadSession()
+            }
+        } while self.pendingDownloadQueuePass
     }
 
     private func persistDownloadSession() {
