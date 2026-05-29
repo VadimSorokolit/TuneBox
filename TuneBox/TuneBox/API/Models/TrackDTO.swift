@@ -56,20 +56,6 @@ struct TrackDTO: Identifiable, Decodable, Hashable {
     // MARK: - Custom Properties
 
     var size: Int?
-    var downloadState: DownloadState = .idle
-    var downloadingSize: Int = 0
-    var fileState: FileStorageState = .none
-
-    var downloadingProgress: Double {
-        guard let size,
-                size > 0,
-                downloadingSize > 0
-        else {
-            return 0.0
-        }
-
-        return min(1.0, Double(downloadingSize) / Double(size))
-    }
 
     init(
         id: String,
@@ -81,9 +67,6 @@ struct TrackDTO: Identifiable, Decodable, Hashable {
         download: String?,
         waveform: Waveform?,
         size: Int? = nil,
-        trackDownloadState: DownloadState = .idle,
-        downloadingSize: Int = 0,
-        fileState: FileStorageState = .none
     ) {
         self.id = id
         self.image = image
@@ -94,9 +77,6 @@ struct TrackDTO: Identifiable, Decodable, Hashable {
         self.download = download
         self.waveform = waveform
         self.size = size
-        self.downloadState = trackDownloadState
-        self.downloadingSize = downloadingSize
-        self.fileState = fileState
     }
 
     init(from decoder: Decoder) throws {
@@ -148,23 +128,4 @@ struct TrackDTO: Identifiable, Decodable, Hashable {
         case releaseDate = "releasedate"
         case download = "audiodownload"
     }
-}
-
-extension TrackDTO {
-
-    init(entity: TrackEntity) {
-        self.id = entity.id
-        self.image = entity.image
-        self.trackName = entity.trackName
-        self.artistName = entity.artistName
-        self.albumName = entity.albumName
-        self.releaseDate = entity.releaseDate
-        self.download = entity.download
-        self.waveform = WaveformMapper.decode(entity.waveformData)
-        self.size = entity.size
-        self.downloadingSize = entity.downloadingSize
-        self.downloadState = DownloadState(rawValue: entity.downloadState.rawValue) ?? .idle
-        self.fileState = FileStorageState(rawValue: entity.fileState.rawValue) ?? .none
-    }
-
 }

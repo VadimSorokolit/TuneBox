@@ -22,6 +22,7 @@ final class TrackEntity {
     var waveformData: Data?
     var size: Int?
     var downloadingSize: Int = 0
+    var downloadQueueIndex: Int?
     private var downloadStateRawValue: String = DownloadState.idle.rawValue
     private var fileStateRawValue: String = FileStorageState.none.rawValue
 
@@ -87,6 +88,7 @@ final class TrackEntity {
         downloadingSize: Int = 0,
         downloadStateRawValue: String = DownloadState.idle.rawValue,
         fileStateRawValue: String = FileStorageState.none.rawValue,
+        downloadQueueIndex: Int? = nil
     ) {
         self.id = id
         self.image = image
@@ -100,6 +102,7 @@ final class TrackEntity {
         self.downloadingSize = downloadingSize
         self.downloadStateRawValue = downloadStateRawValue
         self.fileStateRawValue = fileStateRawValue
+        self.downloadQueueIndex = downloadQueueIndex
     }
 }
 
@@ -115,25 +118,8 @@ extension TrackEntity {
             releaseDate: track.releaseDate,
             download: track.download,
             waveformData: WaveformMapper.encode(track.waveform),
-            size: track.size,
-            downloadingSize: track.downloadingSize,
-            downloadStateRawValue: track.downloadState.rawValue,
-            fileStateRawValue: track.fileState.rawValue
+            size: track.size
         )
-    }
-
-    func update(from track: TrackDTO) {
-        self.image = track.image
-        self.trackName = track.trackName
-        self.artistName = track.artistName
-        self.albumName = track.albumName
-        self.releaseDate = track.releaseDate
-        self.download = track.download
-        self.waveformData = WaveformMapper.encode(track.waveform)
-        self.size = track.size
-        self.downloadingSize = track.downloadingSize
-        self.downloadStateRawValue = track.downloadState.rawValue
-        self.fileStateRawValue = track.fileState.rawValue
     }
 
     func update(from entity: TrackEntity) {
@@ -148,6 +134,7 @@ extension TrackEntity {
         self.downloadingSize = entity.downloadingSize
         self.downloadState = entity.downloadState
         self.fileState = entity.fileState
+        self.downloadQueueIndex = entity.downloadQueueIndex
     }
 
 }

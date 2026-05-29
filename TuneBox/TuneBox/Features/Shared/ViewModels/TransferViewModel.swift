@@ -482,15 +482,6 @@ final class TransferViewModel: TransferManaging {
 
     }
 
-    private func getTrack(id: String) -> TrackEntity? {
-        do {
-            return try self.persistenceService.getTrack(id: id)
-        } catch {
-            self.handleError(error)
-            return nil
-        }
-    }
-
     private func track(byID trackID: String) -> TrackEntity? {
         self.tracks.first { $0.id == trackID }
     }
