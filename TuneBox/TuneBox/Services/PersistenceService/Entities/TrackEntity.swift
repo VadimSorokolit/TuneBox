@@ -21,8 +21,10 @@ final class TrackEntity {
     var download: String?
     var waveformData: Data?
     var size: Int?
+    var isPopular: Bool?
     var downloadingSize: Int = 0
     var downloadQueueIndex: Int?
+    var genreRawValue: String?
     private var downloadStateRawValue: String = DownloadState.idle.rawValue
     private var fileStateRawValue: String = FileStorageState.none.rawValue
 
@@ -45,6 +47,19 @@ final class TrackEntity {
 
         set {
             self.fileStateRawValue = newValue.rawValue
+        }
+    }
+
+    var genre: Genre? {
+        get {
+            guard let genreRawValue else {
+                return nil
+            }
+            return Genre(rawValue: genreRawValue)
+        }
+
+        set {
+            self.genreRawValue = newValue?.rawValue
         }
     }
 
@@ -84,8 +99,10 @@ final class TrackEntity {
         releaseDate: String?,
         download: String?,
         waveformData: Data?,
-        size: Int? = nil,
+        size: Int?,
+        isPopular: Bool? = nil,
         downloadingSize: Int = 0,
+        genreRawValue: String? = nil,
         downloadStateRawValue: String = DownloadState.idle.rawValue,
         fileStateRawValue: String = FileStorageState.none.rawValue,
         downloadQueueIndex: Int? = nil
@@ -99,7 +116,9 @@ final class TrackEntity {
         self.download = download
         self.waveformData = waveformData
         self.size = size
+        self.isPopular = isPopular
         self.downloadingSize = downloadingSize
+        self.genreRawValue = genreRawValue
         self.downloadStateRawValue = downloadStateRawValue
         self.fileStateRawValue = fileStateRawValue
         self.downloadQueueIndex = downloadQueueIndex
@@ -131,9 +150,11 @@ extension TrackEntity {
         self.download = entity.download
         self.waveformData = entity.waveformData
         self.size = entity.size
+        self.isPopular = entity.isPopular
         self.downloadingSize = entity.downloadingSize
         self.downloadState = entity.downloadState
         self.fileState = entity.fileState
+        self.genre = entity.genre
         self.downloadQueueIndex = entity.downloadQueueIndex
     }
 

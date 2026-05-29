@@ -10,7 +10,7 @@ import Combine
 import SwiftData
 
 final class PersistenceService: PersistenceServicing {
-    
+
     // MARK: - Properties. Public
 
     var storageDidChangePublisher: AnyPublisher<Void, Never> {
@@ -34,6 +34,53 @@ final class PersistenceService: PersistenceServicing {
         }
     }
 
+    func getPopularTracks() throws -> [TrackEntity] {
+        do {
+            let descriptor = FetchDescriptor<TrackEntity>(
+                predicate: #Predicate<TrackEntity> {
+                    $0.isPopular == true
+                },
+                sortBy: [SortDescriptor(\.artistName),
+                           SortDescriptor(\.id)
+                          ]
+            )
+
+            return try self.modelContext.fetch(descriptor)
+        } catch {
+            AppLogger.storage.error("Failed to fetch tracks: \(error.localizedDescription)")
+            throw error
+        }
+    }
+
+    func getTracksBy(genre: Genre?) throws -> [TrackEntity] {
+        let descriptor: FetchDescriptor<TrackEntity>
+
+        if let genre {
+            let rawValue = genre.rawValue
+
+            descriptor = FetchDescriptor<TrackEntity>(
+                predicate: #Predicate<TrackEntity> {
+                    $0.genreRawValue == rawValue
+                },
+                sortBy: [
+                    SortDescriptor(\.artistName),
+                    SortDescriptor(\.id)
+                ]
+            )
+        } else {
+            descriptor = FetchDescriptor<TrackEntity>(
+                predicate: #Predicate<TrackEntity> {
+                    $0.genreRawValue == nil
+                },
+                sortBy: [
+                    SortDescriptor(\.artistName),
+                    SortDescriptor(\.id)
+                ]
+            )
+        }
+        return try self.modelContext.fetch(descriptor)
+    }
+
     func getTrack(id: String) throws -> TrackEntity? {
         let trackID = id
         var descriptor = FetchDescriptor<TrackEntity>(
@@ -53,9 +100,7 @@ final class PersistenceService: PersistenceServicing {
         for entity in entities {
             let id = entity.id
             var descriptor = FetchDescriptor<TrackEntity>(
-
                 predicate: #Predicate { $0.id == id }
-
             )
             descriptor.fetchLimit = 1
 
@@ -107,10 +152,10 @@ final class PersistenceService: PersistenceServicing {
             throw error
         }
     }
-    
+
     // MARK: - Initializer
 
-    init() throws {.
+    init() throws {
         _ = try FileManager.default.url(
             for: .applicationSupportDirectory,
             in: .userDomainMask,
@@ -127,14 +172,14 @@ final class PersistenceService: PersistenceServicing {
 
         self.subscribePublishers()
     }
-    
+
     // MARK: - Properties. Private
 
     private let storageDidChangeSubject = PassthroughSubject<Void, Never>()
     private var cancellables = Set<AnyCancellable>()
     private let modelContainer: ModelContainer
     private let modelContext: ModelContext
-    
+
     // MARK: - Methods. Private
 
     private func subscribePublishers() {

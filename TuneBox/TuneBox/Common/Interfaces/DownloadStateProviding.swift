@@ -8,8 +8,8 @@
 import Foundation
 
 protocol DownloadStateProviding: AnyObject {
-    var offset: Int { get }
-    var tracks: [TrackEntity] { get }
+    var offsetPopular: Int { get }
+    var popularTracks: [TrackEntity] { get }
     var inProgressTrackIDs: Set<String> { get }
     var isLoading: Bool { get }
     var error: String? { get }

@@ -14,10 +14,14 @@ struct ResponseHeaders: Decodable {
     let status: String
     let code: Int
     let errorMessage: String?
+    let resultsCount: Int
+    let next: String?
 
     enum CodingKeys: String, CodingKey {
         case status
         case code
         case errorMessage = "error_message"
+        case resultsCount = "results_count"
+        case next = "next"
     }
 }

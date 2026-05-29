@@ -12,6 +12,8 @@ protocol PersistenceServicing: AnyObject {
     var storageDidChangePublisher: AnyPublisher<Void, Never> { get }
 
     func getTracks() throws -> [TrackEntity]
+    func getPopularTracks() throws -> [TrackEntity]
+    func getTracksBy(genre: Genre?) throws -> [TrackEntity]
     func getTrack(id: String) throws -> TrackEntity?
     func insert(tracks: [TrackEntity]) throws
     func delete(track: TrackEntity) throws

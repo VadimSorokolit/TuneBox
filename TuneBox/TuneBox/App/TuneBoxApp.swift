@@ -25,7 +25,7 @@ struct TuneBoxApp: App {
                 .onChange(of: scenePhase) { _, newPhase in
                     switch newPhase {
                         case .active:
-                            if viewModel.tracks.isEmpty == false {
+                            if viewModel.popularTracks.isEmpty == false {
                                 Task {
                                     await viewModel.restoreDownloadsOnForeground()
                                 }

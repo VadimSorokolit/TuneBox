@@ -30,9 +30,7 @@ struct ContentView: View {
 
                 HStack {
                     Button(action: {
-                        Task {
-                            await transferViewModel.loadFirst()
-                        }
+                       transferViewModel.loadFirstPopular()
                     }, label: {
                         Circle().fill(Color.yellow)
                             .frame(width: 50, height: 50)
@@ -42,13 +40,13 @@ struct ContentView: View {
                                     .foregroundStyle(Color.white)
                             )
                     })
-                    .disabled(transferViewModel.tracks.isEmpty == false)
+                    .disabled(transferViewModel.popularTracks.isEmpty == false)
 
                     Spacer()
 
                     Button(action: {
                         Task {
-                            await transferViewModel.loadNext()
+                            await transferViewModel.loadNextPopular()
                         }
                     }, label: {
                         Circle().fill(Color.blue)
@@ -75,14 +73,14 @@ struct ContentView: View {
                                     .foregroundStyle(Color.white)
                             )
                     })
-                    .disabled(transferViewModel.tracks.isEmpty)
+                    .disabled(transferViewModel.popularTracks.isEmpty)
                 }
                 .padding(.horizontal)
             }
 
             VStack(spacing: 5) {
-                if !transferViewModel.tracks.isEmpty {
-                    ForEach(transferViewModel.tracks, id: \.persistentModelID) { track in
+                if !transferViewModel.popularTracks.isEmpty {
+                    ForEach(transferViewModel.popularTracks, id: \.persistentModelID) { track in
                         TrackCell(
                             track: track,
                             onDownloadTap: {
@@ -100,15 +98,13 @@ struct ContentView: View {
                 }
             }
         }
-        .task {
-            await transferViewModel.loadFirst()
+        .onAppear {
+            transferViewModel.loadFirstPopular()
         }
         // Only for test!!!
-        .onChange(of: transferViewModel.tracks) { _, tracks in
+        .onChange(of: transferViewModel.popularTracks) { _, tracks in
             if tracks.isEmpty {
-                Task {
-                    await transferViewModel.loadFirst()
-                }
+                transferViewModel.loadFirstPopular()
             }
         }
     }
