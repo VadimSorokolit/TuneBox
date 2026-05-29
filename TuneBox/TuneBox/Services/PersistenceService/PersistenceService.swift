@@ -10,27 +10,7 @@ import Combine
 import SwiftData
 
 final class PersistenceService: PersistenceServicing {
-
-    // MARK: - Properties. Private
-
-    private let storageDidChangeSubject = PassthroughSubject<Void, Never>()
-    private var cancellables = Set<AnyCancellable>()
-    private let modelContainer: ModelContainer
-    private let modelContext: ModelContext
-
-    // MARK: - Initializer
-
-    init() throws {
-        let schema = Schema([TrackEntity.self])
-        let config = ModelConfiguration(isStoredInMemoryOnly: false)
-        let container = try ModelContainer(for: schema, configurations: [config])
-
-        self.modelContainer = container
-        self.modelContext = container.mainContext
-
-        self.subscribePublishers()
-    }
-
+    
     // MARK: - Properties. Public
 
     var storageDidChangePublisher: AnyPublisher<Void, Never> {
@@ -127,6 +107,35 @@ final class PersistenceService: PersistenceServicing {
             throw error
         }
     }
+    
+    // MARK: - Initializer
+
+    init() throws {.
+        _ = try FileManager.default.url(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+
+        let schema = Schema([TrackEntity.self])
+        let config = ModelConfiguration(isStoredInMemoryOnly: false)
+        let container = try ModelContainer(for: schema, configurations: [config])
+
+        self.modelContainer = container
+        self.modelContext = container.mainContext
+
+        self.subscribePublishers()
+    }
+    
+    // MARK: - Properties. Private
+
+    private let storageDidChangeSubject = PassthroughSubject<Void, Never>()
+    private var cancellables = Set<AnyCancellable>()
+    private let modelContainer: ModelContainer
+    private let modelContext: ModelContext
+    
+    // MARK: - Methods. Private
 
     private func subscribePublishers() {
         NotificationCenter.default

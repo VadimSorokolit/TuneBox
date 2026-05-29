@@ -15,7 +15,6 @@
 		5B2CF4612FBC7C6B00C5BA4C /* TransferDownloadObserverTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2CF4602FBC7C6900C5BA4C /* TransferDownloadObserverTokens.swift */; };
 		5B2CF4642FBCB3F600C5BA4C /* ContentView+TrackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2CF4632FBCB3F500C5BA4C /* ContentView+TrackCell.swift */; };
 		5B2CF4672FBD100100C5BA4D /* DownloadResumeStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2CF4682FBD100000C5BA4D /* DownloadResumeStorage.swift */; };
-		5B2CF4692FBD100200C5BA4E /* TransferQueueStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2CF46A2FBD100100C5BA4E /* TransferQueueStorage.swift */; };
 		5B3FEB3D2FB4539C00DC1562 /* TransferViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB3C2FB4539A00DC1562 /* TransferViewModel.swift */; };
 		5B3FEB432FB4545200DC1562 /* BrowsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB422FB4544B00DC1562 /* BrowsView.swift */; };
 		5B3FEB472FB4548600DC1562 /* DownloadsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB462FB4547E00DC1562 /* DownloadsView.swift */; };
@@ -87,7 +86,6 @@
 		5B2CF4602FBC7C6900C5BA4C /* TransferDownloadObserverTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferDownloadObserverTokens.swift; sourceTree = "<group>"; };
 		5B2CF4632FBCB3F500C5BA4C /* ContentView+TrackCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ContentView+TrackCell.swift"; sourceTree = "<group>"; };
 		5B2CF4682FBD100000C5BA4D /* DownloadResumeStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadResumeStorage.swift; sourceTree = "<group>"; };
-		5B2CF46A2FBD100100C5BA4E /* TransferQueueStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferQueueStorage.swift; sourceTree = "<group>"; };
 		5B3FEB3C2FB4539A00DC1562 /* TransferViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferViewModel.swift; sourceTree = "<group>"; };
 		5B3FEB422FB4544B00DC1562 /* BrowsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowsView.swift; sourceTree = "<group>"; };
 		5B3FEB462FB4547E00DC1562 /* DownloadsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsView.swift; sourceTree = "<group>"; };
@@ -183,7 +181,6 @@
 			children = (
 				5B11C3362FB500AB0089BAD2 /* DownloadStore.swift */,
 				5B2CF4682FBD100000C5BA4D /* DownloadResumeStorage.swift */,
-				5B2CF46A2FBD100100C5BA4E /* TransferQueueStorage.swift */,
 			);
 			path = Download;
 			sourceTree = "<group>";
@@ -728,7 +725,6 @@
 				5B11C3372FB500AC0089BAD2 /* DownloadStore.swift in Sources */,
 				5B2CF4672FBD100100C5BA4D /* DownloadResumeStorage.swift in Sources */,
 				5B8382B32FC4D0D8003625CD /* StorageManaging.swift in Sources */,
-				5B2CF4692FBD100200C5BA4E /* TransferQueueStorage.swift in Sources */,
 				5B2CF4642FBCB3F600C5BA4C /* ContentView+TrackCell.swift in Sources */,
 				5B8382A32FC4CB4D003625CD /* AudioServicing.swift in Sources */,
 				5B8382AD2FC4CFF1003625CD /* DownloadManaging.swift in Sources */,

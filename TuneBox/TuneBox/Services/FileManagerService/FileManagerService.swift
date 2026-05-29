@@ -118,7 +118,6 @@ final class FileManagerService: FileManagerServicing {
 
     private static func makeTracksDirectoryIfNeeded() throws -> URL {
         if let url = FileManagerService.cachedTracksDirectoryURL {
-            AppLogger.storage.debug("Using cached tracks directory URL: \(url.path)")
             return url
         }
 
