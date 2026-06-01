@@ -11,6 +11,7 @@ import Resolver
 struct ContentView: View {
     @Injected private var transferViewModel: TransferManaging
     @Injected private var playerViewModel: PlayerManaging
+    @Environment(\.themeManager) private var theme
 
     var body: some View {
         VStack(spacing: 10) {

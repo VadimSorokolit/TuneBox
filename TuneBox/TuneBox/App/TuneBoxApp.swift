@@ -13,10 +13,13 @@ struct TuneBoxApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @Environment(\.scenePhase) private var scenePhase
     @Injected private var viewModel: TransferManaging
+    @State private var themeManager = ThemeManager()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(themeManager)
+                .applyTheme(themeManager)
                 .overlay {
                     if viewModel.isLoading {
                         SpinnerView()
