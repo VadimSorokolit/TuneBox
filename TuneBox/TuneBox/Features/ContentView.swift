@@ -46,10 +46,8 @@ struct ContentView: View {
                     Spacer()
 
                     Button(action: {
-                        Task {
-                            await transferViewModel.loadNextPopular()
-                            await transferViewModel.loadNextBy(genre: nil)
-                        }
+                        transferViewModel.loadNextPopular()
+                        transferViewModel.loadNextBy(genre: nil)
                     }, label: {
                         Circle().fill(Color.blue)
                             .frame(width: 50, height: 50)

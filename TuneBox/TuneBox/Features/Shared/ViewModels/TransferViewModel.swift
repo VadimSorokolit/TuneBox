@@ -48,8 +48,10 @@ protocol TransferManaging:
 
     func loadFirstPopular()
     func loadFirstBy(genre: Genre?)
-    func loadNextPopular() async
-    func loadNextBy(genre: Genre?) async
+    func loadFirstSearch(query: String)
+    func loadNextPopular()
+    func loadNextBy(genre: Genre?)
+    func loadNextSearch()
     func startDownload(_ track: TrackEntity) async
     func cancelAllDownloads() async
     func resetTransferState() async
@@ -82,7 +84,7 @@ final class TransferViewModel: TransferManaging {
     private(set) var genre: Genre = .all
 
     var isLoading: Bool {
-        isPopularLoading || isGenreLoading || isSearchLoading
+        self.isPopularLoading || self.isGenreLoading || self.isSearchLoading
     }
 
     var availableSpace: Double? {
@@ -201,7 +203,7 @@ final class TransferViewModel: TransferManaging {
         }
     }
 
-    func loadNextBy(genre: Genre?) async {
+    func loadNextBy(genre: Genre?) {
         guard self.isGenreLoading == false else {
             return
         }
@@ -238,6 +240,10 @@ final class TransferViewModel: TransferManaging {
             }
         }
     }
+
+    func loadFirstSearch(query: String) {}
+
+    func loadNextSearch() {}
 
     func startDownload(_ track: TrackEntity) async {
         guard self.hasEnoughFreeSpace(for: track) else {
