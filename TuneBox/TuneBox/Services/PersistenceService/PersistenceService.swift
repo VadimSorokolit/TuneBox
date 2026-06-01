@@ -123,7 +123,8 @@ final class PersistenceService: PersistenceServicing {
             descriptor.fetchLimit = 1
 
             if let existing = try self.modelContext.fetch(descriptor).first {
-                existing.update(from: entity)
+                existing.updateMetadata(from: entity)
+                existing.mergeTransferState(from: entity)
             } else {
                 self.modelContext.insert(entity)
             }

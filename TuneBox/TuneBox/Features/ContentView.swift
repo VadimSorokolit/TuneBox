@@ -82,7 +82,7 @@ struct ContentView: View {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 5) {
                     if !transferViewModel.popularTracks.isEmpty {
-                        ForEach(transferViewModel.popularTracks, id: \.persistentModelID) { track in
+                        ForEach(transferViewModel.popularTracks, id: \.id) { track in
                             TrackCell(
                                 track: track,
                                 onDownloadTap: {
@@ -100,7 +100,7 @@ struct ContentView: View {
                     }
 
                     if !transferViewModel.genreTracks.isEmpty {
-                        ForEach(transferViewModel.genreTracks, id: \.persistentModelID) { track in
+                        ForEach(transferViewModel.genreTracks, id: \.id) { track in
                             TrackCell(
                                 track: track,
                                 onDownloadTap: {
@@ -118,7 +118,7 @@ struct ContentView: View {
                     }
 
                     if !transferViewModel.searchTracks.isEmpty {
-                        ForEach(transferViewModel.searchTracks, id: \.persistentModelID) { track in
+                        ForEach(transferViewModel.searchTracks, id: \.id) { track in
                             TrackCell(
                                 track: track,
                                 onDownloadTap: {

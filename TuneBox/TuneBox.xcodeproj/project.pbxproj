@@ -58,8 +58,8 @@
 		5BD579A12FAB25E300503BA2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD5799D2FAB25E300503BA2 /* ContentView.swift */; };
 		5BD579A22FAB25E300503BA2 /* TuneBoxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD5799E2FAB25E300503BA2 /* TuneBoxApp.swift */; };
 		5BD579A52FAB25EE00503BA2 /* NetworkServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD579A32FAB25EE00503BA2 /* NetworkServiceTests.swift */; };
+		5BC0DEAD2FDD000100503BA2 /* DownloadStateMergeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC0DEAC2FDD000100503BA2 /* DownloadStateMergeTests.swift */; };
 		5BFBF2372FCCC2AB0013F6BB /* ImportFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFBF2362FCCC2AA0013F6BB /* ImportFiles.swift */; };
-		5BFCA7CF2FCDD5B8009C6AD9 /* TransferPrioritizable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA7CE2FCDD5B7009C6AD9 /* TransferPrioritizable.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -128,6 +128,7 @@
 		5BD5799D2FAB25E300503BA2 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		5BD5799E2FAB25E300503BA2 /* TuneBoxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneBoxApp.swift; sourceTree = "<group>"; };
 		5BD579A32FAB25EE00503BA2 /* NetworkServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkServiceTests.swift; sourceTree = "<group>"; };
+		5BC0DEAC2FDD000100503BA2 /* DownloadStateMergeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadStateMergeTests.swift; sourceTree = "<group>"; };
 		5BD579AB2FAB27A000503BA2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5BFBF2362FCCC2AA0013F6BB /* ImportFiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportFiles.swift; sourceTree = "<group>"; };
 		5BFCA7CE2FCDD5B7009C6AD9 /* TransferPrioritizable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferPrioritizable.swift; sourceTree = "<group>"; };
@@ -507,6 +508,7 @@
 		5BD579A42FAB25EE00503BA2 /* TuneBoxTests */ = {
 			isa = PBXGroup;
 			children = (
+				5BC0DEAC2FDD000100503BA2 /* DownloadStateMergeTests.swift */,
 				5B0F630C2FADDB49006F3555 /* NetworkServiceTests */,
 				5B0F630D2FADDB63006F3555 /* StorageServiceTests */,
 			);
@@ -740,7 +742,6 @@
 				5B3FEB432FB4545200DC1562 /* BrowsView.swift in Sources */,
 				5B8382912FC495F9003625CD /* PlayerViewModel.swift in Sources */,
 				5B8382992FC4C9EE003625CD /* SpinnerView.swift in Sources */,
-				5BFCA7CF2FCDD5B8009C6AD9 /* TransferPrioritizable.swift in Sources */,
 				5B9CE54B2FB32589001BE37F /* AppDelegate.swift in Sources */,
 				5B586CBA2FAC842200BCEAD2 /* Resolver+Injection.swift in Sources */,
 				5B2CF4612FBC7C6B00C5BA4C /* TransferDownloadObserverTokens.swift in Sources */,
@@ -783,6 +784,7 @@
 			files = (
 				5B0F630F2FADDB9E006F3555 /* StorageServiceTests.swift in Sources */,
 				5BD579A52FAB25EE00503BA2 /* NetworkServiceTests.swift in Sources */,
+				5BC0DEAD2FDD000100503BA2 /* DownloadStateMergeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

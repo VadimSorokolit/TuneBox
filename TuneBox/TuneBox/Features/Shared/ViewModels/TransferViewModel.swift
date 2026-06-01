@@ -7,7 +7,6 @@
 
 import Foundation
 import Observation
-import Combine
 
 enum ReservedSpace: Int, CaseIterable {
     case oneGB = 1
@@ -50,7 +49,7 @@ protocol TransferManaging:
     func loadFirstPopular()
     func loadFirstBy(genre: Genre?)
     func loadSearch(query: String)
-    func loadNextSearch() 
+    func loadNextSearch()
     func loadNextPopular()
     func loadNextBy(genre: Genre?)
     func startDownload(_ track: TrackEntity) async
@@ -151,12 +150,7 @@ final class TransferViewModel: TransferManaging {
                 let newTracks = await self.loadPopularTracks(offset: self.offsetPopular)
                 try Task.checkCancellation()
 
-                newTracks.forEach {
-                    $0.isPopular = true
-                }
-
                 self.popularTracks.append(contentsOf: newTracks)
-                self.synchronize(newTracks)
 
                 self.offsetPopular += newTracks.count
             } catch is CancellationError {
@@ -244,6 +238,7 @@ final class TransferViewModel: TransferManaging {
     }
 
     func loadSearch(query: String) {
+        self.searchQuery = query
         self.cancelSearchLoadTask()
 
         self.searchLoadTask = Task { @MainActor [weak self] in
@@ -256,8 +251,6 @@ final class TransferViewModel: TransferManaging {
                 self.searchLoadTask = nil
             }
 
-            try? await Task.sleep(for: .seconds(3))
-
             guard query.count > 2 else {
                 self.searchTracks.removeAll()
                 self.offsetSearch = .zero
@@ -265,6 +258,8 @@ final class TransferViewModel: TransferManaging {
             }
 
             do {
+                self.offsetSearch = .zero
+
                 let dtos = try await self.networkService.searchTracks(
                     query: query,
                     limit: self.limit,
@@ -272,9 +267,10 @@ final class TransferViewModel: TransferManaging {
                 )
 
                 let entities = dtos.map(TrackEntity.init)
+                let resolved = self.upsertAndResolve(entities)
 
-                self.searchTracks.append(contentsOf: entities)
-                self.offsetSearch = self.searchTracks.count
+                self.searchTracks = resolved
+                self.offsetSearch += resolved.count
             } catch is CancellationError {
                 AppLogger.network.debug("Search cancelled")
             } catch {
@@ -282,10 +278,53 @@ final class TransferViewModel: TransferManaging {
             }
         }
     }
-    
-    func loadNextSearch() {}
+
+    func loadNextSearch() {
+        guard self.isSearchLoading == false else {
+            return
+        }
+
+        guard self.searchQuery.count > 2 else {
+            return
+        }
+
+        self.cancelSearchLoadTask()
+
+        self.searchLoadTask = Task { @MainActor [weak self] in
+            guard let self else {
+                return
+            }
+
+            self.isSearchLoading = true
+
+            defer {
+                self.isSearchLoading = false
+                self.searchLoadTask = nil
+            }
+
+            do {
+                let dtos = try await self.networkService.searchTracks(
+                    query: self.searchQuery,
+                    limit: self.limit,
+                    offset: self.offsetSearch
+                )
+
+                let entities = dtos.map(TrackEntity.init)
+                let resolved = self.upsertAndResolve(entities)
+
+                self.mergeTracks(resolved, into: &self.searchTracks)
+                self.offsetSearch += resolved.count
+            } catch is CancellationError {
+                AppLogger.network.debug("Search pagination cancelled")
+            } catch {
+                self.handleError(error)
+            }
+        }
+    }
 
     func startDownload(_ track: TrackEntity) async {
+        let track = self.ensureCanonical(track)
+
         guard self.hasEnoughFreeSpace(for: track) else {
             return
         }
@@ -304,16 +343,23 @@ final class TransferViewModel: TransferManaging {
     }
 
     func stopDownload(track: TrackEntity) async {
+        let track = self.ensureCanonical(track)
+
         await self.networkService.stopDownload(trackId: track.id)
         await self.finishActiveDownload(trackId: track.id)
 
-        track.downloadState = .paused
-        track.fileState = .exists
+        self.setTransferState(
+            for: track.id,
+            downloadState: .paused,
+            fileState: .exists
+        )
 
         self.logTransferWarning("Paused track \(track.id): \(self.formatBytes(track.downloadingSize))")
     }
 
     func resumeDownload(track: TrackEntity) async {
+        let track = self.ensureCanonical(track)
+
         guard self.hasEnoughFreeSpace(for: track) else {
             return
         }
@@ -327,6 +373,8 @@ final class TransferViewModel: TransferManaging {
     }
 
     func cancelQueuedDownload(track: TrackEntity) {
+        let track = self.ensureCanonical(track)
+
         guard track.downloadState == .queued else {
             return
         }
@@ -377,7 +425,7 @@ final class TransferViewModel: TransferManaging {
             self.inProgressTrackIDs.insert(trackID)
 
             if let track = self.track(byID: trackID), track.downloadState != .downloading {
-                track.downloadState = .downloading
+                self.setTransferState(for: trackID, downloadState: .downloading)
             }
         }
 
@@ -385,6 +433,8 @@ final class TransferViewModel: TransferManaging {
     }
 
     func deleteDownloadedTrack(track: TrackEntity) {
+        let track = self.ensureCanonical(track)
+
         self.networkService.clearPersistedResumeData(trackId: track.id)
 
         if AudioService.shared.currentTrackId == track.id {
@@ -426,21 +476,10 @@ final class TransferViewModel: TransferManaging {
     }
 
     func handleDownloadAction(for track: TrackEntity) async {
+        let track = self.ensureCanonical(track)
+
         switch track.downloadState {
             case .idle:
-                var persistedTrack: TrackEntity?
-
-                do {
-                    persistedTrack = try self.persistenceService.getTrack(id: track.id)
-                } catch {
-                    self.handleError(error)
-                }
-
-                if persistedTrack == nil {
-                    self.synchronize([track])
-                    self.popularTracks.append(track)
-                }
-
                 await self.startDownload(track)
 
             case .paused:
@@ -534,8 +573,6 @@ final class TransferViewModel: TransferManaging {
     private var isProcessingDownloadQueue = false
     @ObservationIgnored
     private var pendingDownloadQueuePass = false
-    @ObservationIgnored
-    private var subscriptions: Set<AnyCancellable> = Set<AnyCancellable>()
 
     private let progressPersistStepBytes = 65_536
     private let estimatedTrackSizeFallback: Int = 10 * 1024 * 1024
@@ -570,10 +607,6 @@ final class TransferViewModel: TransferManaging {
 
         let loadedTracks = await self.loadPopularTracks(offset: 0)
         try Task.checkCancellation()
-
-        loadedTracks.forEach {
-            $0.isPopular = true
-        }
 
         self.popularTracks = loadedTracks
         self.offsetPopular = loadedTracks.count
@@ -615,9 +648,11 @@ final class TransferViewModel: TransferManaging {
 
             let entities = dtos.map(TrackEntity.init)
 
-            self.synchronize(entities)
+            entities.forEach {
+                $0.isPopular = true
+            }
 
-            return entities
+            return self.upsertAndResolve(entities)
         } catch {
             self.handleError(error)
 
@@ -649,14 +684,14 @@ final class TransferViewModel: TransferManaging {
                 }
             }
 
-            self.synchronize(entities)
+            let resolved = self.upsertAndResolve(entities)
 
             if appendToGenreTracks {
-                self.genreTracks.append(contentsOf: entities)
-                self.offsetGenre += entities.count
+                self.genreTracks.append(contentsOf: resolved)
+                self.offsetGenre += resolved.count
             }
 
-            return entities
+            return resolved
         } catch {
             self.handleError(error)
 
@@ -664,11 +699,110 @@ final class TransferViewModel: TransferManaging {
         }
     }
 
-    private func synchronize(_ entities: [TrackEntity]) {
+    @discardableResult
+    private func upsertAndResolve(_ entities: [TrackEntity]) -> [TrackEntity] {
+        guard entities.isEmpty == false else {
+            return []
+        }
+
         do {
             try self.persistenceService.insert(tracks: entities)
         } catch {
             self.handleError(error)
+            return entities
+        }
+
+        let resolved = entities.map { entity in
+            self.fetchCanonicalTrack(id: entity.id) ?? entity
+        }
+
+        for track in resolved {
+            self.replaceWithCanonical(track)
+        }
+
+        return resolved
+    }
+
+    private func ensureCanonical(_ track: TrackEntity) -> TrackEntity {
+        if let existing = self.fetchCanonicalTrack(id: track.id) {
+            self.replaceWithCanonical(existing)
+            return existing
+        }
+
+        return self.upsertAndResolve([track]).first ?? track
+    }
+
+    private func fetchCanonicalTrack(id: String) -> TrackEntity? {
+        do {
+            return try self.persistenceService.getTrack(id: id)
+        } catch {
+            self.handleError(error)
+            return nil
+        }
+    }
+
+    private func replaceWithCanonical(_ canonical: TrackEntity) {
+        self.replaceInList(&self.popularTracks, with: canonical)
+        self.replaceInList(&self.genreTracks, with: canonical)
+        self.replaceInList(&self.searchTracks, with: canonical)
+    }
+
+    private func replaceInList(_ list: inout [TrackEntity], with canonical: TrackEntity) {
+        for index in list.indices where list[index].id == canonical.id {
+            self.assignCanonical(&list[index], canonical: canonical)
+        }
+    }
+
+    private func mergeTracks(_ incoming: [TrackEntity], into list: inout [TrackEntity]) {
+        for incomingTrack in incoming {
+            if let index = list.firstIndex(where: { $0.id == incomingTrack.id }) {
+                self.assignCanonical(&list[index], canonical: incomingTrack)
+            } else {
+                list.append(incomingTrack)
+            }
+        }
+    }
+
+    /// Replaces a list slot with the SwiftData canonical instance, preserving the stronger transfer snapshot.
+    private func assignCanonical(_ slot: inout TrackEntity, canonical: TrackEntity) {
+        guard slot !== canonical else {
+            return
+        }
+
+        canonical.mergeTransferState(from: slot)
+        slot = canonical
+    }
+
+    private func updateTracks(withID trackID: String, _ update: (TrackEntity) -> Void) {
+        var visited = Set<ObjectIdentifier>()
+
+        for track in self.allTracks where track.id == trackID {
+            let identifier = ObjectIdentifier(track)
+
+            guard visited.insert(identifier).inserted else {
+                continue
+            }
+
+            update(track)
+        }
+    }
+
+    private func setTransferState(
+        for trackID: String,
+        downloadState: DownloadState,
+        fileState: FileStorageState? = nil,
+        downloadingSize: Int? = nil
+    ) {
+        self.updateTracks(withID: trackID) { track in
+            track.downloadState = downloadState
+
+            if let downloadingSize {
+                track.downloadingSize = downloadingSize
+            }
+
+            if let fileState {
+                track.fileState = fileState
+            }
         }
     }
 
@@ -683,18 +817,20 @@ final class TransferViewModel: TransferManaging {
     }
 
     private func enqueueDownload(track: TrackEntity) {
+        let track = self.ensureCanonical(track)
+
         guard self.queuedDownloadTrackIDs.contains(track.id) == false else {
             return
         }
 
         self.queuedDownloadTrackIDs.append(track.id)
-        track.downloadState = .queued
+        self.setTransferState(for: track.id, downloadState: .queued)
         self.persistDownloadSession()
     }
 
     private func activateDownload(track: TrackEntity) async {
         self.inProgressTrackIDs.insert(track.id)
-        track.downloadState = .downloading
+        self.setTransferState(for: track.id, downloadState: .downloading)
         self.updateProgressBaseline(for: track)
         self.persistDownloadSession()
 
@@ -707,7 +843,7 @@ final class TransferViewModel: TransferManaging {
 
     private func activateResumeDownload(track: TrackEntity) async {
         self.inProgressTrackIDs.insert(track.id)
-        track.downloadState = .downloading
+        self.setTransferState(for: track.id, downloadState: .downloading)
         self.updateProgressBaseline(for: track)
         self.persistDownloadSession()
 
@@ -789,31 +925,38 @@ final class TransferViewModel: TransferManaging {
     private func restoreInterruptedDownloads(_ tracks: [TrackEntity]) async {
         let liveActive = await self.networkService.runningDownloadTrackIDs()
 
-        for track in tracks
+        for track in self.uniqueTracksByID(tracks)
         where self.storageService.downloadedTrackExists(id: track.id) {
-            track.downloadingSize = track.size ?? track.downloadingSize
-            track.downloadState = .completed
-            track.fileState = .exists
+            self.setTransferState(
+                for: track.id,
+                downloadState: .completed,
+                fileState: .exists,
+                downloadingSize: track.size ?? track.downloadingSize
+            )
         }
 
         var queuedInOrder: [String] = []
+        var queuedIDs = Set<String>()
 
-        for track in self.allTracks
+        for track in self.uniqueTracksByID(self.allTracks)
         where track.downloadState == .downloading && liveActive.contains(track.id) {
             self.inProgressTrackIDs.insert(track.id)
         }
 
-        for track in self.allTracks
+        for track in self.uniqueTracksByID(self.allTracks)
         where track.downloadState == .downloading && liveActive.contains(track.id) == false {
-            track.downloadState = .queued
-            queuedInOrder.append(track.id)
+            self.setTransferState(for: track.id, downloadState: .queued)
+
+            if queuedIDs.insert(track.id).inserted {
+                queuedInOrder.append(track.id)
+            }
         }
 
-        let persistedQueue = self.allTracks
+        let persistedQueue = self.uniqueTracksByID(self.allTracks)
             .filter { $0.downloadState == .queued }
             .sorted { ($0.downloadQueueIndex ?? .max) < ($1.downloadQueueIndex ?? .max) }
 
-        for track in persistedQueue where queuedInOrder.contains(track.id) == false {
+        for track in persistedQueue where queuedIDs.insert(track.id).inserted {
             queuedInOrder.append(track.id)
         }
 
@@ -887,7 +1030,10 @@ final class TransferViewModel: TransferManaging {
 
         let reportedBytes = Int(min(totalBytesWritten, Int64(Int.max)))
         let displayedBytes = max(track.downloadingSize, reportedBytes)
-        track.downloadingSize = displayedBytes
+
+        self.updateTracks(withID: trackID) { listedTrack in
+            listedTrack.downloadingSize = displayedBytes
+        }
 
         guard track.downloadState == .downloading else {
             return
@@ -909,9 +1055,12 @@ final class TransferViewModel: TransferManaging {
             return
         }
 
-        track.downloadingSize = track.size ?? .zero
-        track.downloadState = .completed
-        track.fileState = .exists
+        self.setTransferState(
+            for: trackID,
+            downloadState: .completed,
+            fileState: .exists,
+            downloadingSize: track.size ?? .zero
+        )
 
         Task { @MainActor [weak self] in
             await self?.finishActiveDownload(trackId: trackID)
@@ -959,14 +1108,33 @@ final class TransferViewModel: TransferManaging {
         if self.queuedDownloadTrackIDs.contains(trackID) == false {
             self.queuedDownloadTrackIDs.insert(trackID, at: .zero)
         }
-        track.downloadState = .queued
+        self.setTransferState(for: trackID, downloadState: .queued)
 
         self.persistDownloadSession()
         await self.processDownloadQueue()
     }
 
     private func track(byID trackID: String) -> TrackEntity? {
-        self.allTracks.first { $0.id == trackID }
+        if let canonical = self.fetchCanonicalTrack(id: trackID) {
+            return canonical
+        }
+
+        return self.allTracks.first { $0.id == trackID }
+    }
+
+    private func uniqueTracksByID(_ tracks: [TrackEntity]) -> [TrackEntity] {
+        var seen = Set<String>()
+        var unique: [TrackEntity] = []
+
+        for track in tracks {
+            guard seen.insert(track.id).inserted else {
+                continue
+            }
+
+            unique.append(track)
+        }
+
+        return unique
     }
 
     private func resetTrackState(
@@ -974,11 +1142,13 @@ final class TransferViewModel: TransferManaging {
         to state: DownloadState,
         fileState: FileStorageState? = nil
     ) {
-        track.downloadState = state
-        track.downloadingSize = .zero
+        self.updateTracks(withID: track.id) { listedTrack in
+            listedTrack.downloadState = state
+            listedTrack.downloadingSize = .zero
 
-        if let fileState {
-            track.fileState = fileState
+            if let fileState {
+                listedTrack.fileState = fileState
+            }
         }
     }
 
@@ -1027,10 +1197,8 @@ final class TransferViewModel: TransferManaging {
 
             guard let self else { return }
 
-            Task { @MainActor [self] in
-
+            Task { @MainActor in
                 self.applyDownloadProgress(trackID: trackID, totalBytesWritten: trackDownloadedBytes)
-
             }
         }
 

@@ -29,12 +29,56 @@ enum DownloadState: String, Hashable {
     case paused
     case completed
     case failed
+
+    /// Higher value wins when merging two snapshots of the same track
+    var mergePriority: Int {
+        switch self {
+            case .idle:
+                return 0
+
+            case .failed:
+                return 1
+
+            case .queued:
+                return 2
+
+            case .paused:
+                return 3
+
+            case .downloading:
+                return 4
+
+            case .completed:
+                return 5
+        }
+    }
+
+    func merged(with other: DownloadState) -> DownloadState {
+        self.mergePriority >= other.mergePriority ? self : other
+    }
 }
 
 enum FileStorageState: String, Hashable {
     case none
     case exists
     case removed
+
+    var mergePriority: Int {
+        switch self {
+            case .none:
+                return 0
+
+            case .exists:
+                return 1
+
+            case .removed:
+                return 2
+        }
+    }
+
+    func merged(with other: FileStorageState) -> FileStorageState {
+        self.mergePriority >= other.mergePriority ? self : other
+    }
 }
 
 struct Waveform: Codable, Hashable {
@@ -42,7 +86,6 @@ struct Waveform: Codable, Hashable {
 }
 
 /// Data Transfer Object used for decoding Jamendo API track response
-
 struct TrackDTO: Identifiable, Decodable, Hashable {
 
     // MARK: - API Properties

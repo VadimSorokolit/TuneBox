@@ -36,7 +36,7 @@ final class PlayerViewModel: PlayerManaging {
     }
 
     func isPlaying(_ track: TrackEntity) -> Bool {
-        self.track === track && self.isPlaying
+        self.track?.id == track.id && self.isPlaying
     }
 
     // MARK: - Properties. Private

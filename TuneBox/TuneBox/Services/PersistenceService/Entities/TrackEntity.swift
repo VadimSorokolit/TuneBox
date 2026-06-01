@@ -141,7 +141,8 @@ extension TrackEntity {
         )
     }
 
-    func update(from entity: TrackEntity) {
+    /// Merges API/catalog fields without touching transfer state
+    func updateMetadata(from entity: TrackEntity) {
         self.image = entity.image
         self.trackName = entity.trackName
         self.artistName = entity.artistName
@@ -150,12 +151,32 @@ extension TrackEntity {
         self.download = entity.download
         self.waveformData = entity.waveformData
         self.size = entity.size
-        self.isPopular = entity.isPopular
-        self.downloadingSize = entity.downloadingSize
-        self.downloadState = entity.downloadState
-        self.fileState = entity.fileState
-        self.genre = entity.genre
-        self.downloadQueueIndex = entity.downloadQueueIndex
+
+        if let isPopular = entity.isPopular {
+            self.isPopular = isPopular
+        }
+
+        if entity.genreRawValue != nil {
+            self.genre = entity.genre
+        }
+    }
+
+    /// Keeps the more advanced transfer snapshot (e.g. `.completed` over `.idle`)
+    func mergeTransferState(from entity: TrackEntity) {
+        let previousState = self.downloadState
+        let mergedState = previousState.merged(with: entity.downloadState)
+
+        self.downloadState = mergedState
+        self.downloadingSize = max(self.downloadingSize, entity.downloadingSize)
+        self.fileState = self.fileState.merged(with: entity.fileState)
+
+        if mergedState == .queued {
+            let indices = [self.downloadQueueIndex, entity.downloadQueueIndex].compactMap { $0 }
+
+            self.downloadQueueIndex = indices.min()
+        } else if mergedState != .queued {
+            self.downloadQueueIndex = nil
+        }
     }
 
 }
