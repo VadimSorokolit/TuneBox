@@ -50,6 +50,7 @@ protocol TransferManaging:
     func loadFirstPopular()
     func loadFirstBy(genre: Genre?)
     func loadSearch(query: String)
+    func loadNextSearch() 
     func loadNextPopular()
     func loadNextBy(genre: Genre?)
     func startDownload(_ track: TrackEntity) async
@@ -281,6 +282,8 @@ final class TransferViewModel: TransferManaging {
             }
         }
     }
+    
+    func loadNextSearch() {}
 
     func startDownload(_ track: TrackEntity) async {
         guard self.hasEnoughFreeSpace(for: track) else {
@@ -660,25 +663,6 @@ final class TransferViewModel: TransferManaging {
             return []
         }
     }
-
-    //                self?.searchProducts(query: query)
-
-//    private func searchProducts(query: String) {
-//        guard query.count > 2 else {
-//            self.searchResults.removeAll()
-//            return
-//        }
-//        self.isLoading = true
-//        
-//        self.dataStorage.searchProducts(query: query)
-//            .receive(on: DispatchQueue.main)
-//            .sink { [weak self] completion in
-//                self?.handleCompletion(completion)
-//            } receiveValue: { [weak self] results in
-//                self?.searchResults = results
-//            }
-//            .store(in: &self.subscriptions)
-//    }
 
     private func synchronize(_ entities: [TrackEntity]) {
         do {

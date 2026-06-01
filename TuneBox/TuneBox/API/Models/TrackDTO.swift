@@ -1,5 +1,5 @@
 //
-//  Track.swift
+//  TrackDTO.swift
 //  TuneBox
 //
 //  Created by Vadim Sorokolit on 07.05.2026.
@@ -9,13 +9,16 @@ import Foundation
 
 enum WaveformMapper {
     static func encode(_ waveform: Waveform?) -> Data? {
-        guard let waveform else { return nil }
-        return try? JSONEncoder().encode(waveform)
-    }
+        guard let waveform else {
+            return nil
+        }
 
-    static func decode(_ data: Data?) -> Waveform? {
-        guard let data else { return nil }
-        return try? JSONDecoder().decode(Waveform.self, from: data)
+        do {
+            return try JSONEncoder().encode(waveform)
+        } catch {
+            AppLogger.transfer.error("Waveform encode error: \(error)")
+            return nil
+        }
     }
 }
 
@@ -92,7 +95,12 @@ struct TrackDTO: Identifiable, Decodable, Hashable {
 
         if let waveformString = try container.decodeIfPresent(String.self, forKey: .waveform) {
             let data = Data(waveformString.utf8)
-            waveform = try? JSONDecoder().decode(Waveform.self, from: data)
+            do {
+                waveform = try JSONDecoder().decode(Waveform.self, from: data)
+            } catch {
+                AppLogger.transfer.error("Waveform decode error: \(error)")
+                waveform = nil
+            }
         } else {
             waveform = nil
         }

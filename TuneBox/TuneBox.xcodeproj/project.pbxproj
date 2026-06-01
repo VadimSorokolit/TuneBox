@@ -59,6 +59,7 @@
 		5BD579A22FAB25E300503BA2 /* TuneBoxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD5799E2FAB25E300503BA2 /* TuneBoxApp.swift */; };
 		5BD579A52FAB25EE00503BA2 /* NetworkServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD579A32FAB25EE00503BA2 /* NetworkServiceTests.swift */; };
 		5BFBF2372FCCC2AB0013F6BB /* ImportFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFBF2362FCCC2AA0013F6BB /* ImportFiles.swift */; };
+		5BFCA7CF2FCDD5B8009C6AD9 /* TransferPrioritizable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA7CE2FCDD5B7009C6AD9 /* TransferPrioritizable.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -129,6 +130,7 @@
 		5BD579A32FAB25EE00503BA2 /* NetworkServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkServiceTests.swift; sourceTree = "<group>"; };
 		5BD579AB2FAB27A000503BA2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5BFBF2362FCCC2AA0013F6BB /* ImportFiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportFiles.swift; sourceTree = "<group>"; };
+		5BFCA7CE2FCDD5B7009C6AD9 /* TransferPrioritizable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferPrioritizable.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -419,6 +421,7 @@
 				5B8382AA2FC4CF84003625CD /* PersistenceServicing.swift */,
 				5B8382BB2FC5D97E003625CD /* PlayerManaging.swift */,
 				5B8382B22FC4D0D6003625CD /* StorageManaging.swift */,
+				5BFCA7CE2FCDD5B7009C6AD9 /* TransferPrioritizable.swift */,
 			);
 			path = Interfaces;
 			sourceTree = "<group>";
@@ -737,6 +740,7 @@
 				5B3FEB432FB4545200DC1562 /* BrowsView.swift in Sources */,
 				5B8382912FC495F9003625CD /* PlayerViewModel.swift in Sources */,
 				5B8382992FC4C9EE003625CD /* SpinnerView.swift in Sources */,
+				5BFCA7CF2FCDD5B8009C6AD9 /* TransferPrioritizable.swift in Sources */,
 				5B9CE54B2FB32589001BE37F /* AppDelegate.swift in Sources */,
 				5B586CBA2FAC842200BCEAD2 /* Resolver+Injection.swift in Sources */,
 				5B2CF4612FBC7C6B00C5BA4C /* TransferDownloadObserverTokens.swift in Sources */,
