@@ -58,6 +58,7 @@
 		5BD579A12FAB25E300503BA2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD5799D2FAB25E300503BA2 /* ContentView.swift */; };
 		5BD579A22FAB25E300503BA2 /* TuneBoxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD5799E2FAB25E300503BA2 /* TuneBoxApp.swift */; };
 		5BD579A52FAB25EE00503BA2 /* NetworkServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD579A32FAB25EE00503BA2 /* NetworkServiceTests.swift */; };
+		5BFBF2372FCCC2AB0013F6BB /* ImportFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFBF2362FCCC2AA0013F6BB /* ImportFiles.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -127,6 +128,7 @@
 		5BD5799E2FAB25E300503BA2 /* TuneBoxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneBoxApp.swift; sourceTree = "<group>"; };
 		5BD579A32FAB25EE00503BA2 /* NetworkServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkServiceTests.swift; sourceTree = "<group>"; };
 		5BD579AB2FAB27A000503BA2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5BFBF2362FCCC2AA0013F6BB /* ImportFiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportFiles.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -544,6 +546,7 @@
 				5B3FEB3E2FB453C100DC1562 /* Brows */,
 				5B3FEB3F2FB453C400DC1562 /* Downloads */,
 				5B3FEB402FB453C800DC1562 /* Player */,
+				5BFBF2342FCCC28E0013F6BB /* Import */,
 				5B3FEB412FB453CB00DC1562 /* Settings */,
 				5B3FEB3A2FB4538100DC1562 /* Shared */,
 			);
@@ -557,6 +560,22 @@
 				5BD579AB2FAB27A000503BA2 /* Info.plist */,
 			);
 			path = SupportingFiles;
+			sourceTree = "<group>";
+		};
+		5BFBF2342FCCC28E0013F6BB /* Import */ = {
+			isa = PBXGroup;
+			children = (
+				5BFBF2352FCCC2A00013F6BB /* Views */,
+			);
+			path = Import;
+			sourceTree = "<group>";
+		};
+		5BFBF2352FCCC2A00013F6BB /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				5BFBF2362FCCC2AA0013F6BB /* ImportFiles.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -740,6 +759,7 @@
 				5B586CCC2FACB61500BCEAD2 /* TracksResponse.swift in Sources */,
 				5B47627A2FAB3DC30069E41A /* TuneBoxRouter.swift in Sources */,
 				5B8382BC2FC5D97F003625CD /* PlayerManaging.swift in Sources */,
+				5BFBF2372FCCC2AB0013F6BB /* ImportFiles.swift in Sources */,
 				5B47627E2FAB49B00069E41A /* AppLogger.swift in Sources */,
 				5B2CF45E2FBC7AA400C5BA4C /* TransferDownloadSlotLimiter.swift in Sources */,
 				5B8382AB2FC4CF88003625CD /* PersistenceServicing.swift in Sources */,
