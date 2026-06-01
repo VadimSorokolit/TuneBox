@@ -30,7 +30,8 @@ struct ContentView: View {
 
                 HStack {
                     Button(action: {
-                       transferViewModel.loadFirstPopular()
+                        transferViewModel.loadFirstPopular()
+                        transferViewModel.loadFirstBy(genre: nil)
                     }, label: {
                         Circle().fill(Color.yellow)
                             .frame(width: 50, height: 50)
@@ -47,6 +48,7 @@ struct ContentView: View {
                     Button(action: {
                         Task {
                             await transferViewModel.loadNextPopular()
+                            await transferViewModel.loadNextBy(genre: nil)
                         }
                     }, label: {
                         Circle().fill(Color.blue)
@@ -78,33 +80,59 @@ struct ContentView: View {
                 .padding(.horizontal)
             }
 
-            VStack(spacing: 5) {
-                if !transferViewModel.popularTracks.isEmpty {
-                    ForEach(transferViewModel.popularTracks, id: \.persistentModelID) { track in
-                        TrackCell(
-                            track: track,
-                            onDownloadTap: {
-                                Task {
-                                    await transferViewModel.handleDownloadAction(for: track)
-                                }
-                            },
-                            onPlayTap: {
-                                playerViewModel.handlePlayAction(for: track)
-                            },
-                            isPlaying: playerViewModel.isPlaying(track)
-                        )
-                        .padding(.horizontal)
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(spacing: 5) {
+                    if !transferViewModel.popularTracks.isEmpty {
+                        ForEach(transferViewModel.popularTracks, id: \.persistentModelID) { track in
+                            TrackCell(
+                                track: track,
+                                onDownloadTap: {
+                                    Task {
+                                        await transferViewModel.handleDownloadAction(for: track)
+                                    }
+                                },
+                                onPlayTap: {
+                                    playerViewModel.handlePlayAction(for: track)
+                                },
+                                isPlaying: playerViewModel.isPlaying(track)
+                            )
+                            .padding(.horizontal)
+                        }
+                    }
+
+                    if !transferViewModel.genreTracks.isEmpty {
+                        ForEach(transferViewModel.genreTracks, id: \.persistentModelID) { track in
+                            TrackCell(
+                                track: track,
+                                onDownloadTap: {
+                                    Task {
+                                        await transferViewModel.handleDownloadAction(for: track)
+                                    }
+                                },
+                                onPlayTap: {
+                                    playerViewModel.handlePlayAction(for: track)
+                                },
+                                isPlaying: playerViewModel.isPlaying(track)
+                            )
+                            .padding(.horizontal)
+                        }
                     }
                 }
             }
         }
         .onAppear {
             transferViewModel.loadFirstPopular()
+            transferViewModel.loadFirstBy(genre: nil)
         }
         // Only for test!!!
         .onChange(of: transferViewModel.popularTracks) { _, tracks in
             if tracks.isEmpty {
                 transferViewModel.loadFirstPopular()
+            }
+        }
+        .onChange(of: transferViewModel.genreTracks) { _, tracks in
+            if tracks.isEmpty {
+                transferViewModel.loadFirstBy(genre: nil)
             }
         }
     }

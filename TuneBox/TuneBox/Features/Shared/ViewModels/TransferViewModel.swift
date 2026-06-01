@@ -47,7 +47,7 @@ protocol TransferManaging:
     PersistenceManaging {
 
     func loadFirstPopular()
-    func loadFirstBy(genre: Genre?) async
+    func loadFirstBy(genre: Genre?)
     func loadNextPopular() async
     func loadNextBy(genre: Genre?) async
     func startDownload(_ track: TrackEntity) async
@@ -80,11 +80,11 @@ final class TransferViewModel: TransferManaging {
     private(set) var simultaneouslyLoadingCount: Int = SimultaneouslyLoadingCount.two.rawValue
     private(set) var reservedSpace: ReservedSpace = .oneGB
     private(set) var genre: Genre = .all
-    
+
     var isLoading: Bool {
         isPopularLoading || isGenreLoading || isSearchLoading
     }
-    
+
     var availableSpace: Double? {
         self.storageService.getFreeStorage()
     }
@@ -163,11 +163,12 @@ final class TransferViewModel: TransferManaging {
         }
     }
 
-    func loadFirstBy(genre: Genre?) async {
+    func loadFirstBy(genre: Genre?) {
         self.cancelGenreLoadTask()
 
-        let resolvedGenre = genre ?? .all
-        self.genre = resolvedGenre
+        let selectedGenre = genre ?? .all
+
+        self.genre = selectedGenre
 
         self.genreLoadTask = Task { @MainActor [weak self] in
             guard let self else {
@@ -182,11 +183,11 @@ final class TransferViewModel: TransferManaging {
             }
 
             do {
-                let persistedEntities = try self.persistenceService.getTracksBy(genre: resolvedGenre)
+                let persistedEntities = try self.persistenceService.getTracksBy(genre: selectedGenre)
                 try Task.checkCancellation()
 
                 if persistedEntities.isEmpty {
-                    try await self.loadGenreInitialTracks(genre: resolvedGenre)
+                    try await self.loadGenreInitialTracks(genre: selectedGenre)
                 } else {
                     self.genreTracks = persistedEntities
                     self.offsetGenre = persistedEntities.count
@@ -198,8 +199,6 @@ final class TransferViewModel: TransferManaging {
                 self.handleError(error)
             }
         }
-
-        await self.genreLoadTask?.value
     }
 
     func loadNextBy(genre: Genre?) async {
@@ -238,8 +237,6 @@ final class TransferViewModel: TransferManaging {
                 self.handleError(error)
             }
         }
-
-        await self.genreLoadTask?.value
     }
 
     func startDownload(_ track: TrackEntity) async {
