@@ -81,6 +81,24 @@ final class PersistenceService: PersistenceServicing {
         return try self.modelContext.fetch(descriptor)
     }
 
+    func getSarchTracksBy(query: String, limit: Int) throws -> [TrackEntity] {
+        let query = query.lowercased()
+
+        let descriptor = FetchDescriptor<TrackEntity>(
+            predicate: #Predicate<TrackEntity> {
+                $0.trackName.localizedStandardContains(query) ||
+                $0.artistName.localizedStandardContains(query) ||
+                $0.albumName.localizedStandardContains(query)
+            },
+            sortBy: [
+                SortDescriptor(\.artistName),
+                SortDescriptor(\.id)
+            ]
+        )
+
+        return try self.modelContext.fetch(descriptor)
+    }
+
     func getTrack(id: String) throws -> TrackEntity? {
         let trackID = id
         var descriptor = FetchDescriptor<TrackEntity>(

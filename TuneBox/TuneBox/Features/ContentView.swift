@@ -32,6 +32,7 @@ struct ContentView: View {
                     Button(action: {
                         transferViewModel.loadFirstPopular()
                         transferViewModel.loadFirstBy(genre: nil)
+                        transferViewModel.loadSearch(query: "Love")
                     }, label: {
                         Circle().fill(Color.yellow)
                             .frame(width: 50, height: 50)
@@ -115,12 +116,31 @@ struct ContentView: View {
                             .padding(.horizontal)
                         }
                     }
+
+                    if !transferViewModel.searchTracks.isEmpty {
+                        ForEach(transferViewModel.searchTracks, id: \.persistentModelID) { track in
+                            TrackCell(
+                                track: track,
+                                onDownloadTap: {
+                                    Task {
+                                        await transferViewModel.handleDownloadAction(for: track)
+                                    }
+                                },
+                                onPlayTap: {
+                                    playerViewModel.handlePlayAction(for: track)
+                                },
+                                isPlaying: playerViewModel.isPlaying(track)
+                            )
+                            .padding(.horizontal)
+                        }
+                    }
                 }
             }
         }
         .onAppear {
             transferViewModel.loadFirstPopular()
             transferViewModel.loadFirstBy(genre: nil)
+            transferViewModel.loadSearch(query: "love")
         }
         // Only for test!!!
         .onChange(of: transferViewModel.popularTracks) { _, tracks in
@@ -131,6 +151,12 @@ struct ContentView: View {
         .onChange(of: transferViewModel.genreTracks) { _, tracks in
             if tracks.isEmpty {
                 transferViewModel.loadFirstBy(genre: nil)
+            }
+        }
+        .onChange(of: transferViewModel.searchTracks) { _, tracks in
+            if tracks.isEmpty {
+                transferViewModel.loadSearch(query: "love")
+                print(transferViewModel.searchTracks.count)
             }
         }
     }

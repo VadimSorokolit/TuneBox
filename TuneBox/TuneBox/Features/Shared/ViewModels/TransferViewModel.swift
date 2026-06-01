@@ -7,6 +7,7 @@
 
 import Foundation
 import Observation
+import Combine
 
 enum ReservedSpace: Int, CaseIterable {
     case oneGB = 1
@@ -48,10 +49,9 @@ protocol TransferManaging:
 
     func loadFirstPopular()
     func loadFirstBy(genre: Genre?)
-    func loadFirstSearch(query: String)
+    func loadSearch(query: String)
     func loadNextPopular()
     func loadNextBy(genre: Genre?)
-    func loadNextSearch()
     func startDownload(_ track: TrackEntity) async
     func cancelAllDownloads() async
     func resetTransferState() async
@@ -82,6 +82,7 @@ final class TransferViewModel: TransferManaging {
     private(set) var simultaneouslyLoadingCount: Int = SimultaneouslyLoadingCount.two.rawValue
     private(set) var reservedSpace: ReservedSpace = .oneGB
     private(set) var genre: Genre = .all
+    var searchQuery: String = ""
 
     var isLoading: Bool {
         self.isPopularLoading || self.isGenreLoading || self.isSearchLoading
@@ -241,9 +242,45 @@ final class TransferViewModel: TransferManaging {
         }
     }
 
-    func loadFirstSearch(query: String) {}
+    func loadSearch(query: String) {
+        self.cancelSearchLoadTask()
 
-    func loadNextSearch() {}
+        self.searchLoadTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+
+            self.isSearchLoading = true
+
+            defer {
+                self.isSearchLoading = false
+                self.searchLoadTask = nil
+            }
+
+            try? await Task.sleep(for: .seconds(3))
+
+            guard query.count > 2 else {
+                self.searchTracks.removeAll()
+                self.offsetSearch = .zero
+                return
+            }
+
+            do {
+                let dtos = try await self.networkService.searchTracks(
+                    query: query,
+                    limit: self.limit,
+                    offset: self.offsetSearch
+                )
+
+                let entities = dtos.map(TrackEntity.init)
+
+                self.searchTracks.append(contentsOf: entities)
+                self.offsetSearch = self.searchTracks.count
+            } catch is CancellationError {
+                AppLogger.network.debug("Search cancelled")
+            } catch {
+                self.handleError(error)
+            }
+        }
+    }
 
     func startDownload(_ track: TrackEntity) async {
         guard self.hasEnoughFreeSpace(for: track) else {
@@ -388,6 +425,19 @@ final class TransferViewModel: TransferManaging {
     func handleDownloadAction(for track: TrackEntity) async {
         switch track.downloadState {
             case .idle:
+                var persistedTrack: TrackEntity?
+
+                do {
+                    persistedTrack = try self.persistenceService.getTrack(id: track.id)
+                } catch {
+                    self.handleError(error)
+                }
+
+                if persistedTrack == nil {
+                    self.synchronize([track])
+                    self.popularTracks.append(track)
+                }
+
                 await self.startDownload(track)
 
             case .paused:
@@ -481,6 +531,8 @@ final class TransferViewModel: TransferManaging {
     private var isProcessingDownloadQueue = false
     @ObservationIgnored
     private var pendingDownloadQueuePass = false
+    @ObservationIgnored
+    private var subscriptions: Set<AnyCancellable> = Set<AnyCancellable>()
 
     private let progressPersistStepBytes = 65_536
     private let estimatedTrackSizeFallback: Int = 10 * 1024 * 1024
@@ -608,6 +660,25 @@ final class TransferViewModel: TransferManaging {
             return []
         }
     }
+
+    //                self?.searchProducts(query: query)
+
+//    private func searchProducts(query: String) {
+//        guard query.count > 2 else {
+//            self.searchResults.removeAll()
+//            return
+//        }
+//        self.isLoading = true
+//        
+//        self.dataStorage.searchProducts(query: query)
+//            .receive(on: DispatchQueue.main)
+//            .sink { [weak self] completion in
+//                self?.handleCompletion(completion)
+//            } receiveValue: { [weak self] results in
+//                self?.searchResults = results
+//            }
+//            .store(in: &self.subscriptions)
+//    }
 
     private func synchronize(_ entities: [TrackEntity]) {
         do {
