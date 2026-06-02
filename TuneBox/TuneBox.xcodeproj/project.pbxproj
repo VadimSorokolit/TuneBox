@@ -85,6 +85,8 @@
 		5BFCA83C2FCED7BF009C6AD9 /* Font+customFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA83B2FCED7BE009C6AD9 /* Font+customFont.swift */; };
 		5BFCA83E2FCED841009C6AD9 /* View+cornerRadius.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA83D2FCED841009C6AD9 /* View+cornerRadius.swift */; };
 		5BFCA8412FCED9F6009C6AD9 /* CustomFontFamily.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA8402FCED9F5009C6AD9 /* CustomFontFamily.swift */; };
+		5BFCA8432FCEE237009C6AD9 /* TransferPrioritizable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA8422FCEE236009C6AD9 /* TransferPrioritizable.swift */; };
+		5BFCA8452FCEE252009C6AD9 /* TransferPrioritizable+mergePriority.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA8442FCEE251009C6AD9 /* TransferPrioritizable+mergePriority.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -156,7 +158,6 @@
 		5BD579A32FAB25EE00503BA2 /* NetworkServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkServiceTests.swift; sourceTree = "<group>"; };
 		5BD579AB2FAB27A000503BA2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5BFBF2362FCCC2AA0013F6BB /* ImportFiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportFiles.swift; sourceTree = "<group>"; };
-		5BFCA7CE2FCDD5B7009C6AD9 /* TransferPrioritizable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferPrioritizable.swift; sourceTree = "<group>"; };
 		5BFCA7D12FCE0DDD009C6AD9 /* AppTheme.swif.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swif.swift; sourceTree = "<group>"; };
 		5BFCA7D32FCE1130009C6AD9 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
 		5BFCA7D52FCE118A009C6AD9 /* Theme+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Theme+Extensions.swift"; sourceTree = "<group>"; };
@@ -182,6 +183,8 @@
 		5BFCA83B2FCED7BE009C6AD9 /* Font+customFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+customFont.swift"; sourceTree = "<group>"; };
 		5BFCA83D2FCED841009C6AD9 /* View+cornerRadius.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+cornerRadius.swift"; sourceTree = "<group>"; };
 		5BFCA8402FCED9F5009C6AD9 /* CustomFontFamily.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomFontFamily.swift; sourceTree = "<group>"; };
+		5BFCA8422FCEE236009C6AD9 /* TransferPrioritizable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferPrioritizable.swift; sourceTree = "<group>"; };
+		5BFCA8442FCEE251009C6AD9 /* TransferPrioritizable+mergePriority.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransferPrioritizable+mergePriority.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -421,6 +424,7 @@
 				5BFCA83B2FCED7BE009C6AD9 /* Font+customFont.swift */,
 				5B586CC22FAC912400BCEAD2 /* MoyaProvider+Async.swift */,
 				5B8382B62FC5AE9F003625CD /* Notifications */,
+				5BFCA8442FCEE251009C6AD9 /* TransferPrioritizable+mergePriority.swift */,
 				5BFCA83D2FCED841009C6AD9 /* View+cornerRadius.swift */,
 			);
 			path = Extensions;
@@ -467,6 +471,7 @@
 		5B8382952FC4C89C003625CD /* Interfaces */ = {
 			isa = PBXGroup;
 			children = (
+				5BFCA8422FCEE236009C6AD9 /* TransferPrioritizable.swift */,
 				5B8382A22FC4CB4C003625CD /* AudioServicing.swift */,
 				5B8382AC2FC4CFEF003625CD /* DownloadManaging.swift */,
 				5B8382B02FC4D05C003625CD /* DownloadStateProviding.swift */,
@@ -476,7 +481,6 @@
 				5B8382AA2FC4CF84003625CD /* PersistenceServicing.swift */,
 				5B8382BB2FC5D97E003625CD /* PlayerManaging.swift */,
 				5B8382B22FC4D0D6003625CD /* StorageManaging.swift */,
-				5BFCA7CE2FCDD5B7009C6AD9 /* TransferPrioritizable.swift */,
 			);
 			path = Interfaces;
 			sourceTree = "<group>";
@@ -881,6 +885,7 @@
 				5BD0DAF72FBF6BA000268A48 /* AudioService.swift in Sources */,
 				5B3FEB472FB4548600DC1562 /* DownloadsView.swift in Sources */,
 				5B3FEB432FB4545200DC1562 /* BrowsView.swift in Sources */,
+				5BFCA8452FCEE252009C6AD9 /* TransferPrioritizable+mergePriority.swift in Sources */,
 				5BFCA83A2FCED71E009C6AD9 /* Color+hex.swift in Sources */,
 				5B8382912FC495F9003625CD /* PlayerViewModel.swift in Sources */,
 				5B8382992FC4C9EE003625CD /* SpinnerView.swift in Sources */,
@@ -918,6 +923,7 @@
 				5B8382AB2FC4CF88003625CD /* PersistenceServicing.swift in Sources */,
 				5B8382AF2FC4D01C003625CD /* PersistenceManaging.swift in Sources */,
 				5B8860A52FB1CF910056BE9A /* NotificationNames+Extension.swift in Sources */,
+				5BFCA8432FCEE237009C6AD9 /* TransferPrioritizable.swift in Sources */,
 				5B11C33B2FB719A80089BAD2 /* TrackEntity.swift in Sources */,
 				5B88609E2FAE184C0056BE9A /* GlobalConstants.swift in Sources */,
 				5B8382B52FC59381003625CD /* BrowsView+.swift in Sources */,

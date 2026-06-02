@@ -22,7 +22,7 @@ enum WaveformMapper {
     }
 }
 
-enum DownloadState: String, Hashable {
+enum DownloadState: String, Hashable, TransferPrioritizable {
     case idle
     case downloading
     case queued
@@ -52,13 +52,9 @@ enum DownloadState: String, Hashable {
                 return 5
         }
     }
-
-    func merged(with other: DownloadState) -> DownloadState {
-        self.mergePriority >= other.mergePriority ? self : other
-    }
 }
 
-enum FileStorageState: String, Hashable {
+enum FileStorageState: String, Hashable, TransferPrioritizable {
     case none
     case exists
     case removed
@@ -74,10 +70,6 @@ enum FileStorageState: String, Hashable {
             case .removed:
                 return 2
         }
-    }
-
-    func merged(with other: FileStorageState) -> FileStorageState {
-        self.mergePriority >= other.mergePriority ? self : other
     }
 }
 
