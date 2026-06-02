@@ -63,6 +63,24 @@
 		5BFCA7D22FCE0DDE009C6AD9 /* AppTheme.swif.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA7D12FCE0DDD009C6AD9 /* AppTheme.swif.swift */; };
 		5BFCA7D42FCE1148009C6AD9 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA7D32FCE1130009C6AD9 /* ThemeManager.swift */; };
 		5BFCA7D62FCE118B009C6AD9 /* Theme+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA7D52FCE118A009C6AD9 /* Theme+Extensions.swift */; };
+		5BFCA7E52FCED3C9009C6AD9 /* Satoshi-Black.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA7D92FCED3C9009C6AD9 /* Satoshi-Black.otf */; };
+		5BFCA7E62FCED3C9009C6AD9 /* Satoshi-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA7DB2FCED3C9009C6AD9 /* Satoshi-Bold.otf */; };
+		5BFCA7E82FCED3C9009C6AD9 /* Satoshi-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA7E02FCED3C9009C6AD9 /* Satoshi-Medium.otf */; };
+		5BFCA7E92FCED3C9009C6AD9 /* Satoshi-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA7DE2FCED3C9009C6AD9 /* Satoshi-Light.otf */; };
+		5BFCA7EB2FCED3C9009C6AD9 /* Satoshi-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA7E22FCED3C9009C6AD9 /* Satoshi-Regular.otf */; };
+		5BFCA8122FCED45F009C6AD9 /* JetBrainsMono-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA7F02FCED45F009C6AD9 /* JetBrainsMono-ExtraBold.ttf */; };
+		5BFCA8152FCED45F009C6AD9 /* JetBrainsMono-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA7F52FCED45F009C6AD9 /* JetBrainsMono-Light.ttf */; };
+		5BFCA8192FCED45F009C6AD9 /* JetBrainsMono-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA7EE2FCED45F009C6AD9 /* JetBrainsMono-Bold.ttf */; };
+		5BFCA81A2FCED45F009C6AD9 /* JetBrainsMono-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA7F72FCED45F009C6AD9 /* JetBrainsMono-Medium.ttf */; };
+		5BFCA81D2FCED45F009C6AD9 /* JetBrainsMono-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA7F22FCED45F009C6AD9 /* JetBrainsMono-ExtraLight.ttf */; };
+		5BFCA8232FCED45F009C6AD9 /* JetBrainsMono-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA7FA2FCED45F009C6AD9 /* JetBrainsMono-SemiBold.ttf */; };
+		5BFCA8252FCED45F009C6AD9 /* JetBrainsMono-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA7F92FCED45F009C6AD9 /* JetBrainsMono-Regular.ttf */; };
+		5BFCA82B2FCED45F009C6AD9 /* JetBrainsMono-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA7FC2FCED45F009C6AD9 /* JetBrainsMono-Thin.ttf */; };
+		5BFCA8342FCED5BF009C6AD9 /* SpaceGrotesk-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA82F2FCED5BF009C6AD9 /* SpaceGrotesk-Bold.otf */; };
+		5BFCA8352FCED5BF009C6AD9 /* SpaceGrotesk-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA8302FCED5BF009C6AD9 /* SpaceGrotesk-Light.otf */; };
+		5BFCA8362FCED5BF009C6AD9 /* SpaceGrotesk-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA8312FCED5BF009C6AD9 /* SpaceGrotesk-Medium.otf */; };
+		5BFCA8372FCED5BF009C6AD9 /* SpaceGrotesk-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA8322FCED5BF009C6AD9 /* SpaceGrotesk-Regular.otf */; };
+		5BFCA8382FCED5BF009C6AD9 /* SpaceGrotesk-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA8332FCED5BF009C6AD9 /* SpaceGrotesk-SemiBold.otf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -138,6 +156,24 @@
 		5BFCA7D12FCE0DDD009C6AD9 /* AppTheme.swif.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swif.swift; sourceTree = "<group>"; };
 		5BFCA7D32FCE1130009C6AD9 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
 		5BFCA7D52FCE118A009C6AD9 /* Theme+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Theme+Extensions.swift"; sourceTree = "<group>"; };
+		5BFCA7D92FCED3C9009C6AD9 /* Satoshi-Black.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Satoshi-Black.otf"; sourceTree = "<group>"; };
+		5BFCA7DB2FCED3C9009C6AD9 /* Satoshi-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Satoshi-Bold.otf"; sourceTree = "<group>"; };
+		5BFCA7DE2FCED3C9009C6AD9 /* Satoshi-Light.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Satoshi-Light.otf"; sourceTree = "<group>"; };
+		5BFCA7E02FCED3C9009C6AD9 /* Satoshi-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Satoshi-Medium.otf"; sourceTree = "<group>"; };
+		5BFCA7E22FCED3C9009C6AD9 /* Satoshi-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Satoshi-Regular.otf"; sourceTree = "<group>"; };
+		5BFCA7EE2FCED45F009C6AD9 /* JetBrainsMono-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "JetBrainsMono-Bold.ttf"; sourceTree = "<group>"; };
+		5BFCA7F02FCED45F009C6AD9 /* JetBrainsMono-ExtraBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "JetBrainsMono-ExtraBold.ttf"; sourceTree = "<group>"; };
+		5BFCA7F22FCED45F009C6AD9 /* JetBrainsMono-ExtraLight.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "JetBrainsMono-ExtraLight.ttf"; sourceTree = "<group>"; };
+		5BFCA7F52FCED45F009C6AD9 /* JetBrainsMono-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "JetBrainsMono-Light.ttf"; sourceTree = "<group>"; };
+		5BFCA7F72FCED45F009C6AD9 /* JetBrainsMono-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "JetBrainsMono-Medium.ttf"; sourceTree = "<group>"; };
+		5BFCA7F92FCED45F009C6AD9 /* JetBrainsMono-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "JetBrainsMono-Regular.ttf"; sourceTree = "<group>"; };
+		5BFCA7FA2FCED45F009C6AD9 /* JetBrainsMono-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "JetBrainsMono-SemiBold.ttf"; sourceTree = "<group>"; };
+		5BFCA7FC2FCED45F009C6AD9 /* JetBrainsMono-Thin.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "JetBrainsMono-Thin.ttf"; sourceTree = "<group>"; };
+		5BFCA82F2FCED5BF009C6AD9 /* SpaceGrotesk-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SpaceGrotesk-Bold.otf"; sourceTree = "<group>"; };
+		5BFCA8302FCED5BF009C6AD9 /* SpaceGrotesk-Light.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SpaceGrotesk-Light.otf"; sourceTree = "<group>"; };
+		5BFCA8312FCED5BF009C6AD9 /* SpaceGrotesk-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SpaceGrotesk-Medium.otf"; sourceTree = "<group>"; };
+		5BFCA8322FCED5BF009C6AD9 /* SpaceGrotesk-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SpaceGrotesk-Regular.otf"; sourceTree = "<group>"; };
+		5BFCA8332FCED5BF009C6AD9 /* SpaceGrotesk-SemiBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SpaceGrotesk-SemiBold.otf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -534,6 +570,7 @@
 		5BD579A72FAB26C800503BA2 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				5BFCA7D72FCED398009C6AD9 /* Fonts */,
 				5BD5799C2FAB25E300503BA2 /* Assets.xcassets */,
 			);
 			path = Resources;
@@ -598,6 +635,55 @@
 				5BFCA7D32FCE1130009C6AD9 /* ThemeManager.swift */,
 			);
 			path = Theme;
+			sourceTree = "<group>";
+		};
+		5BFCA7D72FCED398009C6AD9 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				5BFCA7ED2FCED40D009C6AD9 /* JetBrainsMono */,
+				5BFCA7D82FCED3A3009C6AD9 /* Satoshi */,
+				5BFCA82E2FCED551009C6AD9 /* SpaceGrotesk */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+		5BFCA7D82FCED3A3009C6AD9 /* Satoshi */ = {
+			isa = PBXGroup;
+			children = (
+				5BFCA7D92FCED3C9009C6AD9 /* Satoshi-Black.otf */,
+				5BFCA7DB2FCED3C9009C6AD9 /* Satoshi-Bold.otf */,
+				5BFCA7E02FCED3C9009C6AD9 /* Satoshi-Medium.otf */,
+				5BFCA7E22FCED3C9009C6AD9 /* Satoshi-Regular.otf */,
+				5BFCA7DE2FCED3C9009C6AD9 /* Satoshi-Light.otf */,
+			);
+			path = Satoshi;
+			sourceTree = "<group>";
+		};
+		5BFCA7ED2FCED40D009C6AD9 /* JetBrainsMono */ = {
+			isa = PBXGroup;
+			children = (
+				5BFCA7F02FCED45F009C6AD9 /* JetBrainsMono-ExtraBold.ttf */,
+				5BFCA7FA2FCED45F009C6AD9 /* JetBrainsMono-SemiBold.ttf */,
+				5BFCA7EE2FCED45F009C6AD9 /* JetBrainsMono-Bold.ttf */,
+				5BFCA7F72FCED45F009C6AD9 /* JetBrainsMono-Medium.ttf */,
+				5BFCA7F92FCED45F009C6AD9 /* JetBrainsMono-Regular.ttf */,
+				5BFCA7F52FCED45F009C6AD9 /* JetBrainsMono-Light.ttf */,
+				5BFCA7F22FCED45F009C6AD9 /* JetBrainsMono-ExtraLight.ttf */,
+				5BFCA7FC2FCED45F009C6AD9 /* JetBrainsMono-Thin.ttf */,
+			);
+			path = JetBrainsMono;
+			sourceTree = "<group>";
+		};
+		5BFCA82E2FCED551009C6AD9 /* SpaceGrotesk */ = {
+			isa = PBXGroup;
+			children = (
+				5BFCA8332FCED5BF009C6AD9 /* SpaceGrotesk-SemiBold.otf */,
+				5BFCA82F2FCED5BF009C6AD9 /* SpaceGrotesk-Bold.otf */,
+				5BFCA8312FCED5BF009C6AD9 /* SpaceGrotesk-Medium.otf */,
+				5BFCA8322FCED5BF009C6AD9 /* SpaceGrotesk-Regular.otf */,
+				5BFCA8302FCED5BF009C6AD9 /* SpaceGrotesk-Light.otf */,
+			);
+			path = SpaceGrotesk;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -725,8 +811,26 @@
 			buildActionMask = 2147483647;
 			files = (
 				5B84C0252FAB368D00ACE75A /* .swiftlint.yml in Resources */,
+				5BFCA7E52FCED3C9009C6AD9 /* Satoshi-Black.otf in Resources */,
+				5BFCA7E62FCED3C9009C6AD9 /* Satoshi-Bold.otf in Resources */,
+				5BFCA7E82FCED3C9009C6AD9 /* Satoshi-Medium.otf in Resources */,
+				5BFCA7E92FCED3C9009C6AD9 /* Satoshi-Light.otf in Resources */,
+				5BFCA7EB2FCED3C9009C6AD9 /* Satoshi-Regular.otf in Resources */,
 				5BB9A56E2FC8AF45000B8127 /* Config.xcconfig in Resources */,
 				5BD579A02FAB25E300503BA2 /* Assets.xcassets in Resources */,
+				5BFCA8122FCED45F009C6AD9 /* JetBrainsMono-ExtraBold.ttf in Resources */,
+				5BFCA8152FCED45F009C6AD9 /* JetBrainsMono-Light.ttf in Resources */,
+				5BFCA8192FCED45F009C6AD9 /* JetBrainsMono-Bold.ttf in Resources */,
+				5BFCA81A2FCED45F009C6AD9 /* JetBrainsMono-Medium.ttf in Resources */,
+				5BFCA81D2FCED45F009C6AD9 /* JetBrainsMono-ExtraLight.ttf in Resources */,
+				5BFCA8232FCED45F009C6AD9 /* JetBrainsMono-SemiBold.ttf in Resources */,
+				5BFCA8342FCED5BF009C6AD9 /* SpaceGrotesk-Bold.otf in Resources */,
+				5BFCA8352FCED5BF009C6AD9 /* SpaceGrotesk-Light.otf in Resources */,
+				5BFCA8362FCED5BF009C6AD9 /* SpaceGrotesk-Medium.otf in Resources */,
+				5BFCA8372FCED5BF009C6AD9 /* SpaceGrotesk-Regular.otf in Resources */,
+				5BFCA8382FCED5BF009C6AD9 /* SpaceGrotesk-SemiBold.otf in Resources */,
+				5BFCA8252FCED45F009C6AD9 /* JetBrainsMono-Regular.ttf in Resources */,
+				5BFCA82B2FCED45F009C6AD9 /* JetBrainsMono-Thin.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
