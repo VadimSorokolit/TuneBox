@@ -87,6 +87,8 @@
 		5BFCA8412FCED9F6009C6AD9 /* CustomFontFamily.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA8402FCED9F5009C6AD9 /* CustomFontFamily.swift */; };
 		5BFCA8432FCEE237009C6AD9 /* TransferPrioritizable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA8422FCEE236009C6AD9 /* TransferPrioritizable.swift */; };
 		5BFCA8452FCEE252009C6AD9 /* TransferPrioritizable+mergePriority.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA8442FCEE251009C6AD9 /* TransferPrioritizable+mergePriority.swift */; };
+		5BFCA8492FCEE470009C6AD9 /* Launch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA8482FCEE46F009C6AD9 /* Launch.swift */; };
+		5BFCA84D2FCEE5D4009C6AD9 /* Onboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA84C2FCEE5D3009C6AD9 /* Onboarding.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -185,6 +187,8 @@
 		5BFCA8402FCED9F5009C6AD9 /* CustomFontFamily.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomFontFamily.swift; sourceTree = "<group>"; };
 		5BFCA8422FCEE236009C6AD9 /* TransferPrioritizable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferPrioritizable.swift; sourceTree = "<group>"; };
 		5BFCA8442FCEE251009C6AD9 /* TransferPrioritizable+mergePriority.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransferPrioritizable+mergePriority.swift"; sourceTree = "<group>"; };
+		5BFCA8482FCEE46F009C6AD9 /* Launch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Launch.swift; sourceTree = "<group>"; };
+		5BFCA84C2FCEE5D3009C6AD9 /* Onboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -606,6 +610,8 @@
 		5BD579A92FAB272E00503BA2 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				5BFCA8472FCEE44E009C6AD9 /* Launch */,
+				5BFCA8462FCEE44A009C6AD9 /* Onboarding */,
 				5B2CF4632FBCB3F500C5BA4C /* ContentView+TrackCell.swift */,
 				5BD5799D2FAB25E300503BA2 /* ContentView.swift */,
 				5B3FEB3E2FB453C100DC1562 /* Brows */,
@@ -708,6 +714,22 @@
 				5BFCA8402FCED9F5009C6AD9 /* CustomFontFamily.swift */,
 			);
 			path = Fonts;
+			sourceTree = "<group>";
+		};
+		5BFCA8462FCEE44A009C6AD9 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				5BFCA84C2FCEE5D3009C6AD9 /* Onboarding.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		5BFCA8472FCEE44E009C6AD9 /* Launch */ = {
+			isa = PBXGroup;
+			children = (
+				5BFCA8482FCEE46F009C6AD9 /* Launch.swift */,
+			);
+			path = Launch;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -889,6 +911,7 @@
 				5BFCA83A2FCED71E009C6AD9 /* Color+hex.swift in Sources */,
 				5B8382912FC495F9003625CD /* PlayerViewModel.swift in Sources */,
 				5B8382992FC4C9EE003625CD /* SpinnerView.swift in Sources */,
+				5BFCA84D2FCEE5D4009C6AD9 /* Onboarding.swift in Sources */,
 				5B9CE54B2FB32589001BE37F /* AppDelegate.swift in Sources */,
 				5B586CBA2FAC842200BCEAD2 /* Resolver+Injection.swift in Sources */,
 				5B2CF4612FBC7C6B00C5BA4C /* TransferDownloadObserverTokens.swift in Sources */,
@@ -924,6 +947,7 @@
 				5B8382AF2FC4D01C003625CD /* PersistenceManaging.swift in Sources */,
 				5B8860A52FB1CF910056BE9A /* NotificationNames+Extension.swift in Sources */,
 				5BFCA8432FCEE237009C6AD9 /* TransferPrioritizable.swift in Sources */,
+				5BFCA8492FCEE470009C6AD9 /* Launch.swift in Sources */,
 				5B11C33B2FB719A80089BAD2 /* TrackEntity.swift in Sources */,
 				5B88609E2FAE184C0056BE9A /* GlobalConstants.swift in Sources */,
 				5B8382B52FC59381003625CD /* BrowsView+.swift in Sources */,
