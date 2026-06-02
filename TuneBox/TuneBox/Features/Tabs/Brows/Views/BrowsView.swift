@@ -9,7 +9,11 @@ import Resolver
 import SwiftUI
 
 struct BrowsView: View {
-    var body: some View {}
+
+    var body: some View {
+        Text("Brows")
+    }
+
 }
 
 #Preview {

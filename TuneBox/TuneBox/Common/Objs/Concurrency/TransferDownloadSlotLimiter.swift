@@ -44,5 +44,4 @@ final class TransferDownloadSlotLimiter: Sendable {
     }
 
     private let mutex = Mutex(State())
-
 }

@@ -48,7 +48,7 @@ extension View {
                     .resizable()
                     .scaledToFill()
             } else {
-                theme.tokens.background
+                theme.tokens.appBackground
             }
         }
         .ignoresSafeArea()

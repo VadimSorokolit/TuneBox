@@ -22,7 +22,10 @@ enum ThemePreset: String, CaseIterable, Identifiable {
 }
 
 struct ThemeTokens {
-    let background: Color
+    let appBackground: Color
+    let tabBarBackground: Color
+    let tabIconActive: Color
+    let tabIconInactive: Color
     let cardBackground: Color
     let primaryText: Color
     let secondaryText: Color
@@ -33,20 +36,27 @@ struct ThemeTokens {
 extension ThemeTokens {
 
     static let light = Self(
-        background: .white,
+        appBackground: Color(hex: 0xF7F7F7),
+        tabBarBackground: Color(hex: 0xEFEFEF),
+        tabIconActive: Color(hex: 0x007AFF),
+        tabIconInactive: Color.black.opacity(0.45),
         cardBackground: Color(red: 0.96, green: 0.96, blue: 0.98),
         primaryText: .black,
         secondaryText: .gray,
-        accent: .blue,
-        backgroundImageName: "bg-pattern-light"
+        accent: Color(hex: 0x5E9C76),
+        backgroundImageName: nil
     )
 
     static let dark = Self(
-        background: Color(red: 0.05, green: 0.05, blue: 0.08),
+        appBackground: Color(hex: 0x121212),
+        tabBarBackground: Color(hex: 0x0A0A0A),
+        tabIconActive: Color(hex: 0x4F6EF7),
+        tabIconInactive: Color.white.opacity(0.45),
         cardBackground: Color(red: 0.12, green: 0.12, blue: 0.16),
         primaryText: .white,
         secondaryText: Color.gray.opacity(0.7),
-        accent: Color(red: 0.3, green: 0.6, blue: 1.0),
-        backgroundImageName: "bg-pattern-dark"
+        accent: Color(hex: 0x5E9C76),
+        backgroundImageName: nil
     )
+
 }

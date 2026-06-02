@@ -46,6 +46,8 @@ protocol TransferManaging:
     StorageManaging,
     PersistenceManaging {
 
+    var selectedTab: CustomTab { get set }
+
     func loadFirstPopular()
     func loadFirstBy(genre: Genre?)
     func loadSearch(query: String)
@@ -83,6 +85,7 @@ final class TransferViewModel: TransferManaging {
     private(set) var reservedSpace: ReservedSpace = .oneGB
     private(set) var genre: Genre = .all
     var searchQuery: String = ""
+    var selectedTab: CustomTab = .brows
 
     var isLoading: Bool {
         self.isPopularLoading || self.isGenreLoading || self.isSearchLoading

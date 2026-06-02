@@ -51,6 +51,7 @@
 		5B84C0252FAB368D00ACE75A /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 5B84C0242FAB367B00ACE75A /* .swiftlint.yml */; };
 		5B88609E2FAE184C0056BE9A /* GlobalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B88609D2FAE18450056BE9A /* GlobalConstants.swift */; };
 		5B8860A52FB1CF910056BE9A /* NotificationNames+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8860A42FB1CF900056BE9A /* NotificationNames+Extension.swift */; };
+		5B899F782FCF13A8002D3232 /* RootTabsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B899F772FCF13A8002D3232 /* RootTabsView.swift */; };
 		5B9CE54B2FB32589001BE37F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9CE54A2FB32589001BE37F /* AppDelegate.swift */; };
 		5BB9A56E2FC8AF45000B8127 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5BB9A56D2FC8AF45000B8127 /* Config.xcconfig */; };
 		5BC0DEAD2FDD000100503BA2 /* DownloadStateMergeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC0DEAC2FDD000100503BA2 /* DownloadStateMergeTests.swift */; };
@@ -59,7 +60,7 @@
 		5BD579A12FAB25E300503BA2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD5799D2FAB25E300503BA2 /* ContentView.swift */; };
 		5BD579A22FAB25E300503BA2 /* TuneBoxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD5799E2FAB25E300503BA2 /* TuneBoxApp.swift */; };
 		5BD579A52FAB25EE00503BA2 /* NetworkServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD579A32FAB25EE00503BA2 /* NetworkServiceTests.swift */; };
-		5BFBF2372FCCC2AB0013F6BB /* ImportFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFBF2362FCCC2AA0013F6BB /* ImportFiles.swift */; };
+		5BFBF2372FCCC2AB0013F6BB /* ImportFilesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFBF2362FCCC2AA0013F6BB /* ImportFilesView.swift */; };
 		5BFCA7D22FCE0DDE009C6AD9 /* AppTheme.swif.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA7D12FCE0DDD009C6AD9 /* AppTheme.swif.swift */; };
 		5BFCA7D42FCE1148009C6AD9 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA7D32FCE1130009C6AD9 /* ThemeManager.swift */; };
 		5BFCA7D62FCE118B009C6AD9 /* Theme+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA7D52FCE118A009C6AD9 /* Theme+Extensions.swift */; };
@@ -147,6 +148,7 @@
 		5B84C0242FAB367B00ACE75A /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		5B88609D2FAE18450056BE9A /* GlobalConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalConstants.swift; sourceTree = "<group>"; };
 		5B8860A42FB1CF900056BE9A /* NotificationNames+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationNames+Extension.swift"; sourceTree = "<group>"; };
+		5B899F772FCF13A8002D3232 /* RootTabsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabsView.swift; sourceTree = "<group>"; };
 		5B9CE54A2FB32589001BE37F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5BB9A56D2FC8AF45000B8127 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		5BC0DEAC2FDD000100503BA2 /* DownloadStateMergeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadStateMergeTests.swift; sourceTree = "<group>"; };
@@ -159,7 +161,7 @@
 		5BD5799E2FAB25E300503BA2 /* TuneBoxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneBoxApp.swift; sourceTree = "<group>"; };
 		5BD579A32FAB25EE00503BA2 /* NetworkServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkServiceTests.swift; sourceTree = "<group>"; };
 		5BD579AB2FAB27A000503BA2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		5BFBF2362FCCC2AA0013F6BB /* ImportFiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportFiles.swift; sourceTree = "<group>"; };
+		5BFBF2362FCCC2AA0013F6BB /* ImportFilesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportFilesView.swift; sourceTree = "<group>"; };
 		5BFCA7D12FCE0DDD009C6AD9 /* AppTheme.swif.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swif.swift; sourceTree = "<group>"; };
 		5BFCA7D32FCE1130009C6AD9 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
 		5BFCA7D52FCE118A009C6AD9 /* Theme+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Theme+Extensions.swift"; sourceTree = "<group>"; };
@@ -525,6 +527,19 @@
 			path = Errors;
 			sourceTree = "<group>";
 		};
+		5B899F762FCF139E002D3232 /* Tabs */ = {
+			isa = PBXGroup;
+			children = (
+				5B899F772FCF13A8002D3232 /* RootTabsView.swift */,
+				5B3FEB3E2FB453C100DC1562 /* Brows */,
+				5B3FEB3F2FB453C400DC1562 /* Downloads */,
+				5B3FEB402FB453C800DC1562 /* Player */,
+				5BFBF2342FCCC28E0013F6BB /* Import */,
+				5B3FEB412FB453CB00DC1562 /* Settings */,
+			);
+			path = Tabs;
+			sourceTree = "<group>";
+		};
 		5BD0DAF82FBF6C4A00268A48 /* AudioService */ = {
 			isa = PBXGroup;
 			children = (
@@ -612,13 +627,9 @@
 			children = (
 				5BFCA8472FCEE44E009C6AD9 /* Launch */,
 				5BFCA8462FCEE44A009C6AD9 /* Onboarding */,
+				5B899F762FCF139E002D3232 /* Tabs */,
 				5B2CF4632FBCB3F500C5BA4C /* ContentView+TrackCell.swift */,
 				5BD5799D2FAB25E300503BA2 /* ContentView.swift */,
-				5B3FEB3E2FB453C100DC1562 /* Brows */,
-				5B3FEB3F2FB453C400DC1562 /* Downloads */,
-				5B3FEB402FB453C800DC1562 /* Player */,
-				5BFBF2342FCCC28E0013F6BB /* Import */,
-				5B3FEB412FB453CB00DC1562 /* Settings */,
 				5B3FEB3A2FB4538100DC1562 /* Shared */,
 			);
 			path = Features;
@@ -644,7 +655,7 @@
 		5BFBF2352FCCC2A00013F6BB /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				5BFBF2362FCCC2AA0013F6BB /* ImportFiles.swift */,
+				5BFBF2362FCCC2AA0013F6BB /* ImportFilesView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -903,6 +914,7 @@
 			files = (
 				5B8382B12FC4D05E003625CD /* DownloadStateProviding.swift in Sources */,
 				5B586CB52FAC618500BCEAD2 /* FileManagerService.swift in Sources */,
+				5B899F782FCF13A8002D3232 /* RootTabsView.swift in Sources */,
 				5BD579A12FAB25E300503BA2 /* ContentView.swift in Sources */,
 				5BD0DAF72FBF6BA000268A48 /* AudioService.swift in Sources */,
 				5B3FEB472FB4548600DC1562 /* DownloadsView.swift in Sources */,
@@ -937,7 +949,7 @@
 				5B47627A2FAB3DC30069E41A /* TuneBoxRouter.swift in Sources */,
 				5B8382BC2FC5D97F003625CD /* PlayerManaging.swift in Sources */,
 				5BFCA7D22FCE0DDE009C6AD9 /* AppTheme.swif.swift in Sources */,
-				5BFBF2372FCCC2AB0013F6BB /* ImportFiles.swift in Sources */,
+				5BFBF2372FCCC2AB0013F6BB /* ImportFilesView.swift in Sources */,
 				5BFCA7D42FCE1148009C6AD9 /* ThemeManager.swift in Sources */,
 				5B47627E2FAB49B00069E41A /* AppLogger.swift in Sources */,
 				5BFCA83C2FCED7BF009C6AD9 /* Font+customFont.swift in Sources */,
@@ -1130,6 +1142,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TuneBox/SupportingFiles/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TuneBox;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -1169,6 +1182,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TuneBox/SupportingFiles/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TuneBox;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

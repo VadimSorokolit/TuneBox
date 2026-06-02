@@ -17,8 +17,9 @@ struct TuneBoxApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environment(themeManager)
+//            ContentView()
+            RootTabsView()
+                .environment(\.themeManager, themeManager)
                 .applyTheme(themeManager)
                 .overlay {
                     if viewModel.isLoading {

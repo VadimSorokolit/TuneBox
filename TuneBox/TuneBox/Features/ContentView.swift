@@ -14,125 +14,131 @@ struct ContentView: View {
     @Environment(\.themeManager) private var theme
 
     var body: some View {
-        VStack(spacing: 10) {
-            VStack {
-                Button(action: {
-                    Task {
-                        await transferViewModel.cancelAllDownloads()
-                    }
-                }, label: {
-                    Circle().fill(Color.orange)
-                        .frame(width: 50, height: 50)
-                        .overlay(
-                            Image(systemName: "xmark")
-                                .foregroundStyle(.white)
-                        )
-                })
+        ZStack {
+            theme.tokens.appBackground
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .ignoresSafeArea()
 
-                HStack {
-                    Button(action: {
-                        transferViewModel.loadFirstPopular()
-                        transferViewModel.loadFirstBy(genre: nil)
-                        transferViewModel.loadSearch(query: "Love")
-                    }, label: {
-                        Circle().fill(Color.yellow)
-                            .frame(width: 50, height: 50)
-                            .overlay(
-                                Image(systemName: "music.note")
-                                    .frame(width: 30, height: 30)
-                                    .foregroundStyle(Color.white)
-                            )
-                    })
-                    .disabled(transferViewModel.popularTracks.isEmpty == false)
-
-                    Spacer()
-
-                    Button(action: {
-                        transferViewModel.loadNextPopular()
-                        transferViewModel.loadNextBy(genre: nil)
-                    }, label: {
-                        Circle().fill(Color.blue)
-                            .frame(width: 50, height: 50)
-                            .overlay(
-                                Image(systemName: "music.note.list")
-                                    .frame(width: 30, height: 30)
-                                    .foregroundStyle(Color.white)
-                            )
-                    })
-
-                    Spacer()
-
+            VStack(spacing: 10) {
+                VStack {
                     Button(action: {
                         Task {
-                            await transferViewModel.resetTransferState()
+                            await transferViewModel.cancelAllDownloads()
                         }
                     }, label: {
-                        Circle().fill(Color.red)
+                        Circle().fill(Color.orange)
                             .frame(width: 50, height: 50)
                             .overlay(
-                                Image(systemName: "trash")
-                                    .frame(width: 30, height: 30)
-                                    .foregroundStyle(Color.white)
+                                Image(systemName: "xmark")
+                                    .foregroundStyle(.white)
                             )
                     })
-                    .disabled(transferViewModel.popularTracks.isEmpty)
+
+                    HStack {
+                        Button(action: {
+                            transferViewModel.loadFirstPopular()
+                            transferViewModel.loadFirstBy(genre: nil)
+                            transferViewModel.loadSearch(query: "Love")
+                        }, label: {
+                            Circle().fill(Color.yellow)
+                                .frame(width: 50, height: 50)
+                                .overlay(
+                                    Image(systemName: "music.note")
+                                        .frame(width: 30, height: 30)
+                                        .foregroundStyle(Color.white)
+                                )
+                        })
+                        .disabled(transferViewModel.popularTracks.isEmpty == false)
+
+                        Spacer()
+
+                        Button(action: {
+                            transferViewModel.loadNextPopular()
+                            transferViewModel.loadNextBy(genre: nil)
+                        }, label: {
+                            Circle().fill(Color.blue)
+                                .frame(width: 50, height: 50)
+                                .overlay(
+                                    Image(systemName: "music.note.list")
+                                        .frame(width: 30, height: 30)
+                                        .foregroundStyle(Color.white)
+                                )
+                        })
+
+                        Spacer()
+
+                        Button(action: {
+                            Task {
+                                await transferViewModel.resetTransferState()
+                            }
+                        }, label: {
+                            Circle().fill(Color.red)
+                                .frame(width: 50, height: 50)
+                                .overlay(
+                                    Image(systemName: "trash")
+                                        .frame(width: 30, height: 30)
+                                        .foregroundStyle(Color.white)
+                                )
+                        })
+                        .disabled(transferViewModel.popularTracks.isEmpty)
+                    }
+                    .padding(.horizontal)
                 }
-                .padding(.horizontal)
-            }
 
-            ScrollView(.vertical, showsIndicators: false) {
-                VStack(spacing: 5) {
-                    if !transferViewModel.popularTracks.isEmpty {
-                        ForEach(transferViewModel.popularTracks, id: \.id) { track in
-                            TrackCell(
-                                track: track,
-                                onDownloadTap: {
-                                    Task {
-                                        await transferViewModel.handleDownloadAction(for: track)
-                                    }
-                                },
-                                onPlayTap: {
-                                    playerViewModel.handlePlayAction(for: track)
-                                },
-                                isPlaying: playerViewModel.isPlaying(track)
-                            )
-                            .padding(.horizontal)
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(spacing: 5) {
+                        if !transferViewModel.popularTracks.isEmpty {
+                            ForEach(transferViewModel.popularTracks, id: \.id) { track in
+                                TrackCell(
+                                    track: track,
+                                    onDownloadTap: {
+                                        Task {
+                                            await transferViewModel.handleDownloadAction(for: track)
+                                        }
+                                    },
+                                    onPlayTap: {
+                                        playerViewModel.handlePlayAction(for: track)
+                                    },
+                                    isPlaying: playerViewModel.isPlaying(track)
+                                )
+                                .padding(.horizontal)
+                            }
                         }
-                    }
 
-                    if !transferViewModel.genreTracks.isEmpty {
-                        ForEach(transferViewModel.genreTracks, id: \.id) { track in
-                            TrackCell(
-                                track: track,
-                                onDownloadTap: {
-                                    Task {
-                                        await transferViewModel.handleDownloadAction(for: track)
-                                    }
-                                },
-                                onPlayTap: {
-                                    playerViewModel.handlePlayAction(for: track)
-                                },
-                                isPlaying: playerViewModel.isPlaying(track)
-                            )
-                            .padding(.horizontal)
+                        if !transferViewModel.genreTracks.isEmpty {
+                            ForEach(transferViewModel.genreTracks, id: \.id) { track in
+                                TrackCell(
+                                    track: track,
+                                    onDownloadTap: {
+                                        Task {
+                                            await transferViewModel.handleDownloadAction(for: track)
+                                        }
+                                    },
+                                    onPlayTap: {
+                                        playerViewModel.handlePlayAction(for: track)
+                                    },
+                                    isPlaying: playerViewModel.isPlaying(track)
+                                )
+                                .padding(.horizontal)
+                            }
                         }
-                    }
 
-                    if !transferViewModel.searchTracks.isEmpty {
-                        ForEach(transferViewModel.searchTracks, id: \.id) { track in
-                            TrackCell(
-                                track: track,
-                                onDownloadTap: {
-                                    Task {
-                                        await transferViewModel.handleDownloadAction(for: track)
-                                    }
-                                },
-                                onPlayTap: {
-                                    playerViewModel.handlePlayAction(for: track)
-                                },
-                                isPlaying: playerViewModel.isPlaying(track)
-                            )
-                            .padding(.horizontal)
+                        if !transferViewModel.searchTracks.isEmpty {
+                            ForEach(transferViewModel.searchTracks, id: \.id) { track in
+                                TrackCell(
+                                    track: track,
+                                    onDownloadTap: {
+                                        Task {
+                                            await transferViewModel.handleDownloadAction(for: track)
+                                        }
+                                    },
+                                    onPlayTap: {
+                                        playerViewModel.handlePlayAction(for: track)
+                                    },
+                                    isPlaying: playerViewModel.isPlaying(track)
+                                )
+                                .padding(.horizontal)
+                            }
                         }
                     }
                 }

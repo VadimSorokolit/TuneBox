@@ -6,9 +6,9 @@
 //
 
 extension TransferPrioritizable {
-    
+
     func merged(with other: Self) -> Self {
         mergePriority >= other.mergePriority ? self : other
     }
-    
+
 }

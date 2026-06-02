@@ -2,7 +2,7 @@
 //  DownloadStateMergeTests.swift
 //  TuneBoxTests
 //
-//  Created by Cursor on 01.06.2026.
+//  Created by Vadim Sorokolit on 01.06.2026.
 //
 
 import Testing
