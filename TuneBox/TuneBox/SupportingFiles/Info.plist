@@ -2,8 +2,31 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>JAMENDO_CLIENT_ID</key>
-    <string>$(JAMENDO_CLIENT_ID)</string>
+	<key>UIAppFonts</key>
+	<array>
+        <string>JetBrainsMono-ExtraBold.ttf</string>
+        <string>JetBrainsMono-Bold.ttf</string>
+        <string>JetBrainsMono-SemiBold.ttf</string>
+        <string>JetBrainsMono-Medium.ttf</string>
+        <string>JetBrainsMono-Regular.ttf</string>
+        <string>JetBrainsMono-Light.ttf</string>
+        <string>JetBrainsMono-ExtraLight.ttf</string>
+        <string>JetBrainsMono-Thin.ttf</string>
+
+        <string>Satoshi-Black.otf</string>
+        <string>Satoshi-Bold.otf</string>
+        <string>Satoshi-Medium.otf</string>
+        <string>Satoshi-Regular.otf</string>
+        <string>Satoshi-Light.otf</string>
+        
+        <string>SpaceGrotesk-Bold.otf</string>
+        <string>SpaceGrotesk-SemiBold.otf</string>
+        <string>SpaceGrotesk-Medium.otf</string>
+        <string>SpaceGrotesk-Regular.otf</string>
+        <string>SpaceGrotesk-Light.otf</string>
+	</array>
+	<key>JAMENDO_CLIENT_ID</key>
+	<string>$(JAMENDO_CLIENT_ID)</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

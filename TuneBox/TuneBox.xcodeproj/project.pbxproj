@@ -81,6 +81,10 @@
 		5BFCA8362FCED5BF009C6AD9 /* SpaceGrotesk-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA8312FCED5BF009C6AD9 /* SpaceGrotesk-Medium.otf */; };
 		5BFCA8372FCED5BF009C6AD9 /* SpaceGrotesk-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA8322FCED5BF009C6AD9 /* SpaceGrotesk-Regular.otf */; };
 		5BFCA8382FCED5BF009C6AD9 /* SpaceGrotesk-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA8332FCED5BF009C6AD9 /* SpaceGrotesk-SemiBold.otf */; };
+		5BFCA83A2FCED71E009C6AD9 /* Color+hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA8392FCED71E009C6AD9 /* Color+hex.swift */; };
+		5BFCA83C2FCED7BF009C6AD9 /* Font+customFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA83B2FCED7BE009C6AD9 /* Font+customFont.swift */; };
+		5BFCA83E2FCED841009C6AD9 /* View+cornerRadius.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA83D2FCED841009C6AD9 /* View+cornerRadius.swift */; };
+		5BFCA8412FCED9F6009C6AD9 /* CustomFontFamily.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA8402FCED9F5009C6AD9 /* CustomFontFamily.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -174,6 +178,10 @@
 		5BFCA8312FCED5BF009C6AD9 /* SpaceGrotesk-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SpaceGrotesk-Medium.otf"; sourceTree = "<group>"; };
 		5BFCA8322FCED5BF009C6AD9 /* SpaceGrotesk-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SpaceGrotesk-Regular.otf"; sourceTree = "<group>"; };
 		5BFCA8332FCED5BF009C6AD9 /* SpaceGrotesk-SemiBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SpaceGrotesk-SemiBold.otf"; sourceTree = "<group>"; };
+		5BFCA8392FCED71E009C6AD9 /* Color+hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+hex.swift"; sourceTree = "<group>"; };
+		5BFCA83B2FCED7BE009C6AD9 /* Font+customFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+customFont.swift"; sourceTree = "<group>"; };
+		5BFCA83D2FCED841009C6AD9 /* View+cornerRadius.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+cornerRadius.swift"; sourceTree = "<group>"; };
+		5BFCA8402FCED9F5009C6AD9 /* CustomFontFamily.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomFontFamily.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -409,8 +417,11 @@
 		5B586CC12FAC880500BCEAD2 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				5B8382B62FC5AE9F003625CD /* Notifications */,
+				5BFCA8392FCED71E009C6AD9 /* Color+hex.swift */,
+				5BFCA83B2FCED7BE009C6AD9 /* Font+customFont.swift */,
 				5B586CC22FAC912400BCEAD2 /* MoyaProvider+Async.swift */,
+				5B8382B62FC5AE9F003625CD /* Notifications */,
+				5BFCA83D2FCED841009C6AD9 /* View+cornerRadius.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -427,6 +438,7 @@
 			isa = PBXGroup;
 			children = (
 				5B8382962FC4C8C2003625CD /* UI */,
+				5BFCA83F2FCED9DB009C6AD9 /* Fonts */,
 				5B8382942FC4C865003625CD /* Constants */,
 				5B8382952FC4C89C003625CD /* Interfaces */,
 				5B8382932FC4C7BF003625CD /* Logs */,
@@ -663,8 +675,8 @@
 			isa = PBXGroup;
 			children = (
 				5BFCA7F02FCED45F009C6AD9 /* JetBrainsMono-ExtraBold.ttf */,
-				5BFCA7FA2FCED45F009C6AD9 /* JetBrainsMono-SemiBold.ttf */,
 				5BFCA7EE2FCED45F009C6AD9 /* JetBrainsMono-Bold.ttf */,
+				5BFCA7FA2FCED45F009C6AD9 /* JetBrainsMono-SemiBold.ttf */,
 				5BFCA7F72FCED45F009C6AD9 /* JetBrainsMono-Medium.ttf */,
 				5BFCA7F92FCED45F009C6AD9 /* JetBrainsMono-Regular.ttf */,
 				5BFCA7F52FCED45F009C6AD9 /* JetBrainsMono-Light.ttf */,
@@ -677,13 +689,21 @@
 		5BFCA82E2FCED551009C6AD9 /* SpaceGrotesk */ = {
 			isa = PBXGroup;
 			children = (
-				5BFCA8332FCED5BF009C6AD9 /* SpaceGrotesk-SemiBold.otf */,
 				5BFCA82F2FCED5BF009C6AD9 /* SpaceGrotesk-Bold.otf */,
+				5BFCA8332FCED5BF009C6AD9 /* SpaceGrotesk-SemiBold.otf */,
 				5BFCA8312FCED5BF009C6AD9 /* SpaceGrotesk-Medium.otf */,
 				5BFCA8322FCED5BF009C6AD9 /* SpaceGrotesk-Regular.otf */,
 				5BFCA8302FCED5BF009C6AD9 /* SpaceGrotesk-Light.otf */,
 			);
 			path = SpaceGrotesk;
+			sourceTree = "<group>";
+		};
+		5BFCA83F2FCED9DB009C6AD9 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				5BFCA8402FCED9F5009C6AD9 /* CustomFontFamily.swift */,
+			);
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -861,6 +881,7 @@
 				5BD0DAF72FBF6BA000268A48 /* AudioService.swift in Sources */,
 				5B3FEB472FB4548600DC1562 /* DownloadsView.swift in Sources */,
 				5B3FEB432FB4545200DC1562 /* BrowsView.swift in Sources */,
+				5BFCA83A2FCED71E009C6AD9 /* Color+hex.swift in Sources */,
 				5B8382912FC495F9003625CD /* PlayerViewModel.swift in Sources */,
 				5B8382992FC4C9EE003625CD /* SpinnerView.swift in Sources */,
 				5B9CE54B2FB32589001BE37F /* AppDelegate.swift in Sources */,
@@ -872,6 +893,7 @@
 				5BFCA7D62FCE118B009C6AD9 /* Theme+Extensions.swift in Sources */,
 				5B8382B32FC4D0D8003625CD /* StorageManaging.swift in Sources */,
 				5B2CF4642FBCB3F600C5BA4C /* ContentView+TrackCell.swift in Sources */,
+				5BFCA8412FCED9F6009C6AD9 /* CustomFontFamily.swift in Sources */,
 				5B8382A32FC4CB4D003625CD /* AudioServicing.swift in Sources */,
 				5B8382AD2FC4CFF1003625CD /* DownloadManaging.swift in Sources */,
 				5B586CB72FAC678700BCEAD2 /* TrackDTO.swift in Sources */,
@@ -890,7 +912,9 @@
 				5BFBF2372FCCC2AB0013F6BB /* ImportFiles.swift in Sources */,
 				5BFCA7D42FCE1148009C6AD9 /* ThemeManager.swift in Sources */,
 				5B47627E2FAB49B00069E41A /* AppLogger.swift in Sources */,
+				5BFCA83C2FCED7BF009C6AD9 /* Font+customFont.swift in Sources */,
 				5B2CF45E2FBC7AA400C5BA4C /* TransferDownloadSlotLimiter.swift in Sources */,
+				5BFCA83E2FCED841009C6AD9 /* View+cornerRadius.swift in Sources */,
 				5B8382AB2FC4CF88003625CD /* PersistenceServicing.swift in Sources */,
 				5B8382AF2FC4D01C003625CD /* PersistenceManaging.swift in Sources */,
 				5B8860A52FB1CF910056BE9A /* NotificationNames+Extension.swift in Sources */,
