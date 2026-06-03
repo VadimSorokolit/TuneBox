@@ -86,7 +86,7 @@ final class TransferViewModel: TransferManaging {
     private(set) var reservedSpace: ReservedSpace = .oneGB
     private(set) var genre: Genre = .all
     var searchQuery: String = ""
-    var selectedTab: CustomTab = .brows
+    var selectedTab: CustomTab = .browse
 
     var inProgressTracksCount: Int {
         self.inProgressTrackIDs.count

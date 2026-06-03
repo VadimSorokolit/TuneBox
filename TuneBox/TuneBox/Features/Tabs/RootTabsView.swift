@@ -2,7 +2,7 @@ import SwiftUI
 import Resolver
 
 enum CustomTab: Hashable, Identifiable, CaseIterable {
-    case brows
+    case browse
     case downloads
     case player
     case importFiles
@@ -11,7 +11,7 @@ enum CustomTab: Hashable, Identifiable, CaseIterable {
     var id: Self { self }
 
     static let tabs: [CustomTab] = [
-        .brows,
+        .browse,
         .downloads,
         .player,
         .importFiles,
@@ -20,7 +20,7 @@ enum CustomTab: Hashable, Identifiable, CaseIterable {
 
     var iconInactive: String {
         switch self {
-            case .brows:
+            case .browse:
                 "magnifyingglass.circle"
             case .downloads:
                 "arrow.down.circle"
@@ -35,7 +35,7 @@ enum CustomTab: Hashable, Identifiable, CaseIterable {
 
     var iconActive: String {
         switch self {
-            case .brows:
+            case .browse:
                 "magnifyingglass.circle.fill"
             case .downloads:
                 "arrow.down.circle.fill"
@@ -65,8 +65,8 @@ struct RootTabsView: View {
 
     private var content: some View {
         ZStack {
-            BrowsView()
-                .tabVisible(viewModel.selectedTab == .brows)
+            BrowseView()
+                .tabVisible(viewModel.selectedTab == .browse)
 
             DownloadsView()
                 .tabVisible(viewModel.selectedTab == .downloads)
@@ -160,7 +160,7 @@ private extension View {
             ForEach(CustomTab.tabs) { tab in
                 TabItemView(
                     tab: tab,
-                    isSelected: tab == .brows,
+                    isSelected: tab == .browse,
                     activeColor: Color(hex: 0x6B5CFF),
                     inactiveColor: Color.white.opacity(0.45)
                 ) {}

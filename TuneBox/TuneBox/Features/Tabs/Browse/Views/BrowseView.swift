@@ -8,7 +8,7 @@
 import Resolver
 import SwiftUI
 
-struct BrowsView: View {
+struct BrowseView: View {
     @Injected var viewModel: TransferManaging
     @FocusState private var isTextFieldFocused: Bool
     @State private var searchQuery: String = ""
@@ -35,7 +35,7 @@ struct BrowsView: View {
             viewModel.loadFirstPopular()
         }
         .onChange(of: viewModel.selectedTab) { _, tab in
-            if tab != .brows {
+            if tab != .browse {
                 searchQuery = ""
                 isTextFieldFocused = false
                 viewModel.clearSearch()
@@ -126,5 +126,5 @@ struct BrowsView: View {
 }
 
 #Preview {
-        BrowsView()
+        BrowseView()
 }
