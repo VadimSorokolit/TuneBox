@@ -25,6 +25,7 @@ final class TrackEntity {
     var downloadingSize: Int = 0
     var downloadQueueIndex: Int?
     var genreRawValue: String?
+    private var duration: Int?
     private var downloadStateRawValue: String = DownloadState.idle.rawValue
     private var fileStateRawValue: String = FileStorageState.none.rawValue
 
@@ -48,6 +49,17 @@ final class TrackEntity {
         set {
             self.fileStateRawValue = newValue.rawValue
         }
+    }
+
+    var formattedDuration: String {
+        guard let duration else {
+            return "--:--"
+        }
+
+        let minutes = duration / 60
+        let seconds = duration % 60
+
+        return String(format: "%d:%02d", minutes, seconds)
     }
 
     var genre: Genre? {
@@ -96,6 +108,7 @@ final class TrackEntity {
         id: String,
         image: String?,
         songName: String,
+        duration: Int?,
         artistName: String,
         albumName: String,
         releaseDate: String?,
@@ -112,6 +125,7 @@ final class TrackEntity {
         self.id = id
         self.image = image
         self.songName = songName
+        self.duration = duration
         self.artistName = artistName
         self.albumName = albumName
         self.releaseDate = releaseDate
@@ -134,6 +148,7 @@ extension TrackEntity {
             id: track.id,
             image: track.image,
             songName: track.songName,
+            duration: track.duration,
             artistName: track.artistName,
             albumName: track.albumName,
             releaseDate: track.releaseDate,
@@ -147,6 +162,7 @@ extension TrackEntity {
     func updateMetadata(from entity: TrackEntity) {
         self.image = entity.image
         self.songName = entity.songName
+        self.duration = entity.duration
         self.artistName = entity.artistName
         self.albumName = entity.albumName
         self.releaseDate = entity.releaseDate

@@ -54,7 +54,7 @@ struct BrowsView: View {
             HStack {
                 Text("Discover")
                     .foregroundStyle(theme.tokens.browsHeaderText)
-                    .font(.satoshiRegular34)
+                    .font(.satoshi.regular.size(34))
 
                 Spacer()
 

@@ -21,7 +21,7 @@ struct SearchCell: View {
                 .foregroundStyle(.secondary)
 
             TextField("Search...", text: $searchQuery)
-                .font(.satoshiMedium14)
+                .font(.satoshi.medium.size(14))
                 .submitLabel(.search)
                 .focused(isFocused)
                 .onSubmit {

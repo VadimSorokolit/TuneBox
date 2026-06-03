@@ -14,7 +14,7 @@ struct TrackCell: View {
     let onTap: () -> Void
 
     let cellCornerRadius: CGFloat = 10
-    let imageSize: CGFloat = 30
+    let imageSize: CGFloat = 35
     let imageCornerRadius: CGFloat = 10
 
     var body: some View {
@@ -32,13 +32,25 @@ struct TrackCell: View {
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text(track.songName)
-                            .font(.satoshiMedium14)
+                            .font(.satoshi.medium.size(14))
                             .lineLimit(1)
 
-                        Text(track.artistName)
-                            .font(.satoshiMedium12)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
+                        HStack(spacing: 6) {
+                            Text(track.artistName)
+                                .font(.satoshi.medium.size(12))
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+
+                            Text("•")
+                                .font(.satoshi.medium.size(12))
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+
+                            Text("\(track.formattedDuration)")
+                                .font(.jetBrainsMono.regular.size(10))
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                        }
                     }
                 }
 
@@ -147,6 +159,7 @@ struct TrackCell: View {
         id: "1",
         image: "https://usercontent.jamendo.com/?type=album&id=24&width=300&trackid=168",
         songName: "Believer",
+        duration: 200,
         artistName: "Imagine Dragons",
         albumName: "Evolve",
         releaseDate: "2017-02-01",

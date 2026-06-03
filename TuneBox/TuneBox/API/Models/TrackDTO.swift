@@ -85,6 +85,7 @@ struct TrackDTO: Identifiable, Decodable, Hashable {
     let id: String
     let image: String?
     let songName: String
+    let duration: Int?
     let artistName: String
     let albumName: String
     let releaseDate: String?
@@ -100,6 +101,7 @@ struct TrackDTO: Identifiable, Decodable, Hashable {
         image: String?,
         songName: String,
         artistName: String,
+        duration: Int?,
         albumName: String,
         releaseDate: String?,
         download: String?,
@@ -109,6 +111,7 @@ struct TrackDTO: Identifiable, Decodable, Hashable {
         self.id = id
         self.image = image
         self.songName = songName
+        self.duration = duration
         self.artistName = artistName
         self.albumName = albumName
         self.releaseDate = releaseDate
@@ -123,6 +126,7 @@ struct TrackDTO: Identifiable, Decodable, Hashable {
         id = try container.decode(String.self, forKey: .id)
         image = try container.decodeIfPresent(String.self, forKey: .image)
         songName = try container.decode(String.self, forKey: .songName)
+        duration = try container.decodeIfPresent(Int.self, forKey: .duration)
         artistName = try container.decode(String.self, forKey: .artistName)
         albumName = try container.decode(String.self, forKey: .albumName)
         releaseDate = try container.decodeIfPresent(String.self, forKey: .releaseDate)
@@ -166,6 +170,7 @@ struct TrackDTO: Identifiable, Decodable, Hashable {
         case waveform
         case image
         case songName = "name"
+        case duration
         case artistName = "artist_name"
         case albumName = "album_name"
         case releaseDate = "releasedate"
