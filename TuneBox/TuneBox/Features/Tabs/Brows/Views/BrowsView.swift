@@ -10,12 +10,20 @@ import SwiftUI
 
 struct BrowsView: View {
     @Injected var viewModel: TransferManaging
+    @FocusState private var isTextFieldFocused: Bool
+    @State private var searchQuery: String = ""
 
     var body: some View {
         VStack(spacing: 0) {
             HeaderView()
 
-            SearchView()
+            SearchCell(
+                searchQuery: $searchQuery,
+                isFocused: $isTextFieldFocused) {
+                    viewModel.loadSeachBy(query: searchQuery)
+                } onClear: {
+                    viewModel.clearSearch()
+                }
 
             MainView()
         }
@@ -25,6 +33,16 @@ struct BrowsView: View {
         )
         .onAppear {
             viewModel.loadFirstPopular()
+        }
+        .onChange(of: viewModel.selectedTab) { _, tab in
+            if tab != .brows {
+                searchQuery = ""
+                isTextFieldFocused = false
+                viewModel.clearSearch()
+            }
+        }
+        .onTapGesture {
+            isTextFieldFocused = false
         }
     }
 
@@ -71,18 +89,37 @@ struct BrowsView: View {
         @Injected var viewModel: TransferManaging
 
         var body: some View {
-            if viewModel.popularTracks.isEmpty == false {
-                ForEach(viewModel.popularTracks, id: \.id) { track in
-                    PopularCell(track: track) {
-                        Task {
-                            await viewModel.handleDownloadAction(for: track)
+            if viewModel.searchTracks.isEmpty == false {
+                ScrollView(.vertical, showsIndicators: false) {
+                    LazyVStack(spacing: 8) {
+                        ForEach(viewModel.searchTracks, id: \.id) { track in
+                            TrackCell(track: track) {
+                                Task {
+                                    await viewModel.handleDownloadAction(for: track)
+                                }
+                            }
                         }
                     }
                 }
-                .padding(.vertical, 5)
-
-                Spacer()
+                .padding(.top, 15)
+            } else {
+                if viewModel.popularTracks.isEmpty == false {
+                    ScrollView(.vertical, showsIndicators: false) {
+                        LazyVStack(spacing: 8) {
+                            ForEach(viewModel.popularTracks, id: \.id) { track in
+                                TrackCell(track: track) {
+                                    Task {
+                                        await viewModel.handleDownloadAction(for: track)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .padding(.top, 15)
+                }
             }
+
+            Spacer()
         }
     }
 

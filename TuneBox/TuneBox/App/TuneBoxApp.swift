@@ -17,7 +17,6 @@ struct TuneBoxApp: App {
 
     var body: some Scene {
         WindowGroup {
-//            ContentView()
             RootTabsView()
                 .environment(\.themeManager, themeManager)
                 .applyTheme(themeManager)

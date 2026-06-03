@@ -50,11 +50,12 @@ protocol TransferManaging:
 
     func loadFirstPopular()
     func loadFirstBy(genre: Genre?)
-    func loadSearch(query: String)
+    func loadSeachBy(query: String)
     func loadNextSearch()
     func loadNextPopular()
     func loadNextBy(genre: Genre?)
     func startDownload(_ track: TrackEntity) async
+    func clearSearch()
     func cancelAllDownloads()
     func resetTransferState() async
     func saveTransferState()
@@ -244,12 +245,30 @@ final class TransferViewModel: TransferManaging {
         }
     }
 
-    func loadSearch(query: String) {
+    func loadSeachBy(query: String) {
         self.searchQuery = query
         self.cancelSearchLoadTask()
 
+        guard query.count > 2 else {
+            self.searchTracks.removeAll()
+            self.offsetSearch = .zero
+            self.isSearchLoading = false
+            return
+        }
+
         self.searchLoadTask = Task { @MainActor [weak self] in
             guard let self else { return }
+
+            do {
+                try await Task.sleep(for: self.searchDebounceInterval)
+                try Task.checkCancellation()
+            } catch {
+                self.handleError(error)
+            }
+
+            guard self.searchQuery.count > 2 else {
+                return
+            }
 
             self.isSearchLoading = true
 
@@ -258,20 +277,16 @@ final class TransferViewModel: TransferManaging {
                 self.searchLoadTask = nil
             }
 
-            guard query.count > 2 else {
-                self.searchTracks.removeAll()
-                self.offsetSearch = .zero
-                return
-            }
-
             do {
                 self.offsetSearch = .zero
 
                 let dtos = try await self.networkService.searchTracks(
-                    query: query,
+                    query: self.searchQuery,
                     limit: self.limit,
                     offset: self.offsetSearch
                 )
+
+                try Task.checkCancellation()
 
                 let entities = dtos.map(TrackEntity.init)
                 let resolved = self.upsertAndResolve(entities)
@@ -377,6 +392,14 @@ final class TransferViewModel: TransferManaging {
         }
 
         await self.activateResumeDownload(track: track)
+    }
+
+    func clearSearch() {
+        self.cancelSearchLoadTask()
+        self.searchQuery = ""
+        self.searchTracks.removeAll()
+        self.offsetSearch = .zero
+        self.isSearchLoading = false
     }
 
     func cancelQueuedDownload(track: TrackEntity) {
@@ -585,6 +608,7 @@ final class TransferViewModel: TransferManaging {
 
     private let progressPersistStepBytes = 65_536
     private let estimatedTrackSizeFallback: Int = 10 * 1024 * 1024
+    private let searchDebounceInterval: Duration = .seconds(3)
 
     private var hasFreeDownloadSlot: Bool {
         self.inProgressTrackIDs.count < self.simultaneouslyLoadingCount

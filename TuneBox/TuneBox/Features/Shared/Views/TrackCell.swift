@@ -1,14 +1,14 @@
 //
-//  PopularsView.swift
+//  TrackCell.swift
 //  TuneBox
 //
-//  Created by Nintendo on 03.06.2026.
+//  Created by Vadim Sorokolit on 03.06.2026.
 //
 
 import SwiftUI
 import SDWebImageSwiftUI
 
-struct PopularCell: View {
+struct TrackCell: View {
     @Environment(\.themeManager) var theme
     let track: TrackEntity
     let onTap: () -> Void
@@ -157,7 +157,7 @@ struct PopularCell: View {
 
     track.downloadState = .idle
 
-    return PopularCell(
+    return TrackCell(
         track: track,
         onTap: {
             print("tap")
