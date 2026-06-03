@@ -43,6 +43,7 @@ final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
         super.init()
 
         self.configureAudioSession()
+        self.setupAudioSessionObservers()
     }
 
     // MARK: - Methods. Public
@@ -193,6 +194,22 @@ final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
 
     // MARK: - Methods. Private
 
+    private func setupAudioSessionObservers() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleAudioInterruption),
+            name: AVAudioSession.interruptionNotification,
+            object: AVAudioSession.sharedInstance()
+        )
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleAudioRouteChange),
+            name: AVAudioSession.routeChangeNotification,
+            object: AVAudioSession.sharedInstance()
+        )
+    }
+
     private func stopMainPlayer() {
         self.mainPlayer?.stop()
         self.mainPlayer = nil
@@ -243,5 +260,40 @@ final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
 
     private func clampVolume(_ value: Float) -> Float {
         max(0, min(1, value))
+    }
+
+    @objc
+    private func handleAudioInterruption(_ notification: Notification) {
+        guard
+            let typeValue = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt,
+            let type = AVAudioSession.InterruptionType(rawValue: typeValue)
+        else {
+            return
+        }
+
+        switch type {
+            case .began:
+                self.pause()
+
+            case .ended:
+                break
+
+            @unknown default:
+                break
+        }
+    }
+
+    @objc
+    private func handleAudioRouteChange(_ notification: Notification) {
+        guard
+            let reasonValue = notification.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt,
+            let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue)
+        else {
+            return
+        }
+
+        if reason == .oldDeviceUnavailable {
+            self.pause()
+        }
     }
 }
