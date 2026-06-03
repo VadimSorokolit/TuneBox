@@ -262,8 +262,12 @@ final class TransferViewModel: TransferManaging {
             do {
                 try await Task.sleep(for: self.searchDebounceInterval)
                 try Task.checkCancellation()
+            } catch is CancellationError {
+                AppLogger.network.debug("Search debounce cancelled")
+                return
             } catch {
                 self.handleError(error)
+                return
             }
 
             guard self.searchQuery.count > 2 else {
