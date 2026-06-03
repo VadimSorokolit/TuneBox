@@ -8,6 +8,11 @@
 import Foundation
 import SwiftData
 
+enum TrackSource: String {
+    case api
+    case imported
+}
+
 @Model
 final class TrackEntity {
     @Attribute(.unique)
@@ -26,6 +31,7 @@ final class TrackEntity {
     var downloadQueueIndex: Int?
     var genreRawValue: String?
     private var duration: Int?
+    private var sourceRawValue: String = TrackSource.api.rawValue
     private var downloadStateRawValue: String = DownloadState.idle.rawValue
     private var fileStateRawValue: String = FileStorageState.none.rawValue
 
@@ -49,6 +55,11 @@ final class TrackEntity {
         set {
             self.fileStateRawValue = newValue.rawValue
         }
+    }
+
+    var source: TrackSource {
+        get { TrackSource(rawValue: sourceRawValue) ?? .api }
+        set { sourceRawValue = newValue.rawValue }
     }
 
     var formattedDuration: String {
@@ -118,6 +129,7 @@ final class TrackEntity {
         isPopular: Bool? = nil,
         downloadingSize: Int = 0,
         genreRawValue: String? = nil,
+        sourceRawValue: String = TrackSource.api.rawValue,
         downloadStateRawValue: String = DownloadState.idle.rawValue,
         fileStateRawValue: String = FileStorageState.none.rawValue,
         downloadQueueIndex: Int? = nil
@@ -135,6 +147,7 @@ final class TrackEntity {
         self.isPopular = isPopular
         self.downloadingSize = downloadingSize
         self.genreRawValue = genreRawValue
+        self.sourceRawValue = sourceRawValue
         self.downloadStateRawValue = downloadStateRawValue
         self.fileStateRawValue = fileStateRawValue
         self.downloadQueueIndex = downloadQueueIndex
