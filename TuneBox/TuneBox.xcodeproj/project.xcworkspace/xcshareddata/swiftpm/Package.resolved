@@ -1,5 +1,5 @@
 {
-  "originHash" : "b7611b5754eca78889d277a2d0cb8f7523410f07f087b6497324a60d359594cf",
+  "originHash" : "48a067b46c04fec9c6bde845fb5709d9c7cbac8b38c85b8cb64e86f78544c029",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -71,6 +71,24 @@
       "state" : {
         "revision" : "132aea4f236ccadc51590b38af0357a331d51fa2",
         "version" : "6.10.2"
+      }
+    },
+    {
+      "identity" : "sdwebimage",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SDWebImage/SDWebImage.git",
+      "state" : {
+        "revision" : "2de3a496eaf6df9a1312862adcfd54acd73c39c0",
+        "version" : "5.21.7"
+      }
+    },
+    {
+      "identity" : "sdwebimageswiftui?utm_source=chatgpt.com",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SDWebImage/SDWebImageSwiftUI?utm_source=chatgpt.com",
+      "state" : {
+        "revision" : "0e331457ca9af2f0b08bcaa138a91ffb907b004f",
+        "version" : "3.1.4"
       }
     },
     {

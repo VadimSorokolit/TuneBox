@@ -29,7 +29,8 @@ struct ThemeTokens {
     let browsHeaderText: Color
     let clearAllDownloadsActive: Color
     let clearAllDownloadsInactive: Color
-    let cardBackground: Color
+    let cellBackground: Color
+    let cellBorder: Color
     let primaryText: Color
     let secondaryText: Color
     let accent: Color
@@ -46,7 +47,8 @@ extension ThemeTokens {
         browsHeaderText: Color(hex: 0x111111),
         clearAllDownloadsActive: Color(hex: 0xF28C26),
         clearAllDownloadsInactive: Color(hex: 0x666666),
-        cardBackground: Color(red: 0.96, green: 0.96, blue: 0.98),
+        cellBackground: Color(hex: 0xEFEFEF),
+        cellBorder: Color(hex: 0xE5E5E5),
         primaryText: .black,
         secondaryText: .gray,
         accent: Color(hex: 0x5E9C76),
@@ -61,7 +63,8 @@ extension ThemeTokens {
         browsHeaderText: Color(hex: 0x787878),
         clearAllDownloadsActive: Color(hex: 0xFFA633),
         clearAllDownloadsInactive: Color(hex: 0xA0A0A0),
-        cardBackground: Color(red: 0.12, green: 0.12, blue: 0.16),
+        cellBackground: Color(hex: 0x111111),
+        cellBorder: Color(hex: 0x262626),
         primaryText: .white,
         secondaryText: Color.gray.opacity(0.7),
         accent: Color(hex: 0x5E9C76),

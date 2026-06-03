@@ -9,6 +9,7 @@ import Resolver
 import SwiftUI
 
 struct BrowsView: View {
+    @Injected var viewModel: TransferManaging
 
     var body: some View {
         VStack(spacing: 0) {
@@ -22,6 +23,9 @@ struct BrowsView: View {
                maxHeight: .infinity,
                alignment: .top
         )
+        .onAppear {
+            viewModel.loadFirstPopular()
+        }
     }
 
     private struct HeaderView: View {
@@ -64,11 +68,21 @@ struct BrowsView: View {
     }
 
     private struct MainView: View {
+        @Injected var viewModel: TransferManaging
 
         var body: some View {
-            Text("")
+            if viewModel.popularTracks.isEmpty == false {
+                ForEach(viewModel.popularTracks, id: \.id) { track in
+                    PopularCell(track: track) {
+                        Task {
+                            await viewModel.handleDownloadAction(for: track)
+                        }
+                    }
+                }
+                .padding(.vertical, 5)
 
-            Spacer()
+                Spacer()
+            }
         }
     }
 

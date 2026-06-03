@@ -14,7 +14,7 @@ final class TrackEntity {
     var id: String
 
     var image: String?
-    var trackName: String
+    var songName: String
     var artistName: String
     var albumName: String
     var releaseDate: String?
@@ -68,7 +68,9 @@ final class TrackEntity {
             return nil
         }
 
-        return URL(string: image)
+        let normalizedImageURLString = image.replacingOccurrences(of: "\\/", with: "/")
+
+        return URL(string: normalizedImageURLString)
     }
 
     var downloadURL: URL? {
@@ -93,7 +95,7 @@ final class TrackEntity {
     init(
         id: String,
         image: String?,
-        trackName: String,
+        songName: String,
         artistName: String,
         albumName: String,
         releaseDate: String?,
@@ -109,7 +111,7 @@ final class TrackEntity {
     ) {
         self.id = id
         self.image = image
-        self.trackName = trackName
+        self.songName = songName
         self.artistName = artistName
         self.albumName = albumName
         self.releaseDate = releaseDate
@@ -131,7 +133,7 @@ extension TrackEntity {
         self.init(
             id: track.id,
             image: track.image,
-            trackName: track.trackName,
+            songName: track.songName,
             artistName: track.artistName,
             albumName: track.albumName,
             releaseDate: track.releaseDate,
@@ -144,7 +146,7 @@ extension TrackEntity {
     /// Merges API/catalog fields without touching transfer state
     func updateMetadata(from entity: TrackEntity) {
         self.image = entity.image
-        self.trackName = entity.trackName
+        self.songName = entity.songName
         self.artistName = entity.artistName
         self.albumName = entity.albumName
         self.releaseDate = entity.releaseDate

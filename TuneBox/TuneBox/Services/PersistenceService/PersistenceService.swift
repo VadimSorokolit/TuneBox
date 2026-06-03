@@ -86,7 +86,7 @@ final class PersistenceService: PersistenceServicing {
 
         let descriptor = FetchDescriptor<TrackEntity>(
             predicate: #Predicate<TrackEntity> {
-                $0.trackName.localizedStandardContains(query) ||
+                $0.songName.localizedStandardContains(query) ||
                 $0.artistName.localizedStandardContains(query) ||
                 $0.albumName.localizedStandardContains(query)
             },
