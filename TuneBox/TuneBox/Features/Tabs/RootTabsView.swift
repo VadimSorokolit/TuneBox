@@ -125,11 +125,16 @@ private struct TabItemView: View {
             }
         } label: {
             Image(systemName: isSelected ? tab.iconActive : tab.iconInactive)
-                .font(.system(size: 30, weight: .medium))
+                .font(.system(size: 30, weight: .ultraLight))
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(isSelected ? activeColor : inactiveColor)
-                .frame(width: iconWidth, height: iconWidth)
-                .scaleEffect(isSelected ? 1.12 : 1.0)
+                .frame(width: isSelected
+                       ? iconWidth + 5
+                       : iconWidth,
+                       height: isSelected
+                       ? iconWidth + 5
+                       : iconWidth
+                )
                 .animation(.spring(response: 0.28, dampingFraction: 0.78), value: isSelected)
                 .frame(maxWidth: .infinity)
         }

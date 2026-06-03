@@ -22,9 +22,7 @@ struct ContentView: View {
             VStack(spacing: 10) {
                 VStack {
                     Button(action: {
-                        Task {
-                            await transferViewModel.cancelAllDownloads()
-                        }
+                        transferViewModel.cancelAllDownloads()
                     }, label: {
                         Circle().fill(Color.orange)
                             .frame(width: 50, height: 50)

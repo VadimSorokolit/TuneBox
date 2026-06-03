@@ -13,6 +13,7 @@ protocol DownloadStateProviding: AnyObject {
     var genreTracks: [TrackEntity] { get }
     var searchTracks: [TrackEntity] { get }
     var inProgressTrackIDs: Set<String> { get }
+    var inProgressTracksCount: Int { get }
     var isLoading: Bool { get }
     var searchQuery: String { get set }
     var error: String? { get }

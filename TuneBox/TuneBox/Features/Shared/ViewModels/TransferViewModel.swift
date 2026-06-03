@@ -55,7 +55,7 @@ protocol TransferManaging:
     func loadNextPopular()
     func loadNextBy(genre: Genre?)
     func startDownload(_ track: TrackEntity) async
-    func cancelAllDownloads() async
+    func cancelAllDownloads()
     func resetTransferState() async
     func saveTransferState()
     func snapshotForTerminate() async
@@ -86,6 +86,10 @@ final class TransferViewModel: TransferManaging {
     private(set) var genre: Genre = .all
     var searchQuery: String = ""
     var selectedTab: CustomTab = .brows
+
+    var inProgressTracksCount: Int {
+        self.inProgressTrackIDs.count
+    }
 
     var isLoading: Bool {
         self.isPopularLoading || self.isGenreLoading || self.isSearchLoading
@@ -396,8 +400,10 @@ final class TransferViewModel: TransferManaging {
         await self.networkService.snapshotResumeDataForRelaunch()
     }
 
-    func cancelAllDownloads() async {
-        await self.networkService.cancelAllDownloads()
+    func cancelAllDownloads() {
+        Task {
+            await self.networkService.cancelAllDownloads()
+        }
         self.inProgressTrackIDs.removeAll()
         self.queuedDownloadTrackIDs.removeAll()
 
