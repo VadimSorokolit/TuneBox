@@ -22,11 +22,19 @@ The app allows users to browse, search, and download tracks using the [Jamendo A
 * Async Programming - **Structured Concurrency** `(async/await)`
 * Persistence - **SwiftData**
 * Dependency Injection - **Resolver**
-* Resources – SDWebImage
-* Audio Playback — AVFoundation
+* Resources – **SDWebImage**
+* Audio Playback — **AVFoundation**
 * Dependency Management - **Swift Package Manager**
 * Linting - **SwiftLint**
 * Unit Testing - **Swift Testing**
+
+## For Run:
+
+Download project from repository
+
+Build project (CMD+B)
+
+Run project (CMD+R)
 
 ## Notes
 
