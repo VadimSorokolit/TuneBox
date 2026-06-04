@@ -11,6 +11,8 @@ import SwiftUI
 struct BrowseView: View {
     @Injected var viewModel: TransferManaging
     @FocusState private var isTextFieldFocused: Bool
+    @State private var selectedGenre: Genre = .all
+    @State private var slideDirection: SlideDirection = .forward
     @State private var searchQuery: String = ""
 
     var body: some View {
@@ -25,7 +27,9 @@ struct BrowseView: View {
                     viewModel.clearSearch()
                 }
 
-            MainView()
+            MainView(selectedGenre: $selectedGenre,
+                     slideDirection: $slideDirection
+            )
         }
         .frame(maxWidth: .infinity,
                maxHeight: .infinity,
@@ -87,26 +91,15 @@ struct BrowseView: View {
 
     private struct MainView: View {
         @Injected var viewModel: TransferManaging
+        @Binding var selectedGenre: Genre
+        @Binding var slideDirection: SlideDirection
 
         var body: some View {
-            if viewModel.searchTracks.isEmpty == false {
-                ScrollView(.vertical, showsIndicators: false) {
-                    LazyVStack(spacing: 8) {
-                        ForEach(viewModel.searchTracks, id: \.id) { track in
-                            TrackCell(track: track) {
-                                Task {
-                                    await viewModel.handleDownloadAction(for: track)
-                                }
-                            }
-                        }
-                    }
-                }
-                .padding(.top, 15)
-            } else {
-                if viewModel.popularTracks.isEmpty == false {
+            VStack(spacing: 0) {
+                if viewModel.searchTracks.isEmpty == false {
                     ScrollView(.vertical, showsIndicators: false) {
                         LazyVStack(spacing: 8) {
-                            ForEach(viewModel.popularTracks, id: \.id) { track in
+                            ForEach(viewModel.searchTracks, id: \.id) { track in
                                 TrackCell(track: track) {
                                     Task {
                                         await viewModel.handleDownloadAction(for: track)
@@ -116,10 +109,44 @@ struct BrowseView: View {
                         }
                     }
                     .padding(.top, 15)
+                } else {
+                    VStack(spacing: 10) {
+                        SegmentedChipControl(
+                            items: Genre.allCases,
+                            selected: $selectedGenre,
+                            direction: $slideDirection
+                        )
+                        .padding(.top, 10)
+                        .onChange(of: selectedGenre) { _, genre in
+                            print("")
+                        }
+
+                        Rectangle()
+                            .fill(.gray)
+                            .frame(height: 200)
+                            .frame(maxWidth: .infinity)
+                            .padding(.horizontal)
+                    }
+
+                    if viewModel.popularTracks.isEmpty == false {
+                        ScrollView(.vertical, showsIndicators: false) {
+                            LazyVStack(spacing: 4) {
+                                ForEach(viewModel.popularTracks, id: \.id) { track in
+                                    TrackCell(track: track) {
+                                        Task {
+                                            await viewModel.handleDownloadAction(for: track)
+                                        }
+                                    }
+                                }
+                            }
+                            .padding(.bottom, 90)
+                        }
+                        .padding(.top, 15)
+                    }
+
+                    Spacer()
                 }
             }
-
-            Spacer()
         }
     }
 

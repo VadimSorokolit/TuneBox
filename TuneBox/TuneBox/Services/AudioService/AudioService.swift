@@ -197,14 +197,14 @@ final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
     private func setupAudioSessionObservers() {
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(handleAudioInterruption),
+            selector: #selector(self.handleAudioInterruption),
             name: AVAudioSession.interruptionNotification,
             object: AVAudioSession.sharedInstance()
         )
 
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(handleAudioRouteChange),
+            selector: #selector(self.handleAudioRouteChange),
             name: AVAudioSession.routeChangeNotification,
             object: AVAudioSession.sharedInstance()
         )
