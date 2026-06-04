@@ -75,7 +75,7 @@ struct BrowseView: View {
                 })
                 .disabled(viewModel.inProgressTracksCount == .zero)
             }
-            .padding(.horizontal)
+            .padding(.horizontal, 26)
         }
 
     }
@@ -111,6 +111,7 @@ struct BrowseView: View {
                             .onChange(of: selectedGenre) { _, genre in
                                 viewModel.loadFirstBy(genre: genre)
                             }
+                            .padding(.top, 10)
                             .padding(.top, 10)
 
                             Rectangle()
