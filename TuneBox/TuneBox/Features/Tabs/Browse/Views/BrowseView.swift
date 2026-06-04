@@ -80,15 +80,6 @@ struct BrowseView: View {
 
     }
 
-    private struct SearchView: View {
-
-        var body: some View {
-            Text("")
-                .padding(.top, 10)
-        }
-
-    }
-
     private struct MainView: View {
         @Injected var viewModel: TransferManaging
         @Binding var selectedGenre: Genre
@@ -107,44 +98,50 @@ struct BrowseView: View {
                                 }
                             }
                         }
+                        .padding(.bottom, 100)
                     }
-                    .padding(.top, 15)
                 } else {
-                    VStack(spacing: 10) {
-                        SegmentedChipControl(
-                            items: Genre.allCases,
-                            selected: $selectedGenre,
-                            direction: $slideDirection
-                        )
-                        .padding(.top, 10)
-                        .onChange(of: selectedGenre) { _, genre in
-                            print("")
-                        }
+                    ScrollView(.vertical, showsIndicators: false) {
+                        LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
+                            SegmentedChipControl(
+                                items: Genre.allCases,
+                                selected: $selectedGenre,
+                                direction: $slideDirection
+                            )
+                            .onChange(of: selectedGenre) { _, genre in
+                                viewModel.loadFirstBy(genre: genre)
+                            }
+                            .padding(.top, 10)
 
-                        Rectangle()
-                            .fill(.gray)
-                            .frame(height: 200)
-                            .frame(maxWidth: .infinity)
-                            .padding(.horizontal)
-                    }
+                            Rectangle()
+                                .fill(.gray)
+                                .frame(height: 200)
+                                .frame(maxWidth: .infinity)
+                                .padding(.horizontal)
+                                .padding(.top, 10)
 
-                    if viewModel.popularTracks.isEmpty == false {
-                        ScrollView(.vertical, showsIndicators: false) {
-                            LazyVStack(spacing: 4) {
-                                ForEach(viewModel.popularTracks, id: \.id) { track in
-                                    TrackCell(track: track) {
-                                        Task {
-                                            await viewModel.handleDownloadAction(for: track)
+                            Section {
+                                VStack(spacing: 4) {
+                                    ForEach(viewModel.popularTracks, id: \.id) { track in
+                                        TrackCell(track: track) {
+                                            Task {
+                                                await viewModel.handleDownloadAction(for: track)
+                                            }
                                         }
                                     }
                                 }
+                            } header: {
+                                Text("Popular")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.leading)
+                                    .padding(.vertical, 10)
+                                    .background(Color(.systemBackground))
+                                    .foregroundStyle(Color(.label))
+                                    .font(.headline)
                             }
-                            .padding(.bottom, 90)
                         }
-                        .padding(.top, 15)
+                        .padding(.bottom, 100)
                     }
-
-                    Spacer()
                 }
             }
         }
