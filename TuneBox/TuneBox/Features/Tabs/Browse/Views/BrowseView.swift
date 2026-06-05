@@ -22,7 +22,7 @@ struct BrowseView: View {
             SearchCell(
                 searchQuery: $searchQuery,
                 isFocused: $isTextFieldFocused) {
-                    viewModel.loadSeachBy(query: searchQuery)
+                    viewModel.loadSearchBy(query: searchQuery)
                 } onClear: {
                     viewModel.clearSearchState()
                 }
@@ -224,7 +224,7 @@ struct BrowseView: View {
             }
             .refreshable {
                 if viewModel.searchTracks.isNotEmpty {
-                    viewModel.loadSeachBy(query: viewModel.searchQuery)
+                    viewModel.loadSearchBy(query: viewModel.searchQuery)
                 } else {
                     viewModel.loadFirstPopular()
                     if selectedGenre != .all {

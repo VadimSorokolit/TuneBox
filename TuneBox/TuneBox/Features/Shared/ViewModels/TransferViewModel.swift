@@ -50,7 +50,7 @@ protocol TransferManaging:
 
     func loadFirstPopular()
     func loadFirstBy(genre: Genre?)
-    func loadSeachBy(query: String)
+    func loadSearchBy(query: String)
     func loadNextSearch()
     func loadNextPopular()
     func loadNextBy(genre: Genre?)
@@ -252,7 +252,7 @@ final class TransferViewModel: TransferManaging {
         }
     }
 
-    func loadSeachBy(query: String) {
+    func loadSearchBy(query: String) {
         self.reachedSearchTracksEnd = false
         self.offsetSearch = .zero
         self.searchQuery = query

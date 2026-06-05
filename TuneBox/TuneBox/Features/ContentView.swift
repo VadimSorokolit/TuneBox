@@ -36,7 +36,7 @@ struct ContentView: View {
                         Button(action: {
                             transferViewModel.loadFirstPopular()
                             transferViewModel.loadFirstBy(genre: nil)
-                            transferViewModel.loadSeachBy(query: "Love")
+                            transferViewModel.loadSearchBy(query: "Love")
                         }, label: {
                             Circle().fill(Color.yellow)
                                 .frame(width: 50, height: 50)
@@ -145,7 +145,7 @@ struct ContentView: View {
         .onAppear {
             transferViewModel.loadFirstPopular()
             transferViewModel.loadFirstBy(genre: nil)
-            transferViewModel.loadSeachBy(query: "love")
+            transferViewModel.loadSearchBy(query: "love")
         }
         // Only for test!!!
         .onChange(of: transferViewModel.popularTracks) { _, tracks in
@@ -160,7 +160,7 @@ struct ContentView: View {
         }
         .onChange(of: transferViewModel.searchTracks) { _, tracks in
             if tracks.isEmpty {
-                transferViewModel.loadSeachBy(query: "love")
+                transferViewModel.loadSearchBy(query: "love")
                 print(transferViewModel.searchTracks.count)
             }
         }
