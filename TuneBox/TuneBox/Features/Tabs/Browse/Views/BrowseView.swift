@@ -8,10 +8,6 @@
 import Resolver
 import SwiftUI
 
-private enum ScrollAnchor: Hashable {
-    case top
-}
-
 struct BrowseView: View {
     @Injected var viewModel: TransferManaging
     @FocusState private var isTextFieldFocused: Bool
@@ -118,16 +114,14 @@ struct BrowseView: View {
                         .padding(.bottom, 100)
                     }
                 } else {
-                    ScrollViewReader { proxy in
-                        ScrollView(.vertical, showsIndicators: false) {
-                            LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
-                                SegmentedChipControl(
-                                    items: Genre.allCases,
-                                    selected: $selectedGenre,
-                                    direction: $slideDirection
-                                )
-                                .id(ScrollAnchor.top)
-                                .padding(.top, 10)
+                    ScrollView(.vertical, showsIndicators: false) {
+                        LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
+                            SegmentedChipControl(
+                                items: Genre.allCases,
+                                selected: $selectedGenre,
+                                direction: $slideDirection
+                            )
+                            .padding(.top, 10)
 
                                 if viewModel.genreTracks.isEmpty,
                                    viewModel.popularTracks.isEmpty,
@@ -205,13 +199,10 @@ struct BrowseView: View {
                                 }
                                 }
                             }
-                        }
-                        .onChange(of: selectedGenre) { _, genre in
-                            viewModel.loadFirstBy(genre: genre)
-                            withAnimation(.easeInOut(duration: 0.25)) {
-                                proxy.scrollTo(ScrollAnchor.top, anchor: .top)
-                            }
-                        }
+                    }
+                    .id(selectedGenre)
+                    .onChange(of: selectedGenre) { _, genre in
+                        viewModel.loadFirstBy(genre: genre)
                     }
                 }
             }
