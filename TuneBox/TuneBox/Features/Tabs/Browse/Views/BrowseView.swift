@@ -106,7 +106,7 @@ struct BrowseView: View {
 
                                     if let index = viewModel.searchTracks.firstIndex(where: { $0.id == track.id }),
                                        index >= thresholdIndex {
-                                        viewModel.loadNextBy(genre: selectedGenre)
+                                        viewModel.loadNextSearch()
                                     }
                                 }
                             }
