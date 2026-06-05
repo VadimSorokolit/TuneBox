@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		5B0F630F2FADDB9E006F3555 /* StorageServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0F630E2FADDB9D006F3555 /* StorageServiceTests.swift */; };
+		5B0FD0C22FD2B18600753D3A /* GenreCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0FD0C12FD2B18500753D3A /* GenreCell.swift */; };
 		5B11C3372FB500AC0089BAD2 /* DownloadStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11C3362FB500AB0089BAD2 /* DownloadStore.swift */; };
 		5B11C33B2FB719A80089BAD2 /* TrackEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11C33A2FB719A60089BAD2 /* TrackEntity.swift */; };
 		5B11C3412FB728390089BAD2 /* PersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11C3402FB728380089BAD2 /* PersistenceService.swift */; };
@@ -116,6 +117,7 @@
 
 /* Begin PBXFileReference section */
 		5B0F630E2FADDB9D006F3555 /* StorageServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageServiceTests.swift; sourceTree = "<group>"; };
+		5B0FD0C12FD2B18500753D3A /* GenreCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreCell.swift; sourceTree = "<group>"; };
 		5B11C3362FB500AB0089BAD2 /* DownloadStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadStore.swift; sourceTree = "<group>"; };
 		5B11C33A2FB719A60089BAD2 /* TrackEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackEntity.swift; sourceTree = "<group>"; };
 		5B11C3402FB728380089BAD2 /* PersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceService.swift; sourceTree = "<group>"; };
@@ -566,6 +568,7 @@
 		5B9C3DF82FD03D9700138645 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
+				5B0FD0C12FD2B18500753D3A /* GenreCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -948,6 +951,7 @@
 				5B586CB52FAC618500BCEAD2 /* FileManagerService.swift in Sources */,
 				5B1875C92FD084CB00D8A042 /* SegmentedChipControl.swift in Sources */,
 				5B899F782FCF13A8002D3232 /* RootTabsView.swift in Sources */,
+				5B0FD0C22FD2B18600753D3A /* GenreCell.swift in Sources */,
 				5BD579A12FAB25E300503BA2 /* ContentView.swift in Sources */,
 				5BD0DAF72FBF6BA000268A48 /* AudioService.swift in Sources */,
 				5B3FEB472FB4548600DC1562 /* DownloadsView.swift in Sources */,

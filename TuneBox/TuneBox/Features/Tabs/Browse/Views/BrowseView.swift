@@ -54,6 +54,8 @@ struct BrowseView: View {
         @Injected var viewModel: TransferManaging
         @Environment(\.themeManager) private var theme
 
+        private let horizontalPadding: CGFloat = 26
+
         var body: some View {
             HStack {
                 Text("Discover")
@@ -75,7 +77,7 @@ struct BrowseView: View {
                 })
                 .disabled(viewModel.inProgressTracksCount == .zero)
             }
-            .padding(.horizontal, 26)
+            .padding(.horizontal, horizontalPadding)
         }
 
     }
@@ -84,6 +86,8 @@ struct BrowseView: View {
         @Injected var viewModel: TransferManaging
         @Binding var selectedGenre: Genre
         @Binding var slideDirection: SlideDirection
+
+        private let headerLeadingPadding: CGFloat = 26
 
         var body: some View {
             VStack(spacing: 0) {
@@ -101,47 +105,76 @@ struct BrowseView: View {
                         .padding(.bottom, 100)
                     }
                 } else {
-                    ScrollView(.vertical, showsIndicators: false) {
-                        LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
-                            SegmentedChipControl(
-                                items: Genre.allCases,
-                                selected: $selectedGenre,
-                                direction: $slideDirection
-                            )
-                            .onChange(of: selectedGenre) { _, genre in
-                                viewModel.loadFirstBy(genre: genre)
-                            }
-                            .padding(.top, 10)
-                            .padding(.top, 10)
-
-                            Rectangle()
-                                .fill(.gray)
-                                .frame(height: 200)
-                                .frame(maxWidth: .infinity)
-                                .padding(.horizontal)
+                        ScrollView(.vertical, showsIndicators: false) {
+                            LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
+                                SegmentedChipControl(
+                                    items: Genre.allCases,
+                                    selected: $selectedGenre,
+                                    direction: $slideDirection
+                                )
+                                .onChange(of: selectedGenre) { _, genre in
+                                    viewModel.loadFirstBy(genre: genre)
+                                }
                                 .padding(.top, 10)
 
-                            Section {
-                                VStack(spacing: 4) {
-                                    ForEach(viewModel.popularTracks, id: \.id) { track in
-                                        TrackCell(track: track) {
-                                            Task {
-                                                await viewModel.handleDownloadAction(for: track)
+                                if viewModel.genreTracks.isEmpty, viewModel.popularTracks.isEmpty {
+                                    ContentUnavailableView(
+                                        "Connection issue",
+                                        systemImage: "wifi.slash",
+                                        description: Text("Check your internet connection")
+                                    )
+                                } else {
+                                if viewModel.genreTracks.isEmpty == false {
+                                    Section {
+                                        ScrollView(.horizontal, showsIndicators: false) {
+                                            HStack(spacing: 8) {
+                                                ForEach(viewModel.genreTracks, id: \.id) { track in
+                                                    GenreCell(track: track) {
+                                                        Task {
+                                                            await viewModel.handleDownloadAction(for: track)
+                                                        }
+                                                    }
+                                                }
                                             }
+                                            .padding(.horizontal)
                                         }
+                                    } header: {
+                                        Text("Featured")
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .padding(.leading, headerLeadingPadding)
+                                            .padding(.vertical, 10)
+                                            .background(Color(.systemBackground))
+                                            .foregroundStyle(Color(.label))
+                                            .font(.headline)
                                     }
                                 }
-                            } header: {
-                                Text("Popular")
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .padding(.leading)
-                                    .padding(.vertical, 10)
-                                    .background(Color(.systemBackground))
-                                    .foregroundStyle(Color(.label))
-                                    .font(.headline)
+
+                                if viewModel.popularTracks.isEmpty == false {
+                                    Section {
+                                        VStack(spacing: 4) {
+                                            ForEach(viewModel.popularTracks, id: \.id) { track in
+                                                TrackCell(track: track) {
+                                                    Task {
+                                                        await viewModel.handleDownloadAction(for: track)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } header: {
+                                        Text("Popular")
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .padding(.leading, headerLeadingPadding)
+                                            .padding(.vertical, 10)
+                                            .background(Color(.systemBackground))
+                                            .foregroundStyle(Color(.label))
+                                            .font(.headline)
+                                    }
+
+                                    Color.clear
+                                        .padding(.bottom, 100)
+                                }
                             }
                         }
-                        .padding(.bottom, 100)
                     }
                 }
             }
