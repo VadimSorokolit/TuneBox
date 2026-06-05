@@ -89,16 +89,19 @@ struct GenreCell: View {
         let progress = min(max(track.downloadingProgress, 0), 1)
 
         return ZStack {
-            Circle()
-                .stroke(Color.secondary.opacity(0.4), lineWidth: 1.2)
+            if track.downloadState != .completed,
+               track.downloadState != .idle {
+                Circle()
+                    .stroke(Color.secondary.opacity(0.4), lineWidth: 1.2)
 
-            Circle()
-                .trim(from: 0, to: progress)
-                .stroke(
-                    Color.green,
-                    style: StrokeStyle(lineWidth: 2, lineCap: .round)
-                )
-                .rotationEffect(.degrees(-90))
+                Circle()
+                    .trim(from: 0, to: progress)
+                    .stroke(
+                        Color.green,
+                        style: StrokeStyle(lineWidth: 2, lineCap: .round)
+                    )
+                    .rotationEffect(.degrees(-90))
+            }
 
             stateImage
                 .font(.system(size: 10, weight: .medium))

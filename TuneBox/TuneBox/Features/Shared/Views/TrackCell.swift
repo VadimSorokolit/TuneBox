@@ -60,23 +60,26 @@ struct TrackCell: View {
                     onTap()
                 }, label: {
                     ZStack {
-                        Circle()
-                            .foregroundStyle(.clear)
-                            .overlay(
-                                Circle()
-                                    .stroke(Color.white, lineWidth: 0.8)
-                            )
-
-                        Circle()
-                            .trim(from: 0, to: track.downloadingProgress)
-                            .stroke(
-                                Color.green,
-                                style: StrokeStyle(
-                                    lineWidth: 1,
-                                    lineCap: .round
+                        if track.downloadState != .completed,
+                           track.downloadState != .idle {
+                            Circle()
+                                .foregroundStyle(.clear)
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.white, lineWidth: 0.8)
                                 )
-                            )
-                            .rotationEffect(.degrees(-90))
+
+                            Circle()
+                                .trim(from: 0, to: track.downloadingProgress)
+                                .stroke(
+                                    Color.green,
+                                    style: StrokeStyle(
+                                        lineWidth: 1,
+                                        lineCap: .round
+                                    )
+                                )
+                                .rotationEffect(.degrees(-90))
+                        }
 
                         buttonImage
                             .font(.system(size: 10, weight: .medium))
