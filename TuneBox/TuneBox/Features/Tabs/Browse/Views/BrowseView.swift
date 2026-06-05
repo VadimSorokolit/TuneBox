@@ -24,7 +24,7 @@ struct BrowseView: View {
                 isFocused: $isTextFieldFocused) {
                     viewModel.loadSeachBy(query: searchQuery)
                 } onClear: {
-                    viewModel.clearSearch()
+                    viewModel.clearSearchState()
                 }
 
             MainView(selectedGenre: $selectedGenre,
@@ -43,7 +43,7 @@ struct BrowseView: View {
             if tab != .browse {
                 searchQuery = ""
                 isTextFieldFocused = false
-                viewModel.clearSearch()
+                viewModel.clearSearchState()
             }
         }
         .onTapGesture {

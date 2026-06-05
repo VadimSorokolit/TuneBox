@@ -55,7 +55,7 @@ protocol TransferManaging:
     func loadNextPopular()
     func loadNextBy(genre: Genre?)
     func startDownload(_ track: TrackEntity) async
-    func clearSearch()
+    func clearSearchState()
     func cancelAllDownloads()
     func resetTransferState() async
     func saveTransferState()
@@ -77,14 +77,17 @@ final class TransferViewModel: TransferManaging {
     private(set) var popularTracks: [TrackEntity] = []
     private(set) var genreTracks: [TrackEntity] = []
     private(set) var searchTracks: [TrackEntity] = []
-    private(set) var isPopularLoading = false
-    private(set) var isGenreLoading = false
-    private(set) var isSearchLoading = false
-    private(set) var error: String?
     private(set) var inProgressTrackIDs: Set<String> = []
+    private(set) var error: String?
     private(set) var simultaneouslyLoadingCount: Int = SimultaneouslyLoadingCount.two.rawValue
     private(set) var reservedSpace: ReservedSpace = .oneGB
     private(set) var genre: Genre = .all
+    private(set) var isPopularLoading = false
+    private(set) var isGenreLoading = false
+    private(set) var isSearchLoading = false
+    private(set) var reachedPopularTracksEnd = false
+    private(set) var reachedGenreTracksEnd = false
+    private(set) var reachedSearchTracksEnd = false
     var searchQuery: String = ""
     var selectedTab: CustomTab = .browse
 
@@ -103,6 +106,8 @@ final class TransferViewModel: TransferManaging {
     // MARK: - Methods. Public
 
     func loadFirstPopular() {
+        self.reachedPopularTracksEnd = false
+        self.offsetPopular = .zero
         self.cancelPopularLoadTask()
 
         self.popularLoadTask = Task { @MainActor [weak self] in
@@ -125,6 +130,8 @@ final class TransferViewModel: TransferManaging {
                     try await self.loadPopularInitialTracks()
                 } else {
                     self.popularTracks = persistedEntities
+                    self.offsetPopular = persistedEntities.count
+
                     await self.restoreFromPersistedState(self.popularTracks)
                 }
             } catch is CancellationError {
@@ -136,7 +143,8 @@ final class TransferViewModel: TransferManaging {
     }
 
     func loadNextPopular() {
-        guard self.isPopularLoading == false else {
+        guard self.isPopularLoading == false,
+              self.reachedPopularTracksEnd == false else {
             return
         }
 
@@ -154,6 +162,10 @@ final class TransferViewModel: TransferManaging {
 
             let newTracks = await self.loadPopularTracks(offset: self.offsetPopular)
 
+            if newTracks.count < self.limit {
+                self.reachedPopularTracksEnd = true
+            }
+
             guard newTracks.isNotEmpty else {
                 return
             }
@@ -164,6 +176,10 @@ final class TransferViewModel: TransferManaging {
     }
 
     func loadFirstBy(genre: Genre?) {
+        self.reachedGenreTracksEnd = false
+        self.genreTracks.removeAll()
+        self.offsetGenre = .zero
+
         self.cancelGenreLoadTask()
 
         let selectedGenre = genre ?? .all
@@ -189,9 +205,10 @@ final class TransferViewModel: TransferManaging {
                 if persistedEntities.isEmpty {
                     try await self.loadGenreInitialTracks(genre: selectedGenre)
                 } else {
-                    self.popularTracks = persistedEntities
-                    self.offsetPopular = persistedEntities.count
-                    await self.restoreFromPersistedState(self.popularTracks)
+                    self.genreTracks = persistedEntities
+                    self.offsetGenre = persistedEntities.count
+
+                    await self.restoreFromPersistedState(self.genreTracks)
                 }
             } catch is CancellationError {
                 AppLogger.network.debug("Load cancelled")
@@ -202,7 +219,8 @@ final class TransferViewModel: TransferManaging {
     }
 
     func loadNextBy(genre: Genre?) {
-        guard self.isGenreLoading == false else {
+        guard self.isGenreLoading == false,
+              self.reachedGenreTracksEnd == false else {
             return
         }
 
@@ -222,22 +240,21 @@ final class TransferViewModel: TransferManaging {
                 self.genreLoadTask = nil
             }
 
-            do {
-                _ = await self.loadTracksBy(
-                    genre: apiGenre,
-                    offset: self.offsetGenre,
-                    appendToGenreTracks: true
-                )
-                try Task.checkCancellation()
-            } catch is CancellationError {
-                AppLogger.network.debug("Load cancelled")
-            } catch {
-                self.handleError(error)
+            let newTracks = await self.loadTracksBy(
+                genre: apiGenre,
+                offset: self.offsetGenre,
+                appendToGenreTracks: true
+            )
+
+            if newTracks.count < self.limit {
+                self.reachedGenreTracksEnd = true
             }
         }
     }
 
     func loadSeachBy(query: String) {
+        self.reachedSearchTracksEnd = false
+        self.offsetSearch = .zero
         self.searchQuery = query
         self.cancelSearchLoadTask()
 
@@ -298,15 +315,14 @@ final class TransferViewModel: TransferManaging {
     }
 
     func loadNextSearch() {
-        guard self.isSearchLoading == false else {
+        guard self.isSearchLoading == false,
+              self.reachedSearchTracksEnd == false else {
             return
         }
 
         guard self.searchQuery.count > 2 else {
             return
         }
-
-        self.cancelSearchLoadTask()
 
         self.searchLoadTask = Task { @MainActor [weak self] in
             guard let self else {
@@ -329,6 +345,10 @@ final class TransferViewModel: TransferManaging {
 
                 let entities = dtos.map(TrackEntity.init)
                 let resolved = self.upsertAndResolve(entities)
+
+                if resolved.count < self.limit {
+                    self.reachedSearchTracksEnd = true
+                }
 
                 self.mergeTracks(resolved, into: &self.searchTracks)
                 self.offsetSearch += resolved.count
@@ -390,8 +410,9 @@ final class TransferViewModel: TransferManaging {
         await self.activateResumeDownload(track: track)
     }
 
-    func clearSearch() {
+    func clearSearchState() {
         self.cancelSearchLoadTask()
+        self.reachedSearchTracksEnd = false
         self.searchQuery = ""
         self.searchTracks.removeAll()
         self.offsetSearch = .zero
