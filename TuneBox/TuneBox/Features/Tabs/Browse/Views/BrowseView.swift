@@ -181,6 +181,18 @@ struct BrowseView: View {
                     }
                 }
             }
+            .refreshable {
+                if viewModel.searchTracks.isNotEmpty {
+                    viewModel.loadSeachBy(query: viewModel.searchQuery)
+                } else {
+                    viewModel.loadFirstPopular()
+                    if selectedGenre != .all {
+                        viewModel.loadFirstBy(genre: selectedGenre)
+                    } else {
+                        viewModel.loadFirstBy(genre: nil)
+                    }
+                }
+            }
         }
     }
 
