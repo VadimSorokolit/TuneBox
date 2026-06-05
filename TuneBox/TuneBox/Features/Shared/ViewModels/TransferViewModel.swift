@@ -140,8 +140,6 @@ final class TransferViewModel: TransferManaging {
             return
         }
 
-        self.cancelPopularLoadTask()
-
         self.popularLoadTask = Task { @MainActor [weak self] in
             guard let self else {
                 return
@@ -154,18 +152,14 @@ final class TransferViewModel: TransferManaging {
                 self.popularLoadTask = nil
             }
 
-            do {
-                let newTracks = await self.loadPopularTracks(offset: self.offsetPopular)
-                try Task.checkCancellation()
+            let newTracks = await self.loadPopularTracks(offset: self.offsetPopular)
 
-                self.popularTracks.append(contentsOf: newTracks)
-
-                self.offsetPopular += newTracks.count
-            } catch is CancellationError {
-                AppLogger.network.debug("Load cancelled")
-            } catch {
-                self.handleError(error)
+            guard newTracks.isNotEmpty else {
+                return
             }
+
+            self.mergeTracks(newTracks, into: &self.popularTracks)
+            self.offsetPopular += newTracks.count
         }
     }
 
@@ -195,9 +189,9 @@ final class TransferViewModel: TransferManaging {
                 if persistedEntities.isEmpty {
                     try await self.loadGenreInitialTracks(genre: selectedGenre)
                 } else {
-                    self.genreTracks = persistedEntities
-                    self.offsetGenre = persistedEntities.count
-                    await self.restoreFromPersistedState(self.genreTracks)
+                    self.popularTracks = persistedEntities
+                    self.offsetPopular = persistedEntities.count
+                    await self.restoreFromPersistedState(self.popularTracks)
                 }
             } catch is CancellationError {
                 AppLogger.network.debug("Load cancelled")
@@ -211,8 +205,6 @@ final class TransferViewModel: TransferManaging {
         guard self.isGenreLoading == false else {
             return
         }
-
-        self.cancelGenreLoadTask()
 
         let resolvedGenre = genre ?? self.genre
         self.genre = resolvedGenre
@@ -589,7 +581,7 @@ final class TransferViewModel: TransferManaging {
      Note: `@Observable` already skips `let` constants automatically.
      */
 
-    private let limit: Int = 8
+    private let limit: Int = 30
     private let networkService: NetworkServicing
     private let persistenceService: PersistenceServicing
     private let storageService: FileManagerServicing
@@ -724,14 +716,13 @@ final class TransferViewModel: TransferManaging {
             let resolved = self.upsertAndResolve(entities)
 
             if appendToGenreTracks {
-                self.genreTracks.append(contentsOf: resolved)
+                self.mergeTracks(resolved, into: &self.genreTracks)
                 self.offsetGenre += resolved.count
             }
 
             return resolved
         } catch {
             self.handleError(error)
-
             return []
         }
     }

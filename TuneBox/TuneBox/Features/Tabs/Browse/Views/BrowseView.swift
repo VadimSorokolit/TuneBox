@@ -101,6 +101,14 @@ struct BrowseView: View {
                                         await viewModel.handleDownloadAction(for: track)
                                     }
                                 }
+                                .onAppear {
+                                    let thresholdIndex = max(0, viewModel.searchTracks.count - 3)
+
+                                    if let index = viewModel.searchTracks.firstIndex(where: { $0.id == track.id }),
+                                       index >= thresholdIndex {
+                                        viewModel.loadNextBy(genre: selectedGenre)
+                                    }
+                                }
                             }
                         }
                         .padding(.bottom, 100)
@@ -130,13 +138,21 @@ struct BrowseView: View {
                                 if viewModel.genreTracks.isNotEmpty {
                                     Section {
                                         ScrollView(.horizontal, showsIndicators: false) {
-                                            HStack(spacing: 8) {
+                                            LazyHStack(spacing: 8) {
                                                 ForEach(viewModel.genreTracks, id: \.id) { track in
                                                     GenreCell(track: track) {
                                                         Task {
                                                             await viewModel.handleDownloadAction(for: track)
                                                         }
                                                     }
+                                                        .onAppear {
+                                                            let thresholdIndex = max(0, viewModel.genreTracks.count - 3)
+
+                                                            if let index = viewModel.genreTracks.firstIndex(where: { $0.id == track.id }),
+                                                               index >= thresholdIndex {
+                                                                viewModel.loadNextBy(genre: selectedGenre)
+                                                            }
+                                                        }
                                                 }
                                             }
                                             .padding(.horizontal)
@@ -154,11 +170,18 @@ struct BrowseView: View {
 
                                 if viewModel.popularTracks.isNotEmpty {
                                     Section {
-                                        VStack(spacing: 4) {
+                                        LazyVStack(spacing: 4) {
                                             ForEach(viewModel.popularTracks, id: \.id) { track in
                                                 TrackCell(track: track) {
                                                     Task {
                                                         await viewModel.handleDownloadAction(for: track)
+                                                    }
+                                                }
+                                                .onAppear {
+                                                    let thresholdIndex = max(0, viewModel.popularTracks.count - 3)
+                                                    if let index = viewModel.popularTracks.firstIndex(where: { $0.id == track.id }),
+                                                       index >= thresholdIndex {
+                                                        viewModel.loadNextPopular()
                                                     }
                                                 }
                                             }
