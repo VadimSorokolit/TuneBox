@@ -8,6 +8,10 @@
 import Resolver
 import SwiftUI
 
+private enum ScrollAnchor: Hashable {
+    case top
+}
+
 struct BrowseView: View {
     @Injected var viewModel: TransferManaging
     @FocusState private var isTextFieldFocused: Bool
@@ -114,6 +118,7 @@ struct BrowseView: View {
                         .padding(.bottom, 100)
                     }
                 } else {
+                    ScrollViewReader { proxy in
                         ScrollView(.vertical, showsIndicators: false) {
                             LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
                                 SegmentedChipControl(
@@ -121,9 +126,7 @@ struct BrowseView: View {
                                     selected: $selectedGenre,
                                     direction: $slideDirection
                                 )
-                                .onChange(of: selectedGenre) { _, genre in
-                                    viewModel.loadFirstBy(genre: genre)
-                                }
+                                .id(ScrollAnchor.top)
                                 .padding(.top, 10)
 
                                 if viewModel.genreTracks.isEmpty,
@@ -157,6 +160,7 @@ struct BrowseView: View {
                                             }
                                             .padding(.horizontal)
                                         }
+                                        .id(selectedGenre)
                                     } header: {
                                         Text("Featured")
                                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -199,6 +203,13 @@ struct BrowseView: View {
                                     Color.clear
                                         .padding(.bottom, 100)
                                 }
+                                }
+                            }
+                        }
+                        .onChange(of: selectedGenre) { _, genre in
+                            viewModel.loadFirstBy(genre: genre)
+                            withAnimation(.easeInOut(duration: 0.25)) {
+                                proxy.scrollTo(ScrollAnchor.top, anchor: .top)
                             }
                         }
                     }
