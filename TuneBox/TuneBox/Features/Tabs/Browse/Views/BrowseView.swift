@@ -37,6 +37,7 @@ struct BrowseView: View {
         )
         .onAppear {
             viewModel.loadFirstPopular()
+            viewModel.loadFirstBy(genre: nil)
         }
         .onChange(of: viewModel.selectedTab) { _, tab in
             if tab != .browse {
@@ -91,7 +92,7 @@ struct BrowseView: View {
 
         var body: some View {
             VStack(spacing: 0) {
-                if viewModel.searchTracks.isEmpty == false {
+                if viewModel.searchTracks.isNotEmpty {
                     ScrollView(.vertical, showsIndicators: false) {
                         LazyVStack(spacing: 8) {
                             ForEach(viewModel.searchTracks, id: \.id) { track in
@@ -117,14 +118,16 @@ struct BrowseView: View {
                                 }
                                 .padding(.top, 10)
 
-                                if viewModel.genreTracks.isEmpty, viewModel.popularTracks.isEmpty {
+                                if viewModel.genreTracks.isEmpty,
+                                   viewModel.popularTracks.isEmpty,
+                                   viewModel.isLoading.isFalse {
                                     ContentUnavailableView(
                                         "Connection issue",
                                         systemImage: "wifi.slash",
                                         description: Text("Check your internet connection")
                                     )
                                 } else {
-                                if viewModel.genreTracks.isEmpty == false {
+                                if viewModel.genreTracks.isNotEmpty {
                                     Section {
                                         ScrollView(.horizontal, showsIndicators: false) {
                                             HStack(spacing: 8) {
@@ -149,7 +152,7 @@ struct BrowseView: View {
                                     }
                                 }
 
-                                if viewModel.popularTracks.isEmpty == false {
+                                if viewModel.popularTracks.isNotEmpty {
                                     Section {
                                         VStack(spacing: 4) {
                                             ForEach(viewModel.popularTracks, id: \.id) { track in
