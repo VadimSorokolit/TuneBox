@@ -110,6 +110,11 @@ struct BrowseView: View {
                                     }
                                 }
                             }
+
+                            PaginationFooterView(
+                                hasReachedEnd: viewModel.reachedSearchTracksEnd,
+                                hasItems: viewModel.searchTracks.isNotEmpty
+                            )
                         }
                         .padding(.bottom, 100)
                     }
@@ -151,6 +156,12 @@ struct BrowseView: View {
                                                             }
                                                         }
                                                 }
+
+                                                PaginationFooterView(
+                                                    hasReachedEnd: viewModel.reachedGenreTracksEnd,
+                                                    hasItems: viewModel.genreTracks.isNotEmpty,
+                                                    style: .carousel
+                                                )
                                             }
                                             .padding(.horizontal)
                                         }
@@ -183,6 +194,11 @@ struct BrowseView: View {
                                                     }
                                                 }
                                             }
+
+                                            PaginationFooterView(
+                                                hasReachedEnd: viewModel.reachedPopularTracksEnd,
+                                                hasItems: viewModel.popularTracks.isNotEmpty
+                                            )
                                         }
                                     } header: {
                                         Text("Popular")

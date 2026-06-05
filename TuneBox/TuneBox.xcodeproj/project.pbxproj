@@ -60,6 +60,7 @@
 		5B899F782FCF13A8002D3232 /* RootTabsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B899F772FCF13A8002D3232 /* RootTabsView.swift */; };
 		5B9C3DF72FD03CE300138645 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5B9C3DF62FD03CE300138645 /* SDWebImageSwiftUI */; };
 		5B9C3DFA2FD03DA400138645 /* TrackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9C3DF92FD03DA300138645 /* TrackCell.swift */; };
+		5BA1F0012FE1000100503BA2 /* PaginationFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA1F0002FE1000000503BA2 /* PaginationFooterView.swift */; };
 		5B9CE54B2FB32589001BE37F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9CE54A2FB32589001BE37F /* AppDelegate.swift */; };
 		5BB9A56E2FC8AF45000B8127 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5BB9A56D2FC8AF45000B8127 /* Config.xcconfig */; };
 		5BC0DEAD2FDD000100503BA2 /* DownloadStateMergeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC0DEAC2FDD000100503BA2 /* DownloadStateMergeTests.swift */; };
@@ -164,6 +165,7 @@
 		5B8860A42FB1CF900056BE9A /* NotificationNames+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationNames+Extension.swift"; sourceTree = "<group>"; };
 		5B899F772FCF13A8002D3232 /* RootTabsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabsView.swift; sourceTree = "<group>"; };
 		5B9C3DF92FD03DA300138645 /* TrackCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackCell.swift; sourceTree = "<group>"; };
+		5BA1F0002FE1000000503BA2 /* PaginationFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaginationFooterView.swift; sourceTree = "<group>"; };
 		5B9CE54A2FB32589001BE37F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5BB9A56D2FC8AF45000B8127 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		5BC0DEAC2FDD000100503BA2 /* DownloadStateMergeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadStateMergeTests.swift; sourceTree = "<group>"; };
@@ -287,6 +289,7 @@
 			children = (
 				5B1875C82FD084CA00D8A042 /* SegmentedChipControl.swift */,
 				5B9C3DF92FD03DA300138645 /* TrackCell.swift */,
+				5BA1F0002FE1000000503BA2 /* PaginationFooterView.swift */,
 				5B1875C52FD06EBC00D8A042 /* SearchCell.swift */,
 			);
 			path = Views;
@@ -988,6 +991,7 @@
 				5B3FEB4A2FB454AE00DC1562 /* PlayerView.swift in Sources */,
 				5B586CB12FAB98EE00BCEAD2 /* NetworkService.swift in Sources */,
 				5B9C3DFA2FD03DA400138645 /* TrackCell.swift in Sources */,
+				5BA1F0012FE1000100503BA2 /* PaginationFooterView.swift in Sources */,
 				5B11C3412FB728390089BAD2 /* PersistenceService.swift in Sources */,
 				5B8382B82FC5AEA9003625CD /* Notification+value.swift in Sources */,
 				5B586CC72FACA8E300BCEAD2 /* AppError.swift in Sources */,

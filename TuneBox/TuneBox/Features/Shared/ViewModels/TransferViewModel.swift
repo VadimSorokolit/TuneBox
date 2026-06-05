@@ -306,6 +306,10 @@ final class TransferViewModel: TransferManaging {
 
                 self.searchTracks = resolved
                 self.offsetSearch += resolved.count
+
+                if resolved.count < self.limit {
+                    self.reachedSearchTracksEnd = true
+                }
             } catch is CancellationError {
                 AppLogger.network.debug("Search cancelled")
             } catch {
@@ -660,6 +664,10 @@ final class TransferViewModel: TransferManaging {
 
         self.popularTracks = loadedTracks
         self.offsetPopular = loadedTracks.count
+
+        if loadedTracks.count < self.limit {
+            self.reachedPopularTracksEnd = true
+        }
     }
 
     private func loadGenreInitialTracks(genre: Genre) async throws {
@@ -674,6 +682,10 @@ final class TransferViewModel: TransferManaging {
 
         self.genreTracks = loadedTracks
         self.offsetGenre = loadedTracks.count
+
+        if loadedTracks.count < self.limit {
+            self.reachedGenreTracksEnd = true
+        }
     }
 
     private func apiGenre(for genre: Genre) -> Genre? {
