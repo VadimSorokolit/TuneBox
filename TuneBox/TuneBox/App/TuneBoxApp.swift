@@ -20,11 +20,6 @@ struct TuneBoxApp: App {
             RootTabsView()
                 .environment(\.themeManager, themeManager)
                 .applyTheme(themeManager)
-                .overlay {
-                    if viewModel.isLoading {
-                        SpinnerView()
-                    }
-                }
                 .onChange(of: scenePhase) { _, newPhase in
                     switch newPhase {
                         case .active:

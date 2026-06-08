@@ -82,8 +82,10 @@ final class TransferViewModel: TransferManaging {
     private(set) var simultaneouslyLoadingCount: Int = SimultaneouslyLoadingCount.two.rawValue
     private(set) var reservedSpace: ReservedSpace = .oneGB
     private(set) var genre: Genre = .all
-    private(set) var isPopularLoading = false
-    private(set) var isGenreLoading = false
+    private(set) var isPopularFirstLoading = false
+    private(set) var isPaginationPopularLoading: Bool = false
+    private(set) var isGenreFirstLoading = false
+    private(set) var isPaginationGenreLoading: Bool = false
     private(set) var isSearchLoading = false
     private(set) var reachedPopularTracksEnd = false
     private(set) var reachedGenreTracksEnd = false
@@ -95,8 +97,10 @@ final class TransferViewModel: TransferManaging {
         self.inProgressTrackIDs.count
     }
 
-    var isLoading: Bool {
-        self.isPopularLoading || self.isGenreLoading || self.isSearchLoading
+    var shouldShowCentralSpinner: Bool {
+        (isPopularFirstLoading && popularTracks.isEmpty)
+        || (isGenreFirstLoading && genreTracks.isEmpty)
+        || isSearchLoading
     }
 
     var availableSpace: Double? {
@@ -115,10 +119,10 @@ final class TransferViewModel: TransferManaging {
                 return
             }
 
-            self.isPopularLoading = true
+            self.isPopularFirstLoading = true
 
             defer {
-                self.isPopularLoading = false
+                self.isPopularFirstLoading = false
                 self.popularLoadTask = nil
             }
 
@@ -143,7 +147,7 @@ final class TransferViewModel: TransferManaging {
     }
 
     func loadNextPopular() {
-        guard self.isPopularLoading == false,
+        guard self.isPaginationPopularLoading == false,
               self.reachedPopularTracksEnd == false else {
             return
         }
@@ -153,10 +157,10 @@ final class TransferViewModel: TransferManaging {
                 return
             }
 
-            self.isPopularLoading = true
+            self.isPaginationPopularLoading = true
 
             defer {
-                self.isPopularLoading = false
+                self.isPaginationPopularLoading = false
                 self.popularLoadTask = nil
             }
 
@@ -184,16 +188,15 @@ final class TransferViewModel: TransferManaging {
         let selectedGenre = genre ?? .all
 
         self.genre = selectedGenre
+        self.isGenreFirstLoading = true
 
         self.genreLoadTask = Task { @MainActor [weak self] in
             guard let self else {
                 return
             }
 
-            self.isGenreLoading = true
-
             defer {
-                self.isGenreLoading = false
+                self.isGenreFirstLoading = false
                 self.genreLoadTask = nil
             }
 
@@ -218,7 +221,7 @@ final class TransferViewModel: TransferManaging {
     }
 
     func loadNextBy(genre: Genre?) {
-        guard self.isGenreLoading == false,
+        guard self.isPaginationGenreLoading == false,
               self.reachedGenreTracksEnd == false else {
             return
         }
@@ -232,10 +235,10 @@ final class TransferViewModel: TransferManaging {
                 return
             }
 
-            self.isGenreLoading = true
+            self.isPaginationGenreLoading = true
 
             defer {
-                self.isGenreLoading = false
+                self.isPaginationGenreLoading = false
                 self.genreLoadTask = nil
             }
 

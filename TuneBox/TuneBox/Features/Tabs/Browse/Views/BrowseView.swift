@@ -37,8 +37,18 @@ struct BrowseView: View {
                alignment: .top
         )
         .onAppear {
+            guard viewModel.popularTracks.isEmpty,
+                  viewModel.genreTracks.isEmpty else {
+                return
+            }
+
             viewModel.loadFirstPopular()
             viewModel.loadFirstBy(genre: nil)
+        }
+        .overlay {
+            if viewModel.shouldShowCentralSpinner {
+                SpinnerView()
+            }
         }
         .onChange(of: viewModel.selectedTab) { _, tab in
             if tab != .browse {
@@ -123,7 +133,7 @@ struct BrowseView: View {
                     .contentMargins(.bottom, 100)
                 } else {
                     if searchQuery.count > 2 {
-                        if viewModel.isLoading {
+                        if viewModel.shouldShowCentralSpinner {
                             EmptyView()
                         } else if viewModel.searchTracks.isEmpty {
                             ContentUnavailableView(
@@ -144,7 +154,7 @@ struct BrowseView: View {
 
                                 if viewModel.genreTracks.isEmpty,
                                    viewModel.popularTracks.isEmpty,
-                                   viewModel.isLoading.isFalse {
+                                   viewModel.shouldShowCentralSpinner.isFalse {
                                     ContentUnavailableView(
                                         "Connection issue",
                                         systemImage: "wifi.slash",
@@ -153,31 +163,28 @@ struct BrowseView: View {
                                 } else {
                                     if viewModel.genreTracks.isNotEmpty {
                                         Section {
-                                            ScrollView(.horizontal, showsIndicators: false) {
-                                                LazyHStack(spacing: 8) {
-                                                    ForEach(viewModel.genreTracks, id: \.id) { track in
-                                                        GenreCell(track: track) {
-                                                            Task {
-                                                                await viewModel.handleDownloadAction(for: track)
+                                            ZStack {
+                                                ScrollView(.horizontal, showsIndicators: false) {
+                                                    LazyHStack(spacing: 8) {
+                                                        ForEach(viewModel.genreTracks, id: \.id) { track in
+                                                            GenreCell(track: track) {
+                                                                Task {
+                                                                    await viewModel.handleDownloadAction(for: track)
+                                                                }
                                                             }
                                                         }
-                                                        .onAppear {
-                                                            let thresholdIndex = max(0, viewModel.genreTracks.count - 3)
 
-                                                            if let index = viewModel.genreTracks.firstIndex(where: { $0.id == track.id }),
-                                                               index >= thresholdIndex {
-                                                                viewModel.loadNextBy(genre: selectedGenre)
-                                                            }
-                                                        }
+                                                        PaginationFooterView(
+                                                            hasReachedEnd: viewModel.reachedGenreTracksEnd,
+                                                            hasItems: viewModel.genreTracks.isNotEmpty,
+                                                            style: .carousel
+                                                        )
                                                     }
-
-                                                    PaginationFooterView(
-                                                        hasReachedEnd: viewModel.reachedGenreTracksEnd,
-                                                        hasItems: viewModel.genreTracks.isNotEmpty,
-                                                        style: .carousel
-                                                    )
+                                                    .padding(.horizontal)
                                                 }
-                                                .padding(.horizontal)
+                                                if viewModel.isGenreFirstLoading {
+                                                    SpinnerView()
+                                                }
                                             }
                                             .id(selectedGenre)
                                         } header: {
