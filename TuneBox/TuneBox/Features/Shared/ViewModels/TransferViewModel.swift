@@ -177,7 +177,6 @@ final class TransferViewModel: TransferManaging {
 
     func loadFirstBy(genre: Genre?) {
         self.reachedGenreTracksEnd = false
-        self.genreTracks.removeAll()
         self.offsetGenre = .zero
 
         self.cancelGenreLoadTask()
@@ -254,16 +253,17 @@ final class TransferViewModel: TransferManaging {
 
     func loadSearchBy(query: String) {
         self.reachedSearchTracksEnd = false
+        self.searchTracks.removeAll()
         self.offsetSearch = .zero
         self.searchQuery = query
         self.cancelSearchLoadTask()
 
         guard query.count > 2 else {
-            self.searchTracks.removeAll()
-            self.offsetSearch = .zero
             self.isSearchLoading = false
             return
         }
+
+        self.isSearchLoading = true
 
         self.searchLoadTask = Task { @MainActor [weak self] in
             guard let self else { return }
@@ -278,12 +278,6 @@ final class TransferViewModel: TransferManaging {
                 self.handleError(error)
                 return
             }
-
-            guard self.searchQuery.count > 2 else {
-                return
-            }
-
-            self.isSearchLoading = true
 
             defer {
                 self.isSearchLoading = false
@@ -629,7 +623,7 @@ final class TransferViewModel: TransferManaging {
 
     private let progressPersistStepBytes = 65_536
     private let estimatedTrackSizeFallback: Int = 10 * 1024 * 1024
-    private let searchDebounceInterval: Duration = .seconds(3)
+    private let searchDebounceInterval: Duration = .seconds(0.5)
 
     private var hasFreeDownloadSlot: Bool {
         self.inProgressTrackIDs.count < self.simultaneouslyLoadingCount

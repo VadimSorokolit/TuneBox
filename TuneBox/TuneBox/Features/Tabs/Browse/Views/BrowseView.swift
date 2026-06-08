@@ -28,7 +28,8 @@ struct BrowseView: View {
                 }
 
             MainView(selectedGenre: $selectedGenre,
-                     slideDirection: $slideDirection
+                     slideDirection: $slideDirection,
+                     searchQuery: $searchQuery
             )
         }
         .frame(maxWidth: .infinity,
@@ -87,6 +88,7 @@ struct BrowseView: View {
         @Injected var viewModel: TransferManaging
         @Binding var selectedGenre: Genre
         @Binding var slideDirection: SlideDirection
+        @Binding var searchQuery: String
 
         private let headerLeadingPadding: CGFloat = 26
 
@@ -117,106 +119,119 @@ struct BrowseView: View {
                             )
                         }
                     }
+                    .padding(.top, 10)
                     .contentMargins(.bottom, 100)
                 } else {
-                    ScrollView(.vertical, showsIndicators: false) {
-                        LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
-                            SegmentedChipControl(
-                                items: Genre.allCases,
-                                selected: $selectedGenre,
-                                direction: $slideDirection
+                    if searchQuery.count > 2 {
+                        if viewModel.isLoading {
+                            EmptyView()
+                        } else if viewModel.searchTracks.isEmpty {
+                            ContentUnavailableView(
+                                "No tracks found",
+                                systemImage: "music.note.list",
+                                description: Text("Try searching for another artist or track")
                             )
-                            .padding(.top, 10)
-
-                            if viewModel.genreTracks.isEmpty,
-                               viewModel.popularTracks.isEmpty,
-                               viewModel.isLoading.isFalse {
-                                ContentUnavailableView(
-                                    "Connection issue",
-                                    systemImage: "wifi.slash",
-                                    description: Text("Check your internet connection")
+                        }
+                    } else {
+                            ScrollView(.vertical, showsIndicators: false) {
+                            LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
+                                SegmentedChipControl(
+                                    items: Genre.allCases,
+                                    selected: $selectedGenre,
+                                    direction: $slideDirection
                                 )
-                            } else {
-                                if viewModel.genreTracks.isNotEmpty {
-                                    Section {
-                                        ScrollView(.horizontal, showsIndicators: false) {
-                                            LazyHStack(spacing: 8) {
-                                                ForEach(viewModel.genreTracks, id: \.id) { track in
-                                                    GenreCell(track: track) {
+                                .padding(.top, 10)
+
+                                if viewModel.genreTracks.isEmpty,
+                                   viewModel.popularTracks.isEmpty,
+                                   viewModel.isLoading.isFalse {
+                                    ContentUnavailableView(
+                                        "Connection issue",
+                                        systemImage: "wifi.slash",
+                                        description: Text("Check your internet connection")
+                                    )
+                                } else {
+                                    if viewModel.genreTracks.isNotEmpty {
+                                        Section {
+                                            ScrollView(.horizontal, showsIndicators: false) {
+                                                LazyHStack(spacing: 8) {
+                                                    ForEach(viewModel.genreTracks, id: \.id) { track in
+                                                        GenreCell(track: track) {
+                                                            Task {
+                                                                await viewModel.handleDownloadAction(for: track)
+                                                            }
+                                                        }
+                                                        .onAppear {
+                                                            let thresholdIndex = max(0, viewModel.genreTracks.count - 3)
+
+                                                            if let index = viewModel.genreTracks.firstIndex(where: { $0.id == track.id }),
+                                                               index >= thresholdIndex {
+                                                                viewModel.loadNextBy(genre: selectedGenre)
+                                                            }
+                                                        }
+                                                    }
+
+                                                    PaginationFooterView(
+                                                        hasReachedEnd: viewModel.reachedGenreTracksEnd,
+                                                        hasItems: viewModel.genreTracks.isNotEmpty,
+                                                        style: .carousel
+                                                    )
+                                                }
+                                                .padding(.horizontal)
+                                            }
+                                            .id(selectedGenre)
+                                        } header: {
+                                            Text("Featured")
+                                                .frame(maxWidth: .infinity, alignment: .leading)
+                                                .padding(.leading, headerLeadingPadding)
+                                                .padding(.vertical, 10)
+                                                .background(Color(.systemBackground))
+                                                .foregroundStyle(Color(.label))
+                                                .font(.headline)
+                                        }
+                                    }
+
+                                    if viewModel.popularTracks.isNotEmpty {
+                                        Section {
+                                            LazyVStack(spacing: 4) {
+                                                ForEach(viewModel.popularTracks, id: \.id) { track in
+                                                    TrackCell(track: track) {
                                                         Task {
                                                             await viewModel.handleDownloadAction(for: track)
                                                         }
                                                     }
                                                     .onAppear {
-                                                        let thresholdIndex = max(0, viewModel.genreTracks.count - 3)
-
-                                                        if let index = viewModel.genreTracks.firstIndex(where: { $0.id == track.id }),
+                                                        let thresholdIndex = max(0, viewModel.popularTracks.count - 3)
+                                                        if let index = viewModel.popularTracks.firstIndex(where: { $0.id == track.id }),
                                                            index >= thresholdIndex {
-                                                            viewModel.loadNextBy(genre: selectedGenre)
+                                                            viewModel.loadNextPopular()
                                                         }
                                                     }
                                                 }
 
                                                 PaginationFooterView(
-                                                    hasReachedEnd: viewModel.reachedGenreTracksEnd,
-                                                    hasItems: viewModel.genreTracks.isNotEmpty,
-                                                    style: .carousel
+                                                    hasReachedEnd: viewModel.reachedPopularTracksEnd,
+                                                    hasItems: viewModel.popularTracks.isNotEmpty
                                                 )
                                             }
-                                            .padding(.horizontal)
+                                        } header: {
+                                            Text("Popular")
+                                                .frame(maxWidth: .infinity, alignment: .leading)
+                                                .padding(.leading, headerLeadingPadding)
+                                                .padding(.vertical, 10)
+                                                .background(Color(.systemBackground))
+                                                .foregroundStyle(Color(.label))
+                                                .font(.headline)
                                         }
-                                        .id(selectedGenre)
-                                    } header: {
-                                        Text("Featured")
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .padding(.leading, headerLeadingPadding)
-                                            .padding(.vertical, 10)
-                                            .background(Color(.systemBackground))
-                                            .foregroundStyle(Color(.label))
-                                            .font(.headline)
-                                    }
-                                }
-
-                                if viewModel.popularTracks.isNotEmpty {
-                                    Section {
-                                        LazyVStack(spacing: 4) {
-                                            ForEach(viewModel.popularTracks, id: \.id) { track in
-                                                TrackCell(track: track) {
-                                                    Task {
-                                                        await viewModel.handleDownloadAction(for: track)
-                                                    }
-                                                }
-                                                .onAppear {
-                                                    let thresholdIndex = max(0, viewModel.popularTracks.count - 3)
-                                                    if let index = viewModel.popularTracks.firstIndex(where: { $0.id == track.id }),
-                                                       index >= thresholdIndex {
-                                                        viewModel.loadNextPopular()
-                                                    }
-                                                }
-                                            }
-
-                                            PaginationFooterView(
-                                                hasReachedEnd: viewModel.reachedPopularTracksEnd,
-                                                hasItems: viewModel.popularTracks.isNotEmpty
-                                            )
-                                        }
-                                    } header: {
-                                        Text("Popular")
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .padding(.leading, headerLeadingPadding)
-                                            .padding(.vertical, 10)
-                                            .background(Color(.systemBackground))
-                                            .foregroundStyle(Color(.label))
-                                            .font(.headline)
                                     }
                                 }
                             }
                         }
-                    }
-                    .id(selectedGenre)
-                    .contentMargins(.bottom, 100)
-                    .onChange(of: selectedGenre) { _, genre in
-                        viewModel.loadFirstBy(genre: genre)
+                        .id(selectedGenre)
+                        .contentMargins(.bottom, 100)
+                        .onChange(of: selectedGenre) { _, genre in
+                            viewModel.loadFirstBy(genre: genre)
+                        }
                     }
                 }
             }
