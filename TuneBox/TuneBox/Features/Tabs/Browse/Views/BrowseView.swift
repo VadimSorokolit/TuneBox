@@ -116,8 +116,8 @@ struct BrowseView: View {
                                 hasItems: viewModel.searchTracks.isNotEmpty
                             )
                         }
-                        .padding(.bottom, 100)
                     }
+                    .contentMargins(.bottom, 100)
                 } else {
                     ScrollView(.vertical, showsIndicators: false) {
                         LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
@@ -128,15 +128,15 @@ struct BrowseView: View {
                             )
                             .padding(.top, 10)
 
-                                if viewModel.genreTracks.isEmpty,
-                                   viewModel.popularTracks.isEmpty,
-                                   viewModel.isLoading.isFalse {
-                                    ContentUnavailableView(
-                                        "Connection issue",
-                                        systemImage: "wifi.slash",
-                                        description: Text("Check your internet connection")
-                                    )
-                                } else {
+                            if viewModel.genreTracks.isEmpty,
+                               viewModel.popularTracks.isEmpty,
+                               viewModel.isLoading.isFalse {
+                                ContentUnavailableView(
+                                    "Connection issue",
+                                    systemImage: "wifi.slash",
+                                    description: Text("Check your internet connection")
+                                )
+                            } else {
                                 if viewModel.genreTracks.isNotEmpty {
                                     Section {
                                         ScrollView(.horizontal, showsIndicators: false) {
@@ -147,14 +147,14 @@ struct BrowseView: View {
                                                             await viewModel.handleDownloadAction(for: track)
                                                         }
                                                     }
-                                                        .onAppear {
-                                                            let thresholdIndex = max(0, viewModel.genreTracks.count - 3)
+                                                    .onAppear {
+                                                        let thresholdIndex = max(0, viewModel.genreTracks.count - 3)
 
-                                                            if let index = viewModel.genreTracks.firstIndex(where: { $0.id == track.id }),
-                                                               index >= thresholdIndex {
-                                                                viewModel.loadNextBy(genre: selectedGenre)
-                                                            }
+                                                        if let index = viewModel.genreTracks.firstIndex(where: { $0.id == track.id }),
+                                                           index >= thresholdIndex {
+                                                            viewModel.loadNextBy(genre: selectedGenre)
                                                         }
+                                                    }
                                                 }
 
                                                 PaginationFooterView(
@@ -209,14 +209,12 @@ struct BrowseView: View {
                                             .foregroundStyle(Color(.label))
                                             .font(.headline)
                                     }
-
-                                    Color.clear
-                                        .padding(.bottom, 100)
-                                }
                                 }
                             }
+                        }
                     }
                     .id(selectedGenre)
+                    .contentMargins(.bottom, 100)
                     .onChange(of: selectedGenre) { _, genre in
                         viewModel.loadFirstBy(genre: genre)
                     }
