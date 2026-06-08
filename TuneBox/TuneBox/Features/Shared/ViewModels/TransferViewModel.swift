@@ -84,6 +84,7 @@ final class TransferViewModel: TransferManaging {
     private(set) var genre: Genre = .all
     private(set) var isPopularFirstLoading = false
     private(set) var isPaginationPopularLoading: Bool = false
+    private(set) var isPaginationSearchLoading: Bool = false
     private(set) var isGenreFirstLoading = false
     private(set) var isPaginationGenreLoading: Bool = false
     private(set) var isSearchLoading = false
@@ -316,7 +317,7 @@ final class TransferViewModel: TransferManaging {
     }
 
     func loadNextSearch() {
-        guard self.isSearchLoading == false,
+        guard self.isPaginationSearchLoading == false,
               self.reachedSearchTracksEnd == false else {
             return
         }
@@ -330,10 +331,10 @@ final class TransferViewModel: TransferManaging {
                 return
             }
 
-            self.isSearchLoading = true
+            self.isPaginationSearchLoading = true
 
             defer {
-                self.isSearchLoading = false
+                self.isPaginationSearchLoading = false
                 self.searchLoadTask = nil
             }
 

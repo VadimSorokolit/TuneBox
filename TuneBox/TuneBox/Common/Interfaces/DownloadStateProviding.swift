@@ -15,6 +15,9 @@ protocol DownloadStateProviding: AnyObject {
     var inProgressTrackIDs: Set<String> { get }
     var inProgressTracksCount: Int { get }
     var isGenreFirstLoading: Bool { get }
+    var isPaginationPopularLoading: Bool { get }
+    var isPaginationGenreLoading: Bool { get }
+    var isPaginationSearchLoading: Bool { get }
     var shouldShowCentralSpinner: Bool { get }
     var reachedPopularTracksEnd: Bool { get }
     var reachedGenreTracksEnd: Bool { get }

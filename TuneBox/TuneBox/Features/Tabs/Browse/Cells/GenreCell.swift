@@ -27,32 +27,35 @@ struct GenreCell: View {
     var configuration: GenreCellConfiguration = .init()
 
     var body: some View {
-        VStack(alignment: .leading, spacing: configuration.spacing) {
-            trackImage
-                .aspectRatio(configuration.imageAspectRatio, contentMode: .fill)
-                .frame(maxWidth: .infinity)
-                .clipShape(RoundedRectangle(cornerRadius: configuration.imageCornerRadius))
+        ZStack {
+            EmptyGenreCell()
 
-            Text(track.songName)
-                .font(.satoshi.medium.size(14))
-                .foregroundStyle(.primary)
-                .lineLimit(configuration.titleLineLimit)
+            VStack(alignment: .leading, spacing: configuration.spacing) {
+                trackImage
+                    .aspectRatio(configuration.imageAspectRatio, contentMode: .fill)
+                    .frame(maxWidth: .infinity)
+                    .clipShape(RoundedRectangle(cornerRadius: configuration.imageCornerRadius))
 
-            if configuration.showSubtitle {
-                Text(track.albumName)
-                    .font(.satoshi.medium.size(12))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(configuration.subtitleLineLimit)
+                Text(track.songName)
+                    .font(.satoshi.medium.size(14))
+                    .foregroundStyle(.primary)
+                    .lineLimit(configuration.titleLineLimit)
+
+                if configuration.showSubtitle {
+                    Text(track.albumName)
+                        .font(.satoshi.medium.size(12))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(configuration.subtitleLineLimit)
+                }
+
+                Spacer()
+
+                if configuration.showDuration || configuration.showDownloadButton {
+                    bottomRow
+                }
             }
-
-            Spacer()
-
-            if configuration.showDuration || configuration.showDownloadButton {
-                bottomRow
-            }
+            .padding(configuration.padding)
         }
-        .padding(configuration.padding)
-        .background(cellBackground)
         .frame(width: 100, height: 200)
     }
 

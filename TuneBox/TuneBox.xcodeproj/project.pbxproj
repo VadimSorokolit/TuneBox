@@ -66,6 +66,8 @@
 		5BA5818C2FD6A33200B498D7 /* ImportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA5818B2FD6A33000B498D7 /* ImportViewModel.swift */; };
 		5BA5818E2FD6A45800B498D7 /* SettingsManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA5818D2FD6A45700B498D7 /* SettingsManaging.swift */; };
 		5BA581902FD6A52100B498D7 /* ImportManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA5818F2FD6A52000B498D7 /* ImportManaging.swift */; };
+		5BA581922FD7055C00B498D7 /* EmptyTrackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA581912FD7055B00B498D7 /* EmptyTrackCell.swift */; };
+		5BA581942FD70BC300B498D7 /* EmptyGenreCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA581932FD70BC200B498D7 /* EmptyGenreCell.swift */; };
 		5BB9A56E2FC8AF45000B8127 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5BB9A56D2FC8AF45000B8127 /* Config.xcconfig */; };
 		5BC0DEAD2FDD000100503BA2 /* DownloadStateMergeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC0DEAC2FDD000100503BA2 /* DownloadStateMergeTests.swift */; };
 		5BD0DAF72FBF6BA000268A48 /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0DAF62FBF6B9F00268A48 /* AudioService.swift */; };
@@ -175,6 +177,8 @@
 		5BA5818B2FD6A33000B498D7 /* ImportViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportViewModel.swift; sourceTree = "<group>"; };
 		5BA5818D2FD6A45700B498D7 /* SettingsManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsManaging.swift; sourceTree = "<group>"; };
 		5BA5818F2FD6A52000B498D7 /* ImportManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportManaging.swift; sourceTree = "<group>"; };
+		5BA581912FD7055B00B498D7 /* EmptyTrackCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyTrackCell.swift; sourceTree = "<group>"; };
+		5BA581932FD70BC200B498D7 /* EmptyGenreCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyGenreCell.swift; sourceTree = "<group>"; };
 		5BB9A56D2FC8AF45000B8127 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		5BC0DEAC2FDD000100503BA2 /* DownloadStateMergeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadStateMergeTests.swift; sourceTree = "<group>"; };
 		5BD0DAF62FBF6B9F00268A48 /* AudioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioService.swift; sourceTree = "<group>"; };
@@ -295,6 +299,7 @@
 		5B1875C72FD0842400D8A042 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				5BA581912FD7055B00B498D7 /* EmptyTrackCell.swift */,
 				5B1875C82FD084CA00D8A042 /* SegmentedChipControl.swift */,
 				5B9C3DF92FD03DA300138645 /* TrackCell.swift */,
 				5BA1F0002FE1000000503BA2 /* PaginationFooterView.swift */,
@@ -588,6 +593,7 @@
 		5B9C3DF82FD03D9700138645 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
+				5BA581932FD70BC200B498D7 /* EmptyGenreCell.swift */,
 				5B0FD0C12FD2B18500753D3A /* GenreCell.swift */,
 			);
 			path = Cells;
@@ -995,6 +1001,7 @@
 				5B3FEB472FB4548600DC1562 /* DownloadsView.swift in Sources */,
 				5B3FEB432FB4545200DC1562 /* BrowseView.swift in Sources */,
 				5BFCA8452FCEE252009C6AD9 /* TransferPrioritizable+mergePriority.swift in Sources */,
+				5BA581942FD70BC300B498D7 /* EmptyGenreCell.swift in Sources */,
 				5BFCA83A2FCED71E009C6AD9 /* Color+hex.swift in Sources */,
 				5B8382912FC495F9003625CD /* PlayerViewModel.swift in Sources */,
 				5B8382992FC4C9EE003625CD /* SpinnerView.swift in Sources */,
@@ -1002,6 +1009,7 @@
 				5B9CE54B2FB32589001BE37F /* AppDelegate.swift in Sources */,
 				5B586CBA2FAC842200BCEAD2 /* Resolver+Injection.swift in Sources */,
 				5B2CF4612FBC7C6B00C5BA4C /* TransferDownloadObserverTokens.swift in Sources */,
+				5BA581922FD7055C00B498D7 /* EmptyTrackCell.swift in Sources */,
 				5B586CC32FAC912500BCEAD2 /* MoyaProvider+Async.swift in Sources */,
 				5B11C3372FB500AC0089BAD2 /* DownloadStore.swift in Sources */,
 				5B2CF4672FBD100100C5BA4D /* DownloadResumeStorage.swift in Sources */,

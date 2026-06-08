@@ -19,12 +19,7 @@ struct TrackCell: View {
 
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: cellCornerRadius)
-                .foregroundStyle(theme.tokens.cellBackground)
-                .overlay {
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(theme.tokens.cellBorder, lineWidth: 0.5)
-                }
+            EmptyTrackCell()
 
             HStack {
                 HStack(spacing: 10) {

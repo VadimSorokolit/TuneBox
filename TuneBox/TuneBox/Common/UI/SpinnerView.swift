@@ -8,12 +8,13 @@
 import SwiftUI
 
 struct SpinnerView: View {
+    var size: ControlSize = .large
 
     var body: some View {
         ProgressView()
             .progressViewStyle(.circular)
             .tint(.gray)
-            .controlSize(.large)
+            .controlSize(size)
             .background(Color.clear)
     }
 

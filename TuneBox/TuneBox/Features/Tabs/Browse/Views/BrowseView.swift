@@ -105,28 +105,34 @@ struct BrowseView: View {
         var body: some View {
             VStack(spacing: 0) {
                 if viewModel.searchTracks.isNotEmpty {
-                    ScrollView(.vertical, showsIndicators: false) {
-                        LazyVStack(spacing: 8) {
-                            ForEach(viewModel.searchTracks, id: \.id) { track in
-                                TrackCell(track: track) {
-                                    Task {
-                                        await viewModel.handleDownloadAction(for: track)
+                    ZStack {
+                        ScrollView(.vertical, showsIndicators: false) {
+                            LazyVStack(spacing: 8) {
+                                ForEach(viewModel.searchTracks, id: \.id) { track in
+                                    TrackCell(track: track) {
+                                        Task {
+                                            await viewModel.handleDownloadAction(for: track)
+                                        }
+                                    }
+                                    .onAppear {
+                                        if track.id == viewModel.searchTracks.last?.id {
+                                            viewModel.loadNextSearch()
+                                        }
                                     }
                                 }
-                                .onAppear {
-                                    let thresholdIndex = max(0, viewModel.searchTracks.count - 3)
 
-                                    if let index = viewModel.searchTracks.firstIndex(where: { $0.id == track.id }),
-                                       index >= thresholdIndex {
-                                        viewModel.loadNextSearch()
-                                    }
+                                if viewModel.isPaginationSearchLoading {
+                                    EmptyTrackCell()
+                                        .overlay {
+                                            SpinnerView()
+                                        }
                                 }
+
+                                PaginationFooterView(
+                                    hasReachedEnd: viewModel.reachedSearchTracksEnd,
+                                    hasItems: viewModel.searchTracks.isNotEmpty
+                                )
                             }
-
-                            PaginationFooterView(
-                                hasReachedEnd: viewModel.reachedSearchTracksEnd,
-                                hasItems: viewModel.searchTracks.isNotEmpty
-                            )
                         }
                     }
                     .padding(.top, 10)
@@ -172,6 +178,18 @@ struct BrowseView: View {
                                                                     await viewModel.handleDownloadAction(for: track)
                                                                 }
                                                             }
+                                                            .onAppear {
+                                                                if track.id == viewModel.genreTracks.last?.id {
+                                                                    viewModel.loadNextBy(genre: selectedGenre)
+                                                                }
+                                                            }
+                                                        }
+
+                                                        if viewModel.isPaginationGenreLoading {
+                                                            EmptyGenreCell()
+                                                                .overlay {
+                                                                    SpinnerView()
+                                                                }
                                                         }
 
                                                         PaginationFooterView(
@@ -182,6 +200,7 @@ struct BrowseView: View {
                                                     }
                                                     .padding(.horizontal)
                                                 }
+
                                                 if viewModel.isGenreFirstLoading {
                                                     SpinnerView()
                                                 }
@@ -208,12 +227,17 @@ struct BrowseView: View {
                                                         }
                                                     }
                                                     .onAppear {
-                                                        let thresholdIndex = max(0, viewModel.popularTracks.count - 3)
-                                                        if let index = viewModel.popularTracks.firstIndex(where: { $0.id == track.id }),
-                                                           index >= thresholdIndex {
+                                                        if track.id == viewModel.popularTracks.last?.id {
                                                             viewModel.loadNextPopular()
                                                         }
                                                     }
+                                                }
+
+                                                if viewModel.isPaginationPopularLoading {
+                                                    EmptyTrackCell()
+                                                        .overlay {
+                                                            SpinnerView()
+                                                        }
                                                 }
 
                                                 PaginationFooterView(
