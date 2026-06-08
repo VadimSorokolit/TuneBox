@@ -123,6 +123,7 @@ struct BrowseView: View {
 
                                 if viewModel.isPaginationSearchLoading {
                                     EmptyTrackCell()
+                                        .padding(.horizontal)
                                         .overlay {
                                             SpinnerView()
                                         }
@@ -235,6 +236,7 @@ struct BrowseView: View {
 
                                                 if viewModel.isPaginationPopularLoading {
                                                     EmptyTrackCell()
+                                                        .padding(.horizontal)
                                                         .overlay {
                                                             SpinnerView()
                                                         }

@@ -59,6 +59,7 @@ struct RootTabsView: View {
 
             tabBar
         }
+        .ignoresSafeArea(.keyboard, edges: .bottom)
         .navigationBarBackButtonHidden(true)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
     }
