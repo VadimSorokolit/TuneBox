@@ -2,7 +2,7 @@
 //  AudioService.swift
 //  TuneBox
 //
-//  Created by Nintendo on 21.05.2026.
+//  Created by Vadim Sorokolit on 21.05.2026.
 //
 
 import Foundation

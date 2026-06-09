@@ -2,7 +2,7 @@
 //  AppTheme.swift
 //  TuneBox
 //
-//  Created by Nintendo on 01.06.2026.
+//  Created by Vadim Sorokolit on 01.06.2026.
 //
 
 import SwiftUI

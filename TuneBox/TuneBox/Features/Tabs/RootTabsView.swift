@@ -1,3 +1,10 @@
+//
+//  GenreCell.swift
+//  TuneBox
+//
+//  Created by Vadim Sorokolit on 05.06.2026.
+//
+
 import SwiftUI
 import Resolver
 

@@ -2,7 +2,7 @@
 //  Onboarding.swift
 //  TuneBox
 //
-//  Created by Nintendo on 02.06.2026.
+//  Created by Vadim Sorokolit on 02.06.2026.
 //
 
 import SwiftUI
