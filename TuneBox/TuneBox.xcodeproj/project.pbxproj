@@ -68,6 +68,7 @@
 		5BA581902FD6A52100B498D7 /* ImportManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA5818F2FD6A52000B498D7 /* ImportManaging.swift */; };
 		5BA581922FD7055C00B498D7 /* EmptyTrackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA581912FD7055B00B498D7 /* EmptyTrackCell.swift */; };
 		5BA581942FD70BC300B498D7 /* EmptyGenreCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA581932FD70BC200B498D7 /* EmptyGenreCell.swift */; };
+		5BA581962FD8603500B498D7 /* HighlightedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA581952FD8603400B498D7 /* HighlightedText.swift */; };
 		5BB9A56E2FC8AF45000B8127 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5BB9A56D2FC8AF45000B8127 /* Config.xcconfig */; };
 		5BC0DEAD2FDD000100503BA2 /* DownloadStateMergeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC0DEAC2FDD000100503BA2 /* DownloadStateMergeTests.swift */; };
 		5BD0DAF72FBF6BA000268A48 /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0DAF62FBF6B9F00268A48 /* AudioService.swift */; };
@@ -179,6 +180,7 @@
 		5BA5818F2FD6A52000B498D7 /* ImportManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportManaging.swift; sourceTree = "<group>"; };
 		5BA581912FD7055B00B498D7 /* EmptyTrackCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyTrackCell.swift; sourceTree = "<group>"; };
 		5BA581932FD70BC200B498D7 /* EmptyGenreCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyGenreCell.swift; sourceTree = "<group>"; };
+		5BA581952FD8603400B498D7 /* HighlightedText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightedText.swift; sourceTree = "<group>"; };
 		5BB9A56D2FC8AF45000B8127 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		5BC0DEAC2FDD000100503BA2 /* DownloadStateMergeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadStateMergeTests.swift; sourceTree = "<group>"; };
 		5BD0DAF62FBF6B9F00268A48 /* AudioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioService.swift; sourceTree = "<group>"; };
@@ -299,6 +301,7 @@
 		5B1875C72FD0842400D8A042 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				5BA581952FD8603400B498D7 /* HighlightedText.swift */,
 				5BA581912FD7055B00B498D7 /* EmptyTrackCell.swift */,
 				5B1875C82FD084CA00D8A042 /* SegmentedChipControl.swift */,
 				5B9C3DF92FD03DA300138645 /* TrackCell.swift */,
@@ -1052,6 +1055,7 @@
 				5BFCA8432FCEE237009C6AD9 /* TransferPrioritizable.swift in Sources */,
 				5BFCA8492FCEE470009C6AD9 /* Launch.swift in Sources */,
 				5B11C33B2FB719A80089BAD2 /* TrackEntity.swift in Sources */,
+				5BA581962FD8603500B498D7 /* HighlightedText.swift in Sources */,
 				5B88609E2FAE184C0056BE9A /* GlobalConstants.swift in Sources */,
 				5B1875C62FD06EBD00D8A042 /* SearchBarView.swift in Sources */,
 				5B8382B52FC59381003625CD /* BrowseView+.swift in Sources */,

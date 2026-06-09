@@ -11,11 +11,22 @@ import SDWebImageSwiftUI
 struct TrackCell: View {
     @Environment(\.themeManager) var theme
     let track: TrackEntity
+    let searchQuery: String?
     let onTap: () -> Void
 
     let cellCornerRadius: CGFloat = 10
     let imageSize: CGFloat = 35
     let imageCornerRadius: CGFloat = 10
+
+    init(
+        track: TrackEntity,
+        searchQuery: String? = nil,
+        onTap: @escaping () -> Void
+    ) {
+        self.track = track
+        self.searchQuery = searchQuery
+        self.onTap = onTap
+    }
 
     var body: some View {
         ZStack {
@@ -26,15 +37,21 @@ struct TrackCell: View {
                     trackImage
 
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(track.songName)
-                            .font(.satoshi.medium.size(14))
-                            .lineLimit(1)
+                        HighlightedText(
+                            text: track.songName,
+                            searchQuery: searchQuery
+                        )
+                        .font(.satoshi.medium.size(14))
+                        .lineLimit(1)
 
                         HStack(spacing: 6) {
-                            Text(track.artistName)
-                                .font(.satoshi.medium.size(12))
-                                .foregroundStyle(.secondary)
-                                .lineLimit(1)
+                            HighlightedText(
+                                text: track.artistName,
+                                searchQuery: searchQuery
+                            )
+                            .font(.satoshi.medium.size(12))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
 
                             Text("•")
                                 .font(.satoshi.medium.size(12))
@@ -166,12 +183,7 @@ struct TrackCell: View {
         size: 5_242_880
     )
 
-    track.downloadState = .idle
-
-    return TrackCell(
-        track: track,
-        onTap: {
-            print("tap")
-        }
-    )
+    return TrackCell(track: track) {
+        print("tap")
+    }
 }

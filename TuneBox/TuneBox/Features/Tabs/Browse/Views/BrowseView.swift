@@ -122,7 +122,10 @@ struct BrowseView: View {
                     ScrollView(showsIndicators: false) {
                         LazyVStack(spacing: 8) {
                             ForEach(viewModel.searchTracks, id: \.id) { track in
-                                TrackCell(track: track) {
+                                TrackCell(
+                                    track: track,
+                                    searchQuery: searchQuery
+                                ) {
                                     Task {
                                         await viewModel.handleDownloadAction(for: track)
                                     }
