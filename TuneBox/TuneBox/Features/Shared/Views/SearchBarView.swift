@@ -50,9 +50,6 @@ struct SearchBarView: View {
         }
         .padding(.top, 5)
         .padding(.horizontal)
-        .onChange(of: searchQuery) {
-            viewModel.loadSearchBy(query: searchQuery)
-        }
     }
 }
 

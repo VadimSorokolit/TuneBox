@@ -77,6 +77,7 @@ final class TransferViewModel: TransferManaging {
     private(set) var popularTracks: [TrackEntity] = []
     private(set) var genreTracks: [TrackEntity] = []
     private(set) var searchTracks: [TrackEntity] = []
+    private(set) var completedSearchQuery: String = ""
     private(set) var inProgressTrackIDs: Set<String> = []
     private(set) var error: String?
     private(set) var simultaneouslyLoadingCount: Int = SimultaneouslyLoadingCount.two.rawValue
@@ -91,7 +92,6 @@ final class TransferViewModel: TransferManaging {
     private(set) var reachedPopularTracksEnd = false
     private(set) var reachedGenreTracksEnd = false
     private(set) var reachedSearchTracksEnd = false
-    var searchQuery: String = ""
     var selectedTab: CustomTab = .browse
 
     var inProgressTracksCount: Int {
@@ -258,11 +258,10 @@ final class TransferViewModel: TransferManaging {
     func loadSearchBy(query: String) {
         self.reachedSearchTracksEnd = false
         self.offsetSearch = .zero
-        self.searchQuery = query
         self.cancelSearchLoadTask()
 
         guard query.count > 2 else {
-            self.isSearchLoading = false
+            isSearchLoading = false
             return
         }
 
@@ -271,42 +270,26 @@ final class TransferViewModel: TransferManaging {
         self.searchLoadTask = Task { @MainActor [weak self] in
             guard let self else { return }
 
-            do {
-                try await Task.sleep(for: self.searchDebounceInterval)
-                try Task.checkCancellation()
-            } catch is CancellationError {
-                AppLogger.network.debug("Search debounce cancelled")
-                return
-            } catch {
-                self.handleError(error)
-                return
-            }
-
             defer {
                 self.isSearchLoading = false
                 self.searchLoadTask = nil
             }
 
             do {
-                self.offsetSearch = .zero
-
                 let dtos = try await self.networkService.searchTracks(
-                    query: self.searchQuery,
+                    query: query,
                     limit: self.limit,
-                    offset: self.offsetSearch
+                    offset: .zero
                 )
 
                 try Task.checkCancellation()
 
-                let entities = dtos.map(TrackEntity.init)
-                let resolved = self.upsertAndResolve(entities)
+                let resolved = self.upsertAndResolve(dtos.map(TrackEntity.init))
 
                 self.searchTracks = resolved
-                self.offsetSearch += resolved.count
-
-                if resolved.count < self.limit {
-                    self.reachedSearchTracksEnd = true
-                }
+                self.completedSearchQuery = query
+                self.offsetSearch = resolved.count
+                self.reachedSearchTracksEnd = resolved.count < self.limit
             } catch is CancellationError {
                 AppLogger.network.debug("Search cancelled")
             } catch {
@@ -321,7 +304,7 @@ final class TransferViewModel: TransferManaging {
             return
         }
 
-        guard self.searchQuery.count > 2 else {
+        guard self.completedSearchQuery.count > 2 else {
             return
         }
 
@@ -339,7 +322,7 @@ final class TransferViewModel: TransferManaging {
 
             do {
                 let dtos = try await self.networkService.searchTracks(
-                    query: self.searchQuery,
+                    query: self.completedSearchQuery,
                     limit: self.limit,
                     offset: self.offsetSearch
                 )
@@ -414,10 +397,10 @@ final class TransferViewModel: TransferManaging {
     func clearSearchState() {
         self.cancelSearchLoadTask()
         self.reachedSearchTracksEnd = false
-        self.searchQuery = ""
         self.searchTracks.removeAll()
         self.offsetSearch = .zero
         self.isSearchLoading = false
+        self.completedSearchQuery = ""
     }
 
     func cancelQueuedDownload(track: TrackEntity) {
@@ -626,7 +609,6 @@ final class TransferViewModel: TransferManaging {
 
     private let progressPersistStepBytes = 65_536
     private let estimatedTrackSizeFallback: Int = 10 * 1024 * 1024
-    private let searchDebounceInterval: Duration = .seconds(0.5)
 
     private var hasFreeDownloadSlot: Bool {
         self.inProgressTrackIDs.count < self.simultaneouslyLoadingCount

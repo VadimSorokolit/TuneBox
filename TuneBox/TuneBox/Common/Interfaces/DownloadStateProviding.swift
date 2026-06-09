@@ -22,6 +22,6 @@ protocol DownloadStateProviding: AnyObject {
     var reachedPopularTracksEnd: Bool { get }
     var reachedGenreTracksEnd: Bool { get }
     var reachedSearchTracksEnd: Bool { get }
-    var searchQuery: String { get set }
+    var completedSearchQuery: String { get }
     var error: String? { get }
 }

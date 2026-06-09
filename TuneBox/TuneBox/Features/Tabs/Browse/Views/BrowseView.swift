@@ -21,15 +21,25 @@ struct BrowseView: View {
 
             SearchBarView(
                 searchQuery: $searchQuery,
-                isFocused: $isTextFieldFocused) {
-                    viewModel.loadSearchBy(query: searchQuery)
-                } onClear: {
-                    viewModel.clearSearchState()
+                isFocused: $isTextFieldFocused
+            ) {
+                viewModel.loadSearchBy(query: searchQuery)
+            } onClear: {
+                viewModel.clearSearchState()
+            }
+            .task(id: searchQuery) {
+                try? await Task.sleep(for: .milliseconds(300))
+
+                if Task.isCancelled {
+                    return
                 }
 
+                viewModel.loadSearchBy(query: searchQuery)
+            }
+
             ContentView(selectedGenre: $selectedGenre,
-                     slideDirection: $slideDirection,
-                     searchQuery: $searchQuery
+                        slideDirection: $slideDirection,
+                        searchQuery: $searchQuery
             )
         }
         .frame(maxWidth: .infinity,
@@ -139,13 +149,16 @@ struct BrowseView: View {
                 }
                 .padding(.top, 10)
                 .contentMargins(.bottom, 100)
-            } else if viewModel.searchTracks.isEmpty, searchQuery.count > 2, viewModel.shouldShowCentralSpinner.isFalse {
+            } else if viewModel.searchTracks.isEmpty,
+                      searchQuery.count > 2,
+                      viewModel.shouldShowCentralSpinner.isFalse,
+                      viewModel.completedSearchQuery == searchQuery {
                     ContentUnavailableView(
                         "No tracks found",
                         systemImage: "music.note.list",
                         description: Text("Try searching for another artist or track")
                     )
-            } else {
+            } else if viewModel.completedSearchQuery.isEmpty {
                 ScrollView(.vertical, showsIndicators: false) {
                     LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
                         SegmentedChipControl(
