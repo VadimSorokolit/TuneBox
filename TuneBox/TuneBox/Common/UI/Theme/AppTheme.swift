@@ -26,7 +26,7 @@ struct ThemeTokens {
     let tabBarBackground: Color
     let tabIconActive: Color
     let tabIconInactive: Color
-    let browsHeaderText: Color
+    let browseHeaderText: Color
     let clearAllDownloadsActive: Color
     let clearAllDownloadsInactive: Color
     let cellBackground: Color
@@ -44,7 +44,7 @@ extension ThemeTokens {
         tabBarBackground: Color(hex: 0xEFEFEF),
         tabIconActive: Color(hex: 0x007AFF),
         tabIconInactive: Color.black.opacity(0.45),
-        browsHeaderText: Color(hex: 0x111111),
+        browseHeaderText: Color(hex: 0x111111),
         clearAllDownloadsActive: Color(hex: 0xF28C26),
         clearAllDownloadsInactive: Color(hex: 0x666666),
         cellBackground: Color(hex: 0xEFEFEF),
@@ -60,7 +60,7 @@ extension ThemeTokens {
         tabBarBackground: Color(hex: 0x0A0A0A),
         tabIconActive: Color(hex: 0x4F6EF7),
         tabIconInactive: Color.white.opacity(0.45),
-        browsHeaderText: Color(hex: 0x787878),
+        browseHeaderText: Color(hex: 0x787878),
         clearAllDownloadsActive: Color(hex: 0xFFA633),
         clearAllDownloadsInactive: Color(hex: 0xA0A0A0),
         cellBackground: Color(hex: 0x111111),

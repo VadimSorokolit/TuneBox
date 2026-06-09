@@ -49,14 +49,14 @@ struct BrowseView: View {
                maxHeight: .infinity,
                alignment: .top
         )
-        .onAppear {
+        .task {
             guard viewModel.popularTracks.isEmpty,
                   viewModel.genreTracks.isEmpty else {
                 return
             }
 
-            viewModel.loadFirstPopular()
-            viewModel.loadFirstBy(genre: nil)
+            await viewModel.loadFirstPopular()
+            await viewModel.loadFirstBy(genre: nil)
         }
         .overlay {
             if viewModel.shouldShowCentralSpinner {
@@ -69,7 +69,7 @@ struct BrowseView: View {
             }
         }
         .onChange(of: viewModel.selectedTab) { _, _ in
-                isTextFieldFocused = false
+            isTextFieldFocused = false
         }
         .onTapGesture {
             isTextFieldFocused = false
@@ -85,13 +85,13 @@ struct BrowseView: View {
         var body: some View {
             HStack {
                 Text("Discover")
-                    .foregroundStyle(theme.tokens.browsHeaderText)
+                    .foregroundStyle(theme.tokens.browseHeaderText)
                     .font(.satoshi.regular.size(34))
 
                 Spacer()
 
                 Button(action: {
-                     viewModel.cancelAllDownloads()
+                    viewModel.cancelAllDownloads()
                 }, label: {
                     Image(systemName: "xmark.circle")
                         .symbolRenderingMode(.hierarchical)
@@ -155,11 +155,11 @@ struct BrowseView: View {
                       searchQuery.count > 2,
                       viewModel.shouldShowCentralSpinner.isFalse,
                       viewModel.completedSearchQuery == searchQuery {
-                    ContentUnavailableView(
-                        "No tracks found",
-                        systemImage: "music.note.list",
-                        description: Text("Try searching for another artist or track")
-                    )
+                ContentUnavailableView(
+                    "No tracks found",
+                    systemImage: "music.note.list",
+                    description: Text("Try searching for another artist or track")
+                )
             } else if viewModel.completedSearchQuery.isEmpty {
                 ScrollView(.vertical, showsIndicators: false) {
                     LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
@@ -179,116 +179,111 @@ struct BrowseView: View {
                             )
                         } else {
                             if viewModel.shouldShowCentralSpinner.isFalse {
-                                if viewModel.genreTracks.isNotEmpty {
-                                    Section {
-                                        ZStack {
-                                            ScrollView(.horizontal, showsIndicators: false) {
-                                                LazyHStack(spacing: 8) {
-                                                    ForEach(viewModel.genreTracks, id: \.id) { track in
-                                                        GenreCell(track: track) {
-                                                            Task {
-                                                                await viewModel.handleDownloadAction(for: track)
+                                VStack(spacing: 0) {
+                                    if viewModel.genreTracks.isNotEmpty {
+                                        Section {
+                                            ZStack {
+                                                ScrollView(.horizontal, showsIndicators: false) {
+                                                    LazyHStack(spacing: 8) {
+                                                        ForEach(viewModel.genreTracks, id: \.id) { track in
+                                                            GenreCell(track: track) {
+                                                                Task {
+                                                                    await viewModel.handleDownloadAction(for: track)
+                                                                }
+                                                            }
+                                                            .onAppear {
+                                                                if track === viewModel.genreTracks.last {
+                                                                    viewModel.loadNextBy(genre: selectedGenre)
+                                                                }
                                                             }
                                                         }
-                                                        .onAppear {
-                                                            if track === viewModel.genreTracks.last {
-                                                                viewModel.loadNextBy(genre: selectedGenre)
-                                                            }
+
+                                                        if viewModel.isPaginationGenreLoading {
+                                                            SpinnerView(size: .regular)
+                                                                .padding(.leading, 8)
                                                         }
-                                                    }
 
-                                                    if viewModel.isPaginationGenreLoading {
-                                                        SpinnerView(size: .regular)
-                                                            .padding(.leading, 8)
+                                                        PaginationFooterView(
+                                                            hasReachedEnd: viewModel.reachedGenreTracksEnd,
+                                                            hasItems: viewModel.genreTracks.isNotEmpty,
+                                                            style: .carousel
+                                                        )
                                                     }
-
-                                                    PaginationFooterView(
-                                                        hasReachedEnd: viewModel.reachedGenreTracksEnd,
-                                                        hasItems: viewModel.genreTracks.isNotEmpty,
-                                                        style: .carousel
-                                                    )
+                                                    .padding(.horizontal)
                                                 }
-                                                .padding(.horizontal)
-                                            }
 
-                                            if viewModel.isGenreFirstLoading {
-                                                SpinnerView()
+                                                if viewModel.isGenreFirstLoading {
+                                                    SpinnerView()
+                                                }
                                             }
+                                            .id(selectedGenre)
+                                        } header: {
+                                            Text("Featured")
+                                                .frame(maxWidth: .infinity, alignment: .leading)
+                                                .padding(.leading, headerLeadingPadding)
+                                                .padding(.vertical, 10)
+                                                .background(Color(.systemBackground))
+                                                .foregroundStyle(Color(.label))
+                                                .font(.headline)
                                         }
-                                        .id(selectedGenre)
-                                    } header: {
-                                        Text("Featured")
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .padding(.leading, headerLeadingPadding)
-                                            .padding(.vertical, 10)
-                                            .background(Color(.systemBackground))
-                                            .foregroundStyle(Color(.label))
-                                            .font(.headline)
                                     }
-                                }
 
-                                if viewModel.popularTracks.isNotEmpty {
-                                    Section {
-                                        LazyVStack(spacing: 4) {
-                                            ForEach(viewModel.popularTracks, id: \.id) { track in
-                                                TrackCell(track: track) {
-                                                    Task {
-                                                        await viewModel.handleDownloadAction(for: track)
+                                    if viewModel.popularTracks.isNotEmpty {
+                                        Section {
+                                            LazyVStack(spacing: 4) {
+                                                ForEach(viewModel.popularTracks, id: \.id) { track in
+                                                    TrackCell(track: track) {
+                                                        Task {
+                                                            await viewModel.handleDownloadAction(for: track)
+                                                        }
+                                                    }
+                                                    .onAppear {
+                                                        if track === viewModel.popularTracks.last {
+                                                            viewModel.loadNextPopular()
+                                                        }
                                                     }
                                                 }
-                                                .onAppear {
-                                                    if track === viewModel.popularTracks.last {
-                                                        viewModel.loadNextPopular()
-                                                    }
+
+                                                if viewModel.isPaginationPopularLoading {
+                                                    SpinnerView(size: .regular)
+                                                        .padding(.top, 8)
                                                 }
-                                            }
 
-                                            if viewModel.isPaginationPopularLoading {
-                                                SpinnerView(size: .regular)
-                                                    .padding(.top, 8)
+                                                PaginationFooterView(
+                                                    hasReachedEnd: viewModel.reachedPopularTracksEnd,
+                                                    hasItems: viewModel.popularTracks.isNotEmpty
+                                                )
                                             }
-
-                                            PaginationFooterView(
-                                                hasReachedEnd: viewModel.reachedPopularTracksEnd,
-                                                hasItems: viewModel.popularTracks.isNotEmpty
-                                            )
+                                        } header: {
+                                            Text("Popular")
+                                                .frame(maxWidth: .infinity, alignment: .leading)
+                                                .padding(.leading, headerLeadingPadding)
+                                                .padding(.vertical, 10)
+                                                .background(Color(.systemBackground))
+                                                .foregroundStyle(Color(.label))
+                                                .font(.headline)
                                         }
-                                    } header: {
-                                        Text("Popular")
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .padding(.leading, headerLeadingPadding)
-                                            .padding(.vertical, 10)
-                                            .background(Color(.systemBackground))
-                                            .foregroundStyle(Color(.label))
-                                            .font(.headline)
                                     }
                                 }
                             }
                         }
                     }
                 }
+                .refreshable {
+                    await viewModel.refreshBrowse(
+                        selectedGenre == .all ? nil : selectedGenre
+                    )
+                }
                 .id(selectedGenre)
                 .contentMargins(.bottom, 100)
                 .onChange(of: selectedGenre) { _, genre in
-                    viewModel.loadFirstBy(genre: genre)
+                    Task {
+                        await viewModel.loadFirstBy(genre: genre)
+                    }
                 }
             }
-            }
-//            .refreshable {
-//                if viewModel.searchTracks.isNotEmpty {
-//                    viewModel.loadSearchBy(query: viewModel.searchQuery)
-//                } else {
-//                    viewModel.loadFirstPopular()
-//                    if selectedGenre != .all {
-//                        viewModel.loadFirstBy(genre: selectedGenre)
-//                    } else {
-//                        viewModel.loadFirstBy(genre: nil)
-//                    }
-//                }
-//            }
-//        }
+        }
     }
-
 }
 
 #Preview {

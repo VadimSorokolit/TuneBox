@@ -77,7 +77,7 @@
 		5BD579A22FAB25E300503BA2 /* TuneBoxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD5799E2FAB25E300503BA2 /* TuneBoxApp.swift */; };
 		5BD579A52FAB25EE00503BA2 /* NetworkServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD579A32FAB25EE00503BA2 /* NetworkServiceTests.swift */; };
 		5BFBF2372FCCC2AB0013F6BB /* ImportFilesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFBF2362FCCC2AA0013F6BB /* ImportFilesView.swift */; };
-		5BFCA7D22FCE0DDE009C6AD9 /* AppTheme.swif.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA7D12FCE0DDD009C6AD9 /* AppTheme.swif.swift */; };
+		5BFCA7D22FCE0DDE009C6AD9 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA7D12FCE0DDD009C6AD9 /* AppTheme.swift */; };
 		5BFCA7D42FCE1148009C6AD9 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA7D32FCE1130009C6AD9 /* ThemeManager.swift */; };
 		5BFCA7D62FCE118B009C6AD9 /* Theme+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA7D52FCE118A009C6AD9 /* Theme+Extensions.swift */; };
 		5BFCA7E52FCED3C9009C6AD9 /* Satoshi-Black.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA7D92FCED3C9009C6AD9 /* Satoshi-Black.otf */; };
@@ -193,7 +193,7 @@
 		5BD579A32FAB25EE00503BA2 /* NetworkServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkServiceTests.swift; sourceTree = "<group>"; };
 		5BD579AB2FAB27A000503BA2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5BFBF2362FCCC2AA0013F6BB /* ImportFilesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportFilesView.swift; sourceTree = "<group>"; };
-		5BFCA7D12FCE0DDD009C6AD9 /* AppTheme.swif.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swif.swift; sourceTree = "<group>"; };
+		5BFCA7D12FCE0DDD009C6AD9 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		5BFCA7D32FCE1130009C6AD9 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
 		5BFCA7D52FCE118A009C6AD9 /* Theme+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Theme+Extensions.swift"; sourceTree = "<group>"; };
 		5BFCA7D92FCED3C9009C6AD9 /* Satoshi-Black.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Satoshi-Black.otf"; sourceTree = "<group>"; };
@@ -743,7 +743,7 @@
 			isa = PBXGroup;
 			children = (
 				5BFCA7D52FCE118A009C6AD9 /* Theme+Extensions.swift */,
-				5BFCA7D12FCE0DDD009C6AD9 /* AppTheme.swif.swift */,
+				5BFCA7D12FCE0DDD009C6AD9 /* AppTheme.swift */,
 				5BFCA7D32FCE1130009C6AD9 /* ThemeManager.swift */,
 			);
 			path = Theme;
@@ -1039,7 +1039,7 @@
 				5B586CCC2FACB61500BCEAD2 /* TracksResponse.swift in Sources */,
 				5B47627A2FAB3DC30069E41A /* TuneBoxRouter.swift in Sources */,
 				5B8382BC2FC5D97F003625CD /* PlayerManaging.swift in Sources */,
-				5BFCA7D22FCE0DDE009C6AD9 /* AppTheme.swif.swift in Sources */,
+				5BFCA7D22FCE0DDE009C6AD9 /* AppTheme.swift in Sources */,
 				5BFBF2372FCCC2AB0013F6BB /* ImportFilesView.swift in Sources */,
 				5BFCA7D42FCE1148009C6AD9 /* ThemeManager.swift in Sources */,
 				5B47627E2FAB49B00069E41A /* AppLogger.swift in Sources */,

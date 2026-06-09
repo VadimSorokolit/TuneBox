@@ -48,8 +48,9 @@ protocol TransferManaging:
 
     var selectedTab: CustomTab { get set }
 
-    func loadFirstPopular()
-    func loadFirstBy(genre: Genre?)
+    func loadFirstPopular() async
+    func loadFirstBy(genre: Genre?) async
+    func refreshBrowse(_ selectedGenre: Genre?) async
     func loadSearchBy(query: String)
     func loadNextSearch()
     func loadNextPopular()
@@ -77,17 +78,18 @@ final class TransferViewModel: TransferManaging {
     private(set) var popularTracks: [TrackEntity] = []
     private(set) var genreTracks: [TrackEntity] = []
     private(set) var searchTracks: [TrackEntity] = []
-    private(set) var completedSearchQuery: String = ""
+    private(set) var completedSearchQuery = ""
     private(set) var inProgressTrackIDs: Set<String> = []
     private(set) var error: String?
     private(set) var simultaneouslyLoadingCount: Int = SimultaneouslyLoadingCount.two.rawValue
     private(set) var reservedSpace: ReservedSpace = .oneGB
     private(set) var genre: Genre = .all
+    private(set) var isRefreshing = false
     private(set) var isPopularFirstLoading = false
-    private(set) var isPaginationPopularLoading: Bool = false
-    private(set) var isPaginationSearchLoading: Bool = false
+    private(set) var isPaginationPopularLoading = false
+    private(set) var isPaginationSearchLoading = false
     private(set) var isGenreFirstLoading = false
-    private(set) var isPaginationGenreLoading: Bool = false
+    private(set) var isPaginationGenreLoading = false
     private(set) var isSearchLoading = false
     private(set) var reachedPopularTracksEnd = false
     private(set) var reachedGenreTracksEnd = false
@@ -99,9 +101,9 @@ final class TransferViewModel: TransferManaging {
     }
 
     var shouldShowCentralSpinner: Bool {
-        (isPopularFirstLoading && popularTracks.isEmpty)
-        || (isGenreFirstLoading && genreTracks.isEmpty)
-        || isSearchLoading
+        (self.isPopularFirstLoading && self.popularTracks.isEmpty && self.isRefreshing.isFalse)
+        || (self.isGenreFirstLoading && self.genreTracks.isEmpty && self.isRefreshing.isFalse)
+        || self.isSearchLoading
     }
 
     var availableSpace: Double? {
@@ -110,40 +112,32 @@ final class TransferViewModel: TransferManaging {
 
     // MARK: - Methods. Public
 
-    func loadFirstPopular() {
+    func loadFirstPopular() async {
         self.reachedPopularTracksEnd = false
         self.offsetPopular = .zero
-        self.cancelPopularLoadTask()
 
-        self.popularLoadTask = Task { @MainActor [weak self] in
-            guard let self else {
-                return
+        self.isPopularFirstLoading = true
+
+        defer {
+            self.isPopularFirstLoading = false
+        }
+
+        do {
+            let persistedEntities = try self.persistenceService.getPopularTracks()
+            try Task.checkCancellation()
+
+            if persistedEntities.isEmpty || self.isRefreshing {
+                try await self.loadPopularInitialTracks()
+            } else {
+                self.popularTracks = persistedEntities
+                self.offsetPopular = persistedEntities.count
+
+                await self.restoreFromPersistedState(self.popularTracks)
             }
-
-            self.isPopularFirstLoading = true
-
-            defer {
-                self.isPopularFirstLoading = false
-                self.popularLoadTask = nil
-            }
-
-            do {
-                let persistedEntities = try self.persistenceService.getPopularTracks()
-                try Task.checkCancellation()
-
-                if persistedEntities.isEmpty {
-                    try await self.loadPopularInitialTracks()
-                } else {
-                    self.popularTracks = persistedEntities
-                    self.offsetPopular = persistedEntities.count
-
-                    await self.restoreFromPersistedState(self.popularTracks)
-                }
-            } catch is CancellationError {
-                AppLogger.network.debug("Load cancelled")
-            } catch {
-                self.handleError(error)
-            }
+        } catch is CancellationError {
+            AppLogger.network.debug("Load cancelled")
+        } catch {
+            self.handleError(error)
         }
     }
 
@@ -180,7 +174,7 @@ final class TransferViewModel: TransferManaging {
         }
     }
 
-    func loadFirstBy(genre: Genre?) {
+    func loadFirstBy(genre: Genre?) async {
         self.reachedGenreTracksEnd = false
         self.offsetGenre = .zero
 
@@ -191,33 +185,27 @@ final class TransferViewModel: TransferManaging {
         self.genre = selectedGenre
         self.isGenreFirstLoading = true
 
-        self.genreLoadTask = Task { @MainActor [weak self] in
-            guard let self else {
-                return
+        defer {
+            self.isGenreFirstLoading = false
+            self.genreLoadTask = nil
+        }
+
+        do {
+            let persistedEntities = try self.persistenceService.getTracksBy(genre: selectedGenre)
+            try Task.checkCancellation()
+
+            if persistedEntities.isEmpty || self.isRefreshing {
+                try await self.loadGenreInitialTracks(genre: selectedGenre)
+            } else {
+                self.genreTracks = persistedEntities
+                self.offsetGenre = persistedEntities.count
+
+                await self.restoreFromPersistedState(self.genreTracks)
             }
-
-            defer {
-                self.isGenreFirstLoading = false
-                self.genreLoadTask = nil
-            }
-
-            do {
-                let persistedEntities = try self.persistenceService.getTracksBy(genre: selectedGenre)
-                try Task.checkCancellation()
-
-                if persistedEntities.isEmpty {
-                    try await self.loadGenreInitialTracks(genre: selectedGenre)
-                } else {
-                    self.genreTracks = persistedEntities
-                    self.offsetGenre = persistedEntities.count
-
-                    await self.restoreFromPersistedState(self.genreTracks)
-                }
-            } catch is CancellationError {
-                AppLogger.network.debug("Load cancelled")
-            } catch {
-                self.handleError(error)
-            }
+        } catch is CancellationError {
+            AppLogger.network.debug("Load cancelled")
+        } catch {
+            self.handleError(error)
         }
     }
 
@@ -255,13 +243,24 @@ final class TransferViewModel: TransferManaging {
         }
     }
 
+    func refreshBrowse(_ selectedGenre: Genre?) async {
+        self.isRefreshing = true
+
+        defer { self.isRefreshing = false }
+
+        async let popular = self.loadFirstPopular()
+        async let genre = self.loadFirstBy(genre: selectedGenre)
+
+        _ = await (popular, genre)
+    }
+
     func loadSearchBy(query: String) {
         self.reachedSearchTracksEnd = false
         self.offsetSearch = .zero
         self.cancelSearchLoadTask()
 
         guard query.count > 2 else {
-            isSearchLoading = false
+            self.isSearchLoading = false
             return
         }
 
@@ -641,11 +640,15 @@ final class TransferViewModel: TransferManaging {
         let loadedTracks = await self.loadPopularTracks(offset: 0)
         try Task.checkCancellation()
 
-        self.popularTracks = loadedTracks
-        self.offsetPopular = loadedTracks.count
+        if self.popularTracks.isEmpty {
+            self.popularTracks = loadedTracks
+            self.offsetPopular = loadedTracks.count
 
-        if loadedTracks.count < self.limit {
-            self.reachedPopularTracksEnd = true
+            if loadedTracks.count < self.limit {
+                self.reachedPopularTracksEnd = true
+            }
+        } else {
+            self.mergeTracks(loadedTracks, into: &self.popularTracks)
         }
     }
 
@@ -657,13 +660,18 @@ final class TransferViewModel: TransferManaging {
             offset: 0,
             appendToGenreTracks: false
         )
+
         try Task.checkCancellation()
 
-        self.genreTracks = loadedTracks
-        self.offsetGenre = loadedTracks.count
+        if self.genreTracks.isEmpty {
+            self.genreTracks = loadedTracks
+            self.offsetGenre = loadedTracks.count
 
-        if loadedTracks.count < self.limit {
-            self.reachedGenreTracksEnd = true
+            if loadedTracks.count < self.limit {
+                self.reachedGenreTracksEnd = true
+            }
+        } else {
+            self.mergeTracks(loadedTracks, into: &self.genreTracks)
         }
     }
 
