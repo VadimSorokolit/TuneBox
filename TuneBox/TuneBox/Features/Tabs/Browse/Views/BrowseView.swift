@@ -21,12 +21,13 @@ struct BrowseView: View {
 
             SearchBarView(
                 searchQuery: $searchQuery,
-                isFocused: $isTextFieldFocused
-            ) {
-                viewModel.loadSearchBy(query: searchQuery)
-            } onClear: {
-                viewModel.clearSearchState()
-            }
+                isFocused: $isTextFieldFocused,
+                onSubmit: {
+                    isTextFieldFocused = false
+                },
+                onClear: {
+                    viewModel.clearSearchState()
+                })
             .task(id: searchQuery) {
                 try? await Task.sleep(for: .milliseconds(300))
 
@@ -34,7 +35,9 @@ struct BrowseView: View {
                     return
                 }
 
-                viewModel.loadSearchBy(query: searchQuery)
+                if viewModel.completedSearchQuery != searchQuery {
+                    viewModel.loadSearchBy(query: searchQuery)
+                }
             }
 
             ContentView(selectedGenre: $selectedGenre,
@@ -65,12 +68,8 @@ struct BrowseView: View {
                 viewModel.clearSearchState()
             }
         }
-        .onChange(of: viewModel.selectedTab) { _, tab in
-            if tab != .browse {
-                searchQuery = ""
+        .onChange(of: viewModel.selectedTab) { _, _ in
                 isTextFieldFocused = false
-                viewModel.clearSearchState()
-            }
         }
         .onTapGesture {
             isTextFieldFocused = false
@@ -176,88 +175,90 @@ struct BrowseView: View {
                                 description: Text("Check your internet connection")
                             )
                         } else {
-                            if viewModel.genreTracks.isNotEmpty {
-                                Section {
-                                    ZStack {
-                                        ScrollView(.horizontal, showsIndicators: false) {
-                                            LazyHStack(spacing: 8) {
-                                                ForEach(viewModel.genreTracks, id: \.id) { track in
-                                                    GenreCell(track: track) {
-                                                        Task {
-                                                            await viewModel.handleDownloadAction(for: track)
+                            if viewModel.shouldShowCentralSpinner.isFalse {
+                                if viewModel.genreTracks.isNotEmpty {
+                                    Section {
+                                        ZStack {
+                                            ScrollView(.horizontal, showsIndicators: false) {
+                                                LazyHStack(spacing: 8) {
+                                                    ForEach(viewModel.genreTracks, id: \.id) { track in
+                                                        GenreCell(track: track) {
+                                                            Task {
+                                                                await viewModel.handleDownloadAction(for: track)
+                                                            }
+                                                        }
+                                                        .onAppear {
+                                                            if track === viewModel.genreTracks.last {
+                                                                viewModel.loadNextBy(genre: selectedGenre)
+                                                            }
                                                         }
                                                     }
-                                                    .onAppear {
-                                                        if track === viewModel.genreTracks.last {
-                                                            viewModel.loadNextBy(genre: selectedGenre)
-                                                        }
+
+                                                    if viewModel.isPaginationGenreLoading {
+                                                        SpinnerView(size: .regular)
+                                                            .padding(.leading, 8)
                                                     }
-                                                }
 
-                                                if viewModel.isPaginationGenreLoading {
-                                                    SpinnerView(size: .regular)
-                                                        .padding(.leading, 8)
+                                                    PaginationFooterView(
+                                                        hasReachedEnd: viewModel.reachedGenreTracksEnd,
+                                                        hasItems: viewModel.genreTracks.isNotEmpty,
+                                                        style: .carousel
+                                                    )
                                                 }
-
-                                                PaginationFooterView(
-                                                    hasReachedEnd: viewModel.reachedGenreTracksEnd,
-                                                    hasItems: viewModel.genreTracks.isNotEmpty,
-                                                    style: .carousel
-                                                )
+                                                .padding(.horizontal)
                                             }
-                                            .padding(.horizontal)
-                                        }
 
-                                        if viewModel.isGenreFirstLoading {
-                                            SpinnerView()
+                                            if viewModel.isGenreFirstLoading {
+                                                SpinnerView()
+                                            }
                                         }
+                                        .id(selectedGenre)
+                                    } header: {
+                                        Text("Featured")
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .padding(.leading, headerLeadingPadding)
+                                            .padding(.vertical, 10)
+                                            .background(Color(.systemBackground))
+                                            .foregroundStyle(Color(.label))
+                                            .font(.headline)
                                     }
-                                    .id(selectedGenre)
-                                } header: {
-                                    Text("Featured")
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .padding(.leading, headerLeadingPadding)
-                                        .padding(.vertical, 10)
-                                        .background(Color(.systemBackground))
-                                        .foregroundStyle(Color(.label))
-                                        .font(.headline)
                                 }
-                            }
 
-                            if viewModel.popularTracks.isNotEmpty {
-                                Section {
-                                    LazyVStack(spacing: 4) {
-                                        ForEach(viewModel.popularTracks, id: \.id) { track in
-                                            TrackCell(track: track) {
-                                                Task {
-                                                    await viewModel.handleDownloadAction(for: track)
+                                if viewModel.popularTracks.isNotEmpty {
+                                    Section {
+                                        LazyVStack(spacing: 4) {
+                                            ForEach(viewModel.popularTracks, id: \.id) { track in
+                                                TrackCell(track: track) {
+                                                    Task {
+                                                        await viewModel.handleDownloadAction(for: track)
+                                                    }
+                                                }
+                                                .onAppear {
+                                                    if track === viewModel.popularTracks.last {
+                                                        viewModel.loadNextPopular()
+                                                    }
                                                 }
                                             }
-                                            .onAppear {
-                                                if track === viewModel.popularTracks.last {
-                                                    viewModel.loadNextPopular()
-                                                }
+
+                                            if viewModel.isPaginationPopularLoading {
+                                                SpinnerView(size: .regular)
+                                                    .padding(.top, 8)
                                             }
-                                        }
 
-                                        if viewModel.isPaginationPopularLoading {
-                                            SpinnerView(size: .regular)
-                                                .padding(.top, 8)
+                                            PaginationFooterView(
+                                                hasReachedEnd: viewModel.reachedPopularTracksEnd,
+                                                hasItems: viewModel.popularTracks.isNotEmpty
+                                            )
                                         }
-
-                                        PaginationFooterView(
-                                            hasReachedEnd: viewModel.reachedPopularTracksEnd,
-                                            hasItems: viewModel.popularTracks.isNotEmpty
-                                        )
+                                    } header: {
+                                        Text("Popular")
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .padding(.leading, headerLeadingPadding)
+                                            .padding(.vertical, 10)
+                                            .background(Color(.systemBackground))
+                                            .foregroundStyle(Color(.label))
+                                            .font(.headline)
                                     }
-                                } header: {
-                                    Text("Popular")
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .padding(.leading, headerLeadingPadding)
-                                        .padding(.vertical, 10)
-                                        .background(Color(.systemBackground))
-                                        .foregroundStyle(Color(.label))
-                                        .font(.headline)
                                 }
                             }
                         }
