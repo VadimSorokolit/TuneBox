@@ -226,6 +226,12 @@ struct BrowseView: View {
                                                 .foregroundStyle(Color(.label))
                                                 .font(.headline)
                                         }
+                                    } else if viewModel.shouldShowCentralSpinner.isFalse {
+                                        ContentUnavailableView(
+                                            "No featured tracks",
+                                            systemImage: "music.note.list",
+                                            description: Text("Pull down to refresh")
+                                        )
                                     }
 
                                     if viewModel.popularTracks.isNotEmpty {
@@ -263,6 +269,12 @@ struct BrowseView: View {
                                                 .foregroundStyle(Color(.label))
                                                 .font(.headline)
                                         }
+                                    } else if viewModel.shouldShowCentralSpinner.isFalse {
+                                        ContentUnavailableView(
+                                            "No popular tracks",
+                                            systemImage: "music.note.list",
+                                            description: Text("Pull down to refresh")
+                                        )
                                     }
                                 }
                             }
