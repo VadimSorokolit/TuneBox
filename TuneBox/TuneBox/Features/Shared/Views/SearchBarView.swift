@@ -1,5 +1,5 @@
 //
-//  SearchCell.swift
+//  SearchBarView.swift
 //  TuneBox
 //
 //  Created by Vadim Sorokolit on 03.06.2026.
@@ -8,7 +8,7 @@
 import SwiftUI
 import Resolver
 
-struct SearchCell: View {
+struct SearchBarView: View {
     @Injected var viewModel: TransferManaging
     @Binding var searchQuery: String
     let isFocused: FocusState<Bool>.Binding
@@ -60,7 +60,7 @@ struct SearchCell: View {
     @Previewable @State var searchText = "Love"
     @FocusState var isFocused: Bool
 
-    SearchCell(
+    SearchBarView(
         searchQuery: $searchText,
         isFocused: $isFocused
     ) {

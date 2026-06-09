@@ -257,7 +257,6 @@ final class TransferViewModel: TransferManaging {
 
     func loadSearchBy(query: String) {
         self.reachedSearchTracksEnd = false
-        self.searchTracks.removeAll()
         self.offsetSearch = .zero
         self.searchQuery = query
         self.cancelSearchLoadTask()
