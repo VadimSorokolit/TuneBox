@@ -666,7 +666,7 @@ final class TransferViewModel: TransferManaging {
             self.mergeTracks(loadedTracks, into: &self.genreTracks)
         }
         self.offsetGenre = self.genreTracks.count
-        self.reachedPopularTracksEnd = (loadedTracks.count < self.limit)
+        self.reachedGenreTracksEnd = (loadedTracks.count < self.limit)
     }
 
     private func apiGenre(for genre: Genre) -> Genre? {
