@@ -98,12 +98,35 @@ struct TrackCell: View {
                     }
                     .frame(width: 25, height: 25)
                 })
+                .accessibilityHint(accessibilityLabel)
             }
             .padding(.horizontal)
         }
         .frame(height: 50)
         .frame(maxWidth: .infinity)
         .padding(.horizontal)
+    }
+
+    private var accessibilityLabel: String {
+        switch track.downloadState {
+            case .idle:
+                "Start download track"
+
+            case .queued:
+                "Cancel download"
+
+            case .downloading:
+                "Pause download"
+
+            case .paused:
+                "Resume download"
+
+            case .completed:
+                "Delete track"
+
+            case .failed:
+                "Retry download"
+        }
     }
 
     @ViewBuilder

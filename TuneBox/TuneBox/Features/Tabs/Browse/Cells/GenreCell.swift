@@ -83,7 +83,7 @@ struct GenreCell: View {
                     downloadButton
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel(downloadButtonAccessibility)
+                .accessibilityLabel(accessibilityLabel)
             }
         }
     }
@@ -111,6 +111,28 @@ struct GenreCell: View {
                 .foregroundStyle(iconColor)
         }
         .frame(width: 28, height: 28)
+    }
+    
+    private var accessibilityLabel: String {
+        switch track.downloadState {
+            case .idle:
+                "Start download track"
+
+            case .queued:
+                "Cancel download"
+
+            case .downloading:
+                "Pause download"
+
+            case .paused:
+                "Resume download"
+
+            case .completed:
+                "Delete track"
+
+            case .failed:
+                "Retry download"
+        }
     }
 
     @ViewBuilder
@@ -150,23 +172,6 @@ struct GenreCell: View {
                 return .red
             case .failed:
                 return .orange
-        }
-    }
-
-    private var downloadButtonAccessibility: String {
-        switch track.downloadState {
-            case .idle:
-                return "Download \(track.songName)"
-            case .queued:
-                return "Queued"
-            case .downloading:
-                return "Pause download"
-            case .paused:
-                return "Resume download"
-            case .completed:
-                return "Delete downloaded file"
-            case .failed:
-                return "Retry download"
         }
     }
 
