@@ -161,7 +161,7 @@ struct BrowseView: View {
                     description: Text("Try searching for another artist or track")
                 )
             } else if viewModel.completedSearchQuery.isEmpty {
-                ScrollView(.vertical, showsIndicators: false) {
+                ScrollView(showsIndicators: false) {
                     LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
                         SegmentedChipControl(
                             items: Genre.allCases,
@@ -179,7 +179,6 @@ struct BrowseView: View {
                             )
                         } else {
                             if viewModel.shouldShowCentralSpinner.isFalse {
-                                VStack(spacing: 0) {
                                     if viewModel.genreTracks.isNotEmpty {
                                         Section {
                                             ZStack {
@@ -280,11 +279,11 @@ struct BrowseView: View {
                                             description: Text("Pull down to refresh")
                                         )
                                     }
-                                }
                             }
                         }
                     }
                 }
+                .padding(.top, 5)
                 .refreshable {
                     await viewModel.refreshBrowse(
                         selectedGenre == .all ? nil : selectedGenre
