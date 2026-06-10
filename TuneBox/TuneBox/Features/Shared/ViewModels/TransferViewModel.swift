@@ -642,14 +642,11 @@ final class TransferViewModel: TransferManaging {
 
         if self.popularTracks.isEmpty {
             self.popularTracks = loadedTracks
-            self.offsetPopular = loadedTracks.count
-
-            if loadedTracks.count < self.limit {
-                self.reachedPopularTracksEnd = true
-            }
         } else {
             self.mergeTracks(loadedTracks, into: &self.popularTracks)
         }
+        self.offsetPopular = self.popularTracks.count
+        self.reachedPopularTracksEnd = (loadedTracks.count < self.limit)
     }
 
     private func loadGenreInitialTracks(genre: Genre) async throws {
@@ -665,14 +662,11 @@ final class TransferViewModel: TransferManaging {
 
         if self.genreTracks.isEmpty {
             self.genreTracks = loadedTracks
-            self.offsetGenre = loadedTracks.count
-
-            if loadedTracks.count < self.limit {
-                self.reachedGenreTracksEnd = true
-            }
         } else {
             self.mergeTracks(loadedTracks, into: &self.genreTracks)
         }
+        self.offsetGenre = self.genreTracks.count
+        self.reachedPopularTracksEnd = (loadedTracks.count < self.limit)
     }
 
     private func apiGenre(for genre: Genre) -> Genre? {
