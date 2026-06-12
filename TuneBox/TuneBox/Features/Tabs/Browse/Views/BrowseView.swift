@@ -162,8 +162,8 @@ struct BrowseView: View {
                     )
                 }
             } else if viewModel.completedSearchQuery.isEmpty {
-                let genreSection = viewModel.sections.first(where: { $0.type == .featured })
-                let popularSection = viewModel.sections.first(where: { $0.type == .popular })
+                let genreTracksSection = viewModel.sections.first(where: { $0.type == .genre })
+                let popularTracksSection = viewModel.sections.first(where: { $0.type == .popular })
 
                 ScrollView(showsIndicators: false) {
                     LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
@@ -174,8 +174,8 @@ struct BrowseView: View {
                         )
                         .padding(.top, 10)
 
-                        if genreSection?.tracks.isEmpty == true,
-                           popularSection?.tracks.isEmpty == true,
+                        if genreTracksSection?.tracks.isEmpty == true,
+                           popularTracksSection?.tracks.isEmpty == true,
                            viewModel.shouldShowCentralSpinner.isFalse {
                             ContentUnavailableView(
                                 "Connection issue",
@@ -184,20 +184,20 @@ struct BrowseView: View {
                             )
                         } else {
                             if viewModel.shouldShowCentralSpinner.isFalse {
-                                if let tracks = genreSection?.tracks, tracks.isNotEmpty {
+                                if let section = genreTracksSection, section.tracks.isNotEmpty {
                                         Section {
                                             ZStack {
                                                 ScrollViewReader { horizontalProxy in
                                                     ScrollView(.horizontal, showsIndicators: false) {
                                                         LazyHStack(spacing: 8) {
-                                                            ForEach(tracks, id: \.id) { track in
+                                                            ForEach(section.tracks, id: \.id) { track in
                                                                 GenreCell(track: track) {
                                                                     Task {
                                                                         await viewModel.handleDownloadAction(for: track)
                                                                     }
                                                                 }
                                                                 .onAppear {
-                                                                    if track === tracks.last {
+                                                                    if track === section.tracks.last {
                                                                         viewModel.loadNextBy(genre: selectedGenre)
                                                                     }
                                                                 }
@@ -210,7 +210,7 @@ struct BrowseView: View {
 
                                                             PaginationFooterView(
                                                                 hasReachedEnd: viewModel.reachedGenreTracksEnd,
-                                                                hasItems: tracks.isNotEmpty,
+                                                                hasItems: section.tracks.isNotEmpty,
                                                                 style: .carousel
                                                             )
                                                         }
@@ -226,7 +226,7 @@ struct BrowseView: View {
                                             }
                                             .id(selectedGenre)
                                         } header: {
-                                            Text("Featured")
+                                            Text(section.title)
                                                 .frame(maxWidth: .infinity, alignment: .leading)
                                                 .padding(.leading, headerLeadingPadding)
                                                 .padding(.vertical, 10)
@@ -242,17 +242,17 @@ struct BrowseView: View {
                                         )
                                     }
 
-                                if let tracks = popularSection?.tracks, tracks.isNotEmpty {
+                                if let section = popularTracksSection, section.tracks.isNotEmpty {
                                         Section {
                                                 LazyVStack(spacing: 4) {
-                                                    ForEach(tracks, id: \.id) { track in
+                                                    ForEach(section.tracks, id: \.id) { track in
                                                         TrackCell(track: track) {
                                                             Task {
                                                                 await viewModel.handleDownloadAction(for: track)
                                                             }
                                                         }
                                                         .onAppear {
-                                                            if track === tracks.last {
+                                                            if track === section.tracks.last {
                                                                 viewModel.loadNextPopular()
                                                             }
                                                         }
@@ -265,11 +265,11 @@ struct BrowseView: View {
 
                                                     PaginationFooterView(
                                                         hasReachedEnd: viewModel.reachedPopularTracksEnd,
-                                                        hasItems: tracks.isNotEmpty
+                                                        hasItems: section.tracks.isNotEmpty
                                                     )
                                                 }
                                         } header: {
-                                            Text("Popular")
+                                            Text(section.title)
                                                 .frame(maxWidth: .infinity, alignment: .leading)
                                                 .padding(.leading, headerLeadingPadding)
                                                 .padding(.vertical, 10)

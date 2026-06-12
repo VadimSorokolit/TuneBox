@@ -15,9 +15,9 @@ struct TracksSection: Hashable, Identifiable {
     var tracks: [TrackEntity]
 
     enum SectionType: String {
-        case featured
-        case popular
-        case search
+        case genre = "Featured"
+        case popular = "Popular"
+        case search = "Search"
     }
 
     func hash(into hasher: inout Hasher) {
@@ -121,7 +121,7 @@ final class TransferViewModel: TransferManaging {
 
     var shouldShowCentralSpinner: Bool {
         (self.isPopularFirstLoading && self.tracks(for: .popular).isEmpty && self.isRefreshing.isFalse)
-        || (self.isGenreFirstLoading && self.tracks(for: .featured).isEmpty && self.isRefreshing.isFalse)
+        || (self.isGenreFirstLoading && self.tracks(for: .genre).isEmpty && self.isRefreshing.isFalse)
         || self.isSearchLoading
     }
 
@@ -214,10 +214,10 @@ final class TransferViewModel: TransferManaging {
             if persistedEntities.isEmpty || self.isRefreshing {
                 try await self.loadGenreInitialTracks(genre: selectedGenre)
             } else {
-                self.set(persistedEntities, for: .featured)
+                self.set(persistedEntities, for: .genre)
                 self.offsetGenre = persistedEntities.count
 
-                await self.restoreFromPersistedState(self.tracks(for: .featured))
+                await self.restoreFromPersistedState(self.tracks(for: .genre))
             }
         } catch is CancellationError {
             AppLogger.network.debug("Load cancelled")
@@ -643,7 +643,7 @@ final class TransferViewModel: TransferManaging {
             self.sections.append(
                 TracksSection(
                     type: type,
-                    title: type.rawValue.capitalized,
+                    title: type.rawValue,
                     tracks: tracks
                 )
             )
@@ -694,9 +694,9 @@ final class TransferViewModel: TransferManaging {
 
         self.offsetGenre = offsetZero
 
-        self.set(loadedTracks, for: .featured)
+        self.set(loadedTracks, for: .genre)
 
-        self.offsetGenre = self.tracks(for: .featured).count
+        self.offsetGenre = self.tracks(for: .genre).count
         self.reachedGenreTracksEnd = (loadedTracks.count < self.limit)
     }
 
@@ -761,7 +761,7 @@ final class TransferViewModel: TransferManaging {
             let resolved = self.upsertAndResolve(entities)
 
             if appendToGenreTracks {
-                self.mergeTracks(resolved, for: .featured)
+                self.mergeTracks(resolved, for: .genre)
                 self.offsetGenre += resolved.count
             }
 
