@@ -50,8 +50,7 @@ struct BrowseView: View {
                alignment: .top
         )
         .task {
-            guard viewModel.popularTracks.isEmpty,
-                  viewModel.genreTracks.isEmpty else {
+            guard viewModel.sections.flatMap( \.tracks).isEmpty else {
                 return
             }
 
@@ -117,50 +116,55 @@ struct BrowseView: View {
         private let headerLeadingPadding: CGFloat = 26
 
         var body: some View {
-            if viewModel.searchTracks.isNotEmpty, searchQuery.isNotEmpty {
-                ZStack {
-                    ScrollView(showsIndicators: false) {
-                        LazyVStack(spacing: 8) {
-                            ForEach(viewModel.searchTracks, id: \.id) { track in
-                                TrackCell(
-                                    track: track,
-                                    searchQuery: searchQuery
-                                ) {
-                                    Task {
-                                        await viewModel.handleDownloadAction(for: track)
+            if let section = viewModel.sections.first(where: { $0.type == .search }) {
+                if section.tracks.isNotEmpty, searchQuery.isNotEmpty {
+                    ZStack {
+                        ScrollView(showsIndicators: false) {
+                            LazyVStack(spacing: 8) {
+                                ForEach(section.tracks, id: \.id) { track in
+                                    TrackCell(
+                                        track: track,
+                                        searchQuery: searchQuery
+                                    ) {
+                                        Task {
+                                            await viewModel.handleDownloadAction(for: track)
+                                        }
+                                    }
+                                    .onAppear {
+                                        if track === section.tracks.last {
+                                            viewModel.loadNextSearch()
+                                        }
                                     }
                                 }
-                                .onAppear {
-                                    if track === viewModel.searchTracks.last {
-                                        viewModel.loadNextSearch()
-                                    }
+
+                                if viewModel.isPaginationSearchLoading {
+                                    SpinnerView(size: .regular)
+                                        .padding(.top, 8)
                                 }
-                            }
 
-                            if viewModel.isPaginationSearchLoading {
-                                SpinnerView(size: .regular)
-                                    .padding(.top, 8)
+                                PaginationFooterView(
+                                    hasReachedEnd: viewModel.reachedSearchTracksEnd,
+                                    hasItems: section.tracks.isNotEmpty
+                                )
                             }
-
-                            PaginationFooterView(
-                                hasReachedEnd: viewModel.reachedSearchTracksEnd,
-                                hasItems: viewModel.searchTracks.isNotEmpty
-                            )
                         }
                     }
+                    .padding(.top, 10)
+                    .contentMargins(.bottom, 100)
+                } else if section.tracks.isEmpty,
+                          searchQuery.count > 2,
+                          viewModel.shouldShowCentralSpinner.isFalse,
+                          viewModel.completedSearchQuery == searchQuery {
+                    ContentUnavailableView(
+                        "No tracks found",
+                        systemImage: "music.note.list",
+                        description: Text("Try searching for another artist or track")
+                    )
                 }
-                .padding(.top, 10)
-                .contentMargins(.bottom, 100)
-            } else if viewModel.searchTracks.isEmpty,
-                      searchQuery.count > 2,
-                      viewModel.shouldShowCentralSpinner.isFalse,
-                      viewModel.completedSearchQuery == searchQuery {
-                ContentUnavailableView(
-                    "No tracks found",
-                    systemImage: "music.note.list",
-                    description: Text("Try searching for another artist or track")
-                )
             } else if viewModel.completedSearchQuery.isEmpty {
+                let genreSection = viewModel.sections.first(where: { $0.type == .featured })
+                let popularSection = viewModel.sections.first(where: { $0.type == .popular })
+
                 ScrollView(showsIndicators: false) {
                     LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
                         SegmentedChipControl(
@@ -169,8 +173,9 @@ struct BrowseView: View {
                             direction: $slideDirection
                         )
                         .padding(.top, 10)
-                        if viewModel.genreTracks.isEmpty,
-                           viewModel.popularTracks.isEmpty,
+
+                        if genreSection?.tracks.isEmpty == true,
+                           popularSection?.tracks.isEmpty == true,
                            viewModel.shouldShowCentralSpinner.isFalse {
                             ContentUnavailableView(
                                 "Connection issue",
@@ -179,20 +184,20 @@ struct BrowseView: View {
                             )
                         } else {
                             if viewModel.shouldShowCentralSpinner.isFalse {
-                                    if viewModel.genreTracks.isNotEmpty {
+                                if let tracks = genreSection?.tracks, tracks.isNotEmpty {
                                         Section {
                                             ZStack {
                                                 ScrollViewReader { horizontalProxy in
                                                     ScrollView(.horizontal, showsIndicators: false) {
                                                         LazyHStack(spacing: 8) {
-                                                            ForEach(viewModel.genreTracks, id: \.id) { track in
+                                                            ForEach(tracks, id: \.id) { track in
                                                                 GenreCell(track: track) {
                                                                     Task {
                                                                         await viewModel.handleDownloadAction(for: track)
                                                                     }
                                                                 }
                                                                 .onAppear {
-                                                                    if track === viewModel.genreTracks.last {
+                                                                    if track === tracks.last {
                                                                         viewModel.loadNextBy(genre: selectedGenre)
                                                                     }
                                                                 }
@@ -205,7 +210,7 @@ struct BrowseView: View {
 
                                                             PaginationFooterView(
                                                                 hasReachedEnd: viewModel.reachedGenreTracksEnd,
-                                                                hasItems: viewModel.genreTracks.isNotEmpty,
+                                                                hasItems: tracks.isNotEmpty,
                                                                 style: .carousel
                                                             )
                                                         }
@@ -237,17 +242,17 @@ struct BrowseView: View {
                                         )
                                     }
 
-                                    if viewModel.popularTracks.isNotEmpty {
+                                if let tracks = popularSection?.tracks, tracks.isNotEmpty {
                                         Section {
                                                 LazyVStack(spacing: 4) {
-                                                    ForEach(viewModel.popularTracks, id: \.id) { track in
+                                                    ForEach(tracks, id: \.id) { track in
                                                         TrackCell(track: track) {
                                                             Task {
                                                                 await viewModel.handleDownloadAction(for: track)
                                                             }
                                                         }
                                                         .onAppear {
-                                                            if track === viewModel.popularTracks.last {
+                                                            if track === tracks.last {
                                                                 viewModel.loadNextPopular()
                                                             }
                                                         }
@@ -260,7 +265,7 @@ struct BrowseView: View {
 
                                                     PaginationFooterView(
                                                         hasReachedEnd: viewModel.reachedPopularTracksEnd,
-                                                        hasItems: viewModel.popularTracks.isNotEmpty
+                                                        hasItems: tracks.isNotEmpty
                                                     )
                                                 }
                                         } header: {

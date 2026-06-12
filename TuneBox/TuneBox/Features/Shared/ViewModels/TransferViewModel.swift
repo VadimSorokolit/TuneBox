@@ -8,6 +8,27 @@
 import Foundation
 import Observation
 
+struct TracksSection: Hashable, Identifiable {
+    let id: UUID = UUID()
+    let type: SectionType
+    let title: String
+    var tracks: [TrackEntity]
+
+    enum SectionType: String {
+        case featured
+        case popular
+        case search
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+
+    static func == (lhs: TracksSection, rhs: TracksSection) -> Bool {
+        lhs.id == rhs.id
+    }
+}
+
 enum ReservedSpace: Int, CaseIterable {
     case oneGB = 1
     case twoGB = 2
@@ -33,7 +54,7 @@ enum Genre: String, CaseIterable, Identifiable {
     }
 }
 
-enum SimultaneouslyLoadingCount: Int, CaseIterable {
+private enum SimultaneouslyLoadingCount: Int, CaseIterable {
     case two = 2
     case three = 3
     case four = 4
@@ -75,9 +96,7 @@ final class TransferViewModel: TransferManaging {
     private(set) var offsetPopular: Int = .zero
     private(set) var offsetGenre: Int = .zero
     private(set) var offsetSearch: Int = .zero
-    private(set) var popularTracks: [TrackEntity] = []
-    private(set) var genreTracks: [TrackEntity] = []
-    private(set) var searchTracks: [TrackEntity] = []
+    private(set) var sections: [TracksSection] = []
     private(set) var completedSearchQuery = ""
     private(set) var inProgressTrackIDs: Set<String> = []
     private(set) var error: String?
@@ -101,8 +120,8 @@ final class TransferViewModel: TransferManaging {
     }
 
     var shouldShowCentralSpinner: Bool {
-        (self.isPopularFirstLoading && self.popularTracks.isEmpty && self.isRefreshing.isFalse)
-        || (self.isGenreFirstLoading && self.genreTracks.isEmpty && self.isRefreshing.isFalse)
+        (self.isPopularFirstLoading && self.tracks(for: .popular).isEmpty && self.isRefreshing.isFalse)
+        || (self.isGenreFirstLoading && self.tracks(for: .featured).isEmpty && self.isRefreshing.isFalse)
         || self.isSearchLoading
     }
 
@@ -114,7 +133,6 @@ final class TransferViewModel: TransferManaging {
 
     func loadFirstPopular() async {
         self.reachedPopularTracksEnd = false
-        self.offsetPopular = .zero
 
         self.isPopularFirstLoading = true
 
@@ -129,10 +147,10 @@ final class TransferViewModel: TransferManaging {
             if persistedEntities.isEmpty || self.isRefreshing {
                 try await self.loadPopularInitialTracks()
             } else {
-                self.popularTracks = persistedEntities
+                self.set(persistedEntities, for: .popular)
                 self.offsetPopular = persistedEntities.count
 
-                await self.restoreFromPersistedState(self.popularTracks)
+                await self.restoreFromPersistedState(self.tracks(for: .popular))
             }
         } catch is CancellationError {
             AppLogger.network.debug("Load cancelled")
@@ -169,14 +187,13 @@ final class TransferViewModel: TransferManaging {
                 return
             }
 
-            self.mergeTracks(newTracks, into: &self.popularTracks)
+            self.mergeTracks(newTracks, for: .popular)
             self.offsetPopular += newTracks.count
         }
     }
 
     func loadFirstBy(genre: Genre?) async {
         self.reachedGenreTracksEnd = false
-        self.offsetGenre = .zero
 
         self.cancelGenreLoadTask()
 
@@ -197,10 +214,10 @@ final class TransferViewModel: TransferManaging {
             if persistedEntities.isEmpty || self.isRefreshing {
                 try await self.loadGenreInitialTracks(genre: selectedGenre)
             } else {
-                self.genreTracks = persistedEntities
+                self.set(persistedEntities, for: .featured)
                 self.offsetGenre = persistedEntities.count
 
-                await self.restoreFromPersistedState(self.genreTracks)
+                await self.restoreFromPersistedState(self.tracks(for: .featured))
             }
         } catch is CancellationError {
             AppLogger.network.debug("Load cancelled")
@@ -285,7 +302,7 @@ final class TransferViewModel: TransferManaging {
 
                 let resolved = self.upsertAndResolve(dtos.map(TrackEntity.init))
 
-                self.searchTracks = resolved
+                self.set(resolved, for: .search)
                 self.completedSearchQuery = query
                 self.offsetSearch = resolved.count
                 self.reachedSearchTracksEnd = resolved.count < self.limit
@@ -333,7 +350,7 @@ final class TransferViewModel: TransferManaging {
                     self.reachedSearchTracksEnd = true
                 }
 
-                self.mergeTracks(resolved, into: &self.searchTracks)
+                self.mergeTracks(resolved, for: .search)
                 self.offsetSearch += resolved.count
             } catch is CancellationError {
                 AppLogger.network.debug("Search pagination cancelled")
@@ -396,7 +413,7 @@ final class TransferViewModel: TransferManaging {
     func clearSearchState() {
         self.cancelSearchLoadTask()
         self.reachedSearchTracksEnd = false
-        self.searchTracks.removeAll()
+        self.set([], for: .search)
         self.offsetSearch = .zero
         self.isSearchLoading = false
         self.completedSearchQuery = ""
@@ -545,15 +562,12 @@ final class TransferViewModel: TransferManaging {
         self.inProgressTrackIDs.removeAll()
 
         AudioService.shared.stop()
-        self.popularTracks.removeAll()
-        self.genreTracks.removeAll()
-        self.searchTracks.removeAll()
+        self.clearDownloadState()
+        self.sections.removeAll()
 
         do {
             try self.persistenceService.clearStorage()
             try self.storageService.clearStorage()
-
-            self.clearDownloadState()
 
             self.offsetPopular = .zero
             self.offsetGenre = .zero
@@ -614,10 +628,27 @@ final class TransferViewModel: TransferManaging {
     }
 
     private var allTracks: [TrackEntity] {
-        self.popularTracks + self.genreTracks + self.searchTracks
+        self.sections.flatMap(\.tracks)
     }
 
     // MARK: - Methods. Private
+
+    private func set(
+        _ tracks: [TrackEntity],
+        for type: TracksSection.SectionType
+    ) {
+        if let index = self.sections.firstIndex(where: { $0.type == type }) {
+            self.sections[index].tracks = tracks
+        } else {
+            self.sections.append(
+                TracksSection(
+                    type: type,
+                    title: type.rawValue.capitalized,
+                    tracks: tracks
+                )
+            )
+        }
+    }
 
     private func cancelPopularLoadTask() {
         self.popularLoadTask?.cancel()
@@ -635,37 +666,37 @@ final class TransferViewModel: TransferManaging {
     }
 
     private func loadPopularInitialTracks() async throws {
-        self.offsetPopular = .zero
+        let offsetZero: Int = .zero
 
-        let loadedTracks = await self.loadPopularTracks(offset: 0)
+        let loadedTracks = await self.loadPopularTracks(offset: offsetZero)
         try Task.checkCancellation()
 
-        if self.popularTracks.isEmpty {
-            self.popularTracks = loadedTracks
+        self.offsetPopular = offsetZero
+
+        if self.tracks(for: .popular).isEmpty {
+            self.set(loadedTracks, for: .popular)
         } else {
-            self.mergeTracks(loadedTracks, into: &self.popularTracks)
+            self.mergeTracks(loadedTracks, for: .popular)
         }
-        self.offsetPopular = self.popularTracks.count
+        self.offsetPopular = self.tracks(for: .popular).count
         self.reachedPopularTracksEnd = (loadedTracks.count < self.limit)
     }
 
     private func loadGenreInitialTracks(genre: Genre) async throws {
-        self.offsetGenre = .zero
+        let offsetZero: Int = .zero
 
         let loadedTracks = await self.loadTracksBy(
             genre: self.apiGenre(for: genre),
-            offset: 0,
+            offset: offsetZero,
             appendToGenreTracks: false
         )
-
         try Task.checkCancellation()
 
-        if self.genreTracks.isEmpty {
-            self.genreTracks = loadedTracks
-        } else {
-            self.mergeTracks(loadedTracks, into: &self.genreTracks)
-        }
-        self.offsetGenre = self.genreTracks.count
+        self.offsetGenre = offsetZero
+
+        self.set(loadedTracks, for: .featured)
+
+        self.offsetGenre = self.tracks(for: .featured).count
         self.reachedGenreTracksEnd = (loadedTracks.count < self.limit)
     }
 
@@ -730,7 +761,7 @@ final class TransferViewModel: TransferManaging {
             let resolved = self.upsertAndResolve(entities)
 
             if appendToGenreTracks {
-                self.mergeTracks(resolved, into: &self.genreTracks)
+                self.mergeTracks(resolved, for: .featured)
                 self.offsetGenre += resolved.count
             }
 
@@ -784,9 +815,9 @@ final class TransferViewModel: TransferManaging {
     }
 
     private func replaceWithCanonical(_ canonical: TrackEntity) {
-        self.replaceInList(&self.popularTracks, with: canonical)
-        self.replaceInList(&self.genreTracks, with: canonical)
-        self.replaceInList(&self.searchTracks, with: canonical)
+        for index in self.sections.indices {
+            self.replaceInList(&self.sections[index].tracks, with: canonical)
+        }
     }
 
     private func replaceInList(_ list: inout [TrackEntity], with canonical: TrackEntity) {
@@ -795,12 +826,23 @@ final class TransferViewModel: TransferManaging {
         }
     }
 
-    private func mergeTracks(_ incoming: [TrackEntity], into list: inout [TrackEntity]) {
+    private func mergeTracks(
+        _ incoming: [TrackEntity],
+        for type: TracksSection.SectionType
+    ) {
+        guard let sectionIndex = self.sections.firstIndex(where: { $0.type == type }) else {
+            self.set(incoming, for: type)
+            return
+        }
+
         for incomingTrack in incoming {
-            if let index = list.firstIndex(where: { $0.id == incomingTrack.id }) {
-                self.assignCanonical(&list[index], canonical: incomingTrack)
+            if let trackIndex = self.sections[sectionIndex].tracks.firstIndex(where: { $0.id == incomingTrack.id }) {
+                self.assignCanonical(
+                    &self.sections[sectionIndex].tracks[trackIndex],
+                    canonical: incomingTrack
+                )
             } else {
-                list.append(incomingTrack)
+                self.sections[sectionIndex].tracks.append(incomingTrack)
             }
         }
     }
@@ -881,6 +923,10 @@ final class TransferViewModel: TransferManaging {
         } catch {
             await self.handleDownloadActivationFailure(track, error: error)
         }
+    }
+
+    private func tracks(for type: TracksSection.SectionType) -> [TrackEntity] {
+        self.sections.first { $0.type == type }?.tracks ?? []
     }
 
     private func activateResumeDownload(track: TrackEntity) async {

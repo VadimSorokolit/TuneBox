@@ -23,10 +23,8 @@ struct TuneBoxApp: App {
                 .onChange(of: scenePhase) { _, newPhase in
                     switch newPhase {
                         case .active:
-                            if viewModel.popularTracks.isEmpty == false {
-                                Task {
-                                    await viewModel.restoreDownloadsOnForeground()
-                                }
+                            Task {
+                                await viewModel.restoreDownloadsOnForeground()
                             }
                             AppLogger.app.info("App is active")
 
