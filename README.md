@@ -30,11 +30,9 @@ The app allows users to browse, search, and download tracks using the [Jamendo A
 
 ## For Run:
 
-Download project from repository
-
-Build project (CMD+B)
-
-Run project (CMD+R)
+* Download project from repository  
+* Build project (`CMD+B`)  
+* Run project (`CMD+R`)
 
 ## Notes
 
