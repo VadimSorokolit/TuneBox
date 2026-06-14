@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import Resolver
 
 enum CustomTab: Hashable, Identifiable, CaseIterable {
     case browse
@@ -57,8 +56,8 @@ enum CustomTab: Hashable, Identifiable, CaseIterable {
 }
 
 struct RootTabsView: View {
-    @Injected private var viewModel: TransferManaging
     @Environment(\.themeManager) private var theme
+    @State private var activeTab: CustomTab = .browse
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -71,25 +70,28 @@ struct RootTabsView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
     }
 
+    @ViewBuilder
     private var content: some View {
-        ZStack {
-            BrowseView()
-                .tabVisible(viewModel.selectedTab == .browse)
+        Group {
+            switch activeTab {
+                case .browse:
+                    BrowseView()
 
-            DownloadsView()
-                .tabVisible(viewModel.selectedTab == .downloads)
+                case .downloads:
+                    DownloadsView()
 
-            PlayerView()
-                .tabVisible(viewModel.selectedTab == .player)
+                case .player:
+                    PlayerView()
 
-            ImportFilesView()
-                .tabVisible(viewModel.selectedTab == .importFiles)
+                case .importFiles:
+                    ImportFilesView()
 
-            SettingsView()
-                .tabVisible(viewModel.selectedTab == .settings)
+                case .settings:
+                    SettingsView()
+            }
         }
-        .ignoresSafeArea(edges: .bottom)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .ignoresSafeArea(edges: .bottom)
     }
 
     private var tabBar: some View {
@@ -97,11 +99,11 @@ struct RootTabsView: View {
             ForEach(CustomTab.tabs) { tab in
                 TabItemView(
                     tab: tab,
-                    isSelected: viewModel.selectedTab == tab,
+                    isSelected: activeTab == tab,
                     activeColor: theme.tokens.tabIconActive,
                     inactiveColor: theme.tokens.tabIconInactive
                 ) {
-                    viewModel.selectedTab = tab
+                    activeTab = tab
                 }
             }
         }
@@ -148,14 +150,6 @@ private struct TabItemView: View {
         }
         .offset(y: 10)
         .buttonStyle(.plain)
-    }
-}
-
-private extension View {
-    func tabVisible(_ isVisible: Bool) -> some View {
-        opacity(isVisible ? 1 : 0)
-            .allowsHitTesting(isVisible)
-            .zIndex(isVisible ? 1 : 0)
     }
 }
 

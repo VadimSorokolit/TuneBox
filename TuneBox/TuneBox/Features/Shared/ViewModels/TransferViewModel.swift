@@ -66,9 +66,6 @@ protocol TransferManaging:
     DownloadStateProviding,
     StorageManaging,
     PersistenceManaging {
-
-    var selectedTab: CustomTab { get set }
-
     func loadFirstPopular() async
     func loadFirstBy(genre: Genre?) async
     func refreshBrowse(_ selectedGenre: Genre?) async
@@ -113,7 +110,6 @@ final class TransferViewModel: TransferManaging {
     private(set) var reachedPopularTracksEnd = false
     private(set) var reachedGenreTracksEnd = false
     private(set) var reachedSearchTracksEnd = false
-    var selectedTab: CustomTab = .browse
 
     var inProgressTracksCount: Int {
         self.inProgressTrackIDs.count

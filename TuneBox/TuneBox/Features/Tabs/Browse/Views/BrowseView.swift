@@ -49,13 +49,18 @@ struct BrowseView: View {
                maxHeight: .infinity,
                alignment: .top
         )
-        .task {
+        .onAppear {
             guard viewModel.sections.flatMap( \.tracks).isEmpty else {
                 return
             }
 
-            await viewModel.loadFirstPopular()
-            await viewModel.loadFirstBy(genre: nil)
+            Task {
+                async let popular = viewModel.loadFirstPopular()
+                async let genre = viewModel.loadFirstBy(genre: nil)
+
+                await popular
+                await genre
+            }
         }
         .overlay {
             if viewModel.shouldShowCentralSpinner {
@@ -66,9 +71,6 @@ struct BrowseView: View {
             if query.isEmpty {
                 viewModel.clearSearchState()
             }
-        }
-        .onChange(of: viewModel.selectedTab) { _, _ in
-            isTextFieldFocused = false
         }
         .onTapGesture {
             isTextFieldFocused = false
