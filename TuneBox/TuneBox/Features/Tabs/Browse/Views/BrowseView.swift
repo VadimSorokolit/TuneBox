@@ -11,7 +11,6 @@ import SwiftUI
 struct BrowseView: View {
     @Injected var viewModel: TransferManaging
     @FocusState private var isTextFieldFocused: Bool
-    @State private var selectedGenre: Genre = .all
     @State private var slideDirection: SlideDirection = .forward
     @State private var searchQuery: String = ""
 
@@ -40,27 +39,27 @@ struct BrowseView: View {
                 }
             }
 
-            ContentView(selectedGenre: $selectedGenre,
-                        slideDirection: $slideDirection,
-                        searchQuery: $searchQuery
+            ContentView(
+                slideDirection: $slideDirection,
+                searchQuery: $searchQuery
             )
         }
         .frame(maxWidth: .infinity,
                maxHeight: .infinity,
                alignment: .top
         )
-        .onAppear {
-            guard viewModel.sections.flatMap( \.tracks).isEmpty else {
+        .task {
+            guard viewModel.sections.flatMap(\.tracks).isEmpty else {
                 return
             }
 
-            Task {
-                async let popular = viewModel.loadFirstPopular()
-                async let genre = viewModel.loadFirstBy(genre: nil)
+            async let popular: Void = viewModel.loadFirstPopular()
+            async let genre: Void = viewModel.loadFirstBy(
+                genre: viewModel.selectedGenre == .all ? nil : viewModel.selectedGenre
+            )
 
-                await popular
-                await genre
-            }
+            await popular
+            await genre
         }
         .overlay {
             if viewModel.shouldShowCentralSpinner {
@@ -106,12 +105,10 @@ struct BrowseView: View {
             }
             .padding(.horizontal, horizontalPadding)
         }
-
     }
 
     private struct ContentView: View {
         @Injected var viewModel: TransferManaging
-        @Binding var selectedGenre: Genre
         @Binding var slideDirection: SlideDirection
         @Binding var searchQuery: String
 
@@ -166,18 +163,31 @@ struct BrowseView: View {
             } else if viewModel.completedSearchQuery.isEmpty {
                 let genreTracksSection = viewModel.sections.first(where: { $0.type == .genre })
                 let popularTracksSection = viewModel.sections.first(where: { $0.type == .popular })
+                let hasGenreSection = genreTracksSection != nil
+                let hasPopularSection = popularTracksSection != nil
+                let hasGenreTracks = genreTracksSection?.tracks.isNotEmpty == true
+                let hasPopularTracks = popularTracksSection?.tracks.isNotEmpty == true
 
                 ScrollView(showsIndicators: false) {
                     LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
                         SegmentedChipControl(
-                            selected: $selectedGenre,
+                            selected: Binding(
+                                get: {
+                                    viewModel.selectedGenre
+                                },
+                                set: {
+                                    viewModel.selectedGenre = $0
+                                }
+                            ),
                             direction: $slideDirection,
                             items: Genre.allCases
                         )
                         .padding(.top, 10)
 
-                        if genreTracksSection?.tracks.isEmpty == true,
-                           popularTracksSection?.tracks.isEmpty == true,
+                        if hasGenreSection,
+                           hasPopularSection,
+                           hasGenreTracks.isFalse,
+                           hasPopularTracks.isFalse,
                            viewModel.shouldShowCentralSpinner.isFalse {
                             ContentUnavailableView(
                                 "Connection issue",
@@ -187,118 +197,104 @@ struct BrowseView: View {
                         } else {
                             if viewModel.shouldShowCentralSpinner.isFalse {
                                 if let section = genreTracksSection, section.tracks.isNotEmpty {
-                                        Section {
-                                            ZStack {
-                                                ScrollViewReader { horizontalProxy in
-                                                    ScrollView(.horizontal, showsIndicators: false) {
-                                                        LazyHStack(spacing: 8) {
-                                                            ForEach(section.tracks, id: \.id) { track in
-                                                                GenreCell(track: track) {
-                                                                    Task {
-                                                                        await viewModel.handleDownloadAction(for: track)
-                                                                    }
-                                                                }
-                                                                .onAppear {
-                                                                    if track === section.tracks.last {
-                                                                        viewModel.loadNextBy(genre: selectedGenre)
-                                                                    }
+                                    Section {
+                                        ZStack {
+                                            ScrollViewReader { horizontalProxy in
+                                                ScrollView(.horizontal, showsIndicators: false) {
+                                                    LazyHStack(spacing: 8) {
+                                                        ForEach(section.tracks, id: \.id) { track in
+                                                            GenreCell(track: track) {
+                                                                Task {
+                                                                    await viewModel.handleDownloadAction(for: track)
                                                                 }
                                                             }
-
-                                                            if viewModel.isPaginationGenreLoading {
-                                                                SpinnerView(size: .regular)
-                                                                    .padding(.leading, 8)
+                                                            .onAppear {
+                                                                if track === section.tracks.last {
+                                                                    viewModel.loadNextBy(genre: viewModel.selectedGenre)
+                                                                }
                                                             }
-
-                                                            PaginationFooterView(
-                                                                hasReachedEnd: viewModel.reachedGenreTracksEnd,
-                                                                hasItems: section.tracks.isNotEmpty,
-                                                                style: .carousel
-                                                            )
                                                         }
-                                                        .padding(.horizontal)
-                                                        .id("featuredLeft")
-                                                    }
-                                                    .onChange(of: viewModel.isRefreshing) { _, isRefreshing in
-                                                        guard isRefreshing.isFalse else { return }
 
-                                                        horizontalProxy.scrollTo("featuredLeft", anchor: .leading)
+                                                        if viewModel.isPaginationGenreLoading {
+                                                            SpinnerView(size: .regular)
+                                                                .padding(.leading, 8)
+                                                        }
+
+                                                        PaginationFooterView(
+                                                            hasReachedEnd: viewModel.reachedGenreTracksEnd,
+                                                            hasItems: section.tracks.isNotEmpty,
+                                                            style: .carousel
+                                                        )
+                                                    }
+                                                    .padding(.horizontal)
+                                                    .id("featuredLeft")
+                                                }
+                                                .onChange(of: viewModel.isRefreshing) { _, isRefreshing in
+                                                    guard isRefreshing.isFalse else { return }
+
+                                                    horizontalProxy.scrollTo("featuredLeft", anchor: .leading)
+                                                }
+                                            }
+                                        }
+                                        .id(viewModel.selectedGenre)
+                                    } header: {
+                                        Text(section.title)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .padding(.leading, headerLeadingPadding)
+                                            .padding(.vertical, 10)
+                                            .background(Color(.systemBackground))
+                                            .foregroundStyle(Color(.label))
+                                            .font(.headline)
+                                    }
+                                }
+
+                                if let section = popularTracksSection, section.tracks.isNotEmpty {
+                                    Section {
+                                        LazyVStack(spacing: 4) {
+                                            ForEach(section.tracks, id: \.id) { track in
+                                                TrackCell(track: track) {
+                                                    Task {
+                                                        await viewModel.handleDownloadAction(for: track)
+                                                    }
+                                                }
+                                                .onAppear {
+                                                    if track === section.tracks.last {
+                                                        viewModel.loadNextPopular()
                                                     }
                                                 }
                                             }
-                                            .id(selectedGenre)
-                                        } header: {
-                                            Text(section.title)
-                                                .frame(maxWidth: .infinity, alignment: .leading)
-                                                .padding(.leading, headerLeadingPadding)
-                                                .padding(.vertical, 10)
-                                                .background(Color(.systemBackground))
-                                                .foregroundStyle(Color(.label))
-                                                .font(.headline)
+
+                                            if viewModel.isPaginationPopularLoading {
+                                                SpinnerView(size: .regular)
+                                                    .padding(.top, 8)
+                                            }
+
+                                            PaginationFooterView(
+                                                hasReachedEnd: viewModel.reachedPopularTracksEnd,
+                                                hasItems: section.tracks.isNotEmpty
+                                            )
                                         }
-                                    } else if viewModel.shouldShowCentralSpinner.isFalse {
-                                        ContentUnavailableView(
-                                            "No featured tracks",
-                                            systemImage: "music.note.list",
-                                            description: Text("Pull down to refresh")
-                                        )
+                                    } header: {
+                                        Text(section.title)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .padding(.leading, headerLeadingPadding)
+                                            .padding(.vertical, 10)
+                                            .background(Color(.systemBackground))
+                                            .foregroundStyle(Color(.label))
+                                            .font(.headline)
                                     }
-
-                                if let section = popularTracksSection, section.tracks.isNotEmpty {
-                                        Section {
-                                                LazyVStack(spacing: 4) {
-                                                    ForEach(section.tracks, id: \.id) { track in
-                                                        TrackCell(track: track) {
-                                                            Task {
-                                                                await viewModel.handleDownloadAction(for: track)
-                                                            }
-                                                        }
-                                                        .onAppear {
-                                                            if track === section.tracks.last {
-                                                                viewModel.loadNextPopular()
-                                                            }
-                                                        }
-                                                    }
-
-                                                    if viewModel.isPaginationPopularLoading {
-                                                        SpinnerView(size: .regular)
-                                                            .padding(.top, 8)
-                                                    }
-
-                                                    PaginationFooterView(
-                                                        hasReachedEnd: viewModel.reachedPopularTracksEnd,
-                                                        hasItems: section.tracks.isNotEmpty
-                                                    )
-                                                }
-                                        } header: {
-                                            Text(section.title)
-                                                .frame(maxWidth: .infinity, alignment: .leading)
-                                                .padding(.leading, headerLeadingPadding)
-                                                .padding(.vertical, 10)
-                                                .background(Color(.systemBackground))
-                                                .foregroundStyle(Color(.label))
-                                                .font(.headline)
-                                        }
-                                    } else if viewModel.shouldShowCentralSpinner.isFalse {
-                                        ContentUnavailableView(
-                                            "No popular tracks",
-                                            systemImage: "music.note.list",
-                                            description: Text("Pull down to refresh")
-                                        )
-                                    }
+                                }
                             }
                         }
                     }
                 }
                 .padding(.top, 5)
                 .refreshable {
-                    await viewModel.refreshBrowse(
-                        selectedGenre == .all ? nil : selectedGenre
-                    )
+                    await viewModel.refreshBrowse(viewModel.selectedGenre)
                 }
-                .id(selectedGenre)
+                .id(viewModel.selectedGenre)
                 .contentMargins(.bottom, 100)
-                .onChange(of: selectedGenre) { _, genre in
+                .onChange(of: viewModel.selectedGenre) { _, genre in
                     Task {
                         await viewModel.loadFirstBy(genre: genre)
                     }
@@ -309,5 +305,5 @@ struct BrowseView: View {
 }
 
 #Preview {
-        BrowseView()
+    BrowseView()
 }

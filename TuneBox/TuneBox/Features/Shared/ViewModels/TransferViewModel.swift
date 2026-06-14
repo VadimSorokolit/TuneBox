@@ -99,7 +99,6 @@ final class TransferViewModel: TransferManaging {
     private(set) var error: String?
     private(set) var simultaneouslyLoadingCount: Int = SimultaneouslyLoadingCount.two.rawValue
     private(set) var reservedSpace: ReservedSpace = .oneGB
-    private(set) var genre: Genre = .all
     private(set) var isRefreshing = false
     private(set) var isPopularFirstLoading = false
     private(set) var isPaginationPopularLoading = false
@@ -110,6 +109,8 @@ final class TransferViewModel: TransferManaging {
     private(set) var reachedPopularTracksEnd = false
     private(set) var reachedGenreTracksEnd = false
     private(set) var reachedSearchTracksEnd = false
+
+    var selectedGenre: Genre = .all
 
     var inProgressTracksCount: Int {
         self.inProgressTrackIDs.count
@@ -195,7 +196,7 @@ final class TransferViewModel: TransferManaging {
 
         let selectedGenre = genre ?? .all
 
-        self.genre = selectedGenre
+        self.selectedGenre = selectedGenre
         self.isGenreFirstLoading = true
 
         defer {
@@ -228,8 +229,8 @@ final class TransferViewModel: TransferManaging {
             return
         }
 
-        let resolvedGenre = genre ?? self.genre
-        self.genre = resolvedGenre
+        let resolvedGenre = genre ?? self.selectedGenre
+        self.selectedGenre = resolvedGenre
         let apiGenre = self.apiGenre(for: resolvedGenre)
 
         self.genreLoadTask = Task { @MainActor [weak self] in
@@ -262,7 +263,7 @@ final class TransferViewModel: TransferManaging {
         defer { self.isRefreshing = false }
 
         async let popular = self.loadFirstPopular()
-        async let genre = self.loadFirstBy(genre: selectedGenre)
+        async let genre = self.loadFirstBy(genre: selectedGenre == .all ? nil : selectedGenre)
 
         _ = await (popular, genre)
     }

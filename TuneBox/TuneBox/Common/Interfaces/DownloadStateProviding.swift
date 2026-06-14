@@ -10,6 +10,7 @@ import Foundation
 protocol DownloadStateProviding: AnyObject {
     var offsetPopular: Int { get }
     var sections: [TracksSection] { get }
+    var selectedGenre: Genre { get set }
     var inProgressTrackIDs: Set<String> { get }
     var inProgressTracksCount: Int { get }
     var isRefreshing: Bool { get }
