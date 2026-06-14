@@ -8,27 +8,6 @@
 import Foundation
 import Observation
 
-struct TracksSection: Hashable, Identifiable {
-    let id: UUID = UUID()
-    let type: SectionType
-    let title: String
-    var tracks: [TrackEntity]
-
-    enum SectionType: String {
-        case genre = "Featured"
-        case popular = "Popular"
-        case search = "Search"
-    }
-
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-
-    static func == (lhs: TracksSection, rhs: TracksSection) -> Bool {
-        lhs.id == rhs.id
-    }
-}
-
 enum ReservedSpace: Int, CaseIterable {
     case oneGB = 1
     case twoGB = 2
