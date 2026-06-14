@@ -81,7 +81,7 @@ final class PersistenceService: PersistenceServicing {
         return try self.modelContext.fetch(descriptor)
     }
 
-    func getSarchTracksBy(query: String, limit: Int) throws -> [TrackEntity] {
+    func getSearchTracksBy(query: String, limit: Int) throws -> [TrackEntity] {
         let query = query.lowercased()
 
         let descriptor = FetchDescriptor<TrackEntity>(
