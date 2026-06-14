@@ -10,6 +10,7 @@ import SDWebImageSwiftUI
 
 struct TrackCell: View {
     @Environment(\.themeManager) var theme
+
     let track: TrackEntity
     let searchQuery: String?
     let onTap: () -> Void

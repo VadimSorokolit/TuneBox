@@ -168,9 +168,9 @@ struct BrowseView: View {
                 ScrollView(showsIndicators: false) {
                     LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
                         SegmentedChipControl(
-                            items: Genre.allCases,
                             selected: $selectedGenre,
-                            direction: $slideDirection
+                            direction: $slideDirection,
+                            items: Genre.allCases
                         )
                         .padding(.top, 10)
 

@@ -11,6 +11,7 @@ import Resolver
 struct SearchBarView: View {
     @Injected var viewModel: TransferManaging
     @Binding var searchQuery: String
+
     let isFocused: FocusState<Bool>.Binding
     let onSubmit: () -> Void
     let onClear: () -> Void

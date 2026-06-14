@@ -10,7 +10,8 @@ import SwiftUI
 struct HighlightedText: View {
     let text: String
     let searchQuery: String?
-    var highlightColor: Color = Color(hex: 0xFCFAA6)
+
+    let highlightColor: Color = Color(hex: 0xFCFAA6)
 
     var body: some View {
         Text(highlightedAttributedString)

@@ -18,9 +18,10 @@ struct SegmentedChipControl<T: SegmentedItem & Hashable>: View {
         case trailing
     }
 
-    let items: [T]
     @Binding var selected: T
     @Binding var direction: SlideDirection
+
+    let items: [T]
 
     var body: some View {
         var segmentedChipEdgeInset: CGFloat {
@@ -128,9 +129,9 @@ private struct PreviewWrapper: View {
     var body: some View {
         VStack(spacing: 24) {
             SegmentedChipControl(
-                items: Genre.allCases,
                 selected: $selected,
-                direction: $direction
+                direction: $direction,
+                items: Genre.allCases
             )
 
             ZStack {

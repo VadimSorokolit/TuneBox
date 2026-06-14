@@ -24,7 +24,6 @@ struct EmptyTrackCell: View {
             .frame(maxWidth: .infinity)
             .frame(height: height)
     }
-
 }
 
 #Preview {
