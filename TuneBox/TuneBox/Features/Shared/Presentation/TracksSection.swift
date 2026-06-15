@@ -10,8 +10,11 @@ import Foundation
 struct TracksSection: Hashable, Identifiable {
     let id: UUID = UUID()
     let type: SectionType
-    let title: String
     var tracks: [TrackEntity]
+
+    var title: String {
+        type.rawValue
+    }
 
     enum SectionType: String {
         case genre = "Featured"

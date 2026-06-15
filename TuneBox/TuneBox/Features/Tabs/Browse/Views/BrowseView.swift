@@ -26,7 +26,8 @@ struct BrowseView: View {
                 },
                 onClear: {
                     viewModel.clearSearchState()
-                })
+                }
+            )
             .task(id: searchQuery) {
                 try? await Task.sleep(for: .milliseconds(300))
 

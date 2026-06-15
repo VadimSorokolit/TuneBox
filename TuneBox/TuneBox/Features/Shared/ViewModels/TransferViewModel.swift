@@ -619,7 +619,6 @@ final class TransferViewModel: TransferManaging {
             self.sections.append(
                 TracksSection(
                     type: type,
-                    title: type.rawValue,
                     tracks: tracks
                 )
             )

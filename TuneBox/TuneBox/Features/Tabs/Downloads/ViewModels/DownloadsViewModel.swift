@@ -29,12 +29,10 @@ class DownloadsViewModel: DownloadsPresenting {
         self.sections = [
             TracksSection(
                 type: .activeDownloads,
-                title: TracksSection.SectionType.activeDownloads.rawValue,
                 tracks: activeTracks
             ),
             TracksSection(
                 type: .downloaded,
-                title: TracksSection.SectionType.downloaded.rawValue,
                 tracks: downloadedTracks
             )
         ]
