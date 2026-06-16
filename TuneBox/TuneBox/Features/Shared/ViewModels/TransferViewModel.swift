@@ -639,7 +639,7 @@ final class TransferViewModel: TransferManaging {
     private let persistenceService: PersistenceServicing
     private let storageService: FileManagerServicing
     private let downloadObserverTokens = TransferDownloadObserverTokens()
-    private var fetchTracksCount = .zero
+    private var fetchTracksCount: Int = .zero
 
     @ObservationIgnored
     private var queuedDownloadTrackIDs: [String] = []

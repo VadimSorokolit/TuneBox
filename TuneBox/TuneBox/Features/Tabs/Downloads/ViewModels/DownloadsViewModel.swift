@@ -43,9 +43,10 @@ class DownloadsViewModel: DownloadsPresenting {
             } else {
                 async let activeTracks = self.transferViewModel.getRecentActiveTracks(limit: self.tracksLimit)
                 async let downloadedTracks = self.transferViewModel.getRecentDownloadedTracks(limit: self.tracksLimit)
-
+                
+                // Concurrency execution
                 let (active, downloaded) = await (activeTracks, downloadedTracks)
-
+                
                 self.set(active, for: .activeDownloads)
                 self.set(downloaded, for: .downloaded)
             }
