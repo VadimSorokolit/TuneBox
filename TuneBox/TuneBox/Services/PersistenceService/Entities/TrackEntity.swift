@@ -28,6 +28,7 @@ final class TrackEntity {
     var size: Int?
     var isPopular: Bool?
     var downloadingSize: Int = 0
+    var lastStateChangeAt: Date?
     var downloadQueueIndex: Int?
     var genreRawValue: String?
     private var duration: Int?

@@ -112,7 +112,7 @@ struct GenreCell: View {
         }
         .frame(width: 28, height: 28)
     }
-    
+
     private var accessibilityLabel: String {
         switch track.downloadState {
             case .idle:

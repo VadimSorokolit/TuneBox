@@ -450,7 +450,10 @@ final class TransferViewModel: TransferManaging {
             self.inProgressTrackIDs.insert(trackID)
 
             if let track = self.track(byID: trackID), track.downloadState != .downloading {
-                self.setTransferState(for: trackID, downloadState: .downloading)
+                self.setTransferState(
+                    for: trackID,
+                    downloadState: .downloading
+                )
             }
         }
 
@@ -850,10 +853,12 @@ final class TransferViewModel: TransferManaging {
         for trackID: String,
         downloadState: DownloadState,
         fileState: FileStorageState? = nil,
-        downloadingSize: Int? = nil
+        downloadingSize: Int? = nil,
+        lastStateChangeAt: Date = Date()
     ) {
         self.updateTracks(withID: trackID) { track in
             track.downloadState = downloadState
+            track.lastStateChangeAt = lastStateChangeAt
 
             if let downloadingSize {
                 track.downloadingSize = downloadingSize
@@ -883,13 +888,19 @@ final class TransferViewModel: TransferManaging {
         }
 
         self.queuedDownloadTrackIDs.append(track.id)
-        self.setTransferState(for: track.id, downloadState: .queued)
+        self.setTransferState(
+            for: track.id,
+            downloadState: .queued
+        )
         self.persistDownloadSession()
     }
 
     private func activateDownload(track: TrackEntity) async {
         self.inProgressTrackIDs.insert(track.id)
-        self.setTransferState(for: track.id, downloadState: .downloading)
+        self.setTransferState(
+            for: track.id,
+            downloadState: .downloading
+        )
         self.updateProgressBaseline(for: track)
         self.persistDownloadSession()
 
@@ -906,7 +917,10 @@ final class TransferViewModel: TransferManaging {
 
     private func activateResumeDownload(track: TrackEntity) async {
         self.inProgressTrackIDs.insert(track.id)
-        self.setTransferState(for: track.id, downloadState: .downloading)
+        self.setTransferState(
+            for: track.id,
+            downloadState: .downloading
+        )
         self.updateProgressBaseline(for: track)
         self.persistDownloadSession()
 
@@ -1008,7 +1022,10 @@ final class TransferViewModel: TransferManaging {
 
         for track in self.uniqueTracksByID(self.allTracks)
         where track.downloadState == .downloading && liveActive.contains(track.id) == false {
-            self.setTransferState(for: track.id, downloadState: .queued)
+            self.setTransferState(
+                for: track.id,
+                downloadState: .queued
+            )
 
             if queuedIDs.insert(track.id).inserted {
                 queuedInOrder.append(track.id)
@@ -1171,7 +1188,10 @@ final class TransferViewModel: TransferManaging {
         if self.queuedDownloadTrackIDs.contains(trackID) == false {
             self.queuedDownloadTrackIDs.insert(trackID, at: .zero)
         }
-        self.setTransferState(for: trackID, downloadState: .queued)
+        self.setTransferState(
+            for: trackID,
+            downloadState: .queued
+        )
 
         self.persistDownloadSession()
         await self.processDownloadQueue()
@@ -1203,11 +1223,13 @@ final class TransferViewModel: TransferManaging {
     private func resetTrackState(
         _ track: TrackEntity,
         to state: DownloadState,
-        fileState: FileStorageState? = nil
+        fileState: FileStorageState? = nil,
+        lastStateChangeAt: Date = Date()
     ) {
         self.updateTracks(withID: track.id) { listedTrack in
             listedTrack.downloadState = state
             listedTrack.downloadingSize = .zero
+            listedTrack.lastStateChangeAt = lastStateChangeAt
 
             if let fileState {
                 listedTrack.fileState = fileState
