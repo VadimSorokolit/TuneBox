@@ -45,6 +45,9 @@ protocol TransferManaging:
     DownloadStateProviding,
     StorageManaging,
     PersistenceManaging {
+    func getAllPersistedTracks() async -> [TrackEntity]
+    func getRecentActiveTracks(limit: Int?) async -> [TrackEntity]
+    func getRecentDownloadedTracks(limit: Int?) async -> [TrackEntity]
     func loadFirstPopular() async
     func loadFirstBy(genre: Genre?) async
     func refreshBrowse(_ selectedGenre: Genre?) async
@@ -95,10 +98,15 @@ final class TransferViewModel: TransferManaging {
         self.inProgressTrackIDs.count
     }
 
+    var isFetchTracks: Bool {
+        self.fetchTracksCount > .zero
+    }
+
     var shouldShowCentralSpinner: Bool {
         (self.isPopularFirstLoading && self.tracks(for: .popular).isEmpty && self.isRefreshing.isFalse)
         || (self.isGenreFirstLoading && self.tracks(for: .genre).isEmpty && self.isRefreshing.isFalse)
         || self.isSearchLoading
+        || self.isFetchTracks
     }
 
     var availableSpace: Double? {
@@ -333,6 +341,54 @@ final class TransferViewModel: TransferManaging {
             } catch {
                 self.handleError(error)
             }
+        }
+    }
+
+    func getAllPersistedTracks() async -> [TrackEntity] {
+        self.startFetchTracks()
+
+        defer {
+            self.finishFetchTracks()
+        }
+
+        do {
+            let tracks: [TrackEntity] = try self.persistenceService.getTracks()
+            return tracks
+        } catch {
+            self.handleError(error)
+            return []
+        }
+    }
+
+    func getRecentActiveTracks(limit: Int?) async -> [TrackEntity] {
+        self.startFetchTracks()
+
+        defer {
+            self.finishFetchTracks()
+        }
+
+        do {
+            let tracks = try self.persistenceService.getRecentActiveTracks(limit: limit)
+            return tracks
+        } catch {
+            self.handleError(error)
+            return []
+        }
+    }
+
+    func getRecentDownloadedTracks(limit: Int?) async -> [TrackEntity] {
+        self.startFetchTracks()
+
+        defer {
+            self.finishFetchTracks()
+        }
+
+        do {
+            let tracks = try self.persistenceService.getRecentDownloadedTracks(limit: limit)
+            return tracks
+        } catch {
+            self.handleError(error)
+            return []
         }
     }
 
@@ -583,6 +639,7 @@ final class TransferViewModel: TransferManaging {
     private let persistenceService: PersistenceServicing
     private let storageService: FileManagerServicing
     private let downloadObserverTokens = TransferDownloadObserverTokens()
+    private var fetchTracksCount = .zero
 
     @ObservationIgnored
     private var queuedDownloadTrackIDs: [String] = []
@@ -626,6 +683,14 @@ final class TransferViewModel: TransferManaging {
                 )
             )
         }
+    }
+
+    private func startFetchTracks() {
+        self.fetchTracksCount += 1
+    }
+
+    private func finishFetchTracks() {
+        self.fetchTracksCount = max(.zero, self.fetchTracksCount - 1)
     }
 
     private func cancelPopularLoadTask() {

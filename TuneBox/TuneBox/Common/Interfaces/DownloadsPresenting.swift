@@ -8,5 +8,5 @@
 protocol DownloadsPresenting {
     var sections: [TracksSection] { get }
 
-    func fetchTracksSection() 
+    func fetchTracksSection()
 }

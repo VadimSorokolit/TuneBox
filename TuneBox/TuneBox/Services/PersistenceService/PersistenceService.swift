@@ -34,6 +34,49 @@ final class PersistenceService: PersistenceServicing {
         }
     }
 
+    func getRecentDownloadedTracks(limit: Int?) throws -> [TrackEntity] {
+        let completed = DownloadState.completed.rawValue
+
+        var descriptor = FetchDescriptor<TrackEntity>(
+            predicate: #Predicate<TrackEntity> { track in
+                track.downloadState.rawValue == completed
+            },
+            sortBy: [
+                SortDescriptor(\.lastStateChangeAt, order: .reverse)
+            ]
+        )
+
+        if let limit {
+            descriptor.fetchLimit = limit
+        }
+
+        return try modelContext.fetch(descriptor)
+    }
+
+    func getRecentActiveTracks(limit: Int?) throws -> [TrackEntity] {
+        let downloading = DownloadState.downloading.rawValue
+        let queued = DownloadState.queued.rawValue
+        let paused = DownloadState.paused.rawValue
+
+        var descriptor = FetchDescriptor<TrackEntity>(
+            predicate: #Predicate<TrackEntity> { track in
+                track.downloadState.rawValue == downloading
+                || track.downloadState.rawValue == queued
+                || track.downloadState.rawValue == paused
+            },
+            sortBy: [
+                SortDescriptor(\.lastStateChangeAt, order: .reverse),
+                SortDescriptor(\.id)
+            ]
+        )
+
+        if let limit {
+            descriptor.fetchLimit = limit
+        }
+
+        return try self.modelContext.fetch(descriptor)
+    }
+
     func getPopularTracks() throws -> [TrackEntity] {
         do {
             let descriptor = FetchDescriptor<TrackEntity>(
