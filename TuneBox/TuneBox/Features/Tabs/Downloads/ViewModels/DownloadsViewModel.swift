@@ -10,13 +10,13 @@ import Observation
 import Resolver
 
 enum RecentTracksLimit: Int, CaseIterable {
-    case all = 0
-    case twenty = 20
-    case fifty = 50
-    case hundred = 100
+    case small = 6
+    case medium = 12
+    case large = 18
 }
 
 @MainActor
+@Observable
 class DownloadsViewModel: DownloadsPresenting {
 
     // MARK: - Properties. Public
@@ -25,31 +25,24 @@ class DownloadsViewModel: DownloadsPresenting {
 
     // MARK: - Methods. Public
 
-    func fetchTracksSection() {
-        Task {
-            if self.isAllTracksLimit {
-                let tracks = await self.transferViewModel.getAllPersistedTracks()
+    func fetchTracksSection() async {
+        if self.selectedTracksType == .downloaded {
+            async let recentTracks = self.transferViewModel.getRecentDownloadedTracks(limit: self.tracksLimit)
+            async let allTracks = self.transferViewModel.getRecentDownloadedTracks(limit: nil)
 
-                let activeTracks = tracks.filter {
-                    [.downloading, .queued, .paused].contains($0.downloadState)
-                }
+            let (resents, all) = await (recentTracks, allTracks)
 
-                let downloadedTracks = tracks.filter {
-                    $0.downloadState == .completed
-                }
+            self.set(resents, for: .recent)
+            self.set(all, for: .all)
+        } else {
+            async let recentTracks = self.transferViewModel.getRecentActiveTracks(limit: self.tracksLimit)
+            async let allTracks = self.transferViewModel.getRecentActiveTracks(limit: nil)
 
-                self.set(activeTracks, for: .activeDownloads)
-                self.set(downloadedTracks, for: .downloaded)
-            } else {
-                async let activeTracks = self.transferViewModel.getRecentActiveTracks(limit: self.tracksLimit)
-                async let downloadedTracks = self.transferViewModel.getRecentDownloadedTracks(limit: self.tracksLimit)
-                
-                // Concurrency execution
-                let (active, downloaded) = await (activeTracks, downloadedTracks)
-                
-                self.set(active, for: .activeDownloads)
-                self.set(downloaded, for: .downloaded)
-            }
+            // Concurrency execution
+            let (resents, all) = await (recentTracks, allTracks)
+
+            self.set(resents, for: .recent)
+            self.set(all, for: .all)
         }
     }
 
@@ -57,16 +50,30 @@ class DownloadsViewModel: DownloadsPresenting {
         self.tracksLimit = limit.rawValue
     }
 
+    func set(_ type: TracksType) {
+        self.selectedTracksType = type
+    }
+
+    func handleDownloadAction(for track: TrackEntity) async {
+        await self.transferViewModel.handleDownloadAction(for: track)
+    }
+
+    func startObservingTracksChanges() {
+        self.transferViewModel.onTracksChanged = { [weak self] in
+            Task {
+                await self?.fetchTracksSection()
+            }
+        }
+    }
+
     // MARK: - Properties. Private
 
     @Injected
+    @ObservationIgnored
     private var transferViewModel: TransferManaging
 
-    private var tracksLimit: Int = RecentTracksLimit.all.rawValue
-
-    private var isAllTracksLimit: Bool {
-        self.tracksLimit == RecentTracksLimit.all.rawValue
-    }
+    private var tracksLimit: Int = RecentTracksLimit.small.rawValue
+    private var selectedTracksType: TracksType = .active
 
     // MARK: - Methods. Private
 

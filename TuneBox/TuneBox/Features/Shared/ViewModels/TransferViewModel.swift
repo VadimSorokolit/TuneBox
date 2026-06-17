@@ -64,6 +64,7 @@ protocol TransferManaging:
     func handleBackgroundCompletion(_ handler: @escaping () -> Void)
     func restoreDownloadsOnForeground() async
     func handleDownloadAction(for track: TrackEntity) async
+    var onTracksChanged: (() -> Void)? { get set }
 }
 
 @MainActor
@@ -93,6 +94,8 @@ final class TransferViewModel: TransferManaging {
     private(set) var reachedSearchTracksEnd = false
 
     var selectedGenre: Genre = .all
+    @ObservationIgnored
+    var onTracksChanged: (() -> Void)?
 
     var inProgressTracksCount: Int {
         self.inProgressTrackIDs.count
@@ -610,6 +613,8 @@ final class TransferViewModel: TransferManaging {
         } catch {
             self.handleError(error)
         }
+
+        self.onTracksChanged?()
     }
 
     // MARK: - Initializer
@@ -933,6 +938,8 @@ final class TransferViewModel: TransferManaging {
                 track.fileState = fileState
             }
         }
+
+        self.onTracksChanged?()
     }
 
     private func delete(_ tracks: [TrackEntity]) {
@@ -1180,6 +1187,8 @@ final class TransferViewModel: TransferManaging {
             listedTrack.downloadingSize = displayedBytes
         }
 
+        self.onTracksChanged?()
+
         guard track.downloadState == .downloading else {
             return
         }
@@ -1300,6 +1309,8 @@ final class TransferViewModel: TransferManaging {
                 listedTrack.fileState = fileState
             }
         }
+
+        self.onTracksChanged?()
     }
 
     private func clearDownloadState() {

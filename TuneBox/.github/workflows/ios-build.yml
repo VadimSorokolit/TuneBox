@@ -1,0 +1,32 @@
+# ios-build.yml
+# TuneBox
+#
+# Created by Vadim Sorokolit on 17.06.2026.
+
+name: iOS Build
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Build TuneBox
+        run: |
+          xcodebuild clean build \
+          -project TuneBox.xcodeproj \
+          -scheme TuneBox \
+          -destination 'platform=iOS Simulator,name=iPhone 16'

@@ -20,8 +20,8 @@ struct TracksSection: Hashable, Identifiable {
         case genre = "Featured"
         case popular = "Popular"
         case search = "Search"
-        case activeDownloads = "Active Downloads"
-        case downloaded = "Downloaded"
+        case recent = "Recent"
+        case all = "All"
     }
 
     func hash(into hasher: inout Hasher) {

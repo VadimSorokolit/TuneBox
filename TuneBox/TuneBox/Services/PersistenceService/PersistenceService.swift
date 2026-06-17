@@ -39,7 +39,7 @@ final class PersistenceService: PersistenceServicing {
 
         var descriptor = FetchDescriptor<TrackEntity>(
             predicate: #Predicate<TrackEntity> { track in
-                track.downloadState.rawValue == completed
+                track.downloadStateRawValue == completed
             },
             sortBy: [
                 SortDescriptor(\.lastStateChangeAt, order: .reverse)
@@ -60,9 +60,9 @@ final class PersistenceService: PersistenceServicing {
 
         var descriptor = FetchDescriptor<TrackEntity>(
             predicate: #Predicate<TrackEntity> { track in
-                track.downloadState.rawValue == downloading
-                || track.downloadState.rawValue == queued
-                || track.downloadState.rawValue == paused
+                track.downloadStateRawValue == downloading
+                || track.downloadStateRawValue == queued
+                || track.downloadStateRawValue == paused
             },
             sortBy: [
                 SortDescriptor(\.lastStateChangeAt, order: .reverse),

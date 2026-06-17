@@ -56,7 +56,13 @@ extension Resolver: @retroactive ResolverRegistering {
             ) as TransferManaging
         }
         .scope(.application)
-
+        
+        self.register {
+            DownloadsViewModel()
+            as DownloadsPresenting
+        }
+        .scope(.application)
+        
         self.register {
             PlayerViewModel()
             as PlayerManaging

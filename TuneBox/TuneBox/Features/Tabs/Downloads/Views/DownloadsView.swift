@@ -6,15 +6,22 @@
 //
 
 import SwiftUI
+import Resolver
+
+enum TracksType {
+    case active
+    case downloaded
+}
 
 struct DownloadsView: View {
+    @Injected private var viewModel: DownloadsPresenting
     @FocusState private var isTextFieldFocused: Bool
-    @State private var selectedSection: TracksSection.SectionType = .activeDownloads
+    @State private var selectedTracksType: TracksType = .active
     @State private var searchQuery: String = ""
 
     var body: some View {
         VStack(spacing: 0) {
-            HeaderView(selectedSection: $selectedSection)
+            HeaderView(selectedTracksType: $selectedTracksType)
 
             SearchBarView(
                 searchQuery: $searchQuery,
@@ -22,43 +29,54 @@ struct DownloadsView: View {
                 onSubmit: {},
                 onClear: {}
             )
-
             ContentView()
+        }
+        .frame(maxWidth: .infinity,
+               maxHeight: .infinity,
+               alignment: .top
+        )
+        .task(id: selectedTracksType) {
+            viewModel.startObservingTracksChanges()
+            viewModel.set(selectedTracksType)
+            await viewModel.fetchTracksSection()
         }
     }
 
     private struct HeaderView: View {
         @Environment(\.themeManager) private var theme
-        @Binding var selectedSection: TracksSection.SectionType
+        @Binding var selectedTracksType: TracksType
 
         private let horizontalPadding: CGFloat = 26
 
         var body: some View {
             HStack {
-                Text("My Downloads")
-                    .foregroundStyle(theme.tokens.browseHeaderText)
-                    .font(.satoshi.regular.size(34))
+                Text(selectedTracksType == .active
+                     ? "Active Downloads"
+                     : "Downloaded"
+                )
+                .foregroundStyle(theme.tokens.browseHeaderText)
+                .font(.satoshi.regular.size(34))
 
                 Spacer()
 
                 Menu(content: {
                     Button {
-                        selectedSection = .activeDownloads
+                        selectedTracksType = .active
                     } label: {
                         Label(
                             "Active Downloads",
-                            systemImage: selectedSection == .activeDownloads
+                            systemImage: selectedTracksType == .active
                             ? "checkmark"
                             : ""
                         )
                     }
 
                     Button {
-                        selectedSection = .downloaded
+                        selectedTracksType = .downloaded
                     } label: {
                         Label(
                             "Downloaded",
-                            systemImage: selectedSection == .downloaded
+                            systemImage: selectedTracksType == .downloaded
                             ? "checkmark"
                             : ""
                         )
@@ -74,10 +92,99 @@ struct DownloadsView: View {
     }
 
     private struct ContentView: View {
+        @Injected private var viewModel: DownloadsPresenting
+
+        private let headerLeadingPadding: CGFloat = 26
 
         var body: some View {
-            Text("ContentView")
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            if viewModel.sections.flatMap(\.tracks).isEmpty {
+                ContentUnavailableView("No Tracks", systemImage: "music.note")
+            } else {
+                let recent = viewModel.sections.first(where: { $0.type == .recent })
+                let all = viewModel.sections.first(where: { $0.type == .all })
+
+                if recent?.tracks.count == all?.tracks.count {
+                    if let section = recent {
+                        ScrollView(showsIndicators: false) {
+                            LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
+                                    Section {
+                                        LazyVStack(spacing: 4) {
+                                            ForEach(section.tracks, id: \.id) { track in
+                                                TrackCell(track: track) {
+                                                    Task {
+                                                        await viewModel.handleDownloadAction(for: track)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } header: {
+                                        Text(section.title)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .padding(.leading, headerLeadingPadding)
+                                            .padding(.vertical, 10)
+                                            .background(Color(.systemBackground))
+                                            .foregroundStyle(Color(.label))
+                                            .font(.headline)
+                                    }
+                            }
+                        }
+                        .contentMargins(.bottom, 100)
+                    }
+                } else {
+                    ScrollView(showsIndicators: false) {
+                        LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
+                            if let section = recent, section.tracks.isNotEmpty {
+                                VStack(alignment: .leading, spacing: 0) {
+                                    Text(section.title)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.leading, headerLeadingPadding)
+                                        .padding(.vertical, 10)
+                                        .background(Color(.systemBackground))
+                                        .foregroundStyle(Color(.label))
+                                        .font(.headline)
+
+                                    ScrollView(.horizontal, showsIndicators: false) {
+                                        LazyHStack(spacing: 4) {
+                                            ForEach(section.tracks, id: \.id) { track in
+                                                GenreCell(track: track) {
+                                                    Task {
+                                                        await viewModel.handleDownloadAction(for: track)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .padding(.horizontal)
+                                    }
+                                }
+                            }
+
+                            if let section = all, section.tracks.isNotEmpty {
+                                Section {
+                                    LazyVStack(spacing: 4) {
+                                        ForEach(section.tracks, id: \.id) { track in
+                                            TrackCell(track: track) {
+                                                Task {
+                                                    await viewModel.handleDownloadAction(for: track)
+                                                }
+                                            }
+                                        }
+                                    }
+                                } header: {
+                                    Text(section.title)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.leading, headerLeadingPadding)
+                                        .padding(.vertical, 10)
+                                        .background(Color(.systemBackground))
+                                        .foregroundStyle(Color(.label))
+                                        .font(.headline)
+                                }
+                            }
+                        }
+                    }
+                    .padding(.top, 10)
+                    .contentMargins(.bottom, 100)
+                }
+            }
         }
     }
 }

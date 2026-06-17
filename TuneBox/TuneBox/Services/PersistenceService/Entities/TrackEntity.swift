@@ -33,7 +33,7 @@ final class TrackEntity {
     var genreRawValue: String?
     private var duration: Int?
     private var sourceRawValue: String = TrackSource.api.rawValue
-    private var downloadStateRawValue: String = DownloadState.idle.rawValue
+    private(set) var downloadStateRawValue: String = DownloadState.idle.rawValue
     private var fileStateRawValue: String = FileStorageState.none.rawValue
 
     // MARK: - Computed Properties
