@@ -41,7 +41,7 @@ private enum SimultaneouslyLoadingCount: Int, CaseIterable {
 }
 
 @MainActor
-protocol TransferManaging:
+protocol TransferManaging: AnyObject, Sendable,
     DownloadManaging,
     DownloadStateProviding,
     StorageManaging,

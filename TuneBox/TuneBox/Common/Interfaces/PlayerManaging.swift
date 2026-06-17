@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol PlayerManaging: AnyObject {
+protocol PlayerManaging: AnyObject, Sendable {
     func handlePlayAction(for track: TrackEntity)
     func isPlaying(_ track: TrackEntity) -> Bool
 }

@@ -6,7 +6,7 @@
 //
 
 @MainActor
-protocol DownloadsPresenting {
+protocol DownloadsPresenting: AnyObject, Sendable {
     var sections: [TracksSection] { get }
 
     func fetchTracksSection() async

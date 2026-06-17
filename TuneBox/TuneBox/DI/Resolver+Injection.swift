@@ -8,6 +8,7 @@
 import Moya
 import Resolver
 
+@MainActor
 extension Resolver: @retroactive ResolverRegistering {
 
     public static func registerAllServices() {
@@ -39,6 +40,7 @@ extension Resolver: @retroactive ResolverRegistering {
 
     private static func registerPersistenceService() {
         self.register {
+            MainActor.assumeIsolated {
             do {
                 return try PersistenceService() as PersistenceServicing
             } catch {
@@ -46,26 +48,33 @@ extension Resolver: @retroactive ResolverRegistering {
             }
         }
     }
+}
 
     private static func registerViewModels() {
         self.register {
-            TransferViewModel(
-                networkService: self.resolve(NetworkServicing.self),
-                persistenceService: self.resolve(PersistenceServicing.self),
-                storageService: self.resolve(FileManagerServicing.self)
-            ) as TransferManaging
+            MainActor.assumeIsolated {
+                TransferViewModel(
+                    networkService: self.resolve(NetworkServicing.self),
+                    persistenceService: self.resolve(PersistenceServicing.self),
+                    storageService: self.resolve(FileManagerServicing.self)
+                ) as TransferManaging
+            }
         }
         .scope(.application)
 
         self.register {
-            DownloadsViewModel()
-            as DownloadsPresenting
+            MainActor.assumeIsolated {
+                DownloadsViewModel()
+                as DownloadsPresenting
+            }
         }
         .scope(.application)
 
         self.register {
-            PlayerViewModel()
-            as PlayerManaging
+            MainActor.assumeIsolated {
+                PlayerViewModel()
+                as PlayerManaging
+            }
         }
     }
 

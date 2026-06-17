@@ -398,7 +398,7 @@ final class NetworkService: NSObject, NetworkServicing {
     }
 }
 
-extension NetworkService: @preconcurrency URLSessionDownloadDelegate {
+extension NetworkService: URLSessionDownloadDelegate {
 
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
         _Concurrency.Task { @MainActor in
