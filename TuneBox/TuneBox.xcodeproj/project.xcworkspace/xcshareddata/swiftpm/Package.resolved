@@ -1,5 +1,5 @@
 {
-  "originHash" : "48a067b46c04fec9c6bde845fb5709d9c7cbac8b38c85b8cb64e86f78544c029",
+  "originHash" : "ee8c0dbb468e9b46cd8dd16cd56ebe0a7e0b90fbc7727cac68b847583c3ffcc9",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -83,9 +83,9 @@
       }
     },
     {
-      "identity" : "sdwebimageswiftui?utm_source=chatgpt.com",
+      "identity" : "sdwebimageswiftui",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SDWebImage/SDWebImageSwiftUI?utm_source=chatgpt.com",
+      "location" : "https://github.com/SDWebImage/SDWebImageSwiftUI.git",
       "state" : {
         "revision" : "0e331457ca9af2f0b08bcaa138a91ffb907b004f",
         "version" : "3.1.4"

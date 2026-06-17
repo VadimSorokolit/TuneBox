@@ -40,6 +40,7 @@
 		5B586CC72FACA8E300BCEAD2 /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CC62FACA8E200BCEAD2 /* AppError.swift */; };
 		5B586CCC2FACB61500BCEAD2 /* TracksResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CCB2FACB61400BCEAD2 /* TracksResponse.swift */; };
 		5B6E4DBF2FD17B9000B4E663 /* SegmentedItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6E4DBE2FD17B8F00B4E663 /* SegmentedItem.swift */; };
+		5B7E1DAD2FE2A4FA00561D67 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5B7E1DAC2FE2A4FA00561D67 /* SDWebImageSwiftUI */; };
 		5B8382912FC495F9003625CD /* PlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382902FC495F8003625CD /* PlayerViewModel.swift */; };
 		5B8382992FC4C9EE003625CD /* SpinnerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382982FC4C9ED003625CD /* SpinnerView.swift */; };
 		5B8382A32FC4CB4D003625CD /* AudioServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382A22FC4CB4C003625CD /* AudioServicing.swift */; };
@@ -58,7 +59,6 @@
 		5B88609E2FAE184C0056BE9A /* GlobalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B88609D2FAE18450056BE9A /* GlobalConstants.swift */; };
 		5B8860A52FB1CF910056BE9A /* NotificationNames+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8860A42FB1CF900056BE9A /* NotificationNames+Extension.swift */; };
 		5B899F782FCF13A8002D3232 /* RootTabsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B899F772FCF13A8002D3232 /* RootTabsView.swift */; };
-		5B9C3DF72FD03CE300138645 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5B9C3DF62FD03CE300138645 /* SDWebImageSwiftUI */; };
 		5B9C3DFA2FD03DA400138645 /* TrackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9C3DF92FD03DA300138645 /* TrackCell.swift */; };
 		5B9CE54B2FB32589001BE37F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9CE54A2FB32589001BE37F /* AppDelegate.swift */; };
 		5B9D45DA2FDF099D00F86C1B /* DownloadsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9D45D92FDF099C00F86C1B /* DownloadsViewModel.swift */; };
@@ -235,7 +235,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5B9C3DF72FD03CE300138645 /* SDWebImageSwiftUI in Frameworks */,
+				5B7E1DAD2FE2A4FA00561D67 /* SDWebImageSwiftUI in Frameworks */,
 				5B586CBD2FAC846900BCEAD2 /* Resolver in Frameworks */,
 				5B4762872FAB5C570069E41A /* RxMoya in Frameworks */,
 				5B4762812FAB5C570069E41A /* CombineMoya in Frameworks */,
@@ -871,7 +871,7 @@
 				5B4762842FAB5C570069E41A /* ReactiveMoya */,
 				5B4762862FAB5C570069E41A /* RxMoya */,
 				5B586CBC2FAC846900BCEAD2 /* Resolver */,
-				5B9C3DF62FD03CE300138645 /* SDWebImageSwiftUI */,
+				5B7E1DAC2FE2A4FA00561D67 /* SDWebImageSwiftUI */,
 			);
 			productName = TuneBox;
 			productReference = 5BD579722FAB25BF00503BA2 /* TuneBox.app */;
@@ -954,7 +954,7 @@
 				5B4762752FAB378B0069E41A /* XCRemoteSwiftPackageReference "swiftlint" */,
 				5B47627F2FAB5C570069E41A /* XCRemoteSwiftPackageReference "moya" */,
 				5B586CBB2FAC846900BCEAD2 /* XCRemoteSwiftPackageReference "Resolver" */,
-				5B9C3DF52FD03CE300138645 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
+				5B7E1DAB2FE2A4FA00561D67 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5BD579732FAB25BF00503BA2 /* Products */;
@@ -1484,20 +1484,20 @@
 				minimumVersion = 1.5.1;
 			};
 		};
+		5B7E1DAB2FE2A4FA00561D67 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.1.4;
+			};
+		};
 		5B84C01A2FAB353200ACE75A /* XCRemoteSwiftPackageReference "CustomAlerts" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/VadimSorokolit/CustomAlerts";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.10.21;
-			};
-		};
-		5B9C3DF52FD03CE300138645 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI?utm_source=chatgpt.com";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.1.4;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -1533,15 +1533,15 @@
 			package = 5B586CBB2FAC846900BCEAD2 /* XCRemoteSwiftPackageReference "Resolver" */;
 			productName = Resolver;
 		};
+		5B7E1DAC2FE2A4FA00561D67 /* SDWebImageSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5B7E1DAB2FE2A4FA00561D67 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
+			productName = SDWebImageSwiftUI;
+		};
 		5B84C01B2FAB353200ACE75A /* CustomAlerts */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 5B84C01A2FAB353200ACE75A /* XCRemoteSwiftPackageReference "CustomAlerts" */;
 			productName = CustomAlerts;
-		};
-		5B9C3DF62FD03CE300138645 /* SDWebImageSwiftUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 5B9C3DF52FD03CE300138645 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
-			productName = SDWebImageSwiftUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
