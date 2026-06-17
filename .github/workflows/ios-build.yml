@@ -31,3 +31,4 @@ jobs:
           -project TuneBox/TuneBox.xcodeproj \
           -scheme TuneBox \
           -destination 'generic/platform=iOS Simulator'
+          -skipPackagePluginValidation
