@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 protocol DownloadStateProviding: AnyObject {
     var offsetPopular: Int { get }
     var sections: [TracksSection] { get }

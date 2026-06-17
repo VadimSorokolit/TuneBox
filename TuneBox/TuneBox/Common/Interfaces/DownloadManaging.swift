@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 protocol DownloadManaging: AnyObject {
     func startDownload(_ track: TrackEntity) async
     func stopDownload(track: TrackEntity) async

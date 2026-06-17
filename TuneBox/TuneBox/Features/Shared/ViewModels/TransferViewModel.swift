@@ -40,6 +40,7 @@ private enum SimultaneouslyLoadingCount: Int, CaseIterable {
     case five = 5
 }
 
+@MainActor
 protocol TransferManaging:
     DownloadManaging,
     DownloadStateProviding,

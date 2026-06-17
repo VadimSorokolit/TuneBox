@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 protocol StorageManaging: AnyObject {
     var availableSpace: Double? { get }
     var reservedSpace: ReservedSpace { get }

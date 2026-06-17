@@ -5,6 +5,7 @@
 //  Created by Vadim Sorokolit on 14.06.2026.
 //
 
+@MainActor
 protocol DownloadsPresenting {
     var sections: [TracksSection] { get }
 
