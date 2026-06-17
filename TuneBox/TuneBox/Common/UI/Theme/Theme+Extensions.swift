@@ -8,6 +8,7 @@
 import SwiftUI
 
 private struct ThemeManagerKey: EnvironmentKey {
+    @MainActor
     static let defaultValue = ThemeManager()
 }
 
@@ -61,7 +62,7 @@ extension View {
 }
 
 extension EnvironmentValues {
-
+    
     var themeManager: ThemeManager {
         get { self[ThemeManagerKey.self] }
         set { self[ThemeManagerKey.self] = newValue }
