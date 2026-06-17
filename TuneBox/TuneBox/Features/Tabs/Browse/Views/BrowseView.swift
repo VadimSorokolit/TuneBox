@@ -116,7 +116,8 @@ struct BrowseView: View {
         private let headerLeadingPadding: CGFloat = 26
 
         var body: some View {
-            if let section = viewModel.sections.first(where: { $0.type == .search }) {
+            if searchQuery.isNotEmpty,
+               let section = viewModel.sections.first(where: { $0.type == .search }) {
                 if section.tracks.isNotEmpty, searchQuery.isNotEmpty {
                     ZStack {
                         ScrollView(showsIndicators: false) {
