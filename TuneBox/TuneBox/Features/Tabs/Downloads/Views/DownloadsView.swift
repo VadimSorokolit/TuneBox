@@ -29,6 +29,7 @@ struct DownloadsView: View {
                 onSubmit: {},
                 onClear: {}
             )
+
             ContentView()
         }
         .frame(maxWidth: .infinity,
