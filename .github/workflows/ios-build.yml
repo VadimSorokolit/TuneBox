@@ -28,6 +28,6 @@ jobs:
       - name: Build TuneBox
         run: |
           xcodebuild clean build \
-          -project TuneBox.xcodeproj \
+          -project TuneBox/TuneBox.xcodeproj \
           -scheme TuneBox \
           -destination 'platform=iOS Simulator,name=iPhone 16'
