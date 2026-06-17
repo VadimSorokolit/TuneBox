@@ -20,17 +20,17 @@ final class FileManagerService: FileManagerServicing {
     }
 
     static func storeDownloadedFile(from temporaryURL: URL, trackID: String) throws -> URL {
-        try Swift.Task.checkCancellation()
+        try _Concurrency.Task.checkCancellation()
 
         let destinationURL = try FileManagerService.makeDownloadedTrackURL(id: trackID)
 
-        try Swift.Task.checkCancellation()
+        try _Concurrency.Task.checkCancellation()
 
         if FileManager.default.fileExists(atPath: destinationURL.path) {
             try FileManager.default.removeItem(at: destinationURL)
         }
 
-        try Swift.Task.checkCancellation()
+        try _Concurrency.Task.checkCancellation()
 
         try FileManager.default.moveItem(at: temporaryURL, to: destinationURL)
 

@@ -183,7 +183,7 @@ final class NetworkService: NSObject, NetworkServicing {
         let checkInterval: Duration = .seconds(0.1)
 
         while Date() < deadline {
-            if Swift.Task.isCancelled {
+            if _Concurrency.Task.isCancelled {
                 return
             }
 
@@ -199,7 +199,7 @@ final class NetworkService: NSObject, NetworkServicing {
                 return
             }
 
-            try? await Swift.Task.sleep(for: checkInterval)
+            try? await _Concurrency.Task.sleep(for: checkInterval)
         }
     }
 
@@ -311,7 +311,7 @@ final class NetworkService: NSObject, NetworkServicing {
         await withTaskGroup(of: (Int, Int?).self) { group in
             for (index, track) in tracks.enumerated() {
                 group.addTask { [weak self] in
-                    if Swift.Task.isCancelled {
+                    if _Concurrency.Task.isCancelled {
                         return (index, nil)
                     }
 
@@ -325,7 +325,7 @@ final class NetworkService: NSObject, NetworkServicing {
                     do {
                         let size = try await self.getTrackSize(id: trackID)
 
-                        if Swift.Task.isCancelled {
+                        if _Concurrency.Task.isCancelled {
                             return (index, nil)
                         }
 
@@ -339,7 +339,7 @@ final class NetworkService: NSObject, NetworkServicing {
             var trackSizes = Array(repeating: Optional<Int>.none, count: tracks.count)
 
             for await (index, size) in group {
-                if Swift.Task.isCancelled {
+                if _Concurrency.Task.isCancelled {
                     return tracks
                 }
 
@@ -398,10 +398,10 @@ final class NetworkService: NSObject, NetworkServicing {
     }
 }
 
-extension NetworkService: URLSessionDownloadDelegate {
+extension NetworkService: @preconcurrency URLSessionDownloadDelegate {
 
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
-        Swift.Task { @MainActor in
+        _Concurrency.Task { @MainActor in
             self.backgroundCompletionHandler?()
             self.backgroundCompletionHandler = nil
         }
@@ -428,7 +428,7 @@ extension NetworkService: URLSessionDownloadDelegate {
             return resumeData
         }()
 
-        Swift.Task { [weak self] in
+        _Concurrency.Task { [weak self] in
             guard let self else { return }
 
             guard let trackID = await self.downloadStore.trackID(for: task) else {
