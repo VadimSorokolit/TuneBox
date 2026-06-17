@@ -30,4 +30,4 @@ jobs:
           xcodebuild clean build \
           -project TuneBox/TuneBox.xcodeproj \
           -scheme TuneBox \
-          -destination 'platform=iOS Simulator,name=iPhone 16'
+          -destination 'generic/platform=iOS Simulator'
