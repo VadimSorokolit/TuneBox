@@ -9,6 +9,7 @@ import Foundation
 import Combine
 import SwiftData
 
+@MainActor
 final class PersistenceService: PersistenceServicing {
 
     // MARK: - Properties. Public

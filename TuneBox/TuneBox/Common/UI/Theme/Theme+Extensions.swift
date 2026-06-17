@@ -62,7 +62,7 @@ extension View {
 }
 
 extension EnvironmentValues {
-    
+
     var themeManager: ThemeManager {
         get { self[ThemeManagerKey.self] }
         set { self[ThemeManagerKey.self] = newValue }
