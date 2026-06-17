@@ -157,7 +157,6 @@
 		5B586CC62FACA8E200BCEAD2 /* AppError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppError.swift; sourceTree = "<group>"; };
 		5B586CCB2FACB61400BCEAD2 /* TracksResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TracksResponse.swift; sourceTree = "<group>"; };
 		5B6E4DBE2FD17B8F00B4E663 /* SegmentedItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedItem.swift; sourceTree = "<group>"; };
-		5B7E1DAA2FE29D2800561D67 /* ios-build.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = "ios-build.yml"; sourceTree = "<group>"; };
 		5B8382902FC495F8003625CD /* PlayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewModel.swift; sourceTree = "<group>"; };
 		5B8382982FC4C9ED003625CD /* SpinnerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerView.swift; sourceTree = "<group>"; };
 		5B8382A22FC4CB4C003625CD /* AudioServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioServicing.swift; sourceTree = "<group>"; };
@@ -495,22 +494,6 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
-		5B7E1DA72FE29CEB00561D67 /* .github */ = {
-			isa = PBXGroup;
-			children = (
-				5B7E1DA82FE29D0600561D67 /* workflows */,
-			);
-			path = .github;
-			sourceTree = "<group>";
-		};
-		5B7E1DA82FE29D0600561D67 /* workflows */ = {
-			isa = PBXGroup;
-			children = (
-				5B7E1DAA2FE29D2800561D67 /* ios-build.yml */,
-			);
-			path = workflows;
-			sourceTree = "<group>";
-		};
 		5B83828F2FC495EA003625CD /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
@@ -671,7 +654,6 @@
 		5BD579692FAB25BF00503BA2 = {
 			isa = PBXGroup;
 			children = (
-				5B7E1DA72FE29CEB00561D67 /* .github */,
 				5B84C0242FAB367B00ACE75A /* .swiftlint.yml */,
 				5BD5799F2FAB25E300503BA2 /* TuneBox */,
 				5BD579A42FAB25EE00503BA2 /* TuneBoxTests */,
