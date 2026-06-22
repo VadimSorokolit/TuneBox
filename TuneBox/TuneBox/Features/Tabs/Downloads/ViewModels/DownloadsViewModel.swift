@@ -22,6 +22,8 @@ class DownloadsViewModel: DownloadsPresenting {
     // MARK: - Properties. Public
 
     private(set) var sections: [TracksSection] = []
+    private(set) var isSearchLoading = false
+    private(set) var completedSearchQuery = ""
 
     // MARK: - Methods. Public
 
@@ -45,6 +47,42 @@ class DownloadsViewModel: DownloadsPresenting {
         self.set(all, for: .all)
     }
 
+    func loadSearchBy(query: String) {
+        guard query.count > 2 else {
+            isSearchLoading = false
+            return
+        }
+
+        isSearchLoading = true
+        defer { isSearchLoading = false }
+
+        var seen = Set<String>()
+
+        let tracks = sections
+            .filter { $0.type != .search }
+            .flatMap(\.tracks)
+
+        let filtered = tracks.filter { track in
+            let matches =
+                track.songName.localizedStandardContains(query)
+                || track.albumName.localizedStandardContains(query)
+
+            guard matches else { return false }
+
+            let key = "\(track.songName.lowercased())|\(track.artistName.lowercased())"
+
+            if seen.contains(key) { return false }
+            seen.insert(key)
+            return true
+        }
+
+        if filtered.isEmpty.isFalse {
+            self.saveQuery(query)
+        }
+
+        self.set(filtered, for: .search)
+    }
+
     func setTracksLimit(_ limit: RecentTracksLimit) {
         self.tracksLimit = limit.rawValue
     }
@@ -63,6 +101,12 @@ class DownloadsViewModel: DownloadsPresenting {
                 await self?.fetchTracksSection()
             }
         }
+    }
+
+    func clearSearchState() {
+        self.isSearchLoading = false
+        self.completedSearchQuery = ""
+        self.set([], for: .search)
     }
 
     // MARK: - Properties. Private
@@ -90,5 +134,9 @@ class DownloadsViewModel: DownloadsPresenting {
                 )
             )
         }
+    }
+
+    private func saveQuery(_ query: String) {
+        self.completedSearchQuery = query
     }
 }

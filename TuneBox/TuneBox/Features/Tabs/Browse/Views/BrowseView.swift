@@ -36,6 +36,7 @@ struct BrowseView: View {
                 }
 
                 if viewModel.completedSearchQuery != searchQuery {
+                    viewModel.saveQuery(searchQuery)
                     viewModel.loadSearchBy(query: searchQuery)
                 }
             }
@@ -50,17 +51,25 @@ struct BrowseView: View {
                alignment: .top
         )
         .task {
-            guard viewModel.sections.flatMap(\.tracks).isEmpty else {
+            searchQuery = viewModel.completedSearchQuery
+
+            let tracks = viewModel.sections
+                .filter { $0.type != .search }
+                .flatMap(\.tracks)
+
+            guard tracks.isEmpty else {
                 return
             }
 
-            async let popular: Void = viewModel.loadFirstPopular()
-            async let genre: Void = viewModel.loadFirstBy(
-                genre: viewModel.selectedGenre == .all ? nil : viewModel.selectedGenre
-            )
+            if searchQuery.isEmpty {
+                async let popular: Void = viewModel.loadFirstPopular()
+                async let genre: Void = viewModel.loadFirstBy(
+                    genre: viewModel.selectedGenre == .all ? nil : viewModel.selectedGenre
+                )
 
-            await popular
-            await genre
+                await popular
+                await genre
+            }
         }
         .overlay {
             if viewModel.shouldShowCentralSpinner {

@@ -57,6 +57,7 @@ protocol TransferManaging: AnyObject, Sendable,
     func loadNextSearch()
     func loadNextPopular()
     func loadNextBy(genre: Genre?)
+    func saveQuery(_ query: String)
     func startDownload(_ track: TrackEntity) async
     func clearSearchState()
     func cancelAllDownloads()
@@ -364,14 +365,14 @@ final class TransferViewModel: TransferManaging {
             return []
         }
     }
-    
+
     func getRecentTracks(limit: Int?) async -> [TrackEntity] {
         self.startFetchTracks()
-        
+
         defer {
             self.finishFetchTracks()
         }
-        
+
         do {
             let tracks = try self.persistenceService.getRecentsTracks(limit: limit)
             return tracks
@@ -411,6 +412,10 @@ final class TransferViewModel: TransferManaging {
             self.handleError(error)
             return []
         }
+    }
+
+    func saveQuery(_ query: String) {
+        self.completedSearchQuery = query
     }
 
     func startDownload(_ track: TrackEntity) async {
