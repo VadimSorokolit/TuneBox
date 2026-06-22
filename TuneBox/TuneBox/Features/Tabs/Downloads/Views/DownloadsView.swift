@@ -48,16 +48,10 @@ struct DownloadsView: View {
         )
         .task(id: selectedTracksType) {
             viewModel.startObservingTracksChanges()
+
             searchQuery = viewModel.completedSearchQuery
 
-            let tracks = viewModel.sections
-                .filter { $0.type != .search }
-                .flatMap(\.tracks)
-
-            guard tracks.isEmpty else {
-                return
-            }
-
+            viewModel.set(selectedTracksType)
             await viewModel.fetchTracksSection()
         }
         .task(id: searchQuery) {
@@ -67,8 +61,7 @@ struct DownloadsView: View {
                 viewModel.clearSearchState()
                 isSearchMode = false
             } else {
-                if searchQuery != viewModel.completedSearchQuery,
-                   searchQuery.count > 2 {
+                if searchQuery.count > 2 {
                     isSearchMode = true
                     viewModel.loadSearchBy(query: searchQuery)
                 }

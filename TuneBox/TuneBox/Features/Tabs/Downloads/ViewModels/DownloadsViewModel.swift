@@ -22,8 +22,9 @@ class DownloadsViewModel: DownloadsPresenting {
     // MARK: - Properties. Public
 
     private(set) var sections: [TracksSection] = []
-    private(set) var isSearchLoading = false
+    private(set) var selectedTracksType: TracksType = .active
     private(set) var completedSearchQuery = ""
+    private(set) var isSearchLoading = false
 
     // MARK: - Methods. Public
 
@@ -42,6 +43,11 @@ class DownloadsViewModel: DownloadsPresenting {
 
         // Concurrency execution
         let (recent, all) = await (recentTracks, allTracks)
+
+        if recent.isEmpty.isFalse
+            || all.isEmpty.isFalse {
+            self.sections.removeAll()
+        }
 
         self.set(recent, for: .recent)
         self.set(all, for: .all)
@@ -76,10 +82,7 @@ class DownloadsViewModel: DownloadsPresenting {
             return true
         }
 
-        if filtered.isEmpty.isFalse {
-            self.saveQuery(query)
-        }
-
+        self.saveQuery(query)
         self.set(filtered, for: .search)
     }
 
@@ -116,7 +119,6 @@ class DownloadsViewModel: DownloadsPresenting {
     private var transferViewModel: TransferManaging
 
     private var tracksLimit: Int = RecentTracksLimit.small.rawValue
-    private var selectedTracksType: TracksType = .active
 
     // MARK: - Methods. Private
 

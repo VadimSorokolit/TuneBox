@@ -9,6 +9,7 @@
 protocol DownloadsPresenting: AnyObject, Sendable {
     var isSearchLoading: Bool { get }
     var sections: [TracksSection] { get }
+    var selectedTracksType: TracksType { get }
     var completedSearchQuery: String { get }
 
     func fetchTracksSection() async
