@@ -12,6 +12,7 @@ protocol PersistenceServicing: AnyObject {
     var storageDidChangePublisher: AnyPublisher<Void, Never> { get }
 
     func getTracks() throws -> [TrackEntity]
+    func getRecentsTracks(limit: Int?) throws -> [TrackEntity]
     func getRecentActiveTracks(limit: Int?) throws -> [TrackEntity]
     func getRecentDownloadedTracks(limit: Int?) throws -> [TrackEntity]
     func getPopularTracks() throws -> [TrackEntity]

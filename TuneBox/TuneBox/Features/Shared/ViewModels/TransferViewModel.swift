@@ -47,6 +47,7 @@ protocol TransferManaging: AnyObject, Sendable,
     StorageManaging,
     PersistenceManaging {
     func getAllPersistedTracks() async -> [TrackEntity]
+    func getRecentTracks(limit: Int?) async -> [TrackEntity]
     func getRecentActiveTracks(limit: Int?) async -> [TrackEntity]
     func getRecentDownloadedTracks(limit: Int?) async -> [TrackEntity]
     func loadFirstPopular() async
@@ -357,6 +358,22 @@ final class TransferViewModel: TransferManaging {
 
         do {
             let tracks: [TrackEntity] = try self.persistenceService.getTracks()
+            return tracks
+        } catch {
+            self.handleError(error)
+            return []
+        }
+    }
+    
+    func getRecentTracks(limit: Int?) async -> [TrackEntity] {
+        self.startFetchTracks()
+        
+        defer {
+            self.finishFetchTracks()
+        }
+        
+        do {
+            let tracks = try self.persistenceService.getRecentsTracks(limit: limit)
             return tracks
         } catch {
             self.handleError(error)

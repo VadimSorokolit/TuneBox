@@ -30,7 +30,7 @@ struct DownloadsView: View {
                 onClear: {}
             )
 
-            ContentView()
+            ContentView(selectedTracksType: $selectedTracksType)
         }
         .frame(maxWidth: .infinity,
                maxHeight: .infinity,
@@ -51,10 +51,7 @@ struct DownloadsView: View {
 
         var body: some View {
             HStack {
-                Text(selectedTracksType == .active
-                     ? "Active Downloads"
-                     : "Downloaded"
-                )
+                Text("Library")
                 .foregroundStyle(theme.tokens.browseHeaderText)
                 .font(.satoshi.regular.size(34))
 
@@ -94,12 +91,22 @@ struct DownloadsView: View {
 
     private struct ContentView: View {
         @Injected private var viewModel: DownloadsPresenting
+        @Binding var selectedTracksType: TracksType
 
         private let headerLeadingPadding: CGFloat = 26
 
+        var sectionSuffix: String {
+            selectedTracksType == .downloaded
+            ? "(downloaded)"
+            : "(in progress)"
+        }
+
         var body: some View {
             if viewModel.sections.flatMap(\.tracks).isEmpty {
-                ContentUnavailableView("No Tracks", systemImage: "music.note")
+                ContentUnavailableView(
+                    "No Tracks",
+                    systemImage: "music.note"
+                )
             } else {
                 let recent = viewModel.sections.first(where: { $0.type == .recent })
                 let all = viewModel.sections.first(where: { $0.type == .all })
@@ -171,7 +178,7 @@ struct DownloadsView: View {
                                         }
                                     }
                                 } header: {
-                                    Text(section.title)
+                                    Text("\(section.title) \(sectionSuffix)")
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                         .padding(.leading, headerLeadingPadding)
                                         .padding(.vertical, 10)

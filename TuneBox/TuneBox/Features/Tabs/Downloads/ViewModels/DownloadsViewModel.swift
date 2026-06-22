@@ -26,24 +26,23 @@ class DownloadsViewModel: DownloadsPresenting {
     // MARK: - Methods. Public
 
     func fetchTracksSection() async {
-        if self.selectedTracksType == .downloaded {
-            async let recentTracks = self.transferViewModel.getRecentDownloadedTracks(limit: self.tracksLimit)
-            async let allTracks = self.transferViewModel.getRecentDownloadedTracks(limit: nil)
+        let isDownloaded = self.selectedTracksType == .downloaded
+        let tracksLimit = self.tracksLimit
 
-            let (resents, all) = await (recentTracks, allTracks)
+        async let recentTracks = self.transferViewModel.getRecentTracks(limit: tracksLimit)
+        async let allTracks: [TrackEntity] = {
+            if isDownloaded {
+                return await self.transferViewModel.getRecentDownloadedTracks(limit: nil)
+            } else {
+                return await self.transferViewModel.getRecentActiveTracks(limit: nil)
+            }
+        }()
 
-            self.set(resents, for: .recent)
-            self.set(all, for: .all)
-        } else {
-            async let recentTracks = self.transferViewModel.getRecentActiveTracks(limit: self.tracksLimit)
-            async let allTracks = self.transferViewModel.getRecentActiveTracks(limit: nil)
+        // Concurrency execution
+        let (recent, all) = await (recentTracks, allTracks)
 
-            // Concurrency execution
-            let (resents, all) = await (recentTracks, allTracks)
-
-            self.set(resents, for: .recent)
-            self.set(all, for: .all)
-        }
+        self.set(recent, for: .recent)
+        self.set(all, for: .all)
     }
 
     func setTracksLimit(_ limit: RecentTracksLimit) {
