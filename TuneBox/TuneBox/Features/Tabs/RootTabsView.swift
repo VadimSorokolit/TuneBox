@@ -16,14 +16,6 @@ enum CustomTab: Hashable, Identifiable, CaseIterable {
 
     var id: Self { self }
 
-    static let tabs: [CustomTab] = [
-        .browse,
-        .downloads,
-        .player,
-        .importFiles,
-        .settings
-    ]
-
     var iconInactive: String {
         switch self {
             case .browse:
@@ -96,7 +88,7 @@ struct RootTabsView: View {
 
     private var tabBar: some View {
         HStack(spacing: 10) {
-            ForEach(CustomTab.tabs) { tab in
+            ForEach(CustomTab.allCases) { tab in
                 TabItemView(
                     tab: tab,
                     isSelected: activeTab == tab,
@@ -159,7 +151,7 @@ private struct TabItemView: View {
             .ignoresSafeArea()
 
         HStack(spacing: 10) {
-            ForEach(CustomTab.tabs) { tab in
+            ForEach(CustomTab.allCases) { tab in
                 TabItemView(
                     tab: tab,
                     isSelected: tab == .browse,
