@@ -16,13 +16,12 @@ enum TracksType {
 struct DownloadsView: View {
     @Injected private var viewModel: DownloadsPresenting
     @FocusState private var isTextFieldFocused: Bool
-    @State private var selectedTracksType: TracksType = .active
     @State private var searchQuery: String = ""
     @State private var isSearchMode: Bool = false
 
     var body: some View {
         VStack(spacing: 0) {
-            HeaderView(selectedTracksType: $selectedTracksType)
+            HeaderView()
 
             SearchBarView(
                 searchQuery: $searchQuery,
@@ -37,8 +36,6 @@ struct DownloadsView: View {
             )
 
             ContentView(
-                selectedTracksType: $selectedTracksType,
-                searchQuery: $searchQuery,
                 isSearchMode: $isSearchMode
             )
         }
@@ -46,18 +43,15 @@ struct DownloadsView: View {
                maxHeight: .infinity,
                alignment: .top
         )
-        .task(id: selectedTracksType) {
+        .task(id: viewModel.selectedTracksType) {
             viewModel.startObservingTracksChanges()
 
-            searchQuery = viewModel.completedSearchQuery
-
-            viewModel.set(selectedTracksType)
-            await viewModel.fetchTracksSection()
+            await viewModel.fetchTracksSectionBy(viewModel.selectedTracksType)
         }
         .task(id: searchQuery) {
             try? await Task.sleep(for: .milliseconds(300))
 
-            if searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            if searchQuery.isEmpty {
                 viewModel.clearSearchState()
                 isSearchMode = false
             } else {
@@ -73,8 +67,8 @@ struct DownloadsView: View {
     }
 
     private struct HeaderView: View {
+        @Injected private var viewModel: DownloadsPresenting
         @Environment(\.themeManager) private var theme
-        @Binding var selectedTracksType: TracksType
 
         private let horizontalPadding: CGFloat = 26
 
@@ -88,22 +82,22 @@ struct DownloadsView: View {
 
                 Menu(content: {
                     Button {
-                        selectedTracksType = .active
+                        viewModel.setType(.active)
                     } label: {
                         Label(
                             "Active Downloads",
-                            systemImage: selectedTracksType == .active
+                            systemImage: viewModel.selectedTracksType == .active
                             ? "checkmark"
                             : ""
                         )
                     }
 
                     Button {
-                        selectedTracksType = .downloaded
+                        viewModel.setType(.downloaded)
                     } label: {
                         Label(
                             "Downloaded",
-                            systemImage: selectedTracksType == .downloaded
+                            systemImage: viewModel.selectedTracksType == .downloaded
                             ? "checkmark"
                             : ""
                         )
@@ -120,14 +114,12 @@ struct DownloadsView: View {
 
     private struct ContentView: View {
         @Injected private var viewModel: DownloadsPresenting
-        @Binding var selectedTracksType: TracksType
-        @Binding var searchQuery: String
         @Binding var isSearchMode: Bool
 
         private let headerLeadingPadding: CGFloat = 26
 
         private var sectionSuffix: String {
-            selectedTracksType == .downloaded
+            viewModel.selectedTracksType == .downloaded
             ? "(downloaded)"
             : "(in progress)"
         }
@@ -181,7 +173,7 @@ struct DownloadsView: View {
                         ForEach(section.tracks, id: \.id) { track in
                             TrackCell(
                                 track: track,
-                                searchQuery: searchQuery,
+                                searchQuery: viewModel.completedSearchQuery,
                                 onTap: {
                                     Task {
                                         await viewModel.handleDownloadAction(for: track)

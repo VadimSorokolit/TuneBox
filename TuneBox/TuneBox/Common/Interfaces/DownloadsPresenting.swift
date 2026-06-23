@@ -12,10 +12,10 @@ protocol DownloadsPresenting: AnyObject, Sendable {
     var selectedTracksType: TracksType { get }
     var completedSearchQuery: String { get }
 
-    func fetchTracksSection() async
+    func fetchTracksSectionBy(_ type: TracksType) async
     func loadSearchBy(query: String)
     func setTracksLimit(_ limit: RecentTracksLimit)
-    func set(_ type: TracksType)
+    func setType(_ type: TracksType)
     func startObservingTracksChanges()
     func handleDownloadAction(for track: TrackEntity) async
     func clearSearchState()

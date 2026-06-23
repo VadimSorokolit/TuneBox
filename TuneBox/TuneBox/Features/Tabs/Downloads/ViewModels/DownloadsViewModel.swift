@@ -28,16 +28,17 @@ class DownloadsViewModel: DownloadsPresenting {
 
     // MARK: - Methods. Public
 
-    func fetchTracksSection() async {
-        let isDownloaded = self.selectedTracksType == .downloaded
-        let tracksLimit = self.tracksLimit
+    func fetchTracksSectionBy(_ type: TracksType) async {
+        self.selectedTracksType = type
 
-        async let recentTracks = self.transferViewModel.getRecentTracks(limit: tracksLimit)
+        async let recentTracks = self.transferViewModel.getRecentTracks(limit: self.tracksLimit)
         async let allTracks: [TrackEntity] = {
-            if isDownloaded {
-                return await self.transferViewModel.getRecentDownloadedTracks(limit: nil)
-            } else {
-                return await self.transferViewModel.getRecentActiveTracks(limit: nil)
+            switch type {
+                case .downloaded:
+                    return await self.transferViewModel.getRecentDownloadedTracks(limit: nil)
+
+                case .active:
+                    return await self.transferViewModel.getRecentActiveTracks(limit: nil)
             }
         }()
 
@@ -54,11 +55,14 @@ class DownloadsViewModel: DownloadsPresenting {
     }
 
     func loadSearchBy(query: String) {
-        guard query.count > 2 else {
+        let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        
+        guard trimmedQuery.count > 2 else {
             isSearchLoading = false
             return
         }
-
+        
         isSearchLoading = true
         defer { isSearchLoading = false }
 
@@ -82,7 +86,7 @@ class DownloadsViewModel: DownloadsPresenting {
             return true
         }
 
-        self.saveQuery(query)
+        self.completedSearchQuery = trimmedQuery
         self.set(filtered, for: .search)
     }
 
@@ -90,7 +94,7 @@ class DownloadsViewModel: DownloadsPresenting {
         self.tracksLimit = limit.rawValue
     }
 
-    func set(_ type: TracksType) {
+    func setType(_ type: TracksType) {
         self.selectedTracksType = type
     }
 
@@ -100,8 +104,10 @@ class DownloadsViewModel: DownloadsPresenting {
 
     func startObservingTracksChanges() {
         self.transferViewModel.onTracksChanged = { [weak self] in
+            guard let self else { return }
+
             Task {
-                await self?.fetchTracksSection()
+                await self.fetchTracksSectionBy(self.selectedTracksType)
             }
         }
     }
@@ -136,9 +142,5 @@ class DownloadsViewModel: DownloadsPresenting {
                 )
             )
         }
-    }
-
-    private func saveQuery(_ query: String) {
-        self.completedSearchQuery = query
     }
 }
