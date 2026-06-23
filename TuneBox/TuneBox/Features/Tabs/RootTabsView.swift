@@ -62,28 +62,24 @@ struct RootTabsView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
     }
 
-    @ViewBuilder
     private var content: some View {
-        Group {
-            switch activeTab {
-                case .browse:
-                    BrowseView()
+        TabView(selection: $activeTab) {
+            BrowseView()
+                .tag(CustomTab.browse)
 
-                case .downloads:
-                    DownloadsView()
+            DownloadsView()
+                .tag(CustomTab.downloads)
 
-                case .player:
-                    PlayerView()
+            PlayerView()
+                .tag(CustomTab.player)
 
-                case .importFiles:
-                    ImportFilesView()
+            ImportFilesView()
+                .tag(CustomTab.importFiles)
 
-                case .settings:
-                    SettingsView()
-            }
+            SettingsView()
+                .tag(CustomTab.settings)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .ignoresSafeArea(edges: .bottom)
+        .toolbar(.hidden, for: .tabBar)
     }
 
     private var tabBar: some View {
