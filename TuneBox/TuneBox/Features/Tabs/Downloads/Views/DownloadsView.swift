@@ -133,22 +133,14 @@ struct DownloadsView: View {
         }
 
         private var visibleSections: [TracksSection] {
-            let searchSection = viewModel.sections.first(where: { $0.type == .search })
+            let search = viewModel.sections.first(where: { $0.type == .search })
+            let hasResults = search?.tracks.isEmpty == false
 
-            let hasSearchResults = (searchSection?.tracks.isEmpty == false)
-            let shouldShowSearch = isSearchMode && hasSearchResults
-
-            if shouldShowSearch {
-                return viewModel.sections.filter {
-                    $0.type == .search && !$0.tracks.isEmpty
-                }
-            } else if isSearchMode && !hasSearchResults {
-                return []
-            } else {
-                return viewModel.sections.filter {
-                    $0.type != .search
-                }
+            if isSearchMode {
+                return hasResults ? viewModel.sections.filter { $0.type == .search } : []
             }
+
+            return viewModel.sections.filter { $0.type != .search }
         }
 
         var body: some View {
@@ -160,7 +152,7 @@ struct DownloadsView: View {
                 )
             } else {
                 ScrollView(showsIndicators: false) {
-                    ForEach(visibleSections, id: \.type) { section in
+                    ForEach(visibleSections, id: \.id) { section in
                         if section.type == .search {
                             searchList(section)
                         } else {
