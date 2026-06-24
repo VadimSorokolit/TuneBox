@@ -17,7 +17,6 @@ struct DownloadsView: View {
     @Injected private var viewModel: DownloadsPresenting
     @FocusState private var isTextFieldFocused: Bool
     @State private var searchQuery: String = ""
-    @State private var isSearchMode: Bool = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -31,13 +30,10 @@ struct DownloadsView: View {
                 },
                 onClear: {
                     viewModel.clearSearchState()
-                    isSearchMode = false
                 }
             )
 
-            ContentView(
-                isSearchMode: $isSearchMode
-            )
+            ContentView()
         }
         .frame(maxWidth: .infinity,
                maxHeight: .infinity,
@@ -45,21 +41,12 @@ struct DownloadsView: View {
         )
         .task(id: viewModel.selectedTracksType) {
             viewModel.startObservingTracksChanges()
-
             await viewModel.fetchTracksSectionBy(viewModel.selectedTracksType)
         }
         .task(id: searchQuery) {
             try? await Task.sleep(for: .milliseconds(300))
 
-            if searchQuery.isEmpty {
-                viewModel.clearSearchState()
-                isSearchMode = false
-            } else {
-                if searchQuery.count > 2 {
-                    isSearchMode = true
-                    viewModel.loadSearchBy(query: searchQuery)
-                }
-            }
+            await viewModel.handleSearchQuery(searchQuery)
         }
         .onTapGesture {
             isTextFieldFocused = false
@@ -114,21 +101,14 @@ struct DownloadsView: View {
 
     private struct ContentView: View {
         @Injected private var viewModel: DownloadsPresenting
-        @Binding var isSearchMode: Bool
 
         private let headerLeadingPadding: CGFloat = 26
-
-        private var sectionSuffix: String {
-            viewModel.selectedTracksType == .downloaded
-            ? "(downloaded)"
-            : "(in progress)"
-        }
 
         private var visibleSections: [TracksSection] {
             let search = viewModel.sections.first(where: { $0.type == .search })
             let hasResults = search?.tracks.isEmpty == false
 
-            if isSearchMode {
+            if viewModel.isSearchMode {
                 return hasResults ? viewModel.sections.filter { $0.type == .search } : []
             }
 
@@ -231,7 +211,7 @@ struct DownloadsView: View {
                     }
                 }
             } header: {
-                Text("\(section.title) \(sectionSuffix)")
+                Text("\(section.title) \(viewModel.sectionTitleSuffix)")
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.leading, headerLeadingPadding)
                     .padding(.vertical, 10)

@@ -25,13 +25,20 @@ class DownloadsViewModel: DownloadsPresenting {
     private(set) var selectedTracksType: TracksType = .active
     private(set) var completedSearchQuery = ""
     private(set) var isSearchLoading = false
+    private(set) var isSearchMode: Bool = false
+
+    var sectionTitleSuffix: String {
+        self.selectedTracksType == .downloaded
+        ? "(downloaded)"
+        : "(in progress)"
+    }
 
     // MARK: - Methods. Public
 
     func fetchTracksSectionBy(_ type: TracksType) async {
         self.selectedTracksType = type
 
-        async let recentTracks = self.transferViewModel.getRecentTracks(limit: self.tracksLimit)
+        async let recentTracks = self.transferViewModel.getRecentTracks(limit: self.resentsTrackLimit)
         async let allTracks: [TrackEntity] = {
             switch type {
                 case .downloaded:
@@ -49,43 +56,18 @@ class DownloadsViewModel: DownloadsPresenting {
         self.set(all, for: .all)
     }
 
-    func loadSearchBy(query: String) {
-        let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
-
-        guard trimmedQuery.count > 2 else {
-            isSearchLoading = false
-            return
+    func handleSearchQuery(_ query: String) async {
+        if query.isEmpty {
+            self.clearSearchState()
+        } else {
+            if query.count > self.minimumSearchLength {
+                self.loadSearchBy(query: query)
+            }
         }
-
-        isSearchLoading = true
-        defer { isSearchLoading = false }
-
-        var seen = Set<String>()
-
-        let tracks = sections
-            .filter { $0.type != .search }
-            .flatMap(\.tracks)
-
-        let filtered = tracks.filter { track in
-            let matches =
-                track.songName.localizedStandardContains(query)
-                || track.albumName.localizedStandardContains(query)
-
-            guard matches else { return false }
-
-            let key = "\(track.songName.lowercased())|\(track.artistName.lowercased())"
-
-            if seen.contains(key) { return false }
-            seen.insert(key)
-            return true
-        }
-
-        self.completedSearchQuery = trimmedQuery
-        self.set(filtered, for: .search)
     }
 
-    func setTracksLimit(_ limit: RecentTracksLimit) {
-        self.tracksLimit = limit.rawValue
+    func setResentTrackskLimit(_ limit: RecentTracksLimit) {
+        self.resentsTrackLimit = limit.rawValue
     }
 
     func setType(_ type: TracksType) {
@@ -107,7 +89,7 @@ class DownloadsViewModel: DownloadsPresenting {
     }
 
     func clearSearchState() {
-        self.isSearchLoading = false
+        self.isSearchMode = false
         self.completedSearchQuery = ""
         self.set([], for: .search)
     }
@@ -117,8 +99,8 @@ class DownloadsViewModel: DownloadsPresenting {
     @Injected
     @ObservationIgnored
     private var transferViewModel: TransferManaging
-
-    private var tracksLimit: Int = RecentTracksLimit.small.rawValue
+    private let minimumSearchLength: Int = 2
+    private var resentsTrackLimit: Int = RecentTracksLimit.small.rawValue
 
     // MARK: - Methods. Private
 
@@ -136,5 +118,41 @@ class DownloadsViewModel: DownloadsPresenting {
                 )
             )
         }
+    }
+
+    private func loadSearchBy(query: String) {
+        let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard trimmedQuery.count > self.minimumSearchLength else {
+            self.isSearchLoading = false
+            return
+        }
+
+        self.isSearchLoading = true
+        defer { self.isSearchLoading = false }
+
+        var seen = Set<String>()
+
+        let tracks = self.sections
+            .filter { $0.type != .search }
+            .flatMap(\.tracks)
+
+        let filtered = tracks.filter { track in
+            let matches =
+                track.songName.localizedStandardContains(query)
+                || track.albumName.localizedStandardContains(query)
+
+            guard matches else { return false }
+
+            let key = "\(track.songName.lowercased())|\(track.artistName.lowercased())"
+
+            if seen.contains(key) { return false }
+            seen.insert(key)
+
+            return true
+        }
+
+        self.completedSearchQuery = trimmedQuery
+        self.set(filtered, for: .search)
     }
 }
