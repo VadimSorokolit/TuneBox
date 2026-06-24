@@ -119,7 +119,7 @@ struct DownloadsView: View {
                 }
             }
             .padding(.top, 5)
-            .contentMargins(.bottom, 100)
+            .contentMargins(.bottom, 20)
             .modifier(EmptyTracksStateModifier(showsEmptyState: viewModel.showsEmptyState))
         }
 
@@ -192,40 +192,33 @@ struct DownloadsView: View {
             switch section.type {
                 case .search:
                     if section.type == .search, section.tracks.isEmpty.isFalse, viewModel.isSearchMode {
-                        Text("\(section.title)")
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.horizontal, headerLeadingPadding)
-                            .padding(.vertical, 10)
-                            .background(Color(.systemBackground))
-                            .foregroundStyle(Color(.label))
-                            .font(.headline)
+                        customTitle(for: section)
                     }
 
                 case .recent:
                     if section.type == .recent, section.tracks.isEmpty.isFalse, viewModel.isSearchMode.isFalse {
-                        Text("\(section.title)")
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.horizontal, headerLeadingPadding)
-                            .padding(.vertical, 10)
-                            .background(Color(.systemBackground))
-                            .foregroundStyle(Color(.label))
-                            .font(.headline)
+                        customTitle(for: section)
                     }
 
                 case .all:
                     if section.type == .all, section.tracks.isEmpty.isFalse, viewModel.isSearchMode.isFalse {
-                        Text("\(section.title) \(viewModel.sectionTitleSuffix)")
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.horizontal, headerLeadingPadding)
-                            .padding(.vertical, 10)
-                            .background(Color(.systemBackground))
-                            .foregroundStyle(Color(.label))
-                            .font(.headline)
+                        customTitle(for: section, suffix: viewModel.sectionTitleSuffix)
                     }
 
                 case .genre, .popular:
                     EmptyView()
             }
+        }
+
+        @ViewBuilder
+        private func customTitle(for section: TracksSection, suffix: String? = nil) -> some View {
+            Text("\(section.title) \(suffix ?? "")")
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, headerLeadingPadding)
+                .padding(.vertical, 10)
+                .background(Color(.systemBackground))
+                .foregroundStyle(Color(.label))
+                .font(.headline)
         }
     }
 
