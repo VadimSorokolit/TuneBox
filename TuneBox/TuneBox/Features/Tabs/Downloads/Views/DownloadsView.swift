@@ -107,8 +107,8 @@ struct DownloadsView: View {
         private let headerLeadingPadding: CGFloat = 26
 
         var body: some View {
-            LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
-                ScrollView(showsIndicators: false) {
+            ScrollView(showsIndicators: false) {
+                LazyVStack(spacing: 0) {
                     ForEach(viewModel.sections) { section in
                         sectionView(section)
                     }
