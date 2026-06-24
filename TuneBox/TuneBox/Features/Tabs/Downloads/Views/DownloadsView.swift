@@ -107,20 +107,24 @@ struct DownloadsView: View {
         private let headerLeadingPadding: CGFloat = 26
 
         var body: some View {
-            ScrollView(showsIndicators: false) {
-                LazyVStack(spacing: 0) {
+            ScrollView {
+                LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
                     ForEach(viewModel.sections) { section in
-                        sectionView(section)
+                        Section {
+                            sectionContent(section)
+                        } header: {
+                            sectionHeader(for: section)
+                        }
                     }
                 }
-                .padding(.top, 10)
-                .contentMargins(.bottom, 100)
             }
+            .padding(.top, 5)
+            .contentMargins(.bottom, 100)
             .modifier(EmptyTracksStateModifier(showsEmptyState: viewModel.showsEmptyState))
         }
 
         @ViewBuilder
-        private func sectionView(_ section: TracksSection) -> some View {
+        private func sectionContent(_ section: TracksSection) -> some View {
             switch section.type {
                 case .search:
                     searchSection(section)
@@ -128,6 +132,7 @@ struct DownloadsView: View {
                     recentSection(section)
                 case .all:
                     filteredSection(section)
+
                 case .genre, .popular:
                     EmptyView()
             }
@@ -136,21 +141,17 @@ struct DownloadsView: View {
         @ViewBuilder
         private func searchSection(_ section: TracksSection) -> some View {
             if section.type == .search, section.tracks.isEmpty.isFalse, viewModel.isSearchMode {
-                Section {
-                    LazyVStack(spacing: 4) {
-                        ForEach(section.tracks, id: \.id) { track in
-                            TrackCell(
-                                track: track,
-                                searchQuery: viewModel.completedSearchQuery,
-                                onTap: {
-                                    Task {
-                                        await viewModel.handleDownloadAction(for: track)
-                                    }
-                                })
-                        }
+                LazyVStack(spacing: 4) {
+                    ForEach(section.tracks, id: \.id) { track in
+                        TrackCell(
+                            track: track,
+                            searchQuery: viewModel.completedSearchQuery,
+                            onTap: {
+                                Task {
+                                    await viewModel.handleDownloadAction(for: track)
+                                }
+                            })
                     }
-                } header: {
-                    sectionHeader(title: section.title)
                 }
             }
         }
@@ -158,19 +159,15 @@ struct DownloadsView: View {
         @ViewBuilder
         private func recentSection(_ section: TracksSection) -> some View {
             if section.type == .recent, section.tracks.isEmpty.isFalse, viewModel.isSearchMode.isFalse {
-                Section {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        LazyHStack(spacing: 4) {
-                            ForEach(section.tracks, id: \.id) { track in
-                                GenreCell(track: track) {
-                                    Task { await viewModel.handleDownloadAction(for: track) }
-                                }
+                ScrollView(.horizontal, showsIndicators: false) {
+                    LazyHStack(spacing: 4) {
+                        ForEach(section.tracks, id: \.id) { track in
+                            GenreCell(track: track) {
+                                Task { await viewModel.handleDownloadAction(for: track) }
                             }
                         }
-                        .padding(.horizontal)
                     }
-                } header: {
-                    sectionHeader(title: section.title)
+                    .padding(.horizontal)
                 }
             }
         }
@@ -178,31 +175,57 @@ struct DownloadsView: View {
         @ViewBuilder
         private func filteredSection(_ section: TracksSection) -> some View {
             if section.type == .all, section.tracks.isEmpty.isFalse, viewModel.isSearchMode.isFalse {
-                Section {
-                    LazyVStack(spacing: 4) {
-                        ForEach(section.tracks, id: \.id) { track in
-                            TrackCell(track: track) {
-                                Task {
-                                    await viewModel.handleDownloadAction(for: track)
-                                }
+                LazyVStack(spacing: 4) {
+                    ForEach(section.tracks, id: \.id) { track in
+                        TrackCell(track: track) {
+                            Task {
+                                await viewModel.handleDownloadAction(for: track)
                             }
                         }
                     }
-                } header: {
-                   sectionHeader(title: "\(section.title) \(viewModel.sectionTitleSuffix)")
                 }
             }
         }
 
         @ViewBuilder
-        private func sectionHeader(title: String) -> some View {
-            Text("\(title)")
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, headerLeadingPadding)
-                .padding(.vertical, 10)
-                .background(Color(.systemBackground))
-                .foregroundStyle(Color(.label))
-                .font(.headline)
+        private func sectionHeader(for section: TracksSection) -> some View {
+            switch section.type {
+                case .search:
+                    if section.type == .search, section.tracks.isEmpty.isFalse, viewModel.isSearchMode {
+                        Text("\(section.title)")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, headerLeadingPadding)
+                            .padding(.vertical, 10)
+                            .background(Color(.systemBackground))
+                            .foregroundStyle(Color(.label))
+                            .font(.headline)
+                    }
+
+                case .recent:
+                    if section.type == .recent, section.tracks.isEmpty.isFalse, viewModel.isSearchMode.isFalse {
+                        Text("\(section.title)")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, headerLeadingPadding)
+                            .padding(.vertical, 10)
+                            .background(Color(.systemBackground))
+                            .foregroundStyle(Color(.label))
+                            .font(.headline)
+                    }
+
+                case .all:
+                    if section.type == .all, section.tracks.isEmpty.isFalse, viewModel.isSearchMode.isFalse {
+                        Text("\(section.title) \(viewModel.sectionTitleSuffix)")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, headerLeadingPadding)
+                            .padding(.vertical, 10)
+                            .background(Color(.systemBackground))
+                            .foregroundStyle(Color(.label))
+                            .font(.headline)
+                    }
+
+                case .genre, .popular:
+                    EmptyView()
+            }
         }
     }
 
