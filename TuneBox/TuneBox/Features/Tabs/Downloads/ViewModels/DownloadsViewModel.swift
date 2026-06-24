@@ -33,6 +33,17 @@ class DownloadsViewModel: DownloadsPresenting {
         : "(in progress)"
     }
 
+    var showsEmptyState: Bool {
+        self.isSearchMode
+        && isSearchLoading.isFalse
+        && sections.first(where: { $0.type == .search })?.tracks.isEmpty == true
+        ||
+        self.isSearchMode.isFalse
+        && self.sections.filter({ $0.type != .search })
+            .compactMap({ $0.tracks })
+            .allSatisfy({$0.isEmpty})
+    }
+
     // MARK: - Methods. Public
 
     func fetchTracksSectionBy(_ type: TracksType) async {
@@ -66,7 +77,7 @@ class DownloadsViewModel: DownloadsPresenting {
         }
     }
 
-    func setResentTrackskLimit(_ limit: RecentTracksLimit) {
+    func setResentTracksLimit(_ limit: RecentTracksLimit) {
         self.resentsTrackLimit = limit.rawValue
     }
 
@@ -104,19 +115,11 @@ class DownloadsViewModel: DownloadsPresenting {
 
     // MARK: - Methods. Private
 
-    private func set(
-        _ tracks: [TrackEntity],
-        for type: TracksSection.SectionType
-    ) {
-        if let index = self.sections.firstIndex(where: { $0.type == type }) {
+    private func set(_ tracks: [TrackEntity], for type: TracksSection.SectionType) {
+        if let index = sections.firstIndex(where: { $0.type == type }) {
             self.sections[index].tracks = tracks
         } else {
-            self.sections.append(
-                TracksSection(
-                    type: type,
-                    tracks: tracks
-                )
-            )
+            self.sections.append(.init(type: type, tracks: tracks))
         }
     }
 
@@ -129,6 +132,7 @@ class DownloadsViewModel: DownloadsPresenting {
         }
 
         self.isSearchLoading = true
+        self.isSearchMode = true
         defer { self.isSearchLoading = false }
 
         var seen = Set<String>()

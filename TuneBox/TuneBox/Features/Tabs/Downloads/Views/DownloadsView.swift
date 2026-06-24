@@ -8,7 +8,7 @@
 import SwiftUI
 import Resolver
 
-enum TracksType {
+enum TracksType: Hashable, Equatable {
     case active
     case downloaded
 }
@@ -39,8 +39,10 @@ struct DownloadsView: View {
                maxHeight: .infinity,
                alignment: .top
         )
-        .task(id: viewModel.selectedTracksType) {
+        .onAppear {
             viewModel.startObservingTracksChanges()
+        }
+        .task(id: viewModel.selectedTracksType) {
             await viewModel.fetchTracksSectionBy(viewModel.selectedTracksType)
         }
         .task(id: searchQuery) {
@@ -104,50 +106,36 @@ struct DownloadsView: View {
 
         private let headerLeadingPadding: CGFloat = 26
 
-        private var visibleSections: [TracksSection] {
-            let search = viewModel.sections.first(where: { $0.type == .search })
-            let hasResults = search?.tracks.isEmpty == false
-
-            if viewModel.isSearchMode {
-                return hasResults ? viewModel.sections.filter { $0.type == .search } : []
-            }
-
-            return viewModel.sections.filter { $0.type != .search }
-        }
-
         var body: some View {
-            if visibleSections
-                .allSatisfy({ $0.tracks.isEmpty }) {
-                ContentUnavailableView(
-                    "No Tracks",
-                    systemImage: "music.note"
-                )
-            } else {
+            LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
                 ScrollView(showsIndicators: false) {
-                    ForEach(visibleSections, id: \.id) { section in
-                        if section.type == .search {
-                            searchList(section)
-                        } else {
-                            LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
-                                if section.type == .recent, section.tracks.isNotEmpty {
-                                    recentList(section)
-                                }
-
-                                if section.type == .all, section.tracks.isNotEmpty {
-                                    allList(section)
-                                }
-                            }
-                        }
+                    ForEach(viewModel.sections) { section in
+                        sectionView(section)
                     }
                 }
                 .padding(.top, 10)
                 .contentMargins(.bottom, 100)
             }
+            .modifier(EmptyTracksStateModifier(showsEmptyState: viewModel.showsEmptyState))
         }
 
         @ViewBuilder
-        private func searchList(_ section: TracksSection) -> some View {
-            LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
+        private func sectionView(_ section: TracksSection) -> some View {
+            switch section.type {
+                case .search:
+                    searchSection(section)
+                case .recent:
+                    recentSection(section)
+                case .all:
+                    filteredSection(section)
+                case .genre, .popular:
+                    EmptyView()
+            }
+        }
+
+        @ViewBuilder
+        private func searchSection(_ section: TracksSection) -> some View {
+            if section.type == .search, section.tracks.isEmpty.isFalse, viewModel.isSearchMode {
                 Section {
                     LazyVStack(spacing: 4) {
                         ForEach(section.tracks, id: \.id) { track in
@@ -162,62 +150,73 @@ struct DownloadsView: View {
                         }
                     }
                 } header: {
-                    Text(section.title)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.leading, headerLeadingPadding)
-                        .padding(.vertical, 10)
-                        .background(Color(.systemBackground))
-                        .foregroundStyle(Color(.label))
-                        .font(.headline)
+                    sectionHeader(title: section.title)
                 }
             }
         }
 
         @ViewBuilder
-        private func recentList(_ section: TracksSection) -> some View {
-            VStack(alignment: .leading, spacing: 0) {
-                Text(section.title)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.leading, headerLeadingPadding)
-                    .padding(.vertical, 10)
-                    .background(Color(.systemBackground))
-                    .foregroundStyle(Color(.label))
-                    .font(.headline)
+        private func recentSection(_ section: TracksSection) -> some View {
+            if section.type == .recent, section.tracks.isEmpty.isFalse, viewModel.isSearchMode.isFalse {
+                Section {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        LazyHStack(spacing: 4) {
+                            ForEach(section.tracks, id: \.id) { track in
+                                GenreCell(track: track) {
+                                    Task { await viewModel.handleDownloadAction(for: track) }
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                } header: {
+                    sectionHeader(title: section.title)
+                }
+            }
+        }
 
-                ScrollView(.horizontal, showsIndicators: false) {
-                    LazyHStack(spacing: 4) {
+        @ViewBuilder
+        private func filteredSection(_ section: TracksSection) -> some View {
+            if section.type == .all, section.tracks.isEmpty.isFalse, viewModel.isSearchMode.isFalse {
+                Section {
+                    LazyVStack(spacing: 4) {
                         ForEach(section.tracks, id: \.id) { track in
-                            GenreCell(track: track) {
+                            TrackCell(track: track) {
                                 Task {
                                     await viewModel.handleDownloadAction(for: track)
                                 }
                             }
                         }
                     }
-                    .padding(.horizontal)
+                } header: {
+                   sectionHeader(title: "\(section.title) \(viewModel.sectionTitleSuffix)")
                 }
             }
         }
 
-        @ViewBuilder private func allList(_ section: TracksSection) -> some View {
-            Section {
-                LazyVStack(spacing: 4) {
-                    ForEach(section.tracks, id: \.id) { track in
-                        TrackCell(track: track) {
-                            Task {
-                                await viewModel.handleDownloadAction(for: track)
-                            }
-                        }
-                    }
-                }
-            } header: {
-                Text("\(section.title) \(viewModel.sectionTitleSuffix)")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.leading, headerLeadingPadding)
-                    .padding(.vertical, 10)
-                    .background(Color(.systemBackground))
-                    .foregroundStyle(Color(.label))
-                    .font(.headline)
+        @ViewBuilder
+        private func sectionHeader(title: String) -> some View {
+            Text("\(title)")
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, headerLeadingPadding)
+                .padding(.vertical, 10)
+                .background(Color(.systemBackground))
+                .foregroundStyle(Color(.label))
+                .font(.headline)
+        }
+    }
+
+    private struct EmptyTracksStateModifier: ViewModifier {
+        let showsEmptyState: Bool
+
+        func body(content: Content) -> some View {
+            if showsEmptyState {
+                ContentUnavailableView(
+                    "No Tracks",
+                    systemImage: "music.note"
+                )
+            } else {
+                content
             }
         }
     }

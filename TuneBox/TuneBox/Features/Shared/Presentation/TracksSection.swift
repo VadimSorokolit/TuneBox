@@ -8,27 +8,22 @@
 import Foundation
 
 struct TracksSection: Hashable, Identifiable {
-    let id: UUID = UUID()
     let type: SectionType
     var tracks: [TrackEntity]
+
+    var id: SectionType {
+        type
+    }
 
     var title: String {
         type.rawValue
     }
 
-    enum SectionType: String {
+    enum SectionType: String, Hashable {
         case genre = "Featured"
         case popular = "Popular"
         case search = "Search"
         case recent = "Recent"
         case all = "All"
-    }
-
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-
-    static func == (lhs: TracksSection, rhs: TracksSection) -> Bool {
-        lhs.id == rhs.id
     }
 }
