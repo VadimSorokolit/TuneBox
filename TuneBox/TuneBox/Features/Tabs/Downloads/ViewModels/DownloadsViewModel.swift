@@ -45,24 +45,18 @@ class DownloadsViewModel: DownloadsPresenting {
         // Concurrency execution
         let (recent, all) = await (recentTracks, allTracks)
 
-        if recent.isEmpty.isFalse
-            || all.isEmpty.isFalse {
-            self.sections.removeAll()
-        }
-
         self.set(recent, for: .recent)
         self.set(all, for: .all)
     }
 
     func loadSearchBy(query: String) {
         let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        
+
         guard trimmedQuery.count > 2 else {
             isSearchLoading = false
             return
         }
-        
+
         isSearchLoading = true
         defer { isSearchLoading = false }
 

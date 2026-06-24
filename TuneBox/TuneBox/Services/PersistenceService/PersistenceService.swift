@@ -34,7 +34,7 @@ final class PersistenceService: PersistenceServicing {
             throw error
         }
     }
-    
+
     func getRecentsTracks(limit: Int?) throws -> [TrackEntity] {
         var descriptor = FetchDescriptor<TrackEntity>(
             sortBy: [
@@ -48,7 +48,7 @@ final class PersistenceService: PersistenceServicing {
 
         return try modelContext.fetch(descriptor)
     }
-    
+
     func getRecentDownloadedTracks(limit: Int?) throws -> [TrackEntity] {
         let completed = DownloadState.completed.rawValue
 
