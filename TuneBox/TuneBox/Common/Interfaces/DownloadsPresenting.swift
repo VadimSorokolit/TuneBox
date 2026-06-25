@@ -20,6 +20,7 @@ protocol DownloadsPresenting: AnyObject, Sendable {
     func setResentTracksLimit(_ limit: RecentTracksLimit)
     func setType(_ type: TracksType)
     func startObservingTracksChanges()
+    func stopObservingTracksChanges() 
     func handleDownloadAction(for track: TrackEntity) async
     func clearSearchState()
 }

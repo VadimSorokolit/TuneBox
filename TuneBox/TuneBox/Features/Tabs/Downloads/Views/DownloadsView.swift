@@ -8,15 +8,14 @@
 import SwiftUI
 import Resolver
 
-enum TracksType: Hashable, Equatable {
+enum TracksType: Hashable {
     case active
     case downloaded
 }
 
 struct DownloadsView: View {
-    @Injected private var viewModel: DownloadsPresenting
-    @FocusState private var isTextFieldFocused: Bool
-    @State private var searchQuery: String = ""
+
+    // MARK: - Main Body
 
     var body: some View {
         VStack(spacing: 0) {
@@ -24,9 +23,9 @@ struct DownloadsView: View {
 
             SearchBarView(
                 searchQuery: $searchQuery,
-                isFocused: $isTextFieldFocused,
+                isFocused: $isSearchFieldFocused,
                 onSubmit: {
-                    isTextFieldFocused = false
+                    isSearchFieldFocused = false
                 },
                 onClear: {
                     viewModel.clearSearchState()
@@ -42,18 +41,31 @@ struct DownloadsView: View {
         .onAppear {
             viewModel.startObservingTracksChanges()
         }
+        .onDisappear {
+            viewModel.stopObservingTracksChanges()
+        }
         .task(id: viewModel.selectedTracksType) {
             await viewModel.fetchTracksSectionBy(viewModel.selectedTracksType)
         }
         .task(id: searchQuery) {
             try? await Task.sleep(for: .milliseconds(300))
 
+            guard Task.isCancelled.isFalse else {
+                return
+            }
+
             await viewModel.handleSearchQuery(searchQuery)
         }
-        .onTapGesture {
-            isTextFieldFocused = false
-        }
+        .dismissKeyboardOnTap(focused: $isSearchFieldFocused)
     }
+
+    // MARK: - Properties. Private
+
+    @Injected private var viewModel: DownloadsPresenting
+    @FocusState private var isSearchFieldFocused: Bool
+    @State private var searchQuery: String = ""
+
+    // MARK: - Subviews. Private
 
     private struct HeaderView: View {
         @Injected private var viewModel: DownloadsPresenting
@@ -114,7 +126,7 @@ struct DownloadsView: View {
                             case .search:
                                 searchSectionView(section)
 
-                            case .recent:
+                            case .recents:
                                 recentsSectionView(section)
 
                             case .all:
@@ -131,11 +143,12 @@ struct DownloadsView: View {
             .modifier(EmptyTracksStateModifier(showsEmptyState: viewModel.showsEmptyState))
         }
 
+        // MARK: - Private. Methods
+
         @ViewBuilder
         private func searchSectionView(_ section: TracksSection) -> some View {
-            if section.type == .search,
-                section.tracks.isNotEmpty,
-                viewModel.isSearchMode {
+            if section.tracks.isNotEmpty,
+               viewModel.isSearchMode {
 
                 Section(
                     content: {
@@ -161,9 +174,8 @@ struct DownloadsView: View {
 
         @ViewBuilder
         private func recentsSectionView(_ section: TracksSection) -> some View {
-            if section.type == .recent,
-                section.tracks.isNotEmpty,
-                viewModel.isSearchMode.isFalse {
+            if section.tracks.isNotEmpty,
+               viewModel.isSearchMode.isFalse {
 
                 Section(
                     content: {
@@ -188,9 +200,8 @@ struct DownloadsView: View {
 
         @ViewBuilder
         private func filteredSectionView(_ section: TracksSection) -> some View {
-            if section.type == .all,
-                section.tracks.isNotEmpty,
-                viewModel.isSearchMode.isFalse {
+            if section.tracks.isNotEmpty,
+               viewModel.isSearchMode.isFalse {
 
                 Section(
                     content: {

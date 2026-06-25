@@ -47,8 +47,6 @@ class DownloadsViewModel: DownloadsPresenting {
     // MARK: - Methods. Public
 
     func fetchTracksSectionBy(_ type: TracksType) async {
-        self.selectedTracksType = type
-
         async let recentTracks = self.transferViewModel.getRecentTracks(limit: self.resentsTrackLimit)
         async let allTracks: [TrackEntity] = {
             switch type {
@@ -61,9 +59,9 @@ class DownloadsViewModel: DownloadsPresenting {
         }()
 
         // Concurrency execution
-        let (recent, all) = await (recentTracks, allTracks)
+        let (recents, all) = await (recentTracks, allTracks)
 
-        self.set(recent, for: .recent)
+        self.set(recents, for: .recents)
         self.set(all, for: .all)
     }
 
@@ -90,13 +88,26 @@ class DownloadsViewModel: DownloadsPresenting {
     }
 
     func startObservingTracksChanges() {
-        self.transferViewModel.onTracksChanged = { [weak self] in
+        self.tracksObservationTask?.cancel()
+
+        self.tracksObservationTask = Task { [weak self] in
             guard let self else { return }
 
-            Task {
-                await self.fetchTracksSectionBy(self.selectedTracksType)
+            self.transferViewModel.onTracksChanged = { [weak self] in
+                guard let self else { return }
+
+                Task {
+                    await self.fetchTracksSectionBy(self.selectedTracksType)
+                }
             }
         }
+    }
+
+    func stopObservingTracksChanges() {
+        self.tracksObservationTask?.cancel()
+
+        self.tracksObservationTask = nil
+        self.transferViewModel.onTracksChanged = nil
     }
 
     func clearSearchState() {
@@ -110,6 +121,7 @@ class DownloadsViewModel: DownloadsPresenting {
     @Injected
     @ObservationIgnored
     private var transferViewModel: TransferManaging
+    private var tracksObservationTask: Task<Void, Never>?
     private let minimumSearchLength: Int = 2
     private var resentsTrackLimit: Int = RecentTracksLimit.small.rawValue
 

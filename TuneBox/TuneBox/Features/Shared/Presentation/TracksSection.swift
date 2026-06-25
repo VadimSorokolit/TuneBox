@@ -23,7 +23,7 @@ struct TracksSection: Hashable, Identifiable {
         case genre = "Featured"
         case popular = "Popular"
         case search = "Search"
-        case recent = "Recent"
+        case recents = "Recents"
         case all = "All"
     }
 }

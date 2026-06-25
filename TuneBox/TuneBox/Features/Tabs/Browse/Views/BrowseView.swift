@@ -9,7 +9,7 @@ import Resolver
 import SwiftUI
 
 struct BrowseView: View {
-    @Injected var viewModel: TransferManaging
+    @Injected private var viewModel: TransferManaging
     @FocusState private var isTextFieldFocused: Bool
     @State private var slideDirection: SlideDirection = .forward
     @State private var searchQuery: String = ""
@@ -36,7 +36,6 @@ struct BrowseView: View {
                 }
 
                 if viewModel.completedSearchQuery != searchQuery {
-                    viewModel.saveQuery(searchQuery)
                     viewModel.loadSearchBy(query: searchQuery)
                 }
             }
