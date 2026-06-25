@@ -88,7 +88,7 @@ final class TrackEntity {
     }
 
     var imageURL: URL? {
-        guard let image, !image.isEmpty else {
+        guard let image, image.isNotEmpty else {
             return nil
         }
 
@@ -98,7 +98,7 @@ final class TrackEntity {
     }
 
     var downloadURL: URL? {
-        guard let download, !download.isEmpty else {
+        guard let download, download.isNotEmpty else {
             return nil
         }
 

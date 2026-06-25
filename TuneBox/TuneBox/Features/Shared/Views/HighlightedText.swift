@@ -23,7 +23,7 @@ struct HighlightedText: View {
         let query = searchQuery?
             .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
 
-        guard query.isEmpty == false,
+        guard query.isNotEmpty,
               let range = attributedString.range(
                 of: query,
                 options: .caseInsensitive

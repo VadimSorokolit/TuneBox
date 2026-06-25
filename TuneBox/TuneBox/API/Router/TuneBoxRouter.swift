@@ -75,7 +75,7 @@ extension TuneBoxRouter: TargetType {
                     Params.offset: offset
                 ]
 
-                if let genre, !genre.isEmpty {
+                if let genre, genre.isNotEmpty {
                     params[Params.tags] = genre
                 }
 

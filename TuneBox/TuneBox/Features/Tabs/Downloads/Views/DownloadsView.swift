@@ -70,27 +70,27 @@ struct DownloadsView: View {
                 Spacer()
 
                 Menu(content: {
-                    Button {
+                    Button(action: {
                         viewModel.setType(.active)
-                    } label: {
+                    }, label: {
                         Label(
                             "Active Downloads",
                             systemImage: viewModel.selectedTracksType == .active
                             ? "checkmark"
                             : ""
                         )
-                    }
+                    })
 
-                    Button {
+                    Button(action: {
                         viewModel.setType(.downloaded)
-                    } label: {
+                    }, label: {
                         Label(
                             "Downloaded",
                             systemImage: viewModel.selectedTracksType == .downloaded
                             ? "checkmark"
                             : ""
                         )
-                    }
+                    })
                 }, label: {
                     Image(systemName: "line.3.horizontal.decrease.circle")
                         .font(.system(size: 24))
@@ -110,10 +110,18 @@ struct DownloadsView: View {
             ScrollView {
                 LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
                     ForEach(viewModel.sections) { section in
-                        Section {
-                            sectionContent(section)
-                        } header: {
-                            sectionHeader(for: section)
+                        switch section.type {
+                            case .search:
+                                searchSectionView(section)
+
+                            case .recent:
+                                recentsSectionView(section)
+
+                            case .all:
+                                filteredSectionView(section)
+
+                            case .genre, .popular:
+                                EmptyView()
                         }
                     }
                 }
@@ -124,93 +132,84 @@ struct DownloadsView: View {
         }
 
         @ViewBuilder
-        private func sectionContent(_ section: TracksSection) -> some View {
-            switch section.type {
-                case .search:
-                    searchSection(section)
-                case .recent:
-                    recentSection(section)
-                case .all:
-                    filteredSection(section)
+        private func searchSectionView(_ section: TracksSection) -> some View {
+            if section.type == .search,
+                section.tracks.isNotEmpty,
+                viewModel.isSearchMode {
 
-                case .genre, .popular:
-                    EmptyView()
+                Section(
+                    content: {
+                        LazyVStack(spacing: 4) {
+                            ForEach(section.tracks, id: \.id) { track in
+                                TrackCell(
+                                    track: track,
+                                    searchQuery: viewModel.completedSearchQuery,
+                                    onTap: {
+                                        Task {
+                                            await viewModel.handleDownloadAction(for: track)
+                                        }
+                                    })
+                            }
+                        }
+                    },
+                    header: {
+                        customTitle(for: section)
+                    }
+                )
             }
         }
 
         @ViewBuilder
-        private func searchSection(_ section: TracksSection) -> some View {
-            if section.type == .search, section.tracks.isEmpty.isFalse, viewModel.isSearchMode {
-                LazyVStack(spacing: 4) {
-                    ForEach(section.tracks, id: \.id) { track in
-                        TrackCell(
-                            track: track,
-                            searchQuery: viewModel.completedSearchQuery,
-                            onTap: {
-                                Task {
-                                    await viewModel.handleDownloadAction(for: track)
+        private func recentsSectionView(_ section: TracksSection) -> some View {
+            if section.type == .recent,
+                section.tracks.isNotEmpty,
+                viewModel.isSearchMode.isFalse {
+
+                Section(
+                    content: {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            LazyHStack(spacing: 4) {
+                                ForEach(section.tracks, id: \.id) { track in
+                                    GenreCell(track: track) {
+                                        Task {
+                                            await viewModel.handleDownloadAction(for: track)
+                                        }
+                                    }
                                 }
-                            })
-                    }
-                }
-            }
-        }
-
-        @ViewBuilder
-        private func recentSection(_ section: TracksSection) -> some View {
-            if section.type == .recent, section.tracks.isEmpty.isFalse, viewModel.isSearchMode.isFalse {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    LazyHStack(spacing: 4) {
-                        ForEach(section.tracks, id: \.id) { track in
-                            GenreCell(track: track) {
-                                Task { await viewModel.handleDownloadAction(for: track) }
                             }
+                            .padding(.horizontal)
                         }
-                    }
-                    .padding(.horizontal)
-                }
-            }
-        }
-
-        @ViewBuilder
-        private func filteredSection(_ section: TracksSection) -> some View {
-            if section.type == .all, section.tracks.isEmpty.isFalse, viewModel.isSearchMode.isFalse {
-                LazyVStack(spacing: 4) {
-                    ForEach(section.tracks, id: \.id) { track in
-                        TrackCell(track: track) {
-                            Task {
-                                await viewModel.handleDownloadAction(for: track)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        @ViewBuilder
-        private func sectionHeader(for section: TracksSection) -> some View {
-            switch section.type {
-                case .search:
-                    if section.type == .search, section.tracks.isEmpty.isFalse, viewModel.isSearchMode {
+                    }, header: {
                         customTitle(for: section)
                     }
+                )
+            }
+        }
 
-                case .recent:
-                    if section.type == .recent, section.tracks.isEmpty.isFalse, viewModel.isSearchMode.isFalse {
-                        customTitle(for: section)
-                    }
+        @ViewBuilder
+        private func filteredSectionView(_ section: TracksSection) -> some View {
+            if section.type == .all,
+                section.tracks.isNotEmpty,
+                viewModel.isSearchMode.isFalse {
 
-                case .all:
-                    if section.type == .all, section.tracks.isEmpty.isFalse, viewModel.isSearchMode.isFalse {
+                Section(
+                    content: {
+                        LazyVStack(spacing: 4) {
+                            ForEach(section.tracks, id: \.id) { track in
+                                TrackCell(track: track) {
+                                    Task {
+                                        await viewModel.handleDownloadAction(for: track)
+                                    }
+                                }
+                            }
+                        }
+                    }, header: {
                         customTitle(for: section, suffix: viewModel.sectionTitleSuffix)
                     }
-
-                case .genre, .popular:
-                    EmptyView()
+                )
             }
         }
 
-        @ViewBuilder
         private func customTitle(for section: TracksSection, suffix: String? = nil) -> some View {
             Text("\(section.title) \(suffix ?? "")")
                 .frame(maxWidth: .infinity, alignment: .leading)

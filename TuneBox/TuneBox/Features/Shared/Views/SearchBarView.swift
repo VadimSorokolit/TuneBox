@@ -29,7 +29,7 @@ struct SearchBarView: View {
                     onSubmit()
                 }
 
-            if searchQuery.isEmpty == false {
+            if searchQuery.isNotEmpty {
                 Button {
                     searchQuery = ""
                     onClear()

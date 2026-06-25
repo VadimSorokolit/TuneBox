@@ -845,7 +845,7 @@ final class TransferViewModel: TransferManaging {
 
     @discardableResult
     private func upsertAndResolve(_ entities: [TrackEntity]) -> [TrackEntity] {
-        guard entities.isEmpty == false else {
+        guard entities.isNotEmpty else {
             return []
         }
 
@@ -1066,7 +1066,7 @@ final class TransferViewModel: TransferManaging {
 
             let runningTrackIDs = await self.networkService.runningDownloadTrackIDs()
 
-            while self.hasFreeDownloadSlot, self.queuedDownloadTrackIDs.isEmpty == false {
+            while self.hasFreeDownloadSlot, self.queuedDownloadTrackIDs.isNotEmpty {
                 let trackID = self.queuedDownloadTrackIDs.removeFirst()
 
                 guard runningTrackIDs.contains(trackID) == false,
