@@ -121,19 +121,37 @@ final class TransferViewModel: TransferManaging {
     }
 
     var showsEmptyState: Bool {
-        self.isSearchMode
-        && isSearchLoading.isFalse
-        && sections.first(where: { $0.type == .search })?.tracks.isEmpty == true
-        ||
-        self.isSearchMode.isFalse
-        && self.sections.filter({ $0.type != .search })
-            .compactMap({ $0.tracks })
-            .allSatisfy({$0.isEmpty})
+        guard isInitialLoading.isFalse else {
+            return false
+        }
+
+        if isSearchMode {
+            let searchEmpty =
+                isSearchLoading.isFalse &&
+                (sections.first(where: { $0.type == .search })?.tracks.isEmpty == true)
+
+            return searchEmpty
+        }
+
+        let hasAnyTracks = self.sections
+            .filter { $0.type != .search }
+            .flatMap(\.tracks)
+            .isEmpty
+
+        let noSpinner = shouldShowCentralSpinner == false
+
+        return hasAnyTracks && noSpinner
     }
 
     // MARK: - Methods. Public
 
     func loadInitialContent() async {
+        self.isInitialLoading = true
+
+        defer {
+            self.isInitialLoading = false
+        }
+
         async let genre: Void = self.loadFirstBy(
             genre: self.selectedGenre == .all ? nil : self.selectedGenre
         )
@@ -693,6 +711,7 @@ final class TransferViewModel: TransferManaging {
     private let downloadObserverTokens = TransferDownloadObserverTokens()
     private let minimumSearchLength: Int = 2
     private var fetchTracksCount: Int = .zero
+    private var isInitialLoading = false
 
     @ObservationIgnored
     private var queuedDownloadTrackIDs: [String] = []

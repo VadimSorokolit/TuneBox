@@ -46,20 +46,10 @@ struct BrowseView: View {
                 return
             }
 
-            if searchQuery.isEmpty {
-                viewModel.clearSearchState()
-            }
-
-            if viewModel.completedSearchQuery != searchQuery {
-                viewModel.loadSearchBy(query: searchQuery)
-            }
+            handleSearchStateBy(query: searchQuery)
         }
         .dismissKeyboardOnTap(focused: $isSearchFieldFocused)
-        .overlay {
-            if viewModel.shouldShowCentralSpinner {
-                SpinnerView()
-            }
-        }
+        .modifier(CentralSpinnerModifier(isVisible: viewModel.shouldShowCentralSpinner))
     }
 
     // MARK: - Properties. Private
@@ -295,6 +285,29 @@ struct BrowseView: View {
                     }
                 )
             }
+        }
+    }
+
+    private struct CentralSpinnerModifier: ViewModifier {
+        let isVisible: Bool
+
+        func body(content: Content) -> some View {
+            content
+                .overlay {
+                    if isVisible {
+                        SpinnerView()
+                    }
+                }
+        }
+    }
+
+    private func handleSearchStateBy(query: String) {
+        if query.isEmpty {
+            viewModel.clearSearchState()
+        }
+
+        if viewModel.completedSearchQuery != query {
+            viewModel.loadSearchBy(query: query)
         }
     }
 }
