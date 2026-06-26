@@ -40,7 +40,9 @@
 		5B586CCC2FACB61500BCEAD2 /* TracksResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CCB2FACB61400BCEAD2 /* TracksResponse.swift */; };
 		5B6B8CD32FED1D9400C23D3E /* DismissKeyboardOnTapModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6B8CD22FED1D9200C23D3E /* DismissKeyboardOnTapModifier.swift */; };
 		5B6B8CD52FED1DED00C23D3E /* View+dismissKeyboardOnTap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6B8CD42FED1DEC00C23D3E /* View+dismissKeyboardOnTap.swift */; };
+		5B6B8CD72FED326800C23D3E /* View+sectionTracksTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6B8CD62FED326700C23D3E /* View+sectionTracksTitle.swift */; };
 		5B6E4DBF2FD17B9000B4E663 /* SegmentedItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6E4DBE2FD17B8F00B4E663 /* SegmentedItem.swift */; };
+		5B7D62B32FEE8B7A0084738C /* EmptyTracksStateModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7D62B22FEE8B790084738C /* EmptyTracksStateModifier.swift */; };
 		5B7E1DAD2FE2A4FA00561D67 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5B7E1DAC2FE2A4FA00561D67 /* SDWebImageSwiftUI */; };
 		5B8382912FC495F9003625CD /* PlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382902FC495F8003625CD /* PlayerViewModel.swift */; };
 		5B8382992FC4C9EE003625CD /* SpinnerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382982FC4C9ED003625CD /* SpinnerView.swift */; };
@@ -157,7 +159,9 @@
 		5B586CCB2FACB61400BCEAD2 /* TracksResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TracksResponse.swift; sourceTree = "<group>"; };
 		5B6B8CD22FED1D9200C23D3E /* DismissKeyboardOnTapModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DismissKeyboardOnTapModifier.swift; sourceTree = "<group>"; };
 		5B6B8CD42FED1DEC00C23D3E /* View+dismissKeyboardOnTap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+dismissKeyboardOnTap.swift"; sourceTree = "<group>"; };
+		5B6B8CD62FED326700C23D3E /* View+sectionTracksTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+sectionTracksTitle.swift"; sourceTree = "<group>"; };
 		5B6E4DBE2FD17B8F00B4E663 /* SegmentedItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedItem.swift; sourceTree = "<group>"; };
+		5B7D62B22FEE8B790084738C /* EmptyTracksStateModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyTracksStateModifier.swift; sourceTree = "<group>"; };
 		5B8382902FC495F8003625CD /* PlayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewModel.swift; sourceTree = "<group>"; };
 		5B8382982FC4C9ED003625CD /* SpinnerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerView.swift; sourceTree = "<group>"; };
 		5B8382A22FC4CB4C003625CD /* AudioServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioServicing.swift; sourceTree = "<group>"; };
@@ -491,6 +495,7 @@
 				5BFCA8442FCEE251009C6AD9 /* TransferPrioritizable+mergePriority.swift */,
 				5BFCA83D2FCED841009C6AD9 /* View+cornerRadius.swift */,
 				5B6B8CD42FED1DEC00C23D3E /* View+dismissKeyboardOnTap.swift */,
+				5B6B8CD62FED326700C23D3E /* View+sectionTracksTitle.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -498,6 +503,7 @@
 		5B6B8CD12FED1D7C00C23D3E /* Modifiers */ = {
 			isa = PBXGroup;
 			children = (
+				5B7D62B22FEE8B790084738C /* EmptyTracksStateModifier.swift */,
 				5B6B8CD22FED1D9200C23D3E /* DismissKeyboardOnTapModifier.swift */,
 			);
 			path = Modifiers;
@@ -1040,6 +1046,7 @@
 				5BA581942FD70BC300B498D7 /* EmptyGenreCell.swift in Sources */,
 				5BFCA83A2FCED71E009C6AD9 /* Color+hex.swift in Sources */,
 				5B8382912FC495F9003625CD /* PlayerViewModel.swift in Sources */,
+				5B6B8CD72FED326800C23D3E /* View+sectionTracksTitle.swift in Sources */,
 				5B8382992FC4C9EE003625CD /* SpinnerView.swift in Sources */,
 				5BFCA84D2FCEE5D4009C6AD9 /* Onboarding.swift in Sources */,
 				5B9D45DC2FDF0B1C00F86C1B /* TracksSection.swift in Sources */,
@@ -1090,6 +1097,7 @@
 				5BFCA8492FCEE470009C6AD9 /* Launch.swift in Sources */,
 				5B11C33B2FB719A80089BAD2 /* TrackEntity.swift in Sources */,
 				5B6B8CD52FED1DED00C23D3E /* View+dismissKeyboardOnTap.swift in Sources */,
+				5B7D62B32FEE8B7A0084738C /* EmptyTracksStateModifier.swift in Sources */,
 				5BA581962FD8603500B498D7 /* HighlightedText.swift in Sources */,
 				5B6B8CD32FED1D9400C23D3E /* DismissKeyboardOnTapModifier.swift in Sources */,
 				5B88609E2FAE184C0056BE9A /* GlobalConstants.swift in Sources */,

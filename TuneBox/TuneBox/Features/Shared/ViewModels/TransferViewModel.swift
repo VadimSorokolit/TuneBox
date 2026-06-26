@@ -8,7 +8,7 @@
 import Foundation
 import Observation
 
-enum ReservedSpace: Int, CaseIterable {
+enum ReservedSpace: Int {
     case oneGB = 1
     case twoGB = 2
     case fiveGB = 5
@@ -33,7 +33,7 @@ enum Genre: String, CaseIterable, Identifiable {
     }
 }
 
-private enum SimultaneouslyLoadingCount: Int, CaseIterable {
+private enum SimultaneouslyLoadingCount: Int {
     case two = 2
     case three = 3
     case four = 4
@@ -50,9 +50,10 @@ protocol TransferManaging: AnyObject, Sendable,
     func getRecentTracks(limit: Int?) async -> [TrackEntity]
     func getRecentActiveTracks(limit: Int?) async -> [TrackEntity]
     func getRecentDownloadedTracks(limit: Int?) async -> [TrackEntity]
+    func loadInitialContent() async
     func loadFirstPopular() async
     func loadFirstBy(genre: Genre?) async
-    func refreshBrowse(_ selectedGenre: Genre?) async
+    func refreshBrowse() async
     func loadSearchBy(query: String)
     func loadNextSearch()
     func loadNextPopular()
@@ -85,6 +86,7 @@ final class TransferViewModel: TransferManaging {
     private(set) var simultaneouslyLoadingCount: Int = SimultaneouslyLoadingCount.two.rawValue
     private(set) var reservedSpace: ReservedSpace = .oneGB
     private(set) var isRefreshing = false
+    private(set) var isSearchMode: Bool = false
     private(set) var isPopularFirstLoading = false
     private(set) var isPaginationPopularLoading = false
     private(set) var isPaginationSearchLoading = false
@@ -118,7 +120,28 @@ final class TransferViewModel: TransferManaging {
         self.storageService.getFreeStorage()
     }
 
+    var showsEmptyState: Bool {
+        self.isSearchMode
+        && isSearchLoading.isFalse
+        && sections.first(where: { $0.type == .search })?.tracks.isEmpty == true
+        ||
+        self.isSearchMode.isFalse
+        && self.sections.filter({ $0.type != .search })
+            .compactMap({ $0.tracks })
+            .allSatisfy({$0.isEmpty})
+    }
+
     // MARK: - Methods. Public
+
+    func loadInitialContent() async {
+        async let genre: Void = self.loadFirstBy(
+            genre: self.selectedGenre == .all ? nil : self.selectedGenre
+        )
+        async let popular: Void = self.loadFirstPopular()
+
+        await popular
+        await genre
+    }
 
     func loadFirstPopular() async {
         self.reachedPopularTracksEnd = false
@@ -249,13 +272,13 @@ final class TransferViewModel: TransferManaging {
         }
     }
 
-    func refreshBrowse(_ selectedGenre: Genre?) async {
+    func refreshBrowse() async {
         self.isRefreshing = true
 
         defer { self.isRefreshing = false }
 
         async let popular = self.loadFirstPopular()
-        async let genre = self.loadFirstBy(genre: selectedGenre == .all ? nil : selectedGenre)
+        async let genre = self.loadFirstBy(genre: self.selectedGenre == .all ? nil : self.selectedGenre)
 
         _ = await (popular, genre)
     }
@@ -264,14 +287,17 @@ final class TransferViewModel: TransferManaging {
         self.reachedSearchTracksEnd = false
         self.offsetSearch = .zero
         self.cancelSearchLoadTask()
-        self.completedSearchQuery = query
 
-        guard query.count > 2 else {
+        let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard trimmedQuery.count > self.minimumSearchLength else {
             self.isSearchLoading = false
             return
         }
 
         self.isSearchLoading = true
+        self.isSearchMode = true
+        self.completedSearchQuery = query
 
         self.searchLoadTask = Task { @MainActor [weak self] in
             guard let self else { return }
@@ -470,6 +496,7 @@ final class TransferViewModel: TransferManaging {
         self.set([], for: .search)
         self.offsetSearch = .zero
         self.isSearchLoading = false
+        self.isSearchMode = false
         self.completedSearchQuery = ""
     }
 
@@ -648,6 +675,7 @@ final class TransferViewModel: TransferManaging {
         self.storageService = storageService
 
         self.setupNotificationObservers()
+        self.ensureSectionsOrder()
     }
 
     // MARK: - Properties. Private
@@ -663,6 +691,7 @@ final class TransferViewModel: TransferManaging {
     private let persistenceService: PersistenceServicing
     private let storageService: FileManagerServicing
     private let downloadObserverTokens = TransferDownloadObserverTokens()
+    private let minimumSearchLength: Int = 2
     private var fetchTracksCount: Int = .zero
 
     @ObservationIgnored
@@ -699,13 +728,6 @@ final class TransferViewModel: TransferManaging {
     ) {
         if let index = self.sections.firstIndex(where: { $0.type == type }) {
             self.sections[index].tracks = tracks
-        } else {
-            self.sections.append(
-                TracksSection(
-                    type: type,
-                    tracks: tracks
-                )
-            )
         }
     }
 
@@ -715,6 +737,14 @@ final class TransferViewModel: TransferManaging {
 
     private func finishFetchTracks() {
         self.fetchTracksCount = max(.zero, self.fetchTracksCount - 1)
+    }
+
+    private func ensureSectionsOrder() {
+        self.sections = [
+            .init(type: .search, tracks: []),
+            .init(type: .genre, tracks: []),
+            .init(type: .popular, tracks: [])
+        ]
     }
 
     private func cancelPopularLoadTask() {

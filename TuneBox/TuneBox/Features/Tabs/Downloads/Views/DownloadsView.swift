@@ -19,7 +19,7 @@ struct DownloadsView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HeaderView()
+            HeaderView(viewModel: viewModel)
 
             SearchBarView(
                 searchQuery: $searchQuery,
@@ -32,7 +32,7 @@ struct DownloadsView: View {
                 }
             )
 
-            ContentView()
+            ContentView(viewModel: viewModel)
         }
         .frame(maxWidth: .infinity,
                maxHeight: .infinity,
@@ -50,7 +50,7 @@ struct DownloadsView: View {
         .task(id: searchQuery) {
             try? await Task.sleep(for: .milliseconds(300))
 
-            guard Task.isCancelled.isFalse else {
+            if Task.isCancelled {
                 return
             }
 
@@ -68,8 +68,8 @@ struct DownloadsView: View {
     // MARK: - Subviews. Private
 
     private struct HeaderView: View {
-        @Injected private var viewModel: DownloadsPresenting
         @Environment(\.themeManager) private var theme
+        let viewModel: DownloadsPresenting
 
         private let horizontalPadding: CGFloat = 26
 
@@ -81,63 +81,66 @@ struct DownloadsView: View {
 
                 Spacer()
 
-                Menu(content: {
-                    Button(action: {
-                        viewModel.setType(.active)
-                    }, label: {
-                        Label(
-                            "Active Downloads",
-                            systemImage: viewModel.selectedTracksType == .active
-                            ? "checkmark"
-                            : ""
-                        )
-                    })
+                Menu(
+                    content: {
+                        Button(action: {
+                            viewModel.setType(.active)
+                        }, label: {
+                            Label(
+                                "Active Downloads",
+                                systemImage: viewModel.selectedTracksType == .active
+                                ? "checkmark"
+                                : ""
+                            )
+                        })
 
-                    Button(action: {
-                        viewModel.setType(.downloaded)
+                        Button(action: {
+                            viewModel.setType(.downloaded)
+                        }, label: {
+                            Label(
+                                "Downloaded",
+                                systemImage: viewModel.selectedTracksType == .downloaded
+                                ? "checkmark"
+                                : ""
+                            )
+                        })
                     }, label: {
-                        Label(
-                            "Downloaded",
-                            systemImage: viewModel.selectedTracksType == .downloaded
-                            ? "checkmark"
-                            : ""
-                        )
-                    })
-                }, label: {
-                    Image(systemName: "line.3.horizontal.decrease.circle")
-                        .font(.system(size: 24))
-                        .foregroundStyle(theme.tokens.browseHeaderText)
-                })
+                        Image(systemName: "line.3.horizontal.decrease.circle")
+                            .font(.system(size: 24))
+                            .foregroundStyle(theme.tokens.browseHeaderText)
+                    }
+                )
             }
             .padding(.horizontal, horizontalPadding)
         }
     }
 
     private struct ContentView: View {
-        @Injected private var viewModel: DownloadsPresenting
-
-        private let headerLeadingPadding: CGFloat = 26
+        let viewModel: DownloadsPresenting
 
         var body: some View {
-            ScrollView {
-                LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
-                    ForEach(viewModel.sections) { section in
-                        switch section.type {
-                            case .search:
-                                searchSectionView(section)
+            ScrollView(
+                showsIndicators: false,
+                content: {
+                    LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
+                        ForEach(viewModel.sections) { section in
+                            switch section.type {
+                                case .search:
+                                    searchSectionView(section)
 
-                            case .recents:
-                                recentsSectionView(section)
+                                case .recents:
+                                    recentsSectionView(section)
 
-                            case .all:
-                                filteredSectionView(section)
+                                case .all:
+                                    filteredSectionView(section)
 
-                            case .genre, .popular:
-                                EmptyView()
+                                case .genre, .popular:
+                                    EmptyView()
+                            }
                         }
                     }
                 }
-            }
+            )
             .padding(.top, 5)
             .contentMargins(.bottom, 20)
             .modifier(EmptyTracksStateModifier(showsEmptyState: viewModel.showsEmptyState))
@@ -166,7 +169,7 @@ struct DownloadsView: View {
                         }
                     },
                     header: {
-                        customTitle(for: section)
+                        sectionTracksTitle(section.title)
                     }
                 )
             }
@@ -192,7 +195,7 @@ struct DownloadsView: View {
                             .padding(.horizontal)
                         }
                     }, header: {
-                        customTitle(for: section)
+                        sectionTracksTitle(section.title)
                     }
                 )
             }
@@ -214,35 +217,11 @@ struct DownloadsView: View {
                                 }
                             }
                         }
-                    }, header: {
-                        customTitle(for: section, suffix: viewModel.sectionTitleSuffix)
+                    },
+                    header: {
+                        sectionTracksTitle(section.title, suffix: viewModel.sectionTitleSuffix)
                     }
                 )
-            }
-        }
-
-        private func customTitle(for section: TracksSection, suffix: String? = nil) -> some View {
-            Text("\(section.title) \(suffix ?? "")")
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, headerLeadingPadding)
-                .padding(.vertical, 10)
-                .background(Color(.systemBackground))
-                .foregroundStyle(Color(.label))
-                .font(.headline)
-        }
-    }
-
-    private struct EmptyTracksStateModifier: ViewModifier {
-        let showsEmptyState: Bool
-
-        func body(content: Content) -> some View {
-            if showsEmptyState {
-                ContentUnavailableView(
-                    "No Tracks",
-                    systemImage: "music.note"
-                )
-            } else {
-                content
             }
         }
     }

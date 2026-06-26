@@ -105,7 +105,6 @@ class DownloadsViewModel: DownloadsPresenting {
 
     func stopObservingTracksChanges() {
         self.tracksObservationTask?.cancel()
-
         self.tracksObservationTask = nil
         self.transferViewModel.onTracksChanged = nil
     }
@@ -114,6 +113,12 @@ class DownloadsViewModel: DownloadsPresenting {
         self.isSearchMode = false
         self.completedSearchQuery = ""
         self.set([], for: .search)
+    }
+
+    // MARK: - Initializer
+
+    init() {
+        self.ensureSectionsOrder()
     }
 
     // MARK: - Properties. Private
@@ -130,8 +135,6 @@ class DownloadsViewModel: DownloadsPresenting {
     private func set(_ tracks: [TrackEntity], for type: TracksSection.SectionType) {
         if let index = sections.firstIndex(where: { $0.type == type }) {
             self.sections[index].tracks = tracks
-        } else {
-            self.sections.append(.init(type: type, tracks: tracks))
         }
     }
 
@@ -162,7 +165,9 @@ class DownloadsViewModel: DownloadsPresenting {
 
             let key = "\(track.songName.lowercased())|\(track.artistName.lowercased())"
 
-            if seen.contains(key) { return false }
+            if seen.contains(key) {
+                return false
+            }
             seen.insert(key)
 
             return true
@@ -170,5 +175,13 @@ class DownloadsViewModel: DownloadsPresenting {
 
         self.completedSearchQuery = trimmedQuery
         self.set(filtered, for: .search)
+    }
+
+    private func ensureSectionsOrder() {
+        self.sections = [
+            .init(type: .search, tracks: []),
+            .init(type: .recents, tracks: []),
+            .init(type: .all, tracks: [])
+        ]
     }
 }
