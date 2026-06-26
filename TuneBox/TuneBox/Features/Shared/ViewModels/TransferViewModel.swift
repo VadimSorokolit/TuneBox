@@ -50,7 +50,7 @@ protocol TransferManaging: AnyObject, Sendable,
     func getRecentTracks(limit: Int?) async -> [TrackEntity]
     func getRecentActiveTracks(limit: Int?) async -> [TrackEntity]
     func getRecentDownloadedTracks(limit: Int?) async -> [TrackEntity]
-    func loadInitialContent() async
+    func loadInitialData() async
     func loadFirstPopular() async
     func loadFirstBy(genre: Genre?) async
     func refreshBrowse() async
@@ -62,6 +62,7 @@ protocol TransferManaging: AnyObject, Sendable,
     func clearSearchState()
     func cancelAllDownloads()
     func resetTransferState() async
+    func selectGenre(_ genre: Genre)
     func saveTransferState()
     func snapshotForTerminate() async
     func handleBackgroundCompletion(_ handler: @escaping () -> Void)
@@ -96,7 +97,6 @@ final class TransferViewModel: TransferManaging {
     private(set) var reachedPopularTracksEnd = false
     private(set) var reachedGenreTracksEnd = false
     private(set) var reachedSearchTracksEnd = false
-
     var selectedGenre: Genre = .all
     @ObservationIgnored
     var onTracksChanged: (() -> Void)?
@@ -145,7 +145,7 @@ final class TransferViewModel: TransferManaging {
 
     // MARK: - Methods. Public
 
-    func loadInitialContent() async {
+    func loadInitialData() async {
         self.isInitialLoading = true
 
         defer {
@@ -455,6 +455,14 @@ final class TransferViewModel: TransferManaging {
         } catch {
             self.handleError(error)
             return []
+        }
+    }
+
+    func selectGenre(_ genre: Genre) {
+        self.selectedGenre = genre
+
+        Task {
+            await loadFirstBy(genre: genre)
         }
     }
 

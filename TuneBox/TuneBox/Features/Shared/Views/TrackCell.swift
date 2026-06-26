@@ -13,7 +13,7 @@ struct TrackCell: View {
 
     let track: TrackEntity
     let searchQuery: String?
-    let onTap: () -> Void
+    let onButtonTap: () -> Void
 
     let cellCornerRadius: CGFloat = 10
     let imageSize: CGFloat = 35
@@ -22,11 +22,11 @@ struct TrackCell: View {
     init(
         track: TrackEntity,
         searchQuery: String? = nil,
-        onTap: @escaping () -> Void
+        onButtonTap: @escaping () -> Void
     ) {
         self.track = track
         self.searchQuery = searchQuery
-        self.onTap = onTap
+        self.onButtonTap = onButtonTap
     }
 
     var body: some View {
@@ -70,7 +70,7 @@ struct TrackCell: View {
                 Spacer()
 
                 Button(action: {
-                    onTap()
+                    onButtonTap()
                 }, label: {
                     ZStack {
                         if track.downloadState != .completed,

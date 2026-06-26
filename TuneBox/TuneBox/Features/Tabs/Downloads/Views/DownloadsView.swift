@@ -160,7 +160,7 @@ struct DownloadsView: View {
                                 TrackCell(
                                     track: track,
                                     searchQuery: viewModel.completedSearchQuery,
-                                    onTap: {
+                                    onButtonTap: {
                                         Task {
                                             await viewModel.handleDownloadAction(for: track)
                                         }
@@ -185,11 +185,14 @@ struct DownloadsView: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             LazyHStack(spacing: 4) {
                                 ForEach(section.tracks, id: \.id) { track in
-                                    GenreCell(track: track) {
-                                        Task {
-                                            await viewModel.handleDownloadAction(for: track)
+                                    GenreCell(
+                                        track: track,
+                                        onButtonTap: {
+                                            Task {
+                                                await viewModel.handleDownloadAction(for: track)
+                                            }
                                         }
-                                    }
+                                    )
                                 }
                             }
                             .padding(.horizontal)
@@ -210,11 +213,14 @@ struct DownloadsView: View {
                     content: {
                         LazyVStack(spacing: 4) {
                             ForEach(section.tracks, id: \.id) { track in
-                                TrackCell(track: track) {
-                                    Task {
-                                        await viewModel.handleDownloadAction(for: track)
+                                TrackCell(
+                                    track: track,
+                                    onButtonTap: {
+                                        Task {
+                                            await viewModel.handleDownloadAction(for: track)
+                                        }
                                     }
-                                }
+                                )
                             }
                         }
                     },

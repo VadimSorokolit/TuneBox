@@ -37,7 +37,7 @@ struct BrowseView: View {
                alignment: .top
         )
         .task {
-            await viewModel.loadInitialContent()
+            await viewModel.loadInitialData()
         }
         .task(id: searchQuery) {
             try? await Task.sleep(for: .milliseconds(300))
@@ -109,7 +109,7 @@ struct BrowseView: View {
                                     viewModel.selectedGenre
                                 },
                                 set: {
-                                    viewModel.selectedGenre = $0
+                                    viewModel.selectGenre($0)
                                 }
                             ),
                             direction: $slideDirection,
@@ -158,12 +158,13 @@ struct BrowseView: View {
                             ForEach(section.tracks, id: \.id) { track in
                                 TrackCell(
                                     track: track,
-                                    searchQuery: viewModel.completedSearchQuery
-                                ) {
-                                    Task {
-                                        await viewModel.handleDownloadAction(for: track)
+                                    searchQuery: viewModel.completedSearchQuery,
+                                    onButtonTap: {
+                                        Task {
+                                            await viewModel.handleDownloadAction(for: track)
+                                        }
                                     }
-                                }
+                                )
                                 .onAppear {
                                     if track === section.tracks.last {
                                         viewModel.loadNextSearch()
@@ -201,11 +202,14 @@ struct BrowseView: View {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 LazyHStack(spacing: 8) {
                                     ForEach(section.tracks, id: \.id) { track in
-                                        GenreCell(track: track) {
-                                            Task {
-                                                await viewModel.handleDownloadAction(for: track)
+                                        GenreCell(
+                                            track: track,
+                                            onButtonTap: {
+                                                Task {
+                                                    await viewModel.handleDownloadAction(for: track)
+                                                }
                                             }
-                                        }
+                                        )
                                         .onAppear {
                                             if track === section.tracks.last {
                                                 viewModel.loadNextBy(genre: viewModel.selectedGenre)
@@ -226,11 +230,6 @@ struct BrowseView: View {
                                 }
                                 .padding(.horizontal)
                                 .id("featuredLeft")
-                            }
-                            .onChange(of: viewModel.selectedGenre) { _, genre in
-                                Task {
-                                    await viewModel.loadFirstBy(genre: genre)
-                                }
                             }
                             .onChange(of: viewModel.isRefreshing) { _, isRefreshing in
                                 guard isRefreshing.isFalse else { return }
@@ -257,11 +256,14 @@ struct BrowseView: View {
                     content: {
                         LazyVStack(spacing: 4) {
                             ForEach(section.tracks, id: \.id) { track in
-                                TrackCell(track: track) {
-                                    Task {
-                                        await viewModel.handleDownloadAction(for: track)
+                                TrackCell(
+                                    track: track,
+                                    onButtonTap: {
+                                        Task {
+                                            await viewModel.handleDownloadAction(for: track)
+                                        }
                                     }
-                                }
+                                )
                                 .onAppear {
                                     if track === section.tracks.last {
                                         viewModel.loadNextPopular()

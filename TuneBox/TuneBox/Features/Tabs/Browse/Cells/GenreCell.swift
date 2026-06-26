@@ -23,7 +23,7 @@ struct GenreCellConfiguration {
 
 struct GenreCell: View {
     let track: TrackEntity
-    let onDownloadTap: () -> Void
+    let onButtonTap: () -> Void
     var configuration: GenreCellConfiguration = .init()
 
     var body: some View {
@@ -79,7 +79,7 @@ struct GenreCell: View {
             Spacer()
 
             if configuration.showDownloadButton {
-                Button(action: onDownloadTap) {
+                Button(action: onButtonTap) {
                     downloadButton
                 }
                 .buttonStyle(.plain)
@@ -202,7 +202,7 @@ struct GenreCell: View {
 #Preview {
     GenreCell(
         track: makePreviewTrack(),
-        onDownloadTap: {}
+        onButtonTap: {}
     )
     .frame(width: 120, height: 180)
     .padding()
