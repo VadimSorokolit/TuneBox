@@ -9,13 +9,19 @@ import Resolver
 import SwiftUI
 import UniformTypeIdentifiers
 
+enum ImportMode {
+    case files
+    case folder
+}
+
 struct ImportFilesView: View {
 
     var body: some View {
         VStack(spacing: 0) {
             HeaderView(
-                showImporter: $showImporter,
                 editMode: $editMode,
+                importMode: $importMode,
+                showFileImporter: $showFileImporter,
                 viewModel: viewModel
             )
 
@@ -31,8 +37,10 @@ struct ImportFilesView: View {
             await viewModel.load()
         }
         .fileImporter(
-            isPresented: $showImporter,
-            allowedContentTypes: [UTType.audio],
+            isPresented: $showFileImporter,
+            allowedContentTypes: importMode == .folder
+                ? [UTType.folder]
+                : [UTType.audio],
             allowsMultipleSelection: true,
             onCompletion: { result in
                 switch result {
@@ -49,14 +57,16 @@ struct ImportFilesView: View {
 
     @Injected private var viewModel: ImportManaging
     @State private var editMode: EditMode = .inactive
-    @State private var showImporter = false
+    @State private var showFileImporter = false
+    @State private var importMode: ImportMode = .files
 
     // MARK: - Private. Objects
 
     private struct HeaderView: View {
         @Environment(\.themeManager) private var theme
-        @Binding var showImporter: Bool
         @Binding var editMode: EditMode
+        @Binding var importMode: ImportMode
+        @Binding var showFileImporter: Bool
         let viewModel: ImportManaging
 
         var body: some View {
@@ -77,15 +87,28 @@ struct ImportFilesView: View {
 
                 Spacer()
 
-                Button(action: {
-                    showImporter = true
-                }, label: {
-                    Image(systemName: "plus.circle.fill")
-                        .foregroundStyle(.black)
-                        .font(.system(size: 20, weight: .semibold))
-                })
-                .opacity(showImporter ? 0.5 : 1)
-                .disabled(showImporter)
+                Menu(
+                    content: {
+                        Button(action: {
+                            showFileImporter = true
+                            importMode = .files
+                        }, label: {
+                            Label("Import files", systemImage: "music.note")
+                        })
+
+                        Button(action: {
+                            showFileImporter = true
+                            importMode = .folder
+                        }, label: {
+                            Label("Import folder", systemImage: "folder.badge.plus")
+                        })
+                    },
+                    label: {
+                        Image(systemName: "plus.circle.fill")
+                    }
+                )
+                .opacity(showFileImporter ? 0.5 : 1)
+                .disabled(showFileImporter)
             }
             .padding(.horizontal, 24)
         }
