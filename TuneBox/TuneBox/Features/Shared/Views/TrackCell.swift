@@ -13,7 +13,9 @@ struct TrackCell: View {
 
     let track: TrackEntity
     let searchQuery: String?
+    let isSelected: Bool
     let onButtonTap: () -> Void
+    let onCellTap: () -> Void
 
     let cellCornerRadius: CGFloat = 10
     let imageSize: CGFloat = 35
@@ -22,16 +24,20 @@ struct TrackCell: View {
     init(
         track: TrackEntity,
         searchQuery: String? = nil,
-        onButtonTap: @escaping () -> Void
+        isSelected: Bool = false,
+        onButtonTap: @escaping () -> Void,
+        onCellTap: @escaping () -> Void = {}
     ) {
         self.track = track
         self.searchQuery = searchQuery
+        self.isSelected = isSelected
         self.onButtonTap = onButtonTap
+        self.onCellTap = onCellTap
     }
 
     var body: some View {
         ZStack {
-            EmptyTrackCell()
+            EmptyTrackCell(isSelected: isSelected)
 
             HStack {
                 HStack(spacing: 10) {
@@ -102,6 +108,10 @@ struct TrackCell: View {
                 .accessibilityHint(accessibilityLabel)
             }
             .padding(.horizontal)
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            onCellTap()
         }
         .frame(height: 50)
         .frame(maxWidth: .infinity)

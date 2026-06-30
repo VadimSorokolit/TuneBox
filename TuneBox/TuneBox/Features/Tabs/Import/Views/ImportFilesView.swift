@@ -29,7 +29,10 @@ struct ImportFilesView: View {
                 if viewModel.showsEmptyState {
                     EmptyStateView()
                 } else {
-                    ContentView(viewModel: viewModel)
+                    ContentView(
+                        editMode: $editMode,
+                        viewModel: viewModel
+                    )
                 }
             }
         }
@@ -75,61 +78,86 @@ struct ImportFilesView: View {
                     .flatMap({ $0.tracks})
                     .isNotEmpty {
 
-                    Button(action: {
-                        editMode = editMode == .active ? .inactive : .active
-                    }, label: {
-                        Text(editMode == .active
-                             ? "Active"
-                             : "Done"
-                        )
-                    })
+                    Button(
+                        action: {
+                            editMode = editMode == .active ? .inactive : .active
+                        }, label: {
+                            Text(editMode == .active
+                                 ? "Normal"
+                                 : "Edit"
+                            )
+                        }
+                    )
                 }
 
                 Spacer()
 
-                Menu(
-                    content: {
-                        Button(action: {
-                            showFileImporter = true
-                            importMode = .files
-                        }, label: {
-                            Label("Import files", systemImage: "music.note")
-                        })
+                if editMode == .inactive {
+                    Menu(
+                        content: {
+                            Button(
+                                action: {
+                                    showFileImporter = true
+                                    importMode = .files
+                                }, label: {
+                                    Label("Import files", systemImage: "music.note")
+                                }
+                            )
 
-                        Button(action: {
-                            showFileImporter = true
-                            importMode = .folder
+                            Button(
+                                action: {
+                                    showFileImporter = true
+                                    importMode = .folder
+                                }, label: {
+                                    Label("Import folder", systemImage: "folder.badge.plus")
+                                }
+                            )
+                        },
+                        label: {
+                            Image(systemName: "plus.circle.fill")
+                        }
+                    )
+                    .opacity(showFileImporter ? 0.5 : 1)
+                    .disabled(showFileImporter)
+                } else {
+                    Button(
+                        action: {
+                            Task {
+                                await viewModel.deleteSelectedTracks()
+                            }
                         }, label: {
-                            Label("Import folder", systemImage: "folder.badge.plus")
-                        })
-                    },
-                    label: {
-                        Image(systemName: "plus.circle.fill")
-                    }
-                )
-                .opacity(showFileImporter ? 0.5 : 1)
-                .disabled(showFileImporter)
+                            Label("Delete", systemImage: "trash")
+                                .foregroundStyle(Color(.systemRed))
+                        }
+                    )
+                    .disabled(viewModel.selectedTrackIDs.isEmpty)
+                    .opacity(viewModel.selectedTrackIDs.isEmpty ? 0 : 1)
+                }
             }
             .padding(.horizontal, 24)
         }
     }
 
     private struct ContentView: View {
+        @Binding var editMode: EditMode
         let viewModel: ImportManaging
 
         var body: some View {
             ScrollView(showsIndicators: false) {
                 LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
-                    ForEach(viewModel.sections) { section in
-                        switch section.type {
-                            case .imported:
-                                importedTracksSection(section: section)
-
-                            default:
-                                EmptyView()
+                    ForEach(
+                        viewModel.sections,
+                        content: { section in
+                            switch section.type {
+                                case .imported:
+                                    importedTracksSection(section: section)
+                                    
+                                default:
+                                    EmptyView()
+                            }
+                            
                         }
-
-                    }
+                    )
                 }
             }
             .padding(.top, 5)
@@ -142,13 +170,29 @@ struct ImportFilesView: View {
                 Section(
                     content: {
                         LazyVStack(spacing: 4) {
-                            ForEach(section.tracks) { track in
-                                TrackCell(track: track, onButtonTap: {
-                                    Task {
-                                        await viewModel.removeImportedItem(by: track.id)
-                                    }
-                                })
-                            }
+                            ForEach(
+                                section.tracks,
+                                content: { track in
+                                    TrackCell(
+                                        track: track,
+                                        isSelected: viewModel.selectedTrackIDs.contains(track.id),
+                                        onButtonTap: {
+                                            if editMode == .active {
+                                                viewModel.toggleSelection(for: track.id)
+                                            } else {
+                                                Task {
+                                                    await viewModel.removeImportedItem(by: track.id)
+                                                }
+                                            }
+                                        },
+                                        onCellTap: {
+                                            if editMode == .active {
+                                                viewModel.toggleSelection(for: track.id)
+                                            }
+                                        }
+                                    )
+                                }
+                            )
                         }
                     },
                     header: {

@@ -9,9 +9,12 @@ import Foundation
 
 protocol ImportManaging {
     var sections: [TracksSection] { get }
+    var selectedTrackIDs: Set<String> { get }
     var showsEmptyState: Bool { get }
 
     func load() async
     func addImportItems(from urls: [URL]) async
+    func toggleSelection(for id: String)
+    func deleteSelectedTracks() async
     func removeImportedItem(by id: String) async
 }

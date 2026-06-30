@@ -16,6 +16,7 @@ final class ImportViewModel: ImportManaging {
     // MARK: - Properties. Public
 
     private(set) var sections: [TracksSection] = []
+    private(set) var selectedTrackIDs: Set<String> = []
     private(set) var error: String?
 
     var showsEmptyState: Bool {
@@ -70,6 +71,21 @@ final class ImportViewModel: ImportManaging {
         }
 
         await self.loadImported()
+    }
+
+    func toggleSelection(for id: String) {
+        if self.selectedTrackIDs.contains(id) {
+            self.selectedTrackIDs.remove(id)
+        } else {
+            self.selectedTrackIDs.insert(id)
+        }
+    }
+
+    func deleteSelectedTracks() async {
+        for id in self.selectedTrackIDs {
+            await self.removeImportedItem(by: id)
+        }
+        self.selectedTrackIDs.removeAll()
     }
 
     func removeImportedItem(by id: String) async {
