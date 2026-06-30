@@ -13,16 +13,17 @@ import Resolver
 @Observable
 final class ImportViewModel: ImportManaging {
 
-    // MARK: - State
+    // MARK: - Properties. Public
 
-    private(set) var importedTracks: [TrackEntity] = []
+    private(set) var sections: [TracksSection] = []
     private(set) var error: String?
 
     var showsEmptyState: Bool {
-        self.importedTracks.isEmpty
+        self.sections
+            .allSatisfy { $0.tracks.isEmpty }
     }
 
-    // MARK: - Load
+    // MARK: - Methods. Public
 
     func load() async {
         await self.loadImported()
@@ -30,13 +31,12 @@ final class ImportViewModel: ImportManaging {
 
     func loadImported() async {
         do {
-            self.importedTracks = try self.persistenceService.getImportTracks()
+            let tracks = try self.persistenceService.getImportTracks()
+            self.set(tracks, for: .imported)
         } catch {
             self.handleError(error)
         }
     }
-
-    // MARK: - Actions
 
     func addImportItems(from urls: [URL]) async {
         for url in urls {
@@ -83,17 +83,40 @@ final class ImportViewModel: ImportManaging {
             }
 
             try self.persistenceService.delete(track: track)
-            self.importedTracks.removeAll { $0.id == id }
+
+            if let index = self.sections.firstIndex(where: { $0.type == .imported }) {
+                self.sections[index].tracks.removeAll { $0.id == track.id }
+            }
         } catch {
             self.handleError(error)
         }
     }
 
-    // MARK: - Private
+    // MARK: - Initializer
+
+    init() {
+        self.ensureSectionsOrder()
+    }
+
+    // MARK: - Properties. Private
 
     @Injected
     @ObservationIgnored
     private var persistenceService: PersistenceServicing
+
+    // MARK: - Methods. Private
+
+    private func ensureSectionsOrder() {
+        self.sections = [
+            .init(type: .imported, tracks: [])
+        ]
+    }
+
+    private func set(_ tracks: [TrackEntity], for type: TracksSection.SectionType) {
+        if let index = sections.firstIndex(where: { $0.type == type }) {
+            self.sections[index].tracks = tracks
+        }
+    }
 
     private func handleError(_ error: Error) {
         let message = error.localizedDescription

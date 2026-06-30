@@ -135,7 +135,7 @@ struct DownloadsView: View {
                                 case .all:
                                     filteredSectionView(section)
 
-                                case .genre, .popular, .imported:
+                                default:
                                     EmptyView()
                             }
                         }

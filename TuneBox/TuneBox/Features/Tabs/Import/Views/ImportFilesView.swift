@@ -13,7 +13,11 @@ struct ImportFilesView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HeaderView(showImporter: $showImporter)
+            HeaderView(
+                showImporter: $showImporter,
+                editMode: $editMode,
+                viewModel: viewModel
+            )
 
             Group {
                 if viewModel.showsEmptyState {
@@ -44,6 +48,7 @@ struct ImportFilesView: View {
     // MARK: - Private. Properties
 
     @Injected private var viewModel: ImportManaging
+    @State private var editMode: EditMode = .inactive
     @State private var showImporter = false
 
     // MARK: - Private. Objects
@@ -51,9 +56,25 @@ struct ImportFilesView: View {
     private struct HeaderView: View {
         @Environment(\.themeManager) private var theme
         @Binding var showImporter: Bool
+        @Binding var editMode: EditMode
+        let viewModel: ImportManaging
 
         var body: some View {
             HStack {
+                if viewModel.sections
+                    .flatMap({ $0.tracks})
+                    .isNotEmpty {
+
+                    Button(action: {
+                        editMode = editMode == .active ? .inactive : .active
+                    }, label: {
+                        Text(editMode == .active
+                             ? "Active"
+                             : "Done"
+                        )
+                    })
+                }
+
                 Spacer()
 
                 Button(action: {
@@ -75,23 +96,43 @@ struct ImportFilesView: View {
 
         var body: some View {
             ScrollView(showsIndicators: false) {
-                LazyVStack(spacing: 4) {
-                    ForEach(viewModel.importedTracks, id: \.id) { track in
-                        TrackCell(track: track, onButtonTap: {})
-                            .contextMenu {
-                                Button(role: .destructive) {
-                                    Task {
-                                        await viewModel.removeImportedItem(by: track.id)
-                                    }
-                                } label: {
-                                    Label("Remove", systemImage: "trash")
-                                }
-                            }
+                LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
+                    ForEach(viewModel.sections) { section in
+                        switch section.type {
+                            case .imported:
+                                importedTracksSection(section: section)
+
+                            default:
+                                EmptyView()
+                        }
+
                     }
                 }
             }
             .padding(.top, 5)
             .contentMargins(.bottom, 20)
+        }
+
+        @ViewBuilder
+        private func importedTracksSection(section: TracksSection) -> some View {
+            if section.tracks.isNotEmpty {
+                Section(
+                    content: {
+                        LazyVStack(spacing: 4) {
+                            ForEach(section.tracks) { track in
+                                TrackCell(track: track, onButtonTap: {
+                                    Task {
+                                        await viewModel.removeImportedItem(by: track.id)
+                                    }
+                                })
+                            }
+                        }
+                    },
+                    header: {
+                        sectionTracksTitle(section.title)
+                    }
+                )
+            }
         }
     }
 

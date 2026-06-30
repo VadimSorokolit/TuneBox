@@ -8,7 +8,7 @@
 import Foundation
 
 protocol ImportManaging {
-    var importedTracks: [TrackEntity] { get }
+    var sections: [TracksSection] { get }
     var showsEmptyState: Bool { get }
 
     func load() async
