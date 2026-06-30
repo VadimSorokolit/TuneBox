@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct EmptyGenreCell: View {
-    let cornerRadius: CGFloat = 10
-    let borderWidth: CGFloat = 0.5
+
+    // MARK: - Main Body
 
     var body: some View {
         RoundedRectangle(cornerRadius: cornerRadius)
@@ -21,6 +21,10 @@ struct EmptyGenreCell: View {
             )
     }
 
+    // MARK: - Properties. Private
+
+    private let cornerRadius: CGFloat = 10
+    private let borderWidth: CGFloat = 0.5
 }
 
 #Preview {

@@ -41,32 +41,20 @@ final class ImportViewModel: ImportManaging {
 
     func addImportItems(from urls: [URL]) async {
         for url in urls {
-            do {
-                let localURL = try FileManagerService.storeImportedFile(
-                    from: url,
-                    id: UUID().uuidString
-                )
+            let isFolder = url.hasDirectoryPath
 
-                let entity = TrackEntity(
-                    id: url.absoluteString,
-                    image: nil,
-                    songName: url.deletingPathExtension().lastPathComponent,
-                    duration: nil,
-                    artistName: "",
-                    albumName: "",
-                    releaseDate: nil,
-                    download: nil,
-                    waveformData: nil,
-                    size: nil,
-                    localFilePath: localURL.path,
-                    sourceRawValue: TrackSource.imported.rawValue,
-                    downloadStateRawValue: DownloadState.completed.rawValue,
-                    fileStateRawValue: FileStorageState.exists.rawValue
-                )
+            guard url.startAccessingSecurityScopedResource() else {
+                continue
+            }
 
-                try self.persistenceService.insert(tracks: [entity])
-            } catch {
-                self.handleError(error)
+            defer {
+                url.stopAccessingSecurityScopedResource()
+            }
+
+            if isFolder {
+                await importFolder(url)
+            } else {
+                await importFile(url)
             }
         }
 
@@ -126,6 +114,62 @@ final class ImportViewModel: ImportManaging {
         self.sections = [
             .init(type: .imported, tracks: [])
         ]
+    }
+
+    private func importFolder(_ url: URL) async {
+        guard url.startAccessingSecurityScopedResource() else { return }
+
+        do {
+            let files = try FileManager.default.contentsOfDirectory(
+                at: url,
+                includingPropertiesForKeys: [.isDirectoryKey]
+            )
+
+            for file in files {
+                let values = try file.resourceValues(forKeys: [.isDirectoryKey])
+
+                if values.isDirectory == false {
+                    await self.importFile(file)
+                }
+            }
+
+        } catch {
+            self.handleError(error)
+        }
+
+        url.stopAccessingSecurityScopedResource()
+    }
+    private func importFile(_ url: URL) async {
+        do {
+            let localURL = try FileManagerService.storeImportedFile(
+                from: url,
+                id: UUID().uuidString
+            )
+
+            let metadata = try await AudioMetadataService.extractMetadata(from: localURL)
+
+            let entity = TrackEntity(
+                id: UUID().uuidString,
+                image: nil,
+                songName: metadata.title ?? url.deletingPathExtension().lastPathComponent,
+                duration: nil,
+                artistName: metadata.artist ?? "",
+                albumName: metadata.album ?? "",
+                releaseDate: nil,
+                download: nil,
+                waveformData: nil,
+                size: nil,
+                localFilePath: localURL.path,
+                sourceRawValue: TrackSource.imported.rawValue,
+                downloadStateRawValue: DownloadState.completed.rawValue,
+                fileStateRawValue: FileStorageState.exists.rawValue
+            )
+
+            try persistenceService.insert(tracks: [entity])
+
+        } catch {
+            self.handleError(error)
+        }
     }
 
     private func set(_ tracks: [TrackEntity], for type: TracksSection.SectionType) {

@@ -34,7 +34,7 @@ struct EmptyTrackCell: View {
 
     private var borderColor: Color {
         isSelected
-        ? .blue.opacity(0.8)
+        ? .red.opacity(0.8)
         : theme.tokens.cellBorder
     }
 }

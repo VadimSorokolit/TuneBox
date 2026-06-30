@@ -151,11 +151,10 @@ struct ImportFilesView: View {
                             switch section.type {
                                 case .imported:
                                     importedTracksSection(section: section)
-                                    
+
                                 default:
                                     EmptyView()
                             }
-                            
                         }
                     )
                 }
@@ -176,6 +175,7 @@ struct ImportFilesView: View {
                                     TrackCell(
                                         track: track,
                                         isSelected: viewModel.selectedTrackIDs.contains(track.id),
+                                        editMode: editMode,
                                         onButtonTap: {
                                             if editMode == .active {
                                                 viewModel.toggleSelection(for: track.id)

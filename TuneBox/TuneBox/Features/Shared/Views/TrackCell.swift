@@ -13,6 +13,7 @@ struct TrackCell: View {
 
     let track: TrackEntity
     let searchQuery: String?
+    let editMode: EditMode
     let isSelected: Bool
     let onButtonTap: () -> Void
     let onCellTap: () -> Void
@@ -25,12 +26,14 @@ struct TrackCell: View {
         track: TrackEntity,
         searchQuery: String? = nil,
         isSelected: Bool = false,
+        editMode: EditMode = .inactive,
         onButtonTap: @escaping () -> Void,
         onCellTap: @escaping () -> Void = {}
     ) {
         self.track = track
         self.searchQuery = searchQuery
         self.isSelected = isSelected
+        self.editMode = editMode
         self.onButtonTap = onButtonTap
         self.onCellTap = onCellTap
     }
@@ -75,37 +78,42 @@ struct TrackCell: View {
 
                 Spacer()
 
-                Button(action: {
-                    onButtonTap()
-                }, label: {
-                    ZStack {
-                        if track.downloadState != .completed,
-                           track.downloadState != .idle {
-                            Circle()
-                                .foregroundStyle(.clear)
-                                .overlay(
+                if editMode == .inactive {
+                    Button(
+                        action: {
+                            onButtonTap()
+                        },
+                        label: {
+                            ZStack {
+                                if track.downloadState != .completed,
+                                   track.downloadState != .idle {
                                     Circle()
-                                        .stroke(Color.white, lineWidth: 0.8)
-                                )
+                                        .foregroundStyle(.clear)
+                                        .overlay(
+                                            Circle()
+                                                .stroke(Color.white, lineWidth: 0.8)
+                                        )
 
-                            Circle()
-                                .trim(from: 0, to: track.downloadingProgress)
-                                .stroke(
-                                    Color.green,
-                                    style: StrokeStyle(
-                                        lineWidth: 1,
-                                        lineCap: .round
-                                    )
-                                )
-                                .rotationEffect(.degrees(-90))
+                                    Circle()
+                                        .trim(from: 0, to: track.downloadingProgress)
+                                        .stroke(
+                                            Color.green,
+                                            style: StrokeStyle(
+                                                lineWidth: 1,
+                                                lineCap: .round
+                                            )
+                                        )
+                                        .rotationEffect(.degrees(-90))
+                                }
+
+                                buttonImage
+                                    .font(.system(size: 10, weight: .medium))
+                            }
+                            .frame(width: 25, height: 25)
                         }
-
-                        buttonImage
-                            .font(.system(size: 10, weight: .medium))
-                    }
-                    .frame(width: 25, height: 25)
-                })
-                .accessibilityHint(accessibilityLabel)
+                    )
+                    .accessibilityHint(accessibilityLabel)
+                }
             }
             .padding(.horizontal)
         }

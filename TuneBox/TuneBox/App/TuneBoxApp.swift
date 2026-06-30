@@ -42,5 +42,4 @@ struct TuneBoxApp: App {
                 }
         }
     }
-
 }
