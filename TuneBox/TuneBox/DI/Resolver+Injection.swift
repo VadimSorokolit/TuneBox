@@ -41,21 +41,21 @@ extension Resolver: @retroactive ResolverRegistering {
     private static func registerPersistenceService() {
         self.register {
             MainActor.assumeIsolated {
-            do {
-                return try PersistenceService() as PersistenceServicing
-            } catch {
-                fatalError("Failed to create PersistenceService: \(error)")
+                do {
+                    return try PersistenceService() as PersistenceServicing
+                } catch {
+                    fatalError("Failed to create PersistenceService: \(error)")
+                }
             }
         }
+        .scope(.application)
     }
-}
 
     private static func registerViewModels() {
         self.register {
             MainActor.assumeIsolated {
                 TransferViewModel(
                     networkService: self.resolve(NetworkServicing.self),
-                    persistenceService: self.resolve(PersistenceServicing.self),
                     storageService: self.resolve(FileManagerServicing.self)
                 ) as TransferManaging
             }
@@ -66,6 +66,14 @@ extension Resolver: @retroactive ResolverRegistering {
             MainActor.assumeIsolated {
                 DownloadsViewModel()
                 as DownloadsPresenting
+            }
+        }
+        .scope(.application)
+
+        self.register {
+            MainActor.assumeIsolated {
+                ImportViewModel()
+                as ImportManaging
             }
         }
         .scope(.application)

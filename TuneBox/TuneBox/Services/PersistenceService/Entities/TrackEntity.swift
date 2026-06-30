@@ -31,8 +31,9 @@ final class TrackEntity {
     var lastStateChangeAt: Date?
     var downloadQueueIndex: Int?
     var genreRawValue: String?
+    private var localFilePath: String?
     private var duration: Int?
-    private var sourceRawValue: String = TrackSource.api.rawValue
+    private(set) var sourceRawValue: String = TrackSource.api.rawValue
     private(set) var downloadStateRawValue: String = DownloadState.idle.rawValue
     private var fileStateRawValue: String = FileStorageState.none.rawValue
 
@@ -61,6 +62,20 @@ final class TrackEntity {
     var source: TrackSource {
         get { TrackSource(rawValue: sourceRawValue) ?? .api }
         set { sourceRawValue = newValue.rawValue }
+    }
+
+    var localFileURL: URL? {
+        get {
+            guard let localFilePath else {
+                return nil
+            }
+
+            return URL(fileURLWithPath: localFilePath)
+        }
+
+        set {
+            localFilePath = newValue?.path
+        }
     }
 
     var formattedDuration: String {
@@ -130,6 +145,7 @@ final class TrackEntity {
         isPopular: Bool? = nil,
         downloadingSize: Int = 0,
         genreRawValue: String? = nil,
+        localFilePath: String? = nil,
         sourceRawValue: String = TrackSource.api.rawValue,
         downloadStateRawValue: String = DownloadState.idle.rawValue,
         fileStateRawValue: String = FileStorageState.none.rawValue,
@@ -148,6 +164,7 @@ final class TrackEntity {
         self.isPopular = isPopular
         self.downloadingSize = downloadingSize
         self.genreRawValue = genreRawValue
+        self.localFilePath = localFilePath
         self.sourceRawValue = sourceRawValue
         self.downloadStateRawValue = downloadStateRawValue
         self.fileStateRawValue = fileStateRawValue

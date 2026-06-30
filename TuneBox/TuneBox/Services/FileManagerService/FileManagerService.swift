@@ -15,8 +15,65 @@ final class FileManagerService: FileManagerServicing {
         let tracksDirectory = try self.makeTracksDirectoryIfNeeded()
 
         return tracksDirectory
-            .appendingPathComponent("\(Constants.trackPrefix)\(id)")
+            .appendingPathComponent("\(Constants.downloadTrackPrefix)\(id)")
             .appendingPathExtension(AudioFileExtension.mp3.rawValue)
+    }
+
+    static func makeImportedTrackURL(id: String, fileExtension: String) throws -> URL {
+        let base = try makeImportedDirectoryIfNeeded()
+        let safeExt = fileExtension.isEmpty
+            ? AudioFileExtension.mp3.rawValue
+            : fileExtension
+
+        return base
+            .appendingPathComponent("\(Constants.importedTrackPrefix)\(id)")
+            .appendingPathExtension(safeExt)
+    }
+
+    private static func makeImportedDirectoryIfNeeded() throws -> URL {
+        let base = try self.makeTracksDirectoryIfNeeded()
+
+        let url = base.appendingPathComponent(Constants.importedDirectoryName, isDirectory: true)
+
+        if FileManager.default.fileExists(atPath: url.path).isFalse {
+            try FileManager.default.createDirectory(
+                at: url,
+                withIntermediateDirectories: true
+            )
+        }
+
+        return url
+    }
+
+    static func storeImportedFile(from sourceURL: URL, id: String) throws -> URL {
+        try Task.checkCancellation()
+
+        let needsAccess = sourceURL.startAccessingSecurityScopedResource()
+
+        defer {
+            if needsAccess {
+                sourceURL.stopAccessingSecurityScopedResource()
+            }
+        }
+
+        let fileExtension = sourceURL.pathExtension
+
+        let destinationURL = try makeImportedTrackURL(
+            id: id,
+            fileExtension: fileExtension
+        )
+
+        try Task.checkCancellation()
+
+        if FileManager.default.fileExists(atPath: destinationURL.path) {
+            try FileManager.default.removeItem(at: destinationURL)
+        }
+
+        try Task.checkCancellation()
+
+        try FileManager.default.copyItem(at: sourceURL, to: destinationURL)
+
+        return destinationURL
     }
 
     static func storeDownloadedFile(from temporaryURL: URL, trackID: String) throws -> URL {
@@ -107,9 +164,11 @@ final class FileManagerService: FileManagerServicing {
     // MARK: - Properties. Private
 
     private enum Constants {
+        static let importedDirectoryName = "Imported"
         static let bytesInMegabyte: Double = 1e6
         static let directoryName: String = "Tracks"
-        static let trackPrefix: String = "track"
+        static let downloadTrackPrefix: String = "track"
+        static let importedTrackPrefix: String = "imported"
     }
 
     private static var cachedTracksDirectoryURL: URL?

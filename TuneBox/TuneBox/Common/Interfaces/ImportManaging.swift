@@ -7,4 +7,11 @@
 
 import Foundation
 
-protocol ImportManaging {}
+protocol ImportManaging {
+    var importedTracks: [TrackEntity] { get }
+    var showsEmptyState: Bool { get }
+
+    func load() async
+    func addImportItems(from urls: [URL]) async
+    func removeImportedItem(by id: String) async
+}

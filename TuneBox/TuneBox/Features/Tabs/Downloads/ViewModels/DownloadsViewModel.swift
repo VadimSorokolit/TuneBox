@@ -2,14 +2,14 @@
 //  DownloadsViewModel.swift
 //  TuneBox
 //
-//  Created by Nintendo on 14.06.2026.
+//  Created by Vadim Sorokolit on 14.06.2026.
 //
 
 import Foundation
 import Observation
 import Resolver
 
-enum RecentTracksLimit: Int, CaseIterable {
+enum RecentTracksLimit: Int {
     case small = 6
     case medium = 12
     case large = 18
@@ -55,6 +55,9 @@ class DownloadsViewModel: DownloadsPresenting {
 
                 case .active:
                     return await self.transferViewModel.getRecentActiveTracks(limit: nil)
+
+                case .imported:
+                    return []
             }
         }()
 

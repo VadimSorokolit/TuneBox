@@ -7,6 +7,7 @@
 
 import Foundation
 import Observation
+import Resolver
 
 enum ReservedSpace: Int {
     case oneGB = 1
@@ -693,11 +694,9 @@ final class TransferViewModel: TransferManaging {
 
     init(
         networkService: NetworkServicing,
-        persistenceService: PersistenceServicing,
         storageService: FileManagerServicing
     ) {
         self.networkService = networkService
-        self.persistenceService = persistenceService
         self.storageService = storageService
 
         self.setupNotificationObservers()
@@ -712,9 +711,11 @@ final class TransferViewModel: TransferManaging {
      Note: `@Observable` already skips `let` constants automatically.
      */
 
+    @Injected
+    @ObservationIgnored
+    private var persistenceService: PersistenceServicing
     private let limit: Int = 30
     private let networkService: NetworkServicing
-    private let persistenceService: PersistenceServicing
     private let storageService: FileManagerServicing
     private let downloadObserverTokens = TransferDownloadObserverTokens()
     private let minimumSearchLength: Int = 2

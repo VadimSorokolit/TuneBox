@@ -157,6 +157,22 @@ final class PersistenceService: PersistenceServicing {
         return try self.modelContext.fetch(descriptor)
     }
 
+    func getImportTracks() throws -> [TrackEntity] {
+        let imported = TrackSource.imported.rawValue
+
+        let descriptor = FetchDescriptor<TrackEntity>(
+            predicate: #Predicate<TrackEntity> { track in
+                track.sourceRawValue == imported
+            },
+            sortBy: [
+                SortDescriptor(\.artistName),
+                SortDescriptor(\.id)
+            ]
+        )
+
+        return try modelContext.fetch(descriptor)
+    }
+
     func getTrack(id: String) throws -> TrackEntity? {
         let trackID = id
         var descriptor = FetchDescriptor<TrackEntity>(
@@ -240,7 +256,9 @@ final class PersistenceService: PersistenceServicing {
             create: true
         )
 
-        let schema = Schema([TrackEntity.self])
+        let schema = Schema([
+            TrackEntity.self
+        ])
         let config = ModelConfiguration(isStoredInMemoryOnly: false)
         let container = try ModelContainer(for: schema, configurations: [config])
 

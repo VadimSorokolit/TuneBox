@@ -11,6 +11,7 @@ import Resolver
 enum TracksType: Hashable {
     case active
     case downloaded
+    case imported
 }
 
 struct DownloadsView: View {
@@ -134,7 +135,7 @@ struct DownloadsView: View {
                                 case .all:
                                     filteredSectionView(section)
 
-                                case .genre, .popular:
+                                case .genre, .popular, .imported:
                                     EmptyView()
                             }
                         }

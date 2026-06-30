@@ -128,7 +128,7 @@ struct BrowseView: View {
                                     case .popular:
                                         popularSectionView(section)
 
-                                    case .recents, .all:
+                                    case .recents, .all, .imported:
                                         EmptyView()
                                 }
                             }

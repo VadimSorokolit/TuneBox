@@ -25,5 +25,6 @@ struct TracksSection: Hashable, Identifiable {
         case search = "Search"
         case recents = "Recents"
         case all = "All"
+        case imported = "Imported"
     }
 }

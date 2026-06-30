@@ -75,7 +75,6 @@
 		5BA581922FD7055C00B498D7 /* EmptyTrackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA581912FD7055B00B498D7 /* EmptyTrackCell.swift */; };
 		5BA581942FD70BC300B498D7 /* EmptyGenreCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA581932FD70BC200B498D7 /* EmptyGenreCell.swift */; };
 		5BA581962FD8603500B498D7 /* HighlightedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA581952FD8603400B498D7 /* HighlightedText.swift */; };
-		5BB9A56E2FC8AF45000B8127 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5BB9A56D2FC8AF45000B8127 /* Config.xcconfig */; };
 		5BC0DEAD2FDD000100503BA2 /* DownloadStateMergeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC0DEAC2FDD000100503BA2 /* DownloadStateMergeTests.swift */; };
 		5BD0DAF72FBF6BA000268A48 /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0DAF62FBF6B9F00268A48 /* AudioService.swift */; };
 		5BD579A02FAB25E300503BA2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5BD5799C2FAB25E300503BA2 /* Assets.xcassets */; };
@@ -939,7 +938,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2640;
-				LastUpgradeCheck = 2650;
+				LastUpgradeCheck = 2660;
 				TargetAttributes = {
 					5BD579712FAB25BF00503BA2 = {
 						CreatedOnToolsVersion = 26.4.1;
@@ -993,7 +992,6 @@
 				5BFCA7E82FCED3C9009C6AD9 /* Satoshi-Medium.otf in Resources */,
 				5BFCA7E92FCED3C9009C6AD9 /* Satoshi-Light.otf in Resources */,
 				5BFCA7EB2FCED3C9009C6AD9 /* Satoshi-Regular.otf in Resources */,
-				5BB9A56E2FC8AF45000B8127 /* Config.xcconfig in Resources */,
 				5BD579A02FAB25E300503BA2 /* Assets.xcassets in Resources */,
 				5BFCA8122FCED45F009C6AD9 /* JetBrainsMono-ExtraBold.ttf in Resources */,
 				5BFCA8152FCED45F009C6AD9 /* JetBrainsMono-Light.ttf in Resources */,
