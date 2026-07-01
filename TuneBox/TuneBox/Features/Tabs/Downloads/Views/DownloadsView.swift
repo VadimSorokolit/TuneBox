@@ -33,7 +33,10 @@ struct DownloadsView: View {
                 }
             )
 
-            ContentView(viewModel: viewModel)
+            ContentView(
+                scrolledID: $scrolledID,
+                viewModel: viewModel
+            )
         }
         .frame(maxWidth: .infinity,
                maxHeight: .infinity,
@@ -45,8 +48,20 @@ struct DownloadsView: View {
         .onDisappear {
             viewModel.stopObservingTracksChanges()
         }
+        .onChange(of: scrolledID) { _, id in
+            guard let id, viewModel.isSearchMode == false else {
+                return
+            }
+
+            self.persist(id, for: viewModel.selectedTracksType)
+        }
         .task(id: viewModel.selectedTracksType) {
             await viewModel.fetchTracksSectionBy(viewModel.selectedTracksType)
+
+            await Task.yield()
+            await Task.yield()
+
+            self.scrolledID = self.savedID(for: viewModel.selectedTracksType)
         }
         .task(id: searchQuery) {
             try? await Task.sleep(for: .milliseconds(300))
@@ -65,6 +80,38 @@ struct DownloadsView: View {
     @Injected private var viewModel: DownloadsPresenting
     @FocusState private var isSearchFieldFocused: Bool
     @State private var searchQuery: String = ""
+    @State private var scrolledID: String?
+
+    @AppStorage("activeScrollTrackID") private var activeTopID: String = ""
+    @AppStorage("downloadedScrollTrackID") private var downloadedTopID: String = ""
+
+    // MARK: - Methods. Private
+
+    private func savedID(for type: TracksType) -> String? {
+        switch type {
+            case .active:
+                return self.activeTopID.isEmpty ? nil : self.activeTopID
+
+            case .downloaded:
+                return self.downloadedTopID.isEmpty ? nil : self.downloadedTopID
+
+            default:
+                return nil
+        }
+    }
+
+    private func persist(_ id: String, for type: TracksType) {
+        switch type {
+            case .active:
+                self.activeTopID = id
+
+            case .downloaded:
+                self.downloadedTopID = id
+
+            default:
+                break
+        }
+    }
 
     // MARK: - Subviews. Private
 
@@ -117,6 +164,7 @@ struct DownloadsView: View {
     }
 
     private struct ContentView: View {
+        @Binding var scrolledID: String?
         let viewModel: DownloadsPresenting
 
         var body: some View {
@@ -142,6 +190,7 @@ struct DownloadsView: View {
                     }
                 }
             )
+            .scrollPosition(id: $scrolledID, anchor: .top)
             .padding(.top, 5)
             .contentMargins(.bottom, 20)
             .modifier(EmptyTracksStateModifier(showsEmptyState: viewModel.showsEmptyState))
@@ -224,6 +273,7 @@ struct DownloadsView: View {
                                 )
                             }
                         }
+                        .scrollTargetLayout()
                     },
                     header: {
                         sectionTracksTitle(section.title, suffix: viewModel.sectionTitleSuffix)
