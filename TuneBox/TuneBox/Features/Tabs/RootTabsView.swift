@@ -60,14 +60,11 @@ struct RootTabsView: View {
     // MARK: - Main Body
 
     var body: some View {
-        ZStack(
-            alignment: .bottom,
-            content: {
-                content
+        ZStack(alignment: .bottom) {
+            content
 
-                tabBar
-            }
-        )
+            tabBar
+        }
         .ignoresSafeArea(.keyboard, edges: .bottom)
         .navigationBarBackButtonHidden(true)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
@@ -79,47 +76,39 @@ struct RootTabsView: View {
     @State private var activeTab: CustomTab = .browse
 
     private var content: some View {
-        TabView(
-            selection: $activeTab,
-            content: {
-                BrowseView()
-                    .tag(CustomTab.browse)
+        TabView(selection: $activeTab) {
+            BrowseView()
+                .tag(CustomTab.browse)
 
-                DownloadsView()
-                    .tag(CustomTab.downloads)
+            DownloadsView()
+                .tag(CustomTab.downloads)
 
-                PlayerView()
-                    .tag(CustomTab.player)
+            PlayerView()
+                .tag(CustomTab.player)
 
-                ImportFilesView()
-                    .tag(CustomTab.importFiles)
+            ImportFilesView()
+                .tag(CustomTab.importFiles)
 
-                SettingsView()
-                    .tag(CustomTab.settings)
-            }
-        )
+            SettingsView()
+                .tag(CustomTab.settings)
+        }
         .toolbar(.hidden, for: .tabBar)
     }
 
     private var tabBar: some View {
-        HStack(
-            spacing: 10,
-            content: {
-                ForEach(
-                    CustomTab.allCases,
-                    content: { tab in
-                        TabItemView(
-                            tab: tab,
-                            isSelected: activeTab == tab,
-                            activeColor: theme.tokens.tabIconActive,
-                            inactiveColor: theme.tokens.tabIconInactive
-                        ) {
-                            activeTab = tab
-                        }
+        HStack(spacing: 10) {
+            ForEach(CustomTab.allCases) { tab in
+                TabItemView(
+                    tab: tab,
+                    isSelected: activeTab == tab,
+                    activeColor: theme.tokens.tabIconActive,
+                    inactiveColor: theme.tokens.tabIconInactive,
+                    onTap: {
+                        activeTab = tab
                     }
                 )
             }
-        )
+        }
         .padding(.horizontal, 6)
         .frame(height: 60)
         .background(tabBarBackground)
@@ -131,20 +120,14 @@ struct RootTabsView: View {
             .ignoresSafeArea(edges: .bottom)
     }
 
-    // MARK: - Fileprivate. Object
+    // MARK: - Private. Object
 
     fileprivate struct TabItemView: View {
-        let tab: CustomTab
-        let isSelected: Bool
-        let activeColor: Color
-        let inactiveColor: Color
-        let onTap: () -> Void
 
         // MARK: - Main Body
 
         var body: some View {
-            Button(
-                action: {
+            Button(action: {
                     withAnimation(.spring(response: 0.28, dampingFraction: 0.78)) {
                         onTap()
                     }
@@ -171,34 +154,35 @@ struct RootTabsView: View {
 
         // MARK: - Properties. Private
 
-        let iconWidth: CGFloat = 54
+        fileprivate let tab: CustomTab
+        fileprivate let isSelected: Bool
+        fileprivate let activeColor: Color
+        fileprivate let inactiveColor: Color
+        fileprivate let onTap: () -> Void
+        private let iconWidth: CGFloat = 54
     }
 
 }
 
 #Preview("Tab Bar Only") {
-    ZStack(
-        alignment: .bottom,
-        content: {
-            Color.gray.opacity(0.3)
-                .ignoresSafeArea()
+    typealias TabItem = RootTabsView.TabItemView
 
-            HStack(
-                spacing: 10,
-                content: {
-                    ForEach(CustomTab.allCases) { tab in
-                        RootTabsView.TabItemView(
-                            tab: tab,
-                            isSelected: tab == .browse,
-                            activeColor: Color(hex: 0x6B5CFF),
-                            inactiveColor: Color.white.opacity(0.45)
-                        ) {}
-                    }
-                }
-            )
-            .padding(.horizontal, 6)
-            .frame(height: 60)
-            .background(.black)
+    return ZStack(alignment: .bottom) {
+        Color.gray.opacity(0.3)
+            .ignoresSafeArea()
+
+        HStack(spacing: 10) {
+            ForEach(CustomTab.allCases) { tab in
+                TabItem(
+                    tab: tab,
+                    isSelected: tab == .browse,
+                    activeColor: Color(hex: 0x6B5CFF),
+                    inactiveColor: Color.white.opacity(0.45)
+                ) {}
+            }
         }
-    )
+        .padding(.horizontal, 6)
+        .frame(height: 60)
+        .background(.black)
+    }
 }

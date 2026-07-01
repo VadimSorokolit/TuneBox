@@ -9,18 +9,8 @@ import SwiftUI
 import SDWebImageSwiftUI
 
 struct TrackCell: View {
-    @Environment(\.themeManager) var theme
 
-    let track: TrackEntity
-    let searchQuery: String?
-    let editMode: EditMode
-    let isSelected: Bool
-    let onButtonTap: () -> Void
-    let onCellTap: () -> Void
-
-    let cellCornerRadius: CGFloat = 10
-    let imageSize: CGFloat = 35
-    let imageCornerRadius: CGFloat = 10
+    // MARK: Initializer
 
     init(
         track: TrackEntity,
@@ -28,7 +18,7 @@ struct TrackCell: View {
         isSelected: Bool = false,
         editMode: EditMode = .inactive,
         onButtonTap: @escaping () -> Void,
-        onCellTap: @escaping () -> Void = {}
+        onCellTap: (() -> Void)? = nil
     ) {
         self.track = track
         self.searchQuery = searchQuery
@@ -38,113 +28,109 @@ struct TrackCell: View {
         self.onCellTap = onCellTap
     }
 
+    // MARK: - Main Body
+
     var body: some View {
-        ZStack(
-            content: {
-                EmptyTrackCell(isSelected: isSelected)
+        ZStack {
+            EmptyTrackCell(isSelected: isSelected)
 
-                HStack(
-                    content: {
-                        HStack(
-                            spacing: 10,
-                            content: {
-                                trackImage
+            HStack {
+                HStack(spacing: 10) {
+                    trackImage
 
-                                VStack(
-                                    alignment: .leading,
-                                    spacing: 2,
-                                    content: {
-                                        HighlightedText(
-                                            text: track.songName,
-                                            searchQuery: searchQuery
-                                        )
-                                        .font(.satoshi.medium.size(14))
-                                        .lineLimit(1)
-
-                                        HStack(
-                                            spacing: 6,
-                                            content: {
-                                                HighlightedText(
-                                                    text: track.artistName,
-                                                    searchQuery: searchQuery
-                                                )
-                                                .font(.satoshi.medium.size(12))
-                                                .foregroundStyle(.secondary)
-                                                .lineLimit(1)
-
-                                                Text("•")
-                                                    .font(.satoshi.medium.size(12))
-                                                    .foregroundStyle(.secondary)
-                                                    .lineLimit(1)
-
-                                                Text("\(track.formattedDuration)")
-                                                    .font(.jetBrainsMono.regular.size(10))
-                                                    .foregroundStyle(.secondary)
-                                                    .lineLimit(1)
-                                            }
-                                        )
-                                    }
-                                )
-                            }
+                    VStack(alignment: .leading, spacing: 2) {
+                        HighlightedText(
+                            text: track.songName,
+                            searchQuery: searchQuery
                         )
+                        .font(.satoshi.medium.size(14))
+                        .lineLimit(1)
 
-                        Spacer()
-
-                        if editMode == .inactive {
-                            Button(
-                                action: {
-                                    onButtonTap()
-                                },
-                                label: {
-                                    ZStack(
-                                        content: {
-                                            if track.downloadState != .completed,
-                                               track.downloadState != .idle {
-                                                Circle()
-                                                    .foregroundStyle(.clear)
-                                                    .overlay(
-                                                        content: {
-                                                            Circle()
-                                                                .stroke(Color.white, lineWidth: 0.8)
-                                                        }
-                                                    )
-
-                                                Circle()
-                                                    .trim(from: 0, to: track.downloadingProgress)
-                                                    .stroke(
-                                                        Color.green,
-                                                        style: StrokeStyle(
-                                                            lineWidth: 1,
-                                                            lineCap: .round
-                                                        )
-                                                    )
-                                                    .rotationEffect(.degrees(-90))
-                                            }
-
-                                            buttonImage
-                                                .font(.system(size: 10, weight: .medium))
-                                        }
-                                    )
-                                    .frame(size: 25)
-                                }
+                        HStack(spacing: 6) {
+                            HighlightedText(
+                                text: track.artistName,
+                                searchQuery: searchQuery
                             )
-                            .accessibilityHint(accessibilityLabel)
+                            .font(.satoshi.medium.size(12))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+
+                            Text("•")
+                                .font(.satoshi.medium.size(12))
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+
+                            Text("\(track.formattedDuration)")
+                                .font(.jetBrainsMono.regular.size(10))
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
                         }
                     }
-                )
-                .padding(.horizontal)
+                }
+
+                Spacer()
+
+                if editMode == .inactive {
+                    Button(action: {
+                            onButtonTap()
+                        },
+                        label: {
+                            ZStack {
+                                if track.downloadState != .completed,
+                                   track.downloadState != .idle {
+                                    Circle()
+                                        .foregroundStyle(.clear)
+                                        .overlay(
+                                            content: {
+                                                Circle()
+                                                    .stroke(Color.white, lineWidth: 0.8)
+                                            }
+                                        )
+
+                                    Circle()
+                                        .trim(from: 0, to: track.downloadingProgress)
+                                        .stroke(
+                                            Color.green,
+                                            style: StrokeStyle(
+                                                lineWidth: 1,
+                                                lineCap: .round
+                                            )
+                                        )
+                                        .rotationEffect(.degrees(-90))
+                                }
+
+                                buttonImage
+                                    .font(.system(size: 10, weight: .medium))
+                            }
+                            .frame(size: 25)
+                        }
+                    )
+                    .accessibilityHint(accessibilityLabel)
+                }
             }
-        )
+            .padding(.horizontal)
+        }
         .contentShape(Rectangle())
-        .onTapGesture(
-            perform: {
-                onCellTap()
-            }
-        )
+        .onTapGesture {
+            onCellTap?()
+        }
         .frame(height: 50)
         .frame(maxWidth: .infinity)
         .padding(.horizontal)
     }
+
+    // MARK: - Properties. Private
+
+    @Environment(\.themeManager) private var theme
+    private let track: TrackEntity
+    private let searchQuery: String?
+    private let editMode: EditMode
+    private let isSelected: Bool
+    private let onButtonTap: () -> Void
+    private let onCellTap: (() -> Void)?
+    private let cellCornerRadius: CGFloat = 10
+    private let imageSize: CGFloat = 35
+    private let imageCornerRadius: CGFloat = 10
 
     private var accessibilityLabel: String {
         switch track.downloadState {
