@@ -83,7 +83,7 @@ struct TrackDTO: Identifiable, Decodable, Hashable {
     // MARK: - API Properties
 
     let id: String
-    let image: String?
+    let imagePath: String?
     let songName: String
     let duration: Int?
     let artistName: String
@@ -98,7 +98,7 @@ struct TrackDTO: Identifiable, Decodable, Hashable {
 
     init(
         id: String,
-        image: String?,
+        imagePath: String?,
         songName: String,
         artistName: String,
         duration: Int?,
@@ -109,7 +109,7 @@ struct TrackDTO: Identifiable, Decodable, Hashable {
         size: Int? = nil,
     ) {
         self.id = id
-        self.image = image
+        self.imagePath = imagePath
         self.songName = songName
         self.duration = duration
         self.artistName = artistName
@@ -124,7 +124,7 @@ struct TrackDTO: Identifiable, Decodable, Hashable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         id = try container.decode(String.self, forKey: .id)
-        image = try container.decodeIfPresent(String.self, forKey: .image)
+        imagePath = try container.decodeIfPresent(String.self, forKey: .imagePath)
         songName = try container.decode(String.self, forKey: .songName)
         duration = try container.decodeIfPresent(Int.self, forKey: .duration)
         artistName = try container.decode(String.self, forKey: .artistName)
@@ -148,11 +148,11 @@ struct TrackDTO: Identifiable, Decodable, Hashable {
     // MARK: - Computed Properties
 
     var imageURL: URL? {
-        guard let image, image.isNotEmpty else {
+        guard let imagePath, imagePath.isNotEmpty else {
             return nil
         }
 
-        return URL(string: image)
+        return URL(string: imagePath)
     }
 
     var downloadURL: URL? {
@@ -168,7 +168,7 @@ struct TrackDTO: Identifiable, Decodable, Hashable {
     enum CodingKeys: String, CodingKey {
         case id
         case waveform
-        case image
+        case imagePath = "image"
         case songName = "name"
         case duration
         case artistName = "artist_name"

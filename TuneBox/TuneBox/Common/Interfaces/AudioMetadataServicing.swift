@@ -9,4 +9,5 @@ import Foundation
 
 protocol AudioMetadataServicing {
     static func extractMetadata(from url: URL) async throws -> TrackMetadata
+    static func save(_ data: Data, trackID: String) throws -> URL
 }

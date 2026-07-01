@@ -34,4 +34,19 @@ final class AudioMetadataService: AudioMetadataServicing {
             artwork: artwork
         )
     }
+
+    static func save(_ data: Data, trackID: String) throws -> URL {
+        guard let directory = FileManager.default
+            .urls(for: .cachesDirectory, in: .userDomainMask)
+            .first
+        else {
+            throw CocoaError(.fileNoSuchFile)
+        }
+
+        let fileURL = directory.appendingPathComponent("\(trackID).jpg")
+
+        try data.write(to: fileURL, options: .atomic)
+
+        return fileURL
+    }
 }

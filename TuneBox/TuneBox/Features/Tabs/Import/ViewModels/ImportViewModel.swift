@@ -88,9 +88,7 @@ final class ImportViewModel: ImportManaging {
 
             try self.persistenceService.delete(track: track)
 
-            if let index = self.sections.firstIndex(where: { $0.type == .imported }) {
-                self.sections[index].tracks.removeAll { $0.id == track.id }
-            }
+            await self.loadImported()
         } catch {
             self.handleError(error)
         }
@@ -139,22 +137,40 @@ final class ImportViewModel: ImportManaging {
 
         url.stopAccessingSecurityScopedResource()
     }
+
     private func importFile(_ url: URL) async {
         do {
+            let id = UUID().uuidString
+
             let localURL = try FileManagerService.storeImportedFile(
                 from: url,
-                id: UUID().uuidString
+                id: id
             )
 
-            let metadata = try await AudioMetadataService.extractMetadata(from: localURL)
+            let metadata = try? await AudioMetadataService.extractMetadata(from: localURL)
+
+            var artworkPath: String?
+
+            if let artworkData = metadata?.artwork {
+                let fileURL = try AudioMetadataService.save(artworkData, trackID: id)
+                artworkPath = fileURL.path
+            }
+
+            let duration: Int? = {
+                guard let seconds = metadata?.duration, seconds.isFinite, seconds > 0 else {
+                    return nil
+                }
+
+                return Int(seconds.rounded())
+            }()
 
             let entity = TrackEntity(
-                id: UUID().uuidString,
-                image: nil,
-                songName: metadata.title ?? url.deletingPathExtension().lastPathComponent,
-                duration: nil,
-                artistName: metadata.artist ?? "",
-                albumName: metadata.album ?? "",
+                id: id,
+                image: artworkPath,
+                songName: metadata?.title ?? url.deletingPathExtension().lastPathComponent,
+                duration: duration,
+                artistName: metadata?.artist ?? "",
+                albumName: metadata?.album ?? "",
                 releaseDate: nil,
                 download: nil,
                 waveformData: nil,

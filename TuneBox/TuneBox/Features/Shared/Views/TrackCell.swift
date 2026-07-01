@@ -150,15 +150,33 @@ struct TrackCell: View {
 
     @ViewBuilder
     private var trackImage: some View {
-        if let url = track.imageURL {
-            WebImage(url: url) { image in
-                image
+        if track.source == .imported {
+            if let artworkPath = track.imagePath,
+               let image = UIImage(contentsOfFile: artworkPath) {
+
+                Image(uiImage: image)
                     .resizable()
-                    .scaledToFit()
-            } placeholder: {
+                    .scaledToFill()
+                    .frame(width: imageSize, height: imageSize)
+                    .clipShape(RoundedRectangle(cornerRadius: imageCornerRadius))
+
+            } else {
                 customPlaceholder
+                    .clipShape(RoundedRectangle(cornerRadius: imageCornerRadius))
             }
-            .frame(width: imageSize, height: imageSize)
+        } else if let url = track.imageURL {
+            WebImage(
+                url: url,
+                content: { image in
+                    image
+                        .resizable()
+                        .scaledToFit()
+                },
+                placeholder: {
+                    customPlaceholder
+                }
+            )
+            .frame(size: imageSize)
             .clipShape(RoundedRectangle(cornerRadius: imageCornerRadius))
         } else {
             customPlaceholder
@@ -172,7 +190,7 @@ struct TrackCell: View {
             .scaledToFit()
             .padding(16)
             .foregroundStyle(.secondary)
-            .frame(width: imageSize, height: imageSize)
+            .frame(size: imageSize)
             .background(Color.gray.opacity(0.1))
     }
 
