@@ -39,88 +39,108 @@ struct TrackCell: View {
     }
 
     var body: some View {
-        ZStack {
-            EmptyTrackCell(isSelected: isSelected)
+        ZStack(
+            content: {
+                EmptyTrackCell(isSelected: isSelected)
 
-            HStack {
-                HStack(spacing: 10) {
-                    trackImage
+                HStack(
+                    content: {
+                        HStack(
+                            spacing: 10,
+                            content: {
+                                trackImage
 
-                    VStack(alignment: .leading, spacing: 2) {
-                        HighlightedText(
-                            text: track.songName,
-                            searchQuery: searchQuery
+                                VStack(
+                                    alignment: .leading,
+                                    spacing: 2,
+                                    content: {
+                                        HighlightedText(
+                                            text: track.songName,
+                                            searchQuery: searchQuery
+                                        )
+                                        .font(.satoshi.medium.size(14))
+                                        .lineLimit(1)
+
+                                        HStack(
+                                            spacing: 6,
+                                            content: {
+                                                HighlightedText(
+                                                    text: track.artistName,
+                                                    searchQuery: searchQuery
+                                                )
+                                                .font(.satoshi.medium.size(12))
+                                                .foregroundStyle(.secondary)
+                                                .lineLimit(1)
+
+                                                Text("•")
+                                                    .font(.satoshi.medium.size(12))
+                                                    .foregroundStyle(.secondary)
+                                                    .lineLimit(1)
+
+                                                Text("\(track.formattedDuration)")
+                                                    .font(.jetBrainsMono.regular.size(10))
+                                                    .foregroundStyle(.secondary)
+                                                    .lineLimit(1)
+                                            }
+                                        )
+                                    }
+                                )
+                            }
                         )
-                        .font(.satoshi.medium.size(14))
-                        .lineLimit(1)
 
-                        HStack(spacing: 6) {
-                            HighlightedText(
-                                text: track.artistName,
-                                searchQuery: searchQuery
+                        Spacer()
+
+                        if editMode == .inactive {
+                            Button(
+                                action: {
+                                    onButtonTap()
+                                },
+                                label: {
+                                    ZStack(
+                                        content: {
+                                            if track.downloadState != .completed,
+                                               track.downloadState != .idle {
+                                                Circle()
+                                                    .foregroundStyle(.clear)
+                                                    .overlay(
+                                                        content: {
+                                                            Circle()
+                                                                .stroke(Color.white, lineWidth: 0.8)
+                                                        }
+                                                    )
+
+                                                Circle()
+                                                    .trim(from: 0, to: track.downloadingProgress)
+                                                    .stroke(
+                                                        Color.green,
+                                                        style: StrokeStyle(
+                                                            lineWidth: 1,
+                                                            lineCap: .round
+                                                        )
+                                                    )
+                                                    .rotationEffect(.degrees(-90))
+                                            }
+
+                                            buttonImage
+                                                .font(.system(size: 10, weight: .medium))
+                                        }
+                                    )
+                                    .frame(size: 25)
+                                }
                             )
-                            .font(.satoshi.medium.size(12))
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-
-                            Text("•")
-                                .font(.satoshi.medium.size(12))
-                                .foregroundStyle(.secondary)
-                                .lineLimit(1)
-
-                            Text("\(track.formattedDuration)")
-                                .font(.jetBrainsMono.regular.size(10))
-                                .foregroundStyle(.secondary)
-                                .lineLimit(1)
+                            .accessibilityHint(accessibilityLabel)
                         }
                     }
-                }
-
-                Spacer()
-
-                if editMode == .inactive {
-                    Button(
-                        action: {
-                            onButtonTap()
-                        },
-                        label: {
-                            ZStack {
-                                if track.downloadState != .completed,
-                                   track.downloadState != .idle {
-                                    Circle()
-                                        .foregroundStyle(.clear)
-                                        .overlay(
-                                            Circle()
-                                                .stroke(Color.white, lineWidth: 0.8)
-                                        )
-
-                                    Circle()
-                                        .trim(from: 0, to: track.downloadingProgress)
-                                        .stroke(
-                                            Color.green,
-                                            style: StrokeStyle(
-                                                lineWidth: 1,
-                                                lineCap: .round
-                                            )
-                                        )
-                                        .rotationEffect(.degrees(-90))
-                                }
-
-                                buttonImage
-                                    .font(.system(size: 10, weight: .medium))
-                            }
-                            .frame(width: 25, height: 25)
-                        }
-                    )
-                    .accessibilityHint(accessibilityLabel)
-                }
+                )
+                .padding(.horizontal)
             }
-            .padding(.horizontal)
-        }
+        )
         .contentShape(Rectangle())
-        .onTapGesture {
-            onCellTap()
-        }
+        .onTapGesture(
+            perform: {
+                onCellTap()
+            }
+        )
         .frame(height: 50)
         .frame(maxWidth: .infinity)
         .padding(.horizontal)
@@ -156,8 +176,8 @@ struct TrackCell: View {
 
                 Image(uiImage: image)
                     .resizable()
-                    .scaledToFill()
-                    .frame(width: imageSize, height: imageSize)
+                    .scaledToFit()
+                    .frame(size: imageSize)
                     .clipShape(RoundedRectangle(cornerRadius: imageCornerRadius))
 
             } else {

@@ -37,7 +37,7 @@ final class AudioMetadataService: AudioMetadataServicing {
 
     static func save(_ data: Data, trackID: String) throws -> URL {
         guard let directory = FileManager.default
-            .urls(for: .cachesDirectory, in: .userDomainMask)
+            .urls(for: .documentDirectory, in: .userDomainMask)
             .first
         else {
             throw CocoaError(.fileNoSuchFile)
