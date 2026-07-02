@@ -15,6 +15,7 @@ final class ImportViewModel: ImportManaging {
 
     // MARK: - Properties. Public
 
+    private(set) var playlists: [PlaylistEntity] = []
     private(set) var sections: [TracksSection] = []
     private(set) var selectedTrackIDs: Set<String> = []
     private(set) var error: String?
@@ -25,6 +26,37 @@ final class ImportViewModel: ImportManaging {
     }
 
     // MARK: - Methods. Public
+
+    func createPlaylistDownloadedIfNeeded() {
+        do {
+            let playlists = try persistenceService.fetchPlaylists()
+            guard playlists.contains(where: { $0.name == "Downloaded" }).isFalse else {
+                return
+            }
+
+            let playlist = try self.persistenceService.createPlaylist(
+                name: "Downloaded",
+                isProtected: true
+            )
+
+            let tracks = try persistenceService.getRecentDownloadedTracks(limit: nil)
+            try self.persistenceService.addTracks(tracks, to: playlist)
+
+            self.playlists = try self.persistenceService.fetchPlaylists()
+        } catch {
+            self.handleError(error)
+        }
+    }
+
+    func fetchPlaylists() {
+        do {
+            self.playlists = try self.persistenceService.fetchPlaylists()
+            print(self.playlists.count)
+        } catch {
+            self.handleError(error)
+        }
+
+    }
 
     func load() async {
         await self.loadImported()
@@ -98,6 +130,7 @@ final class ImportViewModel: ImportManaging {
 
     init() {
         self.ensureSectionsOrder()
+        self.createPlaylistDownloadedIfNeeded()
     }
 
     // MARK: - Properties. Private
@@ -191,6 +224,12 @@ final class ImportViewModel: ImportManaging {
     private func set(_ tracks: [TrackEntity], for type: TracksSection.SectionType) {
         if let index = sections.firstIndex(where: { $0.type == type }) {
             self.sections[index].tracks = tracks
+        }
+    }
+
+    private func set(_ tracks: [TrackEntity], for playlist: PlaylistEntity) {
+        if let index = self.playlists.firstIndex(where: { $0.id == playlist.id }) {
+            self.playlists[index].tracks = tracks
         }
     }
 

@@ -25,19 +25,23 @@ struct ImportFilesView: View {
                 viewModel: viewModel
             )
 
-            Group {
-                if viewModel.showsEmptyState {
-                    EmptyStateView()
-                } else {
+//            Group {
+//                if viewModel.showsEmptyState {
+//                    EmptyStateView()
+//                } else {
                     ContentView(
                         editMode: $editMode,
                         viewModel: viewModel
                     )
-                }
-            }
+//                }
+//            }
+        }
+        .onAppear {
+            viewModel.fetchPlaylists()
         }
         .task {
-            await viewModel.load()
+//            await viewModel.load()
+//            viewModel.loadPlaylists()
         }
         .fileImporter(
             isPresented: $showFileImporter,
@@ -58,7 +62,11 @@ struct ImportFilesView: View {
 
     // MARK: - Private. Properties
 
-    @Injected private var viewModel: ImportManaging
+    @Injected
+    private var viewModel: ImportManaging
+    @Injected
+    @ObservationIgnored
+    private var persistenceService: PersistenceServicing
     @State private var editMode: EditMode = .inactive
     @State private var showFileImporter = false
     @State private var importMode: ImportMode = .files
@@ -141,24 +149,46 @@ struct ImportFilesView: View {
     private struct ContentView: View {
         @Binding var editMode: EditMode
         let viewModel: ImportManaging
+        let columns = [
+            GridItem(.flexible()),
+            GridItem(.flexible())
+        ]
 
         var body: some View {
             ScrollView(showsIndicators: false) {
-                LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
-                    ForEach(
-                        viewModel.sections,
-                        content: { section in
-                            switch section.type {
-                                case .imported:
-                                    importedTracksSection(section: section)
+                if viewModel.playlists.count == 1,
+                   let playlist = viewModel.playlists.first {
+                    HStack {
+                        PlaylistCell(model: playlist)
+                            .frame(width: 140)
 
-                                default:
-                                    EmptyView()
-                            }
+                        Spacer()
+                    }
+                    .padding(.horizontal)
+                } else {
+                    LazyVGrid(columns: columns, spacing: 12) {
+                        ForEach(viewModel.playlists) { playlist in
+                            PlaylistCell(model: playlist)
                         }
-                    )
+                    }
+                    .padding(.horizontal)
                 }
+//                LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
+//                    ForEach(
+//                        viewModel.sections,
+//                        content: { section in
+//                            switch section.type {
+//                                case .imported:
+//                                    importedTracksSection(section: section)
+//
+//                                default:
+//                                    EmptyView()
+//                            }
+//                        }
+//                    )
+//                }
             }
+            .frame(maxHeight: .infinity, alignment: .top)
             .padding(.top, 5)
             .contentMargins(.bottom, 20)
         }

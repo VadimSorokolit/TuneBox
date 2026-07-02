@@ -31,4 +31,7 @@ function_parameter_count:
   error: 12
 
 nesting:
-  type_level: 3
+  type_level: 4
+  
+disabled_rules:
+  - for_where

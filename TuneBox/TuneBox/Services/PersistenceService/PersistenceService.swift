@@ -9,6 +9,8 @@ import Foundation
 import Combine
 import SwiftData
 
+protocol PersistenceServicing: PersistenceTrackServicing, PersistencePlaylistServicing {}
+
 @MainActor
 final class PersistenceService: PersistenceServicing {
 
@@ -19,6 +21,12 @@ final class PersistenceService: PersistenceServicing {
     }
 
     // MARK: - Methods. Public
+
+    func fetchPlaylists() throws -> [PlaylistEntity] {
+        let descriptor = FetchDescriptor<PlaylistEntity>()
+
+        return try self.modelContext.fetch(descriptor)
+    }
 
     func getTracks() throws -> [TrackEntity] {
         do {
@@ -212,6 +220,55 @@ final class PersistenceService: PersistenceServicing {
         }
     }
 
+    func createPlaylist(name: String, isProtected: Bool) throws -> PlaylistEntity {
+        let finalName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        let safeName = finalName.isEmpty ? "New Playlist" : finalName
+        let playlist = PlaylistEntity(
+            name: safeName,
+            isProtected: isProtected
+        )
+
+        self.modelContext.insert(playlist)
+
+        try self.modelContext.save()
+
+        return playlist
+    }
+
+    func addTrack(_ track: TrackEntity, to playlist: PlaylistEntity) throws {
+        guard playlist.tracks.contains(where: { $0.id == track.id }).isFalse else { return }
+
+        playlist.tracks.append(track)
+
+        try self.modelContext.save()
+    }
+
+    func addTracks(_ tracks: [TrackEntity], to playlist: PlaylistEntity) throws {
+        for track in tracks {
+            if playlist.tracks.contains(where: { $0.id == track.id }).isFalse {
+                playlist.tracks.append(track)
+
+            }
+        }
+
+        try self.modelContext.save()
+    }
+
+    func setCoverImage(_ imageData: Data?, for playlist: PlaylistEntity) throws {
+        playlist.coverImageData = imageData
+
+        try self.modelContext.save()
+    }
+
+    func renamePlaylist(_ playlist: PlaylistEntity, name: String) throws {
+        let finalName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        let safeName = finalName.isEmpty ? playlist.name : finalName
+
+        playlist.name = safeName
+
+        try self.modelContext.save()
+    }
+
     func save() throws {
         guard self.modelContext.hasChanges else {
             return
@@ -233,6 +290,32 @@ final class PersistenceService: PersistenceServicing {
             AppLogger.storage.error("Failed to delete track: \(error.localizedDescription)")
             throw error
         }
+    }
+
+    func removeTrack(_ track: TrackEntity, from playlist: PlaylistEntity) throws {
+        playlist.tracks.removeAll { $0.id == track.id }
+
+        try self.modelContext.save()
+    }
+
+    func removeTracks(from playlist: PlaylistEntity) throws {
+        playlist.tracks.removeAll()
+
+        try self.modelContext.save()
+    }
+
+    func deletePlaylist(_ playlist: PlaylistEntity) throws {
+        guard playlist.isProtected == false else { return }
+
+        self.modelContext.delete(playlist)
+
+        try self.modelContext.save()
+    }
+
+    func removeCoverImage(for playlist: PlaylistEntity) throws {
+        playlist.coverImageData = nil
+
+        try self.modelContext.save()
     }
 
     func clearStorage() throws {
@@ -257,7 +340,8 @@ final class PersistenceService: PersistenceServicing {
         )
 
         let schema = Schema([
-            TrackEntity.self
+            TrackEntity.self,
+            PlaylistEntity.self
         ])
         let config = ModelConfiguration(isStoredInMemoryOnly: false)
         let container = try ModelContainer(for: schema, configurations: [config])

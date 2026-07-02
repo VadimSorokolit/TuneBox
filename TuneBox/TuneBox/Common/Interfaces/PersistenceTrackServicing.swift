@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-protocol PersistenceServicing: AnyObject {
+protocol PersistenceTrackServicing: AnyObject {
     var storageDidChangePublisher: AnyPublisher<Void, Never> { get }
 
     func getTracks() throws -> [TrackEntity]

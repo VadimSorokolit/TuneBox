@@ -52,7 +52,7 @@
 		5B8382A32FC4CB4D003625CD /* AudioServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382A22FC4CB4C003625CD /* AudioServicing.swift */; };
 		5B8382A72FC4CEF8003625CD /* FileManagerServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382A62FC4CEF6003625CD /* FileManagerServicing.swift */; };
 		5B8382A92FC4CF43003625CD /* NetworkServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382A82FC4CF41003625CD /* NetworkServicing.swift */; };
-		5B8382AB2FC4CF88003625CD /* PersistenceServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382AA2FC4CF84003625CD /* PersistenceServicing.swift */; };
+		5B8382AB2FC4CF88003625CD /* PersistenceTrackServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382AA2FC4CF84003625CD /* PersistenceTrackServicing.swift */; };
 		5B8382AD2FC4CFF1003625CD /* DownloadManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382AC2FC4CFEF003625CD /* DownloadManaging.swift */; };
 		5B8382AF2FC4D01C003625CD /* PersistenceManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382AE2FC4D01B003625CD /* PersistenceManaging.swift */; };
 		5B8382B12FC4D05E003625CD /* DownloadStateProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382B02FC4D05C003625CD /* DownloadStateProviding.swift */; };
@@ -80,6 +80,9 @@
 		5BA581962FD8603500B498D7 /* HighlightedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA581952FD8603400B498D7 /* HighlightedText.swift */; };
 		5BC0DEAD2FDD000100503BA2 /* DownloadStateMergeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC0DEAC2FDD000100503BA2 /* DownloadStateMergeTests.swift */; };
 		5BD0DAF72FBF6BA000268A48 /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0DAF62FBF6B9F00268A48 /* AudioService.swift */; };
+		5BD3BF312FF56EDC006FED4B /* PlaylistEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD3BF302FF56EDB006FED4B /* PlaylistEntity.swift */; };
+		5BD3BF332FF5711D006FED4B /* PersistencePlaylistServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD3BF322FF5711C006FED4B /* PersistencePlaylistServicing.swift */; };
+		5BD3BF362FF586B3006FED4B /* PlaylistCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD3BF352FF586B2006FED4B /* PlaylistCell.swift */; };
 		5BD579A02FAB25E300503BA2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5BD5799C2FAB25E300503BA2 /* Assets.xcassets */; };
 		5BD579A22FAB25E300503BA2 /* TuneBoxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD5799E2FAB25E300503BA2 /* TuneBoxApp.swift */; };
 		5BD579A52FAB25EE00503BA2 /* NetworkServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD579A32FAB25EE00503BA2 /* NetworkServiceTests.swift */; };
@@ -172,7 +175,7 @@
 		5B8382A22FC4CB4C003625CD /* AudioServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioServicing.swift; sourceTree = "<group>"; };
 		5B8382A62FC4CEF6003625CD /* FileManagerServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerServicing.swift; sourceTree = "<group>"; };
 		5B8382A82FC4CF41003625CD /* NetworkServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkServicing.swift; sourceTree = "<group>"; };
-		5B8382AA2FC4CF84003625CD /* PersistenceServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceServicing.swift; sourceTree = "<group>"; };
+		5B8382AA2FC4CF84003625CD /* PersistenceTrackServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceTrackServicing.swift; sourceTree = "<group>"; };
 		5B8382AC2FC4CFEF003625CD /* DownloadManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadManaging.swift; sourceTree = "<group>"; };
 		5B8382AE2FC4D01B003625CD /* PersistenceManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceManaging.swift; sourceTree = "<group>"; };
 		5B8382B02FC4D05C003625CD /* DownloadStateProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadStateProviding.swift; sourceTree = "<group>"; };
@@ -200,6 +203,9 @@
 		5BB9A56D2FC8AF45000B8127 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		5BC0DEAC2FDD000100503BA2 /* DownloadStateMergeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadStateMergeTests.swift; sourceTree = "<group>"; };
 		5BD0DAF62FBF6B9F00268A48 /* AudioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioService.swift; sourceTree = "<group>"; };
+		5BD3BF302FF56EDB006FED4B /* PlaylistEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistEntity.swift; sourceTree = "<group>"; };
+		5BD3BF322FF5711C006FED4B /* PersistencePlaylistServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistencePlaylistServicing.swift; sourceTree = "<group>"; };
+		5BD3BF352FF586B2006FED4B /* PlaylistCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistCell.swift; sourceTree = "<group>"; };
 		5BD579722FAB25BF00503BA2 /* TuneBox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TuneBox.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5BD5797F2FAB25C000503BA2 /* TuneBoxTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TuneBoxTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5BD579892FAB25C000503BA2 /* TuneBoxUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TuneBoxUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -308,6 +314,7 @@
 		5B11C3392FB719980089BAD2 /* Entities */ = {
 			isa = PBXGroup;
 			children = (
+				5BD3BF302FF56EDB006FED4B /* PlaylistEntity.swift */,
 				5B11C33A2FB719A60089BAD2 /* TrackEntity.swift */,
 			);
 			path = Entities;
@@ -574,8 +581,9 @@
 				5BA5818F2FD6A52000B498D7 /* ImportManaging.swift */,
 				5B8382A82FC4CF41003625CD /* NetworkServicing.swift */,
 				5B8382AE2FC4D01B003625CD /* PersistenceManaging.swift */,
-				5B8382AA2FC4CF84003625CD /* PersistenceServicing.swift */,
+				5B8382AA2FC4CF84003625CD /* PersistenceTrackServicing.swift */,
 				5B8382BB2FC5D97E003625CD /* PlayerManaging.swift */,
+				5BD3BF322FF5711C006FED4B /* PersistencePlaylistServicing.swift */,
 				5B6E4DBE2FD17B8F00B4E663 /* SegmentedItem.swift */,
 				5BA5818D2FD6A45700B498D7 /* SettingsManaging.swift */,
 				5B8382B22FC4D0D6003625CD /* StorageManaging.swift */,
@@ -680,6 +688,14 @@
 				5BD0DAF62FBF6B9F00268A48 /* AudioService.swift */,
 			);
 			path = AudioService;
+			sourceTree = "<group>";
+		};
+		5BD3BF342FF586A8006FED4B /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				5BD3BF352FF586B2006FED4B /* PlaylistCell.swift */,
+			);
+			path = Cells;
 			sourceTree = "<group>";
 		};
 		5BD579692FAB25BF00503BA2 = {
@@ -789,6 +805,7 @@
 		5BFBF2352FCCC2A00013F6BB /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				5BD3BF342FF586A8006FED4B /* Cells */,
 				5BFBF2362FCCC2AA0013F6BB /* ImportFilesView.swift */,
 			);
 			path = Views;
@@ -1083,7 +1100,9 @@
 				5B3FEB3D2FB4539C00DC1562 /* TransferViewModel.swift in Sources */,
 				5B8382A92FC4CF43003625CD /* NetworkServicing.swift in Sources */,
 				5BA5818C2FD6A33200B498D7 /* ImportViewModel.swift in Sources */,
+				5BD3BF332FF5711D006FED4B /* PersistencePlaylistServicing.swift in Sources */,
 				5B8382A72FC4CEF8003625CD /* FileManagerServicing.swift in Sources */,
+				5BD3BF362FF586B3006FED4B /* PlaylistCell.swift in Sources */,
 				5B0FD0C42FD2FAD200753D3A /* Bool+Extensions.swift in Sources */,
 				5B3FEB4A2FB454AE00DC1562 /* PlayerView.swift in Sources */,
 				5B9D45DA2FDF099D00F86C1B /* DownloadsViewModel.swift in Sources */,
@@ -1098,6 +1117,7 @@
 				5B586CCC2FACB61500BCEAD2 /* TracksResponse.swift in Sources */,
 				5B47627A2FAB3DC30069E41A /* TuneBoxRouter.swift in Sources */,
 				5B8382BC2FC5D97F003625CD /* PlayerManaging.swift in Sources */,
+				5BD3BF312FF56EDC006FED4B /* PlaylistEntity.swift in Sources */,
 				5BFCA7D22FCE0DDE009C6AD9 /* AppTheme.swift in Sources */,
 				5BFBF2372FCCC2AB0013F6BB /* ImportFilesView.swift in Sources */,
 				5BFCA7D42FCE1148009C6AD9 /* ThemeManager.swift in Sources */,
@@ -1108,7 +1128,7 @@
 				5BA5818E2FD6A45800B498D7 /* SettingsManaging.swift in Sources */,
 				5BFCA83E2FCED841009C6AD9 /* View+cornerRadius.swift in Sources */,
 				5B6E4DBF2FD17B9000B4E663 /* SegmentedItem.swift in Sources */,
-				5B8382AB2FC4CF88003625CD /* PersistenceServicing.swift in Sources */,
+				5B8382AB2FC4CF88003625CD /* PersistenceTrackServicing.swift in Sources */,
 				5B8382AF2FC4D01C003625CD /* PersistenceManaging.swift in Sources */,
 				5B8860A52FB1CF910056BE9A /* NotificationNames+Extension.swift in Sources */,
 				5BFCA8432FCEE237009C6AD9 /* TransferPrioritizable.swift in Sources */,

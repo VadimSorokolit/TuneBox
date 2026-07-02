@@ -5,10 +5,6 @@
 //  Created by Vadim Sorokolit on 08.05.2026.
 //
 
-private enum FileError: Error {
-    case missingDirectory
-}
-
 import Foundation
 
 enum GlobalConstants {
