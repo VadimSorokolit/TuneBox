@@ -220,16 +220,42 @@ final class PersistenceService: PersistenceServicing {
         }
     }
 
-    func createPlaylist(name: String, isProtected: Bool) throws -> PlaylistEntity {
-        let finalName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        let safeName = finalName.isEmpty ? "New Playlist" : finalName
-        let playlist = PlaylistEntity(
-            name: safeName,
-            isProtected: isProtected
-        )
+    func createSystemPlaylist() throws -> PlaylistEntity {
+        if let existing = try self.fetchPlaylists().first(where: {
+            self.normalizedPlaylistTitle($0.title) == self.normalizedPlaylistTitle(Constants.systemPlaylistTitle)
+        }) {
+            return existing
+        }
+
+        let playlist = PlaylistEntity(name: Constants.systemPlaylistTitle)
 
         self.modelContext.insert(playlist)
+        try self.modelContext.save()
 
+        return playlist
+    }
+
+    func createPlaylist(title: String) throws -> PlaylistEntity {
+        let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        let safeName: String
+        if trimmed.isEmpty {
+            safeName = try self.makeDefaultPlaylistName()
+        } else {
+            safeName = trimmed
+        }
+
+        if self.normalizedPlaylistTitle(safeName) == self.normalizedPlaylistTitle(Constants.systemPlaylistTitle) {
+            throw AppError.Storage.reservedPlaylistTitle
+        }
+
+        if try self.playlistExists(withTitle: safeName) {
+            throw AppError.Storage.playlistTitleAlreadyExists
+        }
+
+        let playlist = PlaylistEntity(name: safeName)
+
+        self.modelContext.insert(playlist)
         try self.modelContext.save()
 
         return playlist
@@ -261,10 +287,21 @@ final class PersistenceService: PersistenceServicing {
     }
 
     func renamePlaylist(_ playlist: PlaylistEntity, name: String) throws {
-        let finalName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        let safeName = finalName.isEmpty ? playlist.name : finalName
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        playlist.name = safeName
+        let safeName = trimmed.isEmpty
+            ? playlist.title
+            : trimmed
+
+        if self.normalizedPlaylistTitle(safeName) == self.normalizedPlaylistTitle(Constants.systemPlaylistTitle) {
+            throw AppError.Storage.reservedPlaylistTitle
+        }
+
+        if try self.playlistExists(withTitle: safeName, excluding: playlist.id) {
+            throw AppError.Storage.playlistTitleAlreadyExists
+        }
+
+        playlist.title = safeName
 
         try self.modelContext.save()
     }
@@ -305,8 +342,6 @@ final class PersistenceService: PersistenceServicing {
     }
 
     func deletePlaylist(_ playlist: PlaylistEntity) throws {
-        guard playlist.isProtected == false else { return }
-
         self.modelContext.delete(playlist)
 
         try self.modelContext.save()
@@ -354,12 +389,56 @@ final class PersistenceService: PersistenceServicing {
 
     // MARK: - Properties. Private
 
+    private enum Constants {
+        static let systemPlaylistTitle = "Downloaded"
+        static let defaultPlaylistTitle = "New Playlist"
+    }
     private let storageDidChangeSubject = PassthroughSubject<Void, Never>()
     private var cancellables = Set<AnyCancellable>()
     private let modelContainer: ModelContainer
     private let modelContext: ModelContext
 
     // MARK: - Methods. Private
+
+    private func normalizedPlaylistTitle(_ title: String) -> String {
+        title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+    }
+
+    private func playlistExists(
+        withTitle title: String,
+        excluding playlistID: String? = nil
+    ) throws -> Bool {
+        let normalized = self.normalizedPlaylistTitle(title)
+        return try self.fetchPlaylists().contains { playlist in
+            if let playlistID, playlist.id == playlistID {
+                return false
+            }
+            return self.normalizedPlaylistTitle(playlist.title) == normalized
+        }
+    }
+
+    private func makeDefaultPlaylistName() throws -> String {
+        let baseName = Constants.defaultPlaylistTitle
+
+        let playlists = try self.fetchPlaylists()
+
+        guard playlists.contains(where: {
+            self.normalizedPlaylistTitle($0.title) == self.normalizedPlaylistTitle(baseName)
+
+        }) else {
+            return baseName
+        }
+
+        var index = 2
+
+        while playlists.contains(where: {
+            self.normalizedPlaylistTitle($0.title) == normalizedPlaylistTitle("\(baseName) \(index)")
+        }) {
+            index += 1
+
+        }
+        return "\(baseName)\(index)"
+    }
 
     private func subscribePublishers() {
         NotificationCenter.default

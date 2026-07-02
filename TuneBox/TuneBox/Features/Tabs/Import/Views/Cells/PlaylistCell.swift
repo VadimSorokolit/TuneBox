@@ -12,7 +12,7 @@ struct PlaylistCell: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(model.name)
+            Text(model.title)
                 .font(.headline)
 
             Text("\(model.tracks.count) tracks")
@@ -20,12 +20,6 @@ struct PlaylistCell: View {
                 .foregroundStyle(.secondary)
 
             Spacer()
-
-            if model.isProtected {
-                Image(systemName: "lock.fill")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-            }
         }
         .frame(maxWidth: .infinity)
         .aspectRatio(1, contentMode: .fit)

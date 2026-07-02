@@ -12,8 +12,7 @@ import SwiftData
 final class PlaylistEntity: Identifiable {
     @Attribute(.unique)
     var id: String
-    var name: String
-    var isProtected: Bool
+    var title: String
     var coverImageData: Data?
 
     var tracks: [TrackEntity]
@@ -26,8 +25,7 @@ final class PlaylistEntity: Identifiable {
         tracks: [TrackEntity] = []
     ) {
         self.id = id
-        self.name = name
-        self.isProtected = isProtected
+        self.title = name
         self.coverImageData = coverImageData
         self.tracks = tracks
     }

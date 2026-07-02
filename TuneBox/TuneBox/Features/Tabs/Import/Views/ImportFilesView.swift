@@ -25,19 +25,22 @@ struct ImportFilesView: View {
                 viewModel: viewModel
             )
 
-//            Group {
-//                if viewModel.showsEmptyState {
-//                    EmptyStateView()
-//                } else {
+            Group {
+                if viewModel.showsEmptyState {
+                    EmptyStateView()
+                } else {
                     ContentView(
                         editMode: $editMode,
                         viewModel: viewModel
                     )
-//                }
-//            }
+                }
+            }
         }
         .onAppear {
-            viewModel.fetchPlaylists()
+            viewModel.startObservingTracksChanges()
+        }
+        .onDisappear {
+            viewModel.stopObservingTracksChanges()
         }
         .task {
 //            await viewModel.load()

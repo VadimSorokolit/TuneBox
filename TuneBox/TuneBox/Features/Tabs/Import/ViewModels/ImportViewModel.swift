@@ -21,32 +21,11 @@ final class ImportViewModel: ImportManaging {
     private(set) var error: String?
 
     var showsEmptyState: Bool {
-        self.sections
+        self.playlists
             .allSatisfy { $0.tracks.isEmpty }
     }
 
     // MARK: - Methods. Public
-
-    func createPlaylistDownloadedIfNeeded() {
-        do {
-            let playlists = try persistenceService.fetchPlaylists()
-            guard playlists.contains(where: { $0.name == "Downloaded" }).isFalse else {
-                return
-            }
-
-            let playlist = try self.persistenceService.createPlaylist(
-                name: "Downloaded",
-                isProtected: true
-            )
-
-            let tracks = try persistenceService.getRecentDownloadedTracks(limit: nil)
-            try self.persistenceService.addTracks(tracks, to: playlist)
-
-            self.playlists = try self.persistenceService.fetchPlaylists()
-        } catch {
-            self.handleError(error)
-        }
-    }
 
     func fetchPlaylists() {
         do {
@@ -69,6 +48,30 @@ final class ImportViewModel: ImportManaging {
         } catch {
             self.handleError(error)
         }
+    }
+
+    func startObservingTracksChanges() {
+        self.tracksObservationTask?.cancel()
+
+        self.tracksObservationTask = Task { [weak self] in
+            guard let self else { return }
+
+            self.syncSystemPlaylist()
+
+            self.transferViewModel.onTracksChanged = { [weak self] in
+                guard let self else { return }
+
+                Task {
+                    self.syncSystemPlaylist()
+                }
+            }
+        }
+    }
+
+    func stopObservingTracksChanges() {
+        self.tracksObservationTask?.cancel()
+        self.tracksObservationTask = nil
+        self.transferViewModel.onTracksChanged = nil
     }
 
     func addImportItems(from urls: [URL]) async {
@@ -130,14 +133,17 @@ final class ImportViewModel: ImportManaging {
 
     init() {
         self.ensureSectionsOrder()
-        self.createPlaylistDownloadedIfNeeded()
     }
 
     // MARK: - Properties. Private
 
     @Injected
     @ObservationIgnored
+    private var transferViewModel: TransferManaging
+    @Injected
+    @ObservationIgnored
     private var persistenceService: PersistenceServicing
+    private var tracksObservationTask: Task<Void, Never>?
 
     // MARK: - Methods. Private
 
@@ -145,6 +151,22 @@ final class ImportViewModel: ImportManaging {
         self.sections = [
             .init(type: .imported, tracks: [])
         ]
+    }
+
+    private func syncSystemPlaylist() {
+        do {
+            let downloadedTracks = try self.persistenceService.getRecentDownloadedTracks(limit: nil)
+
+            if downloadedTracks.isNotEmpty {
+                let systemPlaylist = try self.persistenceService.createSystemPlaylist()
+                systemPlaylist.tracks = downloadedTracks
+            }
+
+            self.playlists = try self.persistenceService.fetchPlaylists()
+
+        } catch {
+            self.handleError(error)
+        }
     }
 
     private func importFolder(_ url: URL) async {

@@ -132,6 +132,20 @@ enum AppError: Error {
         }
     }
 
+    enum Storage: LocalizedError {
+        case reservedPlaylistTitle
+        case playlistTitleAlreadyExists
+
+        var errorDescription: String? {
+            switch self {
+                case .reservedPlaylistTitle:
+                    return "Name \"Downloaded\" is reserved"
+                case .playlistTitleAlreadyExists:
+                    return "Playlist with this name already exists"
+            }
+        }
+    }
+
     enum File: Error {
         case missingDirectory
     }
