@@ -152,44 +152,30 @@ struct ImportFilesView: View {
     private struct ContentView: View {
         @Binding var editMode: EditMode
         let viewModel: ImportManaging
-        let columns = [
-            GridItem(.flexible()),
-            GridItem(.flexible())
-        ]
+
+        private enum Layout {
+            static let compactColumnCount = 2
+            static let regularColumnCount = 3
+            static let gridSpacing: CGFloat = 50
+        }
 
         var body: some View {
-            ScrollView(showsIndicators: false) {
-                if viewModel.playlists.count == 1,
-                   let playlist = viewModel.playlists.first {
-                    HStack {
-                        PlaylistCell(model: playlist)
-                            .frame(width: 140)
+            GeometryReader { geometry in
+                let columnCount = (geometry.size.width > GlobalConstants.Screen.regularWidth)
+                ? Layout.regularColumnCount
+                : Layout.regularColumnCount
+                let columns = Array(repeating: GridItem(.flexible(), spacing: Layout.gridSpacing), count: columnCount)
 
-                        Spacer()
-                    }
-                    .padding(.horizontal)
-                } else {
-                    LazyVGrid(columns: columns, spacing: 12) {
+                ScrollView {
+                    LazyVGrid(columns: columns, spacing: Layout.gridSpacing) {
                         ForEach(viewModel.playlists) { playlist in
                             PlaylistCell(model: playlist)
                         }
                     }
+
                     .padding(.horizontal)
                 }
-//                LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
-//                    ForEach(
-//                        viewModel.sections,
-//                        content: { section in
-//                            switch section.type {
-//                                case .imported:
-//                                    importedTracksSection(section: section)
-//
-//                                default:
-//                                    EmptyView()
-//                            }
-//                        }
-//                    )
-//                }
+
             }
             .frame(maxHeight: .infinity, alignment: .top)
             .padding(.top, 5)

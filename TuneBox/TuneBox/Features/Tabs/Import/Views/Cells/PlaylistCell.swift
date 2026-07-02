@@ -21,6 +21,7 @@ struct PlaylistCell: View {
 
             Spacer()
         }
+        .frame(height: 200)
         .frame(maxWidth: .infinity)
         .aspectRatio(1, contentMode: .fit)
         .background(Color.red)
