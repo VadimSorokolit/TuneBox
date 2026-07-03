@@ -21,8 +21,7 @@ final class ImportViewModel: ImportManaging {
     private(set) var error: String?
 
     var showsEmptyState: Bool {
-        self.playlists
-            .allSatisfy { $0.tracks.isEmpty }
+        self.playlists.isEmpty
     }
 
     // MARK: - Methods. Public
@@ -35,6 +34,15 @@ final class ImportViewModel: ImportManaging {
             self.handleError(error)
         }
 
+    }
+
+    func createPlaylist(title: String) {
+        do {
+            _ = try self.persistenceService.createPlaylist(title: title)
+            self.fetchPlaylists()
+        } catch {
+            self.handleError(error)
+        }
     }
 
     func load() async {
@@ -76,24 +84,19 @@ final class ImportViewModel: ImportManaging {
 
     func addImportItems(from urls: [URL]) async {
         for url in urls {
-            let isFolder = url.hasDirectoryPath
+            if url.hasDirectoryPath {
+                let title = url.lastPathComponent
 
-            guard url.startAccessingSecurityScopedResource() else {
-                continue
-            }
+                guard let playlist = try? self.persistenceService.createPlaylist(title: title) else {
+                    continue
+                }
 
-            defer {
-                url.stopAccessingSecurityScopedResource()
-            }
-
-            if isFolder {
-                await importFolder(url)
+                await self.importFolder(url, into: playlist)
             } else {
-                await importFile(url)
+                await self.importFile(url, into: nil)
             }
         }
-
-        await self.loadImported()
+        self.fetchPlaylists()
     }
 
     func toggleSelection(for id: String) {
@@ -169,7 +172,7 @@ final class ImportViewModel: ImportManaging {
         }
     }
 
-    private func importFolder(_ url: URL) async {
+    private func importFolder(_ url: URL, into playlist: PlaylistEntity) async {
         guard url.startAccessingSecurityScopedResource() else { return }
 
         do {
@@ -182,10 +185,9 @@ final class ImportViewModel: ImportManaging {
                 let values = try file.resourceValues(forKeys: [.isDirectoryKey])
 
                 if values.isDirectory == false {
-                    await self.importFile(file)
+                    await self.importFile(file, into: playlist)
                 }
             }
-
         } catch {
             self.handleError(error)
         }
@@ -193,7 +195,7 @@ final class ImportViewModel: ImportManaging {
         url.stopAccessingSecurityScopedResource()
     }
 
-    private func importFile(_ url: URL) async {
+    private func importFile(_ url: URL, into playlist: PlaylistEntity?) async {
         do {
             let id = UUID().uuidString
 

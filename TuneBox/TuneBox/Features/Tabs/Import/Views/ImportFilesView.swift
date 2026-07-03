@@ -16,6 +16,8 @@ enum ImportMode {
 
 struct ImportFilesView: View {
 
+    // MARK: - Main Body
+
     var body: some View {
         VStack(spacing: 0) {
             HeaderView(
@@ -27,7 +29,11 @@ struct ImportFilesView: View {
 
             Group {
                 if viewModel.showsEmptyState {
-                    EmptyStateView()
+                    EmptyStateView(
+                        importMode: $importMode,
+                        showFileImporter: $showFileImporter,
+                        showCreatePlaylistDialog: $showCreatePlaylistDialog
+                    )
                 } else {
                     ContentView(
                         editMode: $editMode,
@@ -44,24 +50,47 @@ struct ImportFilesView: View {
             viewModel.stopObservingTracksChanges()
         }
         .task {
-//            await viewModel.load()
-//            viewModel.loadPlaylists()
+            //            await viewModel.load()
+            //            viewModel.loadPlaylists()
         }
         .fileImporter(
             isPresented: $showFileImporter,
             allowedContentTypes: importMode == .folder
-                ? [UTType.folder]
-                : [UTType.audio],
+            ? [UTType.folder]
+            : [UTType.audio],
             allowsMultipleSelection: true,
             onCompletion: { result in
                 switch result {
                     case .success(let urls):
-                        Task { await viewModel.addImportItems(from: urls) }
+                        Task {
+                            await viewModel.addImportItems(from: urls)
+                        }
                     case .failure(let error):
                         AppLogger.imported.warning("\(error.localizedDescription)")
                 }
             }
         )
+        .onChange(of: showCreatePlaylistDialog) { _, dialog in
+            if dialog == false {
+                newPlaylistTitle = ""
+            }
+        }
+        .alert("New Playlist", isPresented: $showCreatePlaylistDialog) {
+            TextField("Playlist title", text: $newPlaylistTitle)
+
+            Button("Cancel", role: .cancel) {
+                showCreatePlaylistDialog = false
+            }
+
+            Button("Save") {
+                if newPlaylistTitle.trimmingCharacters(in: .whitespacesAndNewlines).isNotEmpty {
+                    viewModel.createPlaylist(title: newPlaylistTitle)
+                    showCreatePlaylistDialog = false
+                }
+            }
+        } message: {
+            Text("Enter a title for this playlist")
+        }
     }
 
     // MARK: - Private. Properties
@@ -71,9 +100,11 @@ struct ImportFilesView: View {
     @Injected
     @ObservationIgnored
     private var persistenceService: PersistenceServicing
+    @State private var newPlaylistTitle: String = ""
     @State private var editMode: EditMode = .inactive
-    @State private var showFileImporter = false
     @State private var importMode: ImportMode = .files
+    @State private var showCreatePlaylistDialog = false
+    @State private var showFileImporter = false
 
     // MARK: - Private. Objects
 
@@ -83,6 +114,8 @@ struct ImportFilesView: View {
         @Binding var importMode: ImportMode
         @Binding var showFileImporter: Bool
         let viewModel: ImportManaging
+
+    // MARK: - Body
 
         var body: some View {
             HStack {
@@ -154,12 +187,14 @@ struct ImportFilesView: View {
         @Binding var editMode: EditMode
         let viewModel: ImportManaging
 
+        // MARK: - Private. Properties
         private enum Layout {
             static let compactColumnCount = 2
             static let regularColumnCount = 3
             static let gridSpacing: CGFloat = 16
         }
 
+        // MARK: - Main Body
         var body: some View {
             GeometryReader { geometry in
                 let columnCount = (geometry.size.width > GlobalConstants.Screen.regularWidth)
@@ -176,7 +211,6 @@ struct ImportFilesView: View {
 
                     .padding(.horizontal)
                 }
-
             }
             .frame(maxHeight: .infinity, alignment: .top)
             .padding(.top, 5)
@@ -223,25 +257,57 @@ struct ImportFilesView: View {
         }
     }
 
-    private struct EmptyStateView: View {
+    struct EmptyStateView: View {
+
+        // MARK: - Properties. Public
+
+        @Binding var importMode: ImportMode
+        @Binding var showFileImporter: Bool
+        @Binding var showCreatePlaylistDialog: Bool
+
+        // MARK: - Body
+
         var body: some View {
-            VStack(spacing: 14) {
+            VStack(spacing: 40) {
                 Spacer()
 
-                Image(systemName: "folder")
-                    .font(.system(size: 56, weight: .light))
-                    .foregroundStyle(.secondary)
-                    .symbolRenderingMode(.hierarchical)
+                Menu {
+                    Button(
+                        action: {
+                            showCreatePlaylistDialog = true
+                        }, label: {
+                            Label("Create a playlist", systemImage: "plus")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundStyle(.white)
+                        }
+                    )
 
-                Text("No files yet")
-                    .font(.title3.weight(.semibold))
+                    Button(
+                        action: {
+                            showFileImporter = true
+                            importMode = .folder
+                        }, label: {
+                            Label("Import a playlist", systemImage: "doc.text")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundStyle(.white)
+                        }
+                    )
+                } label: {
+                    Circle()
+                        .fill(Color.gray)
+                        .frame(width: 64, height: 64)
+                        .overlay(
+                            Image(systemName: "plus")
+                                .font(.system(size: 40, weight: .medium))
+                                .foregroundStyle(.black)
+                        )
+                }
 
-                Text("Import audio files to start building your library")
+                Text("There are no playlists in your library")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 40)
-                    .padding(.top, 8)
 
                 Spacer()
             }

@@ -15,6 +15,7 @@ protocol ImportManaging {
 
     func load() async
     func fetchPlaylists()
+    func createPlaylist(title: String)
     func startObservingTracksChanges()
     func stopObservingTracksChanges()
     func addImportItems(from urls: [URL]) async
