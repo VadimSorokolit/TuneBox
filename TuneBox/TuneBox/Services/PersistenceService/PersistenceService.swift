@@ -282,7 +282,11 @@ final class PersistenceService: PersistenceServicing {
         try self.modelContext.save()
     }
 
-    func setCoverImage(_ imageData: Data?, for playlist: PlaylistEntity) throws {
+    func setCoverImage(_ imageData: Data?, playlist: PlaylistEntity) throws {
+        guard let playlist = try self.getPlaylist(id: playlist.id) else {
+            return
+        }
+
         playlist.coverImageData = imageData
 
         try self.modelContext.save()
@@ -416,6 +420,25 @@ final class PersistenceService: PersistenceServicing {
                 return false
             }
             return self.normalizedPlaylistTitle(playlist.title) == normalized
+        }
+    }
+
+    private func getPlaylist(id: String) throws -> PlaylistEntity? {
+        let playlistID = id
+
+        var descriptor = FetchDescriptor<PlaylistEntity>(
+            predicate: #Predicate {
+                $0.id == playlistID
+            }
+        )
+
+        descriptor.fetchLimit = 1
+
+        do {
+            return try self.modelContext.fetch(descriptor).first
+        } catch {
+            AppLogger.storage.error("Failed to fetch playlist \(id): \(error.localizedDescription)")
+            throw error
         }
     }
 

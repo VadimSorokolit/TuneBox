@@ -17,6 +17,6 @@ protocol PersistencePlaylistServicing: AnyObject {
     func addTracks(_ tracks: [TrackEntity], to playlist: PlaylistEntity) throws
     func removeTrack(_ track: TrackEntity, from playlist: PlaylistEntity) throws
     func removeTracks(from playlist: PlaylistEntity) throws
-    func setCoverImage(_ imageData: Data?, for playlist: PlaylistEntity) throws
+    func setCoverImage(_ imageData: Data?, playlist: PlaylistEntity) throws
     func removeCoverImage(for playlist: PlaylistEntity) throws
 }

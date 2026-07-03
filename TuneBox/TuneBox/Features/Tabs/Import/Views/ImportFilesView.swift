@@ -7,6 +7,7 @@
 
 import Resolver
 import SwiftUI
+import PhotosUI
 import UniformTypeIdentifiers
 
 enum ImportMode {
@@ -37,6 +38,9 @@ struct ImportFilesView: View {
                 } else {
                     ContentView(
                         editMode: $editMode,
+                        selectedPhoto: $selectedPhoto,
+                        selectedPlaylist: $selectedPlaylist,
+                        showPhotoPicker: $showPhotoPicker,
                         viewModel: viewModel
                     )
                 }
@@ -70,6 +74,11 @@ struct ImportFilesView: View {
                 }
             }
         )
+        .photosPicker(
+            isPresented: $showPhotoPicker,
+            selection: $selectedPhoto,
+            matching: .images,
+        )
         .onChange(of: showCreatePlaylistDialog) { _, dialog in
             if dialog == false {
                 newPlaylistTitle = ""
@@ -100,9 +109,12 @@ struct ImportFilesView: View {
     @Injected
     @ObservationIgnored
     private var persistenceService: PersistenceServicing
+    @State private var selectedPhoto: PhotosPickerItem?
+    @State private var selectedPlaylist: PlaylistEntity?
     @State private var newPlaylistTitle: String = ""
     @State private var editMode: EditMode = .inactive
     @State private var importMode: ImportMode = .files
+    @State private var showPhotoPicker = false
     @State private var showCreatePlaylistDialog = false
     @State private var showFileImporter = false
 
@@ -185,6 +197,9 @@ struct ImportFilesView: View {
 
     private struct ContentView: View {
         @Binding var editMode: EditMode
+        @Binding var selectedPhoto: PhotosPickerItem?
+        @Binding var selectedPlaylist: PlaylistEntity?
+        @Binding var showPhotoPicker: Bool
         let viewModel: ImportManaging
 
         // MARK: - Private. Properties
@@ -205,7 +220,40 @@ struct ImportFilesView: View {
                 ScrollView {
                     LazyVGrid(columns: columns, spacing: Layout.gridSpacing) {
                         ForEach(viewModel.playlists) { playlist in
-                            PlaylistCell(playlist: playlist)
+                            PlaylistCell(
+                                playlist: playlist,
+                                onPlayBtnTap: {
+                                    print("")
+                                },
+                                onChangeCoverBtnTap: {
+                                    showPhotoPicker = true
+                                    selectedPlaylist = playlist
+                                },
+                                onAddTracksBtnTap: {
+                                    print("")
+                                },
+                                onRenamePlaylistBtnTap: {
+                                    print("")
+                                },
+                                onDeletePlaylistBtnTap: {
+                                    print("")
+                                }
+                            )
+                            .onChange(of: selectedPhoto) { _, item in
+                                Task {
+                                    guard
+                                        let item,
+                                        let data = try? await item.loadTransferable(type: Data.self)
+                                    else {
+                                        return
+                                    }
+
+                                    if let playlist = selectedPlaylist {
+                                        viewModel.setCoverImage(data, playlist: playlist)
+                                    }
+                                }
+
+                            }
                         }
                     }
 

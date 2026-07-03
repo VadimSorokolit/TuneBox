@@ -45,6 +45,14 @@ final class ImportViewModel: ImportManaging {
         }
     }
 
+    func setCoverImage(_ imageData: Data?, playlist: PlaylistEntity) {
+        do {
+            try self.persistenceService.setCoverImage(imageData, playlist: playlist)
+        } catch {
+            self.handleError(error)
+        }
+    }
+
     func load() async {
         await self.loadImported()
     }

@@ -8,33 +8,21 @@
 import SwiftUI
 
 struct PlaylistCell: View {
+
+    // MARK: - Properties. Public
+
     let playlist: PlaylistEntity
-    let customPadding: CGFloat = 10
-    let cornerRadius: CGFloat = 12
-    let cellHeight: CGFloat = 230
+    let onPlayBtnTap: () -> Void
+    let onChangeCoverBtnTap: () -> Void
+    let onAddTracksBtnTap: () -> Void
+    let onRenamePlaylistBtnTap: () -> Void
+    let onDeletePlaylistBtnTap: () -> Void
+
+    // MARK: - Main Body
 
     var body: some View {
         VStack(spacing: 0) {
-            Group {
-                if let data = playlist.coverImageData,
-                   let uiImage = UIImage(data: data) {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .scaledToFit()
-                } else {
-                    Image(systemName: "music.note")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxWidth: .infinity)
-                        .aspectRatio(1, contentMode: .fit)
-                        .padding(20)
-                        .foregroundStyle(.secondary)
-                        .background(Color.gray.opacity(0.1))
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .aspectRatio(1, contentMode: .fit)
-            .cornerRadius(cornerRadius)
+            coverView
 
             Text(playlist.title)
                 .lineLimit(2)
@@ -51,9 +39,59 @@ struct PlaylistCell: View {
 
                 Spacer()
 
-                Circle()
-                    .fill(.white)
-                    .frame(width: 24, height: 24)
+                Menu {
+                    Button(
+                        action: {
+                            onPlayBtnTap()
+                        }, label: {
+                            Label("Play all", systemImage: "play.fill")
+                        }
+                    )
+
+                    Button(
+                        action: {
+                            onChangeCoverBtnTap()
+                        }, label: {
+                            Label("Change Cover", systemImage: "photo")
+                        }
+                    )
+
+                    Button(
+                        action: {
+                            onAddTracksBtnTap()
+                        }, label: {
+                            Label("Add Tracks", systemImage: "plus")
+                        }
+                    )
+
+                    Button(
+                        action: {
+                            onRenamePlaylistBtnTap()
+                        }, label: {
+                            Label("Rename Playlist", systemImage: "pencil")
+                        }
+                    )
+
+                    Button(
+                        role: .destructive,
+                        action: {
+                            onDeletePlaylistBtnTap()
+                        },
+                        label: {
+                            Label("Delete Playlist", systemImage: "trash")
+                        }
+                    )
+                } label: {
+                    Circle()
+                        .fill(.clear)
+                        .frame(width: 24, height: 24)
+                        .overlay {
+                            Image(systemName: "ellipsis")
+                                .font(.system(size: 20, weight: .regular))
+                                .foregroundColor(.white)
+                        }
+
+                }
             }
         }
         .frame(height: cellHeight)
@@ -62,8 +100,41 @@ struct PlaylistCell: View {
         .background(Color.red)
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
     }
+
+    // MARK: - Properties. Private
+
+    private let customPadding: CGFloat = 10
+    private let cornerRadius: CGFloat = 12
+    private let cellHeight: CGFloat = 230
+
+    @ViewBuilder
+    private var coverView: some View {
+        RoundedRectangle(cornerRadius: cornerRadius)
+            .fill(Color.gray.opacity(0.1))
+            .aspectRatio(1, contentMode: .fit)
+            .overlay {
+                if let data = playlist.coverImageData,
+                   let uiImage = UIImage(data: data) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                } else {
+                    Image(systemName: "music.note")
+                        .font(.system(size: 36))
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+    }
 }
 
 #Preview {
-    PlaylistCell(playlist: PlaylistEntity(name: "Downloaded"))
+    PlaylistCell(
+        playlist: PlaylistEntity(name: "Default"),
+        onPlayBtnTap: {},
+        onChangeCoverBtnTap: {},
+        onAddTracksBtnTap: {},
+        onRenamePlaylistBtnTap: {},
+        onDeletePlaylistBtnTap: {}
+    )
 }
