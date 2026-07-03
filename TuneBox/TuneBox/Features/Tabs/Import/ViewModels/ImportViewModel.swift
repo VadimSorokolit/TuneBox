@@ -45,6 +45,15 @@ final class ImportViewModel: ImportManaging {
         }
     }
 
+    func renamePlaylist(_ playlist: PlaylistEntity, name: String) {
+        do {
+            try self.persistenceService.renamePlaylist(playlist, name: name)
+            self.fetchPlaylists()
+        } catch {
+            self.handleError(error)
+        }
+    }
+
     func setCoverImage(_ imageData: Data?, playlist: PlaylistEntity) {
         do {
             try self.persistenceService.setCoverImage(imageData, playlist: playlist)
@@ -120,6 +129,15 @@ final class ImportViewModel: ImportManaging {
             await self.removeImportedItem(by: id)
         }
         self.selectedTrackIDs.removeAll()
+    }
+
+    func deletePlaylist(_ playlist: PlaylistEntity) {
+        do {
+            try self.persistenceService.deletePlaylist(playlist)
+            self.fetchPlaylists()
+        } catch {
+            self.handleError(error)
+        }
     }
 
     func removeImportedItem(by id: String) async {
@@ -246,8 +264,27 @@ final class ImportViewModel: ImportManaging {
                 fileStateRawValue: FileStorageState.exists.rawValue
             )
 
-            try persistenceService.insert(tracks: [entity])
+            try self.persistenceService.insert(tracks: [entity])
 
+            if let playlist {
+                try self.persistenceService.addTrack(entity, to: playlist)
+            }
+
+        } catch {
+            self.handleError(error)
+        }
+    }
+
+    func importFiles(_ urls: [URL], playlistTitle: String) async {
+
+        do {
+            let playlist = try self.persistenceService.createPlaylist(title: playlistTitle)
+
+            for url in urls {
+                await self.importFile(url, into: playlist)
+            }
+
+            self.fetchPlaylists()
         } catch {
             self.handleError(error)
         }

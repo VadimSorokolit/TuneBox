@@ -61,10 +61,12 @@ final class PersistenceService: PersistenceServicing {
 
     func getRecentDownloadedTracks(limit: Int?) throws -> [TrackEntity] {
         let completed = DownloadState.completed.rawValue
+        let sourceState = TrackSource.api.rawValue
 
         var descriptor = FetchDescriptor<TrackEntity>(
             predicate: #Predicate<TrackEntity> { track in
                 track.downloadStateRawValue == completed
+                && track.sourceRawValue == sourceState
             },
             sortBy: [
                 SortDescriptor(\.lastStateChangeAt, order: .reverse)
@@ -82,11 +84,12 @@ final class PersistenceService: PersistenceServicing {
         let downloading = DownloadState.downloading.rawValue
         let queued = DownloadState.queued.rawValue
         let paused = DownloadState.paused.rawValue
+        let sourceState = TrackSource.api.rawValue
 
         var descriptor = FetchDescriptor<TrackEntity>(
             predicate: #Predicate<TrackEntity> { track in
-                track.downloadStateRawValue == downloading
-                || track.downloadStateRawValue == queued
+                (track.downloadStateRawValue == downloading && track.sourceRawValue == sourceState)
+                || (track.downloadStateRawValue == queued)
                 || track.downloadStateRawValue == paused
             },
             sortBy: [

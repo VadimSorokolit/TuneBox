@@ -16,6 +16,9 @@ protocol ImportManaging {
     func load() async
     func fetchPlaylists()
     func createPlaylist(title: String)
+    func renamePlaylist(_ playlist: PlaylistEntity, name: String)
+    func importFiles(_ urls: [URL], playlistTitle: String) async
+    func deletePlaylist(_ playlist: PlaylistEntity)
     func setCoverImage(_ imageData: Data?, playlist: PlaylistEntity)
     func startObservingTracksChanges()
     func stopObservingTracksChanges()
