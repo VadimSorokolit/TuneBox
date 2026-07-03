@@ -8,34 +8,46 @@
 import SwiftUI
 
 struct PlaylistCell: View {
-    let model: PlaylistEntity
+    let playlist: PlaylistEntity
+    let customPadding: CGFloat = 10
+    let cornerRadius: CGFloat = 12
+    let cellHeight: CGFloat = 230
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(model.title)
-                .font(.headline)
+        VStack(spacing: 0) {
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .fill(Color.gray)
+                .frame(maxWidth: .infinity)
+                .aspectRatio(1, contentMode: .fit)
 
-            Text("\(model.tracks.count) tracks")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+            Text(playlist.title)
+                .lineLimit(2)
+                .font(.headline)
+                .padding(.top, customPadding)
 
             Spacer()
+
+            HStack(alignment: .bottom) {
+                Text("\(playlist.tracks.count)")
+                    .lineLimit(1)
+                    .frame(width: 60, alignment: .leading)
+                    .offset(y: -3)
+
+                Spacer()
+
+                Circle()
+                    .fill(.white)
+                    .frame(width: 24, height: 24)
+            }
         }
-        .frame(height: 200)
+        .frame(height: cellHeight)
         .frame(maxWidth: .infinity)
-        .aspectRatio(1, contentMode: .fit)
+        .padding(customPadding)
         .background(Color.red)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
     }
 }
 
 #Preview {
-    PlaylistCell(
-        model: PlaylistEntity(
-            name: "Downloaded",
-            isProtected: true
-        )
-    )
-
-    .padding()
+    PlaylistCell(playlist: PlaylistEntity(name: "Downloaded"))
 }

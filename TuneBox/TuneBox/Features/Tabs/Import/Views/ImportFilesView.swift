@@ -38,6 +38,7 @@ struct ImportFilesView: View {
         }
         .onAppear {
             viewModel.startObservingTracksChanges()
+            viewModel.fetchPlaylists()
         }
         .onDisappear {
             viewModel.stopObservingTracksChanges()
@@ -156,20 +157,20 @@ struct ImportFilesView: View {
         private enum Layout {
             static let compactColumnCount = 2
             static let regularColumnCount = 3
-            static let gridSpacing: CGFloat = 50
+            static let gridSpacing: CGFloat = 16
         }
 
         var body: some View {
             GeometryReader { geometry in
                 let columnCount = (geometry.size.width > GlobalConstants.Screen.regularWidth)
                 ? Layout.regularColumnCount
-                : Layout.regularColumnCount
+                : Layout.compactColumnCount
                 let columns = Array(repeating: GridItem(.flexible(), spacing: Layout.gridSpacing), count: columnCount)
 
                 ScrollView {
                     LazyVGrid(columns: columns, spacing: Layout.gridSpacing) {
                         ForEach(viewModel.playlists) { playlist in
-                            PlaylistCell(model: playlist)
+                            PlaylistCell(playlist: playlist)
                         }
                     }
 
