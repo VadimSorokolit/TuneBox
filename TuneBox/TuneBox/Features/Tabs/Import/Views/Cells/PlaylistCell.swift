@@ -15,10 +15,26 @@ struct PlaylistCell: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            RoundedRectangle(cornerRadius: cornerRadius)
-                .fill(Color.gray)
-                .frame(maxWidth: .infinity)
-                .aspectRatio(1, contentMode: .fit)
+            Group {
+                if let data = playlist.coverImageData,
+                   let uiImage = UIImage(data: data) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFit()
+                } else {
+                    Image(systemName: "music.note")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: .infinity)
+                        .aspectRatio(1, contentMode: .fit)
+                        .padding(20)
+                        .foregroundStyle(.secondary)
+                        .background(Color.gray.opacity(0.1))
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .aspectRatio(1, contentMode: .fit)
+            .cornerRadius(cornerRadius)
 
             Text(playlist.title)
                 .lineLimit(2)

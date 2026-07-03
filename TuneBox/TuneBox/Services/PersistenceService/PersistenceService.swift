@@ -23,7 +23,9 @@ final class PersistenceService: PersistenceServicing {
     // MARK: - Methods. Public
 
     func fetchPlaylists() throws -> [PlaylistEntity] {
-        let descriptor = FetchDescriptor<PlaylistEntity>()
+        let descriptor = FetchDescriptor<PlaylistEntity>(
+            sortBy: [SortDescriptor(\.title)]
+        )
 
         return try self.modelContext.fetch(descriptor)
     }
