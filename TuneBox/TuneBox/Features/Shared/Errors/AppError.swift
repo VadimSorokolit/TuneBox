@@ -146,6 +146,21 @@ enum AppError: Error {
         }
     }
 
+    enum Playlist: LocalizedError {
+        case emptyTitle
+        case sameTitle
+
+        var errorDescription: String? {
+            switch self {
+                case .emptyTitle:
+                    return "Playlist title cannot be empty"
+
+                case .sameTitle:
+                    return "The playlist already has this title"
+            }
+        }
+    }
+
     enum File: Error {
         case missingDirectory
     }

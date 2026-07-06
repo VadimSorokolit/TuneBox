@@ -9,6 +9,16 @@ import Foundation
 import Observation
 import Resolver
 
+enum PlaylistAction {
+    case create
+    case rename(PlaylistEntity)
+    case addTracks(PlaylistEntity)
+    case play(PlaylistEntity)
+    case changeCover(PlaylistEntity)
+    case deletePlaylist(PlaylistEntity)
+    case deleteTracks(PlaylistEntity)
+}
+
 @MainActor
 @Observable
 final class ImportViewModel: ImportManaging {
@@ -18,6 +28,7 @@ final class ImportViewModel: ImportManaging {
     private(set) var playlists: [PlaylistEntity] = []
     private(set) var sections: [TracksSection] = []
     private(set) var selectedTrackIDs: Set<String> = []
+    var playlistAction: PlaylistAction?
     private(set) var error: String?
 
     var showsEmptyState: Bool {
@@ -37,7 +48,13 @@ final class ImportViewModel: ImportManaging {
     }
 
     func createPlaylist(title: String) {
+        let title = title.trimmingCharacters(in: .whitespacesAndNewlines)
+
         do {
+            guard title.isNotEmpty else {
+                throw AppError.Playlist.emptyTitle
+            }
+
             _ = try self.persistenceService.createPlaylist(title: title)
             self.fetchPlaylists()
         } catch {
@@ -45,9 +62,19 @@ final class ImportViewModel: ImportManaging {
         }
     }
 
-    func renamePlaylist(_ playlist: PlaylistEntity, name: String) {
+    func renamePlaylist(_ playlist: PlaylistEntity, newTitle: String) {
+        let title = newTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+
         do {
-            try self.persistenceService.renamePlaylist(playlist, name: name)
+            guard title.isNotEmpty else {
+                throw AppError.Playlist.emptyTitle
+            }
+
+            guard title != playlist.title else {
+                throw AppError.Playlist.sameTitle
+            }
+
+            try self.persistenceService.renamePlaylist(playlist, newTitle: title)
             self.fetchPlaylists()
         } catch {
             self.handleError(error)
@@ -276,9 +303,14 @@ final class ImportViewModel: ImportManaging {
     }
 
     func importFiles(_ urls: [URL], playlistTitle: String) async {
+        let title = playlistTitle.trimmingCharacters(in: .whitespacesAndNewlines)
 
         do {
-            let playlist = try self.persistenceService.createPlaylist(title: playlistTitle)
+            guard title.isNotEmpty else {
+                throw AppError.Playlist.emptyTitle
+            }
+            print(title)
+            let playlist = try self.persistenceService.createPlaylist(title: title)
 
             for url in urls {
                 await self.importFile(url, into: playlist)

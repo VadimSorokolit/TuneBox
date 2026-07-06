@@ -7,16 +7,17 @@
 
 import Foundation
 
-protocol ImportManaging {
+protocol ImportManaging: AnyObject {
     var playlists: [PlaylistEntity] { get }
     var sections: [TracksSection] { get }
     var selectedTrackIDs: Set<String> { get }
     var showsEmptyState: Bool { get }
+    var playlistAction: PlaylistAction? { get set }
 
     func load() async
     func fetchPlaylists()
     func createPlaylist(title: String)
-    func renamePlaylist(_ playlist: PlaylistEntity, name: String)
+    func renamePlaylist(_ playlist: PlaylistEntity, newTitle: String)
     func importFiles(_ urls: [URL], playlistTitle: String) async
     func deletePlaylist(_ playlist: PlaylistEntity)
     func setCoverImage(_ imageData: Data?, playlist: PlaylistEntity)

@@ -295,8 +295,8 @@ final class PersistenceService: PersistenceServicing {
         try self.modelContext.save()
     }
 
-    func renamePlaylist(_ playlist: PlaylistEntity, name: String) throws {
-        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+    func renamePlaylist(_ playlist: PlaylistEntity, newTitle: String) throws {
+        let trimmed = newTitle.trimmingCharacters(in: .whitespacesAndNewlines)
 
         let safeName = trimmed.isEmpty
             ? playlist.title

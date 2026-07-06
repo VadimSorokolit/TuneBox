@@ -33,13 +33,12 @@ struct ImportFilesView: View {
                     EmptyStateView(
                         importMode: $importMode,
                         showFileImporter: $showFileImporter,
-                        showCreatePlaylistDialog: $showCreatePlaylistDialog
+                        showCreatePlaylistDialog: $showPlaylistDialog
                     )
                 } else {
                     ContentView(
                         editMode: $editMode,
                         selectedPhoto: $selectedPhoto,
-                        selectedPlaylist: $selectedPlaylist,
                         showPhotoPicker: $showPhotoPicker,
                         viewModel: viewModel
                     )
@@ -74,7 +73,7 @@ struct ImportFilesView: View {
 
                             case .files:
                                 selectedImportURLs = urls
-                                showCreatePlaylistDialog = true
+                                viewModel.playlistAction = .create
                         }
                     case .failure(let error):
                         AppLogger.imported.warning("\(error.localizedDescription)")
@@ -86,33 +85,52 @@ struct ImportFilesView: View {
             selection: $selectedPhoto,
             matching: .images,
         )
-        .onTapGesture {
-            selectedPlaylist = nil
-        }
-        .onChange(of: showCreatePlaylistDialog) { _, dialog in
-            if dialog == false {
-                newPlaylistTitle = ""
-            }
-        }
-        .alert("New Playlist", isPresented: $showCreatePlaylistDialog) {
-            TextField("Playlist title", text: $newPlaylistTitle)
+        .alert(
+            playlistDialogTitle,
+            isPresented: Binding(
+                get: { showsPlaylistDialog },
+                set: { isPresented in
+                    if !isPresented {
+                        viewModel.playlistAction = nil
+                    }
+                }
+            )
+        ) {
+            TextField("Playlist title", text: $playlistTitle)
 
             Button("Cancel", role: .cancel) {
-                showCreatePlaylistDialog = false
+                viewModel.playlistAction = nil
                 selectedImportURLs.removeAll()
+                playlistTitle = ""
             }
 
             Button("Save") {
-                if newPlaylistTitle.trimmingCharacters(in: .whitespacesAndNewlines).isNotEmpty {
-                    Task {
-                        await viewModel.importFiles(selectedImportURLs, playlistTitle: newPlaylistTitle)
-                        showCreatePlaylistDialog = false
-                        selectedImportURLs.removeAll()
-                    }
+                let title = playlistTitle
+
+                switch viewModel.playlistAction {
+                    case .create:
+                        Task {
+                            await viewModel.importFiles(
+                                selectedImportURLs,
+                                playlistTitle: title
+                            )
+                        }
+
+                    case .rename(let playlist):
+                        viewModel.renamePlaylist(
+                            playlist,
+                            newTitle: title
+                        )
+
+                    default:
+                        break
                 }
+                viewModel.playlistAction = nil
+                playlistTitle = ""
+                selectedImportURLs.removeAll()
             }
         } message: {
-            Text("Enter a title for this playlist")
+            Text("\(playlistDialogMessage)")
         }
     }
 
@@ -124,14 +142,49 @@ struct ImportFilesView: View {
     @ObservationIgnored
     private var persistenceService: PersistenceServicing
     @State private var selectedPhoto: PhotosPickerItem?
-    @State private var selectedPlaylist: PlaylistEntity?
     @State private var selectedImportURLs: [URL] = []
-    @State private var newPlaylistTitle: String = ""
+    @State private var playlistTitle: String = ""
     @State private var editMode: EditMode = .inactive
     @State private var importMode: ImportMode = .files
     @State private var showPhotoPicker = false
-    @State private var showCreatePlaylistDialog = false
+    @State private var showPlaylistDialog = false
     @State private var showFileImporter = false
+
+    private var playlistDialogTitle: String {
+        switch viewModel.playlistAction {
+            case .create:
+                return "New Playlist"
+
+            case .rename:
+                return "Rename Playlist"
+
+            default:
+                return ""
+        }
+    }
+
+    private var playlistDialogMessage: String {
+        switch viewModel.playlistAction {
+            case .create:
+                return "Enter title for this playlist"
+
+            case .rename:
+                return "Enter new title"
+
+            default:
+                return ""
+        }
+    }
+
+    private var showsPlaylistDialog: Bool {
+        switch viewModel.playlistAction {
+            case .create, .rename:
+                return true
+
+            default:
+                return false
+        }
+    }
 
     // MARK: - Private. Objects
 
@@ -147,16 +200,18 @@ struct ImportFilesView: View {
         var body: some View {
             HStack {
                 if viewModel.playlists.isNotEmpty {
-                    Button(
-                        action: {
-                            editMode = editMode == .active ? .inactive : .active
-                        }, label: {
-                            Text(editMode == .active
-                                 ? "Normal"
-                                 : "Edit"
-                            )
-                        }
-                    )
+                    if case .deleteTracks = viewModel.playlistAction {
+                        Button(
+                            action: {
+                                editMode = editMode == .active ? .inactive : .active
+                            }, label: {
+                                Text(editMode == .active
+                                     ? "Normal"
+                                     : "Edit"
+                                )
+                            }
+                        )
+                    }
                 }
 
                 Spacer()
@@ -170,7 +225,7 @@ struct ImportFilesView: View {
                                         showFileImporter = true
                                         importMode = .files
                                     }, label: {
-                                        Label("Import files", systemImage: "music.note")
+                                        Label("Create new playlist", systemImage: "plus")
                                     }
                                 )
 
@@ -179,7 +234,7 @@ struct ImportFilesView: View {
                                         showFileImporter = true
                                         importMode = .folder
                                     }, label: {
-                                        Label("Import folder", systemImage: "folder.badge.plus")
+                                        Label("Import new playlist", systemImage: "doc.text")
                                     }
                                 )
                             },
@@ -212,7 +267,8 @@ struct ImportFilesView: View {
     private struct ContentView: View {
         @Binding var editMode: EditMode
         @Binding var selectedPhoto: PhotosPickerItem?
-        @Binding var selectedPlaylist: PlaylistEntity?
+        @State private var playlistForDeletion: PlaylistEntity?
+        @State private var playlistForCover: PlaylistEntity?
         @Binding var showPhotoPicker: Bool
         let viewModel: ImportManaging
 
@@ -241,42 +297,47 @@ struct ImportFilesView: View {
                                 },
                                 onChangeCoverBtnTap: {
                                     showPhotoPicker = true
-                                    selectedPlaylist = playlist
+                                    viewModel.playlistAction = .changeCover(playlist)
                                 },
                                 onAddTracksBtnTap: {
                                     print("")
                                 },
                                 onRenamePlaylistBtnTap: {
-                                    print("")
+                                    viewModel.playlistAction = .rename(playlist)
                                 },
                                 onDeletePlaylistBtnTap: {
-                                    selectedPlaylist = playlist
+                                    viewModel.playlistAction = .deletePlaylist(playlist)
                                 }
                             )
                             .confirmationDialog(
+
                                 "Delete Playlist?",
+
                                 isPresented: Binding(
                                     get: {
-                                        selectedPlaylist?.id == playlist.id
+                                        if case .deletePlaylist(let selected) = viewModel.playlistAction {
+                                            return selected.id == playlist.id
+                                        }
+                                        return false
                                     },
-                                    set: {
-                                        if !$0 { selectedPlaylist = nil }
+                                    set: { isPresented in
+                                        if !isPresented {
+                                            viewModel.playlistAction = nil
+                                        }
                                     }
-                                ),
-                                titleVisibility: .visible
+                                )
                             ) {
                                 Button("Delete", role: .destructive) {
-                                    if let playlist = selectedPlaylist {
-                                        viewModel.deletePlaylist(playlist)
-                                    }
+                                    if case .deletePlaylist(let playlist) = viewModel.playlistAction {
 
-                                    selectedPlaylist = nil
+                                        viewModel.deletePlaylist(playlist)
+
+                                    }
+                                    viewModel.playlistAction = nil
                                 }
                             } message: {
-
                                 Text("This action cannot be undone")
                             }
-
                             .onChange(of: selectedPhoto) { _, item in
                                 Task {
                                     guard
@@ -286,9 +347,11 @@ struct ImportFilesView: View {
                                         return
                                     }
 
-                                    if let playlist = selectedPlaylist {
+                                    if case .changeCover(let playlist) = viewModel.playlistAction {
                                         viewModel.setCoverImage(data, playlist: playlist)
                                     }
+
+                                    viewModel.playlistAction = nil
                                 }
                             }
                         }

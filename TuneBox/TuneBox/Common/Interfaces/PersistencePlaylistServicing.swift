@@ -11,7 +11,7 @@ protocol PersistencePlaylistServicing: AnyObject {
     func fetchPlaylists() throws -> [PlaylistEntity]
     func createSystemPlaylist() throws -> PlaylistEntity
     func createPlaylist(title: String) throws -> PlaylistEntity
-    func renamePlaylist(_ playlist: PlaylistEntity, name: String) throws
+    func renamePlaylist(_ playlist: PlaylistEntity, newTitle: String) throws
     func deletePlaylist(_ playlist: PlaylistEntity) throws
     func addTrack(_ track: TrackEntity, to playlist: PlaylistEntity) throws
     func addTracks(_ tracks: [TrackEntity], to playlist: PlaylistEntity) throws
