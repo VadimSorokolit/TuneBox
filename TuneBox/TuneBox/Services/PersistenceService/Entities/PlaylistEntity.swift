@@ -8,24 +8,40 @@
 import Foundation
 import SwiftData
 
+enum PlaylistType: String {
+    case system
+    case custom
+}
+
 @Model
 final class PlaylistEntity: Identifiable {
     @Attribute(.unique)
     var id: String
+    var typeRawValue: String
     var title: String
     var coverImageData: Data?
-
     var tracks: [TrackEntity]
+
+    var type: PlaylistType {
+        get {
+            PlaylistType(rawValue: typeRawValue) ?? .custom
+        }
+        set {
+            typeRawValue = newValue.rawValue
+        }
+    }
 
     init(
         id: String = UUID().uuidString,
-        name: String,
+        type: PlaylistType = .custom,
+        title: String,
         isProtected: Bool = false,
         coverImageData: Data? = nil,
         tracks: [TrackEntity] = []
     ) {
         self.id = id
-        self.title = name
+        self.typeRawValue = type.rawValue
+        self.title = title
         self.coverImageData = coverImageData
         self.tracks = tracks
     }

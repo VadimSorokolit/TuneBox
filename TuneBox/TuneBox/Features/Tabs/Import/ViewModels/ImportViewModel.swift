@@ -40,11 +40,9 @@ final class ImportViewModel: ImportManaging {
     func fetchPlaylists() {
         do {
             self.playlists = try self.persistenceService.fetchPlaylists()
-            print(self.playlists.count)
         } catch {
             self.handleError(error)
         }
-
     }
 
     func createPlaylist(title: String) {
@@ -159,10 +157,10 @@ final class ImportViewModel: ImportManaging {
     }
 
     func deleteSelectedTracks() async {
-        for id in self.selectedTrackIDs {
-            await self.removeImportedItem(by: id)
-        }
-        self.selectedTrackIDs.removeAll()
+//        for id in self.selectedTrackIDs {
+//            await self.removeDownloadedTrack(by: id)
+//        }
+//        self.selectedTrackIDs.removeAll()
     }
 
     func deletePlaylist(_ playlist: PlaylistEntity) {
@@ -174,19 +172,25 @@ final class ImportViewModel: ImportManaging {
         }
     }
 
-    func removeImportedItem(by id: String) async {
+    func removeTrack(track: TrackEntity, from playlist: PlaylistEntity) async {
+        switch playlist.type {
+            case .system:
+                self.removeDownloadedTrack(track: track)
+                self.removeImportedTrack(track: track, from: playlist)
+
+            case .custom:
+                self.removeImportedTrack(track: track, from: playlist)
+        }
+    }
+
+    private func removeDownloadedTrack(track: TrackEntity) {
+        self.transferViewModel.deleteDownloadedTrack(track: track)
+    }
+
+    private func removeImportedTrack(track: TrackEntity, from playlist: PlaylistEntity) {
         do {
-            guard let track = try self.persistenceService.getTrack(id: id) else {
-                return
-            }
-
-            if let url = track.localFileURL {
-                try? FileManager.default.removeItem(at: url)
-            }
-
-            try self.persistenceService.delete(track: track)
-
-            await self.loadImported()
+            try self.persistenceService.removeTrack(track, from: playlist)
+            self.playlists = try self.persistenceService.fetchPlaylists()
         } catch {
             self.handleError(error)
         }
@@ -220,18 +224,25 @@ final class ImportViewModel: ImportManaging {
         do {
             let downloadedTracks = try self.persistenceService.getRecentDownloadedTracks(limit: nil)
 
+            print("Downloaded tracks:", downloadedTracks.count)
+
             if downloadedTracks.isNotEmpty {
+                print("Calling createSystemPlaylist")
+
                 let systemPlaylist = try self.persistenceService.createSystemPlaylist()
+
+                print("Created/found:", systemPlaylist.title)
+
                 systemPlaylist.tracks = downloadedTracks
+            } else {
+                print("No downloaded tracks")
             }
 
             self.playlists = try self.persistenceService.fetchPlaylists()
-
         } catch {
             self.handleError(error)
         }
     }
-
     private func importFolder(_ url: URL, into playlist: PlaylistEntity) async {
         guard url.startAccessingSecurityScopedResource() else { return }
 
@@ -325,7 +336,6 @@ final class ImportViewModel: ImportManaging {
             guard title.isNotEmpty else {
                 throw AppError.Playlist.emptyTitle
             }
-            print(title)
             let playlist = try self.persistenceService.createPlaylist(title: title)
 
             for url in urls {

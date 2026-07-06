@@ -226,17 +226,17 @@ final class PersistenceService: PersistenceServicing {
     }
 
     func createSystemPlaylist() throws -> PlaylistEntity {
-        if let existing = try self.fetchPlaylists().first(where: {
-            self.normalizedPlaylistTitle($0.title) == self.normalizedPlaylistTitle(Constants.systemPlaylistTitle)
-        }) {
+        if let existing = try self.fetchPlaylists().first(where: { $0.type == .system }) {
             return existing
+
         }
 
-        let playlist = PlaylistEntity(name: Constants.systemPlaylistTitle)
+        let playlist = PlaylistEntity(type: PlaylistType.system, title: Constants.systemPlaylistTitle)
 
         self.modelContext.insert(playlist)
         try self.modelContext.save()
 
+        print(playlist.title)
         return playlist
     }
 
@@ -258,7 +258,7 @@ final class PersistenceService: PersistenceServicing {
             throw AppError.Storage.playlistTitleAlreadyExists
         }
 
-        let playlist = PlaylistEntity(name: safeName)
+        let playlist = PlaylistEntity(title: safeName)
 
         self.modelContext.insert(playlist)
         try self.modelContext.save()

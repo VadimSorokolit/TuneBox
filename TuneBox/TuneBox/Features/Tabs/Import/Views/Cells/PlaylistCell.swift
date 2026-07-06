@@ -135,7 +135,7 @@ struct PlaylistCell: View {
 
 #Preview {
     PlaylistCell(
-        playlist: PlaylistEntity(name: "Default"),
+        playlist: PlaylistEntity(title: "Default"),
         onCellTap: {},
         onPlayBtnTap: {},
         onChangeCoverBtnTap: {},

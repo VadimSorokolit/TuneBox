@@ -69,6 +69,7 @@ protocol TransferManaging: AnyObject, Sendable,
     func handleBackgroundCompletion(_ handler: @escaping () -> Void)
     func restoreDownloadsOnForeground() async
     func handleDownloadAction(for track: TrackEntity) async
+    func deleteDownloadedTrack(track: TrackEntity)
     var onTracksChanged: (() -> Void)? { get set }
 }
 

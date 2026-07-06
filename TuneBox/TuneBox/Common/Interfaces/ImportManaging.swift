@@ -27,5 +27,5 @@ protocol ImportManaging: AnyObject {
     func addFiles(_ urls: [URL], to playlist: PlaylistEntity) async
     func toggleSelection(for id: String)
     func deleteSelectedTracks() async
-    func removeImportedItem(by id: String) async
+    func removeTrack(track: TrackEntity, from playlist: PlaylistEntity) async
 }

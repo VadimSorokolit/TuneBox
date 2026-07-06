@@ -116,7 +116,6 @@
 		5BFCA8452FCEE252009C6AD9 /* TransferPrioritizable+mergePriority.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA8442FCEE251009C6AD9 /* TransferPrioritizable+mergePriority.swift */; };
 		5BFCA8492FCEE470009C6AD9 /* Launch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA8482FCEE46F009C6AD9 /* Launch.swift */; };
 		5BFCA84D2FCEE5D4009C6AD9 /* Onboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA84C2FCEE5D3009C6AD9 /* Onboarding.swift */; };
-		5BFEC6E52FFBDDF70072E4CD /* RemovTrackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFEC6E42FFBDDF50072E4CD /* RemovTrackView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -244,7 +243,6 @@
 		5BFCA8442FCEE251009C6AD9 /* TransferPrioritizable+mergePriority.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransferPrioritizable+mergePriority.swift"; sourceTree = "<group>"; };
 		5BFCA8482FCEE46F009C6AD9 /* Launch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Launch.swift; sourceTree = "<group>"; };
 		5BFCA84C2FCEE5D3009C6AD9 /* Onboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding.swift; sourceTree = "<group>"; };
-		5BFEC6E42FFBDDF50072E4CD /* RemovTrackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemovTrackView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -809,7 +807,6 @@
 			children = (
 				5BD3BF342FF586A8006FED4B /* Cells */,
 				5BFBF2362FCCC2AA0013F6BB /* ImportTracksView.swift */,
-				5BFEC6E42FFBDDF50072E4CD /* RemovTrackView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1133,7 +1130,6 @@
 				5B6E4DBF2FD17B9000B4E663 /* SegmentedItem.swift in Sources */,
 				5B8382AB2FC4CF88003625CD /* PersistenceTrackServicing.swift in Sources */,
 				5B8382AF2FC4D01C003625CD /* PersistenceManaging.swift in Sources */,
-				5BFEC6E52FFBDDF70072E4CD /* RemovTrackView.swift in Sources */,
 				5B8860A52FB1CF910056BE9A /* NotificationNames+Extension.swift in Sources */,
 				5BFCA8432FCEE237009C6AD9 /* TransferPrioritizable.swift in Sources */,
 				5BFCA8492FCEE470009C6AD9 /* Launch.swift in Sources */,
