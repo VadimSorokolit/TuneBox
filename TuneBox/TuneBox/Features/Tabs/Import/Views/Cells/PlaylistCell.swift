@@ -12,6 +12,7 @@ struct PlaylistCell: View {
     // MARK: - Properties. Public
 
     let playlist: PlaylistEntity
+    let onCellTap: () -> Void
     let onPlayBtnTap: () -> Void
     let onChangeCoverBtnTap: () -> Void
     let onAddTracksBtnTap: () -> Void
@@ -99,6 +100,10 @@ struct PlaylistCell: View {
         .padding(customPadding)
         .background(Color.red)
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+        .contentShape(RoundedRectangle(cornerRadius: cornerRadius))
+        .onTapGesture {
+            onCellTap()
+        }
     }
 
     // MARK: - Properties. Private
@@ -131,6 +136,7 @@ struct PlaylistCell: View {
 #Preview {
     PlaylistCell(
         playlist: PlaylistEntity(name: "Default"),
+        onCellTap: {},
         onPlayBtnTap: {},
         onChangeCoverBtnTap: {},
         onAddTracksBtnTap: {},

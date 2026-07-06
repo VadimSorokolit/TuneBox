@@ -32,13 +32,14 @@ struct ImportFilesView: View {
                 if viewModel.showsEmptyState {
                     EmptyStateView(
                         importMode: $importMode,
-                        showFileImporter: $showFileImporter,
-                        showCreatePlaylistDialog: $showPlaylistDialog
+                        showFileImporter: $showFileImporter
                     )
                 } else {
                     ContentView(
                         editMode: $editMode,
+                        importMode: $importMode,
                         selectedPhoto: $selectedPhoto,
+                        showFileImporter: $showFileImporter,
                         showPhotoPicker: $showPhotoPicker,
                         viewModel: viewModel
                     )
@@ -68,12 +69,20 @@ struct ImportFilesView: View {
                         switch importMode {
                             case .folder:
                                 Task {
-                                    await viewModel.addImportItems(from: urls)
+                                    await viewModel.createPlaylist(with: urls)
                                 }
 
                             case .files:
-                                selectedImportURLs = urls
-                                viewModel.playlistAction = .create
+                                switch viewModel.playlistAction {
+                                    case .addTracks(let playlist):
+                                        Task {
+                                            await viewModel.addFiles(urls, to: playlist)
+                                        }
+
+                                    default:
+                                        selectedImportURLs = urls
+                                        viewModel.playlistAction = .create
+                                }
                         }
                     case .failure(let error):
                         AppLogger.imported.warning("\(error.localizedDescription)")
@@ -96,6 +105,7 @@ struct ImportFilesView: View {
                 }
             )
         ) {
+            let urls = selectedImportURLs
             TextField("Playlist title", text: $playlistTitle)
 
             Button("Cancel", role: .cancel) {
@@ -111,7 +121,7 @@ struct ImportFilesView: View {
                     case .create:
                         Task {
                             await viewModel.importFiles(
-                                selectedImportURLs,
+                                urls,
                                 playlistTitle: title
                             )
                         }
@@ -147,7 +157,6 @@ struct ImportFilesView: View {
     @State private var editMode: EditMode = .inactive
     @State private var importMode: ImportMode = .files
     @State private var showPhotoPicker = false
-    @State private var showPlaylistDialog = false
     @State private var showFileImporter = false
 
     private var playlistDialogTitle: String {
@@ -266,10 +275,11 @@ struct ImportFilesView: View {
 
     private struct ContentView: View {
         @Binding var editMode: EditMode
+        @Binding var importMode: ImportMode
         @Binding var selectedPhoto: PhotosPickerItem?
-        @State private var playlistForDeletion: PlaylistEntity?
-        @State private var playlistForCover: PlaylistEntity?
+        @Binding var showFileImporter: Bool
         @Binding var showPhotoPicker: Bool
+
         let viewModel: ImportManaging
 
         // MARK: - Private. Properties
@@ -292,6 +302,9 @@ struct ImportFilesView: View {
                         ForEach(viewModel.playlists) { playlist in
                             PlaylistCell(
                                 playlist: playlist,
+                                onCellTap: {
+                                    viewModel.playlistAction = .deleteTracks(playlist)
+                                },
                                 onPlayBtnTap: {
                                     print("")
                                 },
@@ -300,7 +313,9 @@ struct ImportFilesView: View {
                                     viewModel.playlistAction = .changeCover(playlist)
                                 },
                                 onAddTracksBtnTap: {
-                                    print("")
+                                    viewModel.playlistAction = .addTracks(playlist)
+                                    showFileImporter = true
+                                    importMode = .files
                                 },
                                 onRenamePlaylistBtnTap: {
                                     viewModel.playlistAction = .rename(playlist)
@@ -410,7 +425,6 @@ struct ImportFilesView: View {
 
         @Binding var importMode: ImportMode
         @Binding var showFileImporter: Bool
-        @Binding var showCreatePlaylistDialog: Bool
 
         // MARK: - Body
 

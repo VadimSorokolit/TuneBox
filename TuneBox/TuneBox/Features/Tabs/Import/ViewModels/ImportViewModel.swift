@@ -126,7 +126,7 @@ final class ImportViewModel: ImportManaging {
         self.transferViewModel.onTracksChanged = nil
     }
 
-    func addImportItems(from urls: [URL]) async {
+    func createPlaylist(with urls: [URL]) async {
         for url in urls {
             if url.hasDirectoryPath {
                 let title = url.lastPathComponent
@@ -139,6 +139,13 @@ final class ImportViewModel: ImportManaging {
             } else {
                 await self.importFile(url, into: nil)
             }
+        }
+        self.fetchPlaylists()
+    }
+
+    func addFiles(_ urls: [URL], to playlist: PlaylistEntity) async {
+        for url in urls {
+            await self.importFile(url, into: playlist)
         }
         self.fetchPlaylists()
     }
@@ -258,6 +265,15 @@ final class ImportViewModel: ImportManaging {
             )
 
             let metadata = try? await AudioMetadataService.extractMetadata(from: localURL)
+            let name = metadata?.title ?? url.deletingPathExtension().lastPathComponent
+            let artist = metadata?.artist ?? ""
+
+            if let playlist,
+               self.trackAlreadyExists(name: name, artist: artist, in: playlist) {
+                try? FileManager.default.removeItem(at: localURL)
+
+                return
+            }
 
             var artworkPath: String?
 
@@ -319,6 +335,17 @@ final class ImportViewModel: ImportManaging {
             self.fetchPlaylists()
         } catch {
             self.handleError(error)
+        }
+    }
+
+    private func trackAlreadyExists(
+        name: String,
+        artist: String,
+        in playlist: PlaylistEntity
+    ) -> Bool {
+        playlist.tracks.contains {
+            $0.songName == name &&
+            $0.artistName == artist
         }
     }
 

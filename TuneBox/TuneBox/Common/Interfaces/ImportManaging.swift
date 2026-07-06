@@ -23,7 +23,8 @@ protocol ImportManaging: AnyObject {
     func setCoverImage(_ imageData: Data?, playlist: PlaylistEntity)
     func startObservingTracksChanges()
     func stopObservingTracksChanges()
-    func addImportItems(from urls: [URL]) async
+    func createPlaylist(with urls: [URL]) async
+    func addFiles(_ urls: [URL], to playlist: PlaylistEntity) async
     func toggleSelection(for id: String)
     func deleteSelectedTracks() async
     func removeImportedItem(by id: String) async
