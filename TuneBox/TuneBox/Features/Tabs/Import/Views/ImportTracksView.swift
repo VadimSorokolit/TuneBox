@@ -10,19 +10,25 @@ import SwiftUI
 import PhotosUI
 import UniformTypeIdentifiers
 
-enum ImportMode {
+enum ImportTrackMode {
     case files
     case folder
 }
 
-struct ImportFilesView: View {
+enum ViewMode {
+    case importing
+    case removing
+}
+
+struct ImportTracksView: View {
 
     // MARK: - Main Body
 
     var body: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: 5) {
             HeaderView(
                 editMode: $editMode,
+                viewMode: $viewMode,
                 importMode: $importMode,
                 showFileImporter: $showFileImporter,
                 viewModel: viewModel
@@ -37,6 +43,7 @@ struct ImportFilesView: View {
                 } else {
                     ContentView(
                         editMode: $editMode,
+                        viewMode: $viewMode,
                         importMode: $importMode,
                         selectedPhoto: $selectedPhoto,
                         showFileImporter: $showFileImporter,
@@ -155,7 +162,8 @@ struct ImportFilesView: View {
     @State private var selectedImportURLs: [URL] = []
     @State private var playlistTitle: String = ""
     @State private var editMode: EditMode = .inactive
-    @State private var importMode: ImportMode = .files
+    @State private var importMode: ImportTrackMode = .files
+    @State private var viewMode: ViewMode = .importing
     @State private var showPhotoPicker = false
     @State private var showFileImporter = false
 
@@ -200,32 +208,36 @@ struct ImportFilesView: View {
     private struct HeaderView: View {
         @Environment(\.themeManager) private var theme
         @Binding var editMode: EditMode
-        @Binding var importMode: ImportMode
+        @Binding var viewMode: ViewMode
+        @Binding var importMode: ImportTrackMode
         @Binding var showFileImporter: Bool
         let viewModel: ImportManaging
 
-    // MARK: - Body
+        // MARK: - Body
 
         var body: some View {
             HStack {
-                if viewModel.playlists.isNotEmpty {
+                if viewMode == .removing {
+                    Button {
+                        viewMode = .importing
+                    } label: {
+                        Label("Back", systemImage: "chevron.left")
+                    }
+
+                } else if viewModel.playlists.isNotEmpty {
                     if case .deleteTracks = viewModel.playlistAction {
-                        Button(
-                            action: {
-                                editMode = editMode == .active ? .inactive : .active
-                            }, label: {
-                                Text(editMode == .active
-                                     ? "Normal"
-                                     : "Edit"
-                                )
-                            }
-                        )
+//                        Button {
+//                            editMode = editMode == .active ? .inactive : .active
+//                        } label: {
+//                            Text(editMode == .active ? "Normal" : "Edit")
+//                        }
                     }
                 }
 
                 Spacer()
 
-                if viewModel.playlists.isNotEmpty {
+                if viewModel.playlists.isNotEmpty,
+                   viewMode == .importing {
                     if editMode == .inactive {
                         Menu(
                             content: {
@@ -249,6 +261,7 @@ struct ImportFilesView: View {
                             },
                             label: {
                                 Image(systemName: "plus.circle.fill")
+                                    .font(.system(size: 30, weight: .medium))
                             }
                         )
                         .opacity(showFileImporter ? 0.5 : 1)
@@ -274,22 +287,52 @@ struct ImportFilesView: View {
     }
 
     private struct ContentView: View {
+
+        // Properties. Public
+
         @Binding var editMode: EditMode
-        @Binding var importMode: ImportMode
+        @Binding var viewMode: ViewMode
+        @Binding var importMode: ImportTrackMode
         @Binding var selectedPhoto: PhotosPickerItem?
         @Binding var showFileImporter: Bool
         @Binding var showPhotoPicker: Bool
 
         let viewModel: ImportManaging
 
-        // MARK: - Private. Properties
-        private enum Layout {
-            static let compactColumnCount = 2
-            static let regularColumnCount = 3
-            static let gridSpacing: CGFloat = 16
-        }
+        // MARK: - Body
 
-        // MARK: - Main Body
+        var body: some View {
+            ZStack {
+                PlaylistsGridView(
+                    importMode: $importMode,
+                    viewMode: $viewMode,
+                    selectedPhoto: $selectedPhoto,
+                    showFileImporter: $showFileImporter,
+                    showPhotoPicker: $showPhotoPicker,
+                    viewModel: viewModel
+                )
+                .offset(x: viewMode == .importing ? 0 : -UIScreen.main.bounds.width)
+
+                RemoveTracksView()
+                    .offset(x: viewMode == .removing ? 0 : UIScreen.main.bounds.width)
+            }
+            .animation(.easeInOut(duration: 0.25), value: viewMode)
+            .clipped()
+        }
+    }
+
+    private struct PlaylistsGridView: View {
+
+        // MARK: - Properties. Public
+
+        @Binding var importMode: ImportTrackMode
+        @Binding var viewMode: ViewMode
+        @Binding var selectedPhoto: PhotosPickerItem?
+        @Binding var showFileImporter: Bool
+        @Binding var showPhotoPicker: Bool
+
+        let viewModel: ImportManaging
+
         var body: some View {
             GeometryReader { geometry in
                 let columnCount = (geometry.size.width > GlobalConstants.Screen.regularWidth)
@@ -304,6 +347,7 @@ struct ImportFilesView: View {
                                 playlist: playlist,
                                 onCellTap: {
                                     viewModel.playlistAction = .deleteTracks(playlist)
+                                    viewMode = .removing
                                 },
                                 onPlayBtnTap: {
                                     print("")
@@ -379,51 +423,69 @@ struct ImportFilesView: View {
             .contentMargins(.bottom, 20)
         }
 
-        @ViewBuilder
-        private func importedTracksSection(section: TracksSection) -> some View {
-            if section.tracks.isNotEmpty {
-                Section(
-                    content: {
-                        LazyVStack(spacing: 4) {
-                            ForEach(
-                                section.tracks,
-                                content: { track in
-                                    TrackCell(
-                                        track: track,
-                                        isSelected: viewModel.selectedTrackIDs.contains(track.id),
-                                        editMode: editMode,
-                                        onButtonTap: {
-                                            if editMode == .active {
-                                                viewModel.toggleSelection(for: track.id)
-                                            } else {
-                                                Task {
-                                                    await viewModel.removeImportedItem(by: track.id)
-                                                }
-                                            }
-                                        },
-                                        onCellTap: {
-                                            if editMode == .active {
-                                                viewModel.toggleSelection(for: track.id)
-                                            }
-                                        }
-                                    )
-                                }
-                            )
-                        }
-                    },
-                    header: {
-                        sectionTracksTitle(section.title)
-                    }
-                )
+        // MARK: - Private. Properties
+
+        private enum Layout {
+            static let compactColumnCount = 2
+            static let regularColumnCount = 3
+            static let gridSpacing: CGFloat = 16
+        }
+
+//        @ViewBuilder
+//        private func importedTracksSection(section: TracksSection) -> some View {
+//            if section.tracks.isNotEmpty {
+//                Section(
+//                    content: {
+//                        LazyVStack(spacing: 4) {
+//                            ForEach(
+//                                section.tracks,
+//                                content: { track in
+//                                    TrackCell(
+//                                        track: track,
+//                                        isSelected: viewModel.selectedTrackIDs.contains(track.id),
+//                                        editMode: editMode,
+//                                        onButtonTap: {
+//                                            if editMode == .active {
+//                                                viewModel.toggleSelection(for: track.id)
+//                                            } else {
+//                                                Task {
+//                                                    await viewModel.removeImportedItem(by: track.id)
+//                                                }
+//                                            }
+//                                        },
+//                                        onCellTap: {
+//                                            if editMode == .active {
+//                                                viewModel.toggleSelection(for: track.id)
+//                                            }
+//                                        }
+//                                    )
+//                                }
+//                            )
+//                        }
+//                    },
+//                    header: {
+//                        sectionTracksTitle(section.title)
+//                    }
+//                )
+//            }
+//        }
+    }
+
+    private struct RemoveTracksView: View {
+
+        var body: some View {
+            VStack(spacing: 0) {
+                Text("Tracks will be removed from your library")
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 
-    struct EmptyStateView: View {
+    private struct EmptyStateView: View {
 
         // MARK: - Properties. Public
 
-        @Binding var importMode: ImportMode
+        @Binding var importMode: ImportTrackMode
         @Binding var showFileImporter: Bool
 
         // MARK: - Body

@@ -86,7 +86,7 @@ struct RootTabsView: View {
             PlayerView()
                 .tag(CustomTab.player)
 
-            ImportFilesView()
+            ImportTracksView()
                 .tag(CustomTab.importFiles)
 
             SettingsView()
