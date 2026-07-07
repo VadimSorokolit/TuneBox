@@ -168,6 +168,44 @@ final class ImportViewModel: ImportManaging {
         self.fetchPlaylists()
     }
 
+    func importPlaylistFolder(_ folderURL: URL) async {
+        let needsStopAccess = folderURL.startAccessingSecurityScopedResource()
+
+        defer {
+            if needsStopAccess {
+                folderURL.stopAccessingSecurityScopedResource()
+            }
+        }
+
+        guard let files = try? FileManager.default.contentsOfDirectory(
+            at: folderURL,
+            includingPropertiesForKeys: nil
+        ) else {
+            return
+        }
+
+        guard let m3u = files.first(where: {
+            $0.pathExtension.lowercased() == "m3u"
+        }) else {
+            return
+        }
+
+        let trackURLs = self.loadPlaylist(from: m3u)
+
+        do {
+            let playlist = try self.persistenceService.createPlaylist(
+                title: m3u.deletingPathExtension().lastPathComponent
+            )
+
+            for trackURL in trackURLs {
+                await importFile(trackURL, into: playlist)
+            }
+            self.fetchPlaylists()
+        } catch {
+            self.handleError(error)
+        }
+    }
+
     func toogleSelection(for track: TrackEntity) {
         if self.selectedTracks.contains(track) {
             self.selectedTracks.remove(track)
@@ -348,6 +386,27 @@ final class ImportViewModel: ImportManaging {
         } catch {
             self.handleError(error)
         }
+    }
+
+    private func loadPlaylist(from url: URL) -> [URL] {
+        guard let content = try? String(
+            contentsOf: url,
+            encoding: .utf8
+        ) else {
+            return []
+        }
+
+        return content
+            .components(separatedBy: .newlines)
+            .filter {
+                !$0.isEmpty &&
+                !$0.hasPrefix("#")
+            }
+            .map {
+                url
+                    .deletingLastPathComponent()
+                    .appendingPathComponent($0)
+            }
     }
 
     func importFiles(_ urls: [URL], playlistTitle: String) async {

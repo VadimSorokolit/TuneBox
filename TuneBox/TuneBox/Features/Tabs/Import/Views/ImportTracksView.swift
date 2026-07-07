@@ -95,7 +95,13 @@ struct ImportTracksView: View {
                                 }
 
                             case .playlist:
-                                print("")
+                                guard let folderURL = urls.first else {
+                                    return
+                                }
+
+                                Task {
+                                    await viewModel.importPlaylistFolder(folderURL)
+                                }
                         }
 
                     case .failure(let error):
