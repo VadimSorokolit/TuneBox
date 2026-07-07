@@ -30,6 +30,7 @@ struct ImportTracksView: View {
                 editMode: $editMode,
                 viewMode: $viewMode,
                 importMode: $importMode,
+                showsToolbarDeleteConfirmation: $showsToolbarDeleteConfirmation,
                 showFileImporter: $showFileImporter,
                 viewModel: viewModel
             )
@@ -46,6 +47,7 @@ struct ImportTracksView: View {
                         viewMode: $viewMode,
                         importMode: $importMode,
                         selectedPhoto: $selectedPhoto,
+                        showDeletePlaylistDialog: $showDeletePlaylistDialog,
                         showFileImporter: $showFileImporter,
                         showPhotoPicker: $showPhotoPicker,
                         viewModel: viewModel
@@ -59,10 +61,6 @@ struct ImportTracksView: View {
         }
         .onDisappear {
             viewModel.stopObservingTracksChanges()
-        }
-        .task {
-            //            await viewModel.load()
-            //            viewModel.loadPlaylists()
         }
         .fileImporter(
             isPresented: $showFileImporter,
@@ -165,6 +163,8 @@ struct ImportTracksView: View {
     @State private var editMode: EditMode = .inactive
     @State private var importMode: ImportTrackMode = .files
     @State private var viewMode: ViewMode = .importing
+    @State private var showDeletePlaylistDialog = false
+    @State private var showsToolbarDeleteConfirmation = false
     @State private var showPhotoPicker = false
     @State private var showFileImporter = false
 
@@ -211,6 +211,7 @@ struct ImportTracksView: View {
         @Binding var editMode: EditMode
         @Binding var viewMode: ViewMode
         @Binding var importMode: ImportTrackMode
+        @Binding var showsToolbarDeleteConfirmation: Bool
         @Binding var showFileImporter: Bool
         let viewModel: ImportManaging
 
@@ -224,62 +225,90 @@ struct ImportTracksView: View {
                     } label: {
                         Label("Back", systemImage: "chevron.left")
                     }
-
-                } else if viewModel.playlists.isNotEmpty {
-                    if case .deleteTracks = viewModel.playlistAction {
-//                        Button {
-//                            editMode = editMode == .active ? .inactive : .active
-//                        } label: {
-//                            Text(editMode == .active ? "Normal" : "Edit")
-//                        }
-                    }
                 }
 
                 Spacer()
 
                 if viewModel.playlists.isNotEmpty,
                    viewMode == .importing {
-                    if editMode == .inactive {
-                        Menu(
-                            content: {
-                                Button(
-                                    action: {
-                                        showFileImporter = true
-                                        importMode = .files
-                                    }, label: {
-                                        Label("Create new playlist", systemImage: "plus")
-                                    }
-                                )
+                    Menu(
+                        content: {
+                            Button(
+                                action: {
+                                    showFileImporter = true
+                                    importMode = .files
+                                }, label: {
+                                    Label("Create new playlist", systemImage: "plus")
+                                }
+                            )
 
-                                Button(
-                                    action: {
-                                        showFileImporter = true
-                                        importMode = .folder
-                                    }, label: {
-                                        Label("Import new playlist", systemImage: "doc.text")
-                                    }
-                                )
-                            },
-                            label: {
-                                Image(systemName: "plus.circle.fill")
-                                    .font(.system(size: 30, weight: .medium))
-                            }
-                        )
-                        .opacity(showFileImporter ? 0.5 : 1)
-                        .disabled(showFileImporter)
-                    } else {
+                            Button(
+                                action: {
+                                    showFileImporter = true
+                                    importMode = .folder
+                                }, label: {
+                                    Label("Import new playlist", systemImage: "doc.text")
+                                }
+                            )
+                        },
+                        label: {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.system(size: 30, weight: .medium))
+                        }
+                    )
+                    .opacity(showFileImporter ? 0.5 : 1)
+                    .disabled(showFileImporter)
+                }
+
+                if viewMode == .removing {
+                    HStack(spacing: 10) {
                         Button(
                             action: {
-                                Task {
-                                    await viewModel.deleteSelectedTracks()
+                                if case .deleteTracks(let playlist) = viewModel.playlistAction {
+                                    if playlist.tracks.count == viewModel.selectedTracks.count {
+                                        showsToolbarDeleteConfirmation = true
+                                    } else {
+                                        Task {
+                                            await viewModel.deleteSelectedTracks(from: playlist)
+                                        }
+                                    }
                                 }
                             }, label: {
                                 Label("Delete", systemImage: "trash")
                                     .foregroundStyle(Color(.systemRed))
                             }
                         )
-                        .disabled(viewModel.selectedTrackIDs.isEmpty)
-                        .opacity(viewModel.selectedTrackIDs.isEmpty ? 0 : 1)
+                        .disabled(viewModel.selectedTracks.isEmpty)
+                        .opacity(viewModel.selectedTracks.isEmpty ? 0 : 1)
+                        .confirmationDialog(
+                            "Delete tracks?",
+                            isPresented: $showsToolbarDeleteConfirmation
+                        ) {
+                            Button("Delete", role: .destructive) {
+                                if case .deleteTracks(let playlist) = viewModel.playlistAction {
+                                    Task {
+                                        await viewModel.deleteSelectedTracks(from: playlist)
+                                        viewModel.deletePlaylist(playlist)
+                                        viewModel.playlistAction = nil
+                                        showsToolbarDeleteConfirmation = false
+                                        viewMode = .importing
+                                    }
+                                }
+                            }
+
+                            Button("Cancel", role: .cancel) {
+                                showsToolbarDeleteConfirmation = false
+                            }
+                        } message: {
+                            Text("Are you sure you want to delete all tracks?\nThe playlist will also be deleted")
+                        }
+                    }
+
+                    Button {
+                        editMode = editMode == .active ? .inactive : .active
+                        viewModel.selectedTracks.removeAll()
+                    } label: {
+                        Text(editMode == .active ? "Normal" : "Edit")
                     }
                 }
             }
@@ -295,6 +324,7 @@ struct ImportTracksView: View {
         @Binding var viewMode: ViewMode
         @Binding var importMode: ImportTrackMode
         @Binding var selectedPhoto: PhotosPickerItem?
+        @Binding var showDeletePlaylistDialog: Bool
         @Binding var showFileImporter: Bool
         @Binding var showPhotoPicker: Bool
 
@@ -309,6 +339,7 @@ struct ImportTracksView: View {
                         importMode: $importMode,
                         viewMode: $viewMode,
                         selectedPhoto: $selectedPhoto,
+                        showDeletePlaylistDialog: $showDeletePlaylistDialog,
                         showFileImporter: $showFileImporter,
                         showPhotoPicker: $showPhotoPicker,
                         viewModel: viewModel
@@ -317,6 +348,7 @@ struct ImportTracksView: View {
 
                     RemoveTracksView(
                         editMode: $editMode,
+                        showDeletePlaylistDialog: $showDeletePlaylistDialog,
                         viewMode: $viewMode,
                         viewModel: viewModel
                     )
@@ -335,6 +367,7 @@ struct ImportTracksView: View {
         @Binding var importMode: ImportTrackMode
         @Binding var viewMode: ViewMode
         @Binding var selectedPhoto: PhotosPickerItem?
+        @Binding var showDeletePlaylistDialog: Bool
         @Binding var showFileImporter: Bool
         @Binding var showPhotoPicker: Bool
 
@@ -440,7 +473,7 @@ struct ImportTracksView: View {
 
     private struct RemoveTracksView: View {
         @Binding var editMode: EditMode
-        @State private var showDeletePlaylistDialog = false
+        @Binding var showDeletePlaylistDialog: Bool
         @Binding var viewMode: ViewMode
         let viewModel: ImportManaging
 
@@ -476,7 +509,7 @@ struct ImportTracksView: View {
                             ForEach(playlist.tracks) { track in
                                 TrackCell(
                                     track: track,
-                                    isSelected: viewModel.selectedTrackIDs.contains(track.id),
+                                    isSelected: viewModel.selectedTracks.contains(track),
                                     editMode: editMode,
                                     onButtonTap: {
                                         if playlist.tracks.count == 1 {
@@ -489,7 +522,7 @@ struct ImportTracksView: View {
                                     },
                                     onCellTap: {
                                         if editMode == .active {
-                                            viewModel.toggleSelection(for: track.id)
+                                            viewModel.toogleSelection(for: track)
                                         }
                                     }
                                 )

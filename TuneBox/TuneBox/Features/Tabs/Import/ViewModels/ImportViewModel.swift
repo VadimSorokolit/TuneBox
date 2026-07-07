@@ -27,7 +27,8 @@ final class ImportViewModel: ImportManaging {
 
     private(set) var playlists: [PlaylistEntity] = []
     private(set) var sections: [TracksSection] = []
-    private(set) var selectedTrackIDs: Set<String> = []
+    var selectedTrackIDs: Set<String> = []
+    var selectedTracks: Set<TrackEntity> = []
     var playlistAction: PlaylistAction?
     private(set) var error: String?
 
@@ -148,19 +149,19 @@ final class ImportViewModel: ImportManaging {
         self.fetchPlaylists()
     }
 
-    func toggleSelection(for id: String) {
-        if self.selectedTrackIDs.contains(id) {
-            self.selectedTrackIDs.remove(id)
+    func toogleSelection(for track: TrackEntity) {
+        if self.selectedTracks.contains(track) {
+            self.selectedTracks.remove(track)
         } else {
-            self.selectedTrackIDs.insert(id)
+            self.selectedTracks.insert(track)
         }
     }
 
-    func deleteSelectedTracks() async {
-//        for id in self.selectedTrackIDs {
-//            await self.removeDownloadedTrack(by: id)
-//        }
-//        self.selectedTrackIDs.removeAll()
+    func deleteSelectedTracks(from playlist: PlaylistEntity) async {
+        for track in self.selectedTracks {
+            await self.removeTrack(track: track, from: playlist)
+        }
+        self.selectedTracks.removeAll()
     }
 
     func deletePlaylist(_ playlist: PlaylistEntity) {

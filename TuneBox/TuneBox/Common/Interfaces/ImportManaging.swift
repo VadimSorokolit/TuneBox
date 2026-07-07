@@ -10,7 +10,8 @@ import Foundation
 protocol ImportManaging: AnyObject {
     var playlists: [PlaylistEntity] { get }
     var sections: [TracksSection] { get }
-    var selectedTrackIDs: Set<String> { get }
+    var selectedTracks: Set<TrackEntity> { get set }
+    var selectedTrackIDs: Set<String> { get set }
     var showsEmptyState: Bool { get }
     var playlistAction: PlaylistAction? { get set }
 
@@ -25,7 +26,7 @@ protocol ImportManaging: AnyObject {
     func stopObservingTracksChanges()
     func createPlaylist(with urls: [URL]) async
     func addFiles(_ urls: [URL], to playlist: PlaylistEntity) async
-    func toggleSelection(for id: String)
-    func deleteSelectedTracks() async
+    func toogleSelection(for track: TrackEntity)
+    func deleteSelectedTracks(from playlist: PlaylistEntity) async
     func removeTrack(track: TrackEntity, from playlist: PlaylistEntity) async
 }
