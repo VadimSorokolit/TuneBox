@@ -128,15 +128,34 @@ final class ImportViewModel: ImportManaging {
     func createPlaylist(with urls: [URL]) async {
         for url in urls {
             if url.hasDirectoryPath {
-                let title = url.lastPathComponent
-
-                guard let playlist = try? self.persistenceService.createPlaylist(title: title) else {
-                    continue
+                let needsStopAccess = url.startAccessingSecurityScopedResource()
+                defer {
+                    if needsStopAccess {
+                        url.stopAccessingSecurityScopedResource()
+                    }
                 }
 
-                await self.importFolder(url, into: playlist)
+                let mp3Files = (try? FileManager.default.contentsOfDirectory(
+                    at: url,
+                    includingPropertiesForKeys: [.isDirectoryKey]
+                ))?.filter { file in
+                    let isDirectory = (try? file.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true
+                    return !isDirectory && file.pathExtension.lowercased() == "mp3"
+                } ?? []
+
+                guard mp3Files.isNotEmpty else { continue }
+
+                let title = url.lastPathComponent
+                guard let playlist = try? persistenceService.createPlaylist(title: title) else { continue }
+
+                for file in mp3Files {
+                    await importFile(file, into: playlist)
+                }
+
+            } else if url.pathExtension.lowercased() == "mp3" {
+                await importFile(url, into: nil)
             } else {
-                await self.importFile(url, into: nil)
+                continue
             }
         }
         self.fetchPlaylists()
@@ -244,6 +263,7 @@ final class ImportViewModel: ImportManaging {
             self.handleError(error)
         }
     }
+
     private func importFolder(_ url: URL, into playlist: PlaylistEntity) async {
         guard url.startAccessingSecurityScopedResource() else { return }
 

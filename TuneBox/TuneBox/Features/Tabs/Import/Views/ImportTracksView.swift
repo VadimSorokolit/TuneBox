@@ -10,14 +10,21 @@ import SwiftUI
 import PhotosUI
 import UniformTypeIdentifiers
 
-enum ImportTrackMode {
+private enum ImportTrackMode {
     case files
     case folder
+    case playlist
 }
 
-enum ViewMode {
+private enum ViewMode {
     case importing
     case removing
+}
+
+private struct ImportMenuItem {
+    let title: String
+    let icon: String
+    let mode: ImportTrackMode
 }
 
 struct ImportTracksView: View {
@@ -64,10 +71,8 @@ struct ImportTracksView: View {
         }
         .fileImporter(
             isPresented: $showFileImporter,
-            allowedContentTypes: importMode == .folder
-            ? [UTType.folder]
-            : [UTType.audio],
-            allowsMultipleSelection: true,
+            allowedContentTypes: allowedContentTypes,
+            allowsMultipleSelection: allowsMultipleSelection,
             onCompletion: { result in
                 switch result {
                     case .success(let urls):
@@ -88,6 +93,9 @@ struct ImportTracksView: View {
                                         selectedImportURLs = urls
                                         viewModel.playlistAction = .create
                                 }
+
+                            case .playlist:
+                                print("")
                         }
 
                     case .failure(let error):
@@ -152,6 +160,33 @@ struct ImportTracksView: View {
 
     // MARK: - Private. Properties
 
+    private enum Constants {
+        static let importFolderTitle = "Import folder"
+        static let importPlaylistTitle = "Import playlist"
+        static let createPlaylistTitle = "Create playlist"
+        static let createPlaylistIcon = "plus"
+        static let importPlaylistIcon = "music.note.list"
+        static let importFolderIcon = "folder"
+
+        static let importMenuItems: [ImportMenuItem] = [
+            .init(
+                title: Constants.createPlaylistTitle,
+                icon: createPlaylistIcon,
+                mode: .files
+            ),
+            .init(
+                title: Constants.importPlaylistTitle,
+                icon: importPlaylistIcon,
+                mode: .playlist
+            ),
+            .init(
+                title: Constants.importFolderTitle,
+                icon: importFolderIcon,
+                mode: .folder
+            )
+        ]
+    }
+
     @Injected
     private var viewModel: ImportManaging
     @Injected
@@ -167,6 +202,29 @@ struct ImportTracksView: View {
     @State private var showsToolbarDeleteConfirmation = false
     @State private var showPhotoPicker = false
     @State private var showFileImporter = false
+
+    private var allowedContentTypes: [UTType] {
+        switch importMode {
+            case .folder:
+                return [.folder]
+
+            case .files:
+                return [.audio]
+
+            case .playlist:
+                return [.folder]
+        }
+    }
+
+    private var allowsMultipleSelection: Bool {
+        switch importMode {
+            case .files:
+                return true
+
+            case .folder, .playlist:
+                return false
+        }
+    }
 
     private var playlistDialogTitle: String {
         switch viewModel.playlistAction {
@@ -231,33 +289,24 @@ struct ImportTracksView: View {
 
                 if viewModel.playlists.isNotEmpty,
                    viewMode == .importing {
-                    Menu(
-                        content: {
-                            Button(
-                                action: {
-                                    showFileImporter = true
-                                    importMode = .files
-                                }, label: {
-                                    Label("Create new playlist", systemImage: "plus")
-                                }
-                            )
-
-                            Button(
-                                action: {
-                                    showFileImporter = true
-                                    importMode = .folder
-                                }, label: {
-                                    Label("Import new playlist", systemImage: "doc.text")
-                                }
-                            )
-                        },
-                        label: {
-                            Image(systemName: "plus.circle.fill")
-                                .font(.system(size: 30, weight: .medium))
+                    Menu {
+                        ForEach(Constants.importMenuItems, id: \.title) { item in
+                            Button {
+                                importMode = item.mode
+                                showFileImporter = true
+                            } label: {
+                                Label(
+                                    item.title,
+                                    systemImage: item.icon
+                                )
+                            }
                         }
-                    )
-                    .opacity(showFileImporter ? 0.5 : 1)
-                    .disabled(showFileImporter)
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 30, weight: .medium))
+                            .opacity(showFileImporter ? 0.5 : 1)
+                            .disabled(showFileImporter)
+                    }
                 }
 
                 if viewMode == .removing {
@@ -573,27 +622,17 @@ struct ImportTracksView: View {
                 Spacer()
 
                 Menu {
-                    Button(
-                        action: {
+                    ForEach(Constants.importMenuItems, id: \.title) { item in
+                        Button {
+                            importMode = item.mode
                             showFileImporter = true
-                            importMode = .files
-                        }, label: {
-                            Label("Create new playlist", systemImage: "plus")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundStyle(.white)
+                        } label: {
+                            Label(
+                                item.title,
+                                systemImage: item.icon
+                            )
                         }
-                    )
-
-                    Button(
-                        action: {
-                            showFileImporter = true
-                            importMode = .folder
-                        }, label: {
-                            Label("Import new playlist", systemImage: "doc.text")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundStyle(.white)
-                        }
-                    )
+                    }
                 } label: {
                     Circle()
                         .fill(Color.gray)

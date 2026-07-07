@@ -57,21 +57,23 @@ struct PlaylistCell: View {
                         }
                     )
 
-                    Button(
-                        action: {
-                            onAddTracksBtnTap()
-                        }, label: {
-                            Label("Add Tracks", systemImage: "plus")
-                        }
-                    )
+                    if playlist.type == .custom {
+                        Button(
+                            action: {
+                                onAddTracksBtnTap()
+                            }, label: {
+                                Label("Add Tracks", systemImage: "plus")
+                            }
+                        )
 
-                    Button(
-                        action: {
-                            onRenamePlaylistBtnTap()
-                        }, label: {
-                            Label("Rename Playlist", systemImage: "pencil")
-                        }
-                    )
+                        Button(
+                            action: {
+                                onRenamePlaylistBtnTap()
+                            }, label: {
+                                Label("Rename Playlist", systemImage: "pencil")
+                            }
+                        )
+                    }
 
                     Button(
                         role: .destructive,
