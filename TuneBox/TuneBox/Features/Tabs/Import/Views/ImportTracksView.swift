@@ -27,6 +27,13 @@ private struct ImportMenuItem {
     let mode: ImportTrackMode
 }
 
+struct ImportedPlaylist: Identifiable, Hashable {
+    let id = UUID()
+    let title: String
+    let fileURL: URL
+    let trackURLs: [URL]
+}
+
 struct ImportTracksView: View {
 
     // MARK: - Main Body
@@ -99,9 +106,8 @@ struct ImportTracksView: View {
                                     return
                                 }
 
-                                Task {
-                                    await viewModel.importPlaylistFolder(folderURL)
-                                }
+                                importedPlaylists = viewModel.loadPlaylists(from: folderURL)
+                                showImportPlaylists = true
                         }
 
                     case .failure(let error):
@@ -109,6 +115,13 @@ struct ImportTracksView: View {
                 }
             }
         )
+        .sheet(isPresented: $showImportPlaylists) {
+            ImportPlaylistsView(
+                showImportPlaylists: $showImportPlaylists,
+                viewModel: viewModel,
+                playlists: importedPlaylists
+            )
+        }
         .photosPicker(
             isPresented: $showPhotoPicker,
             selection: $selectedPhoto,
@@ -199,6 +212,8 @@ struct ImportTracksView: View {
     @ObservationIgnored
     private var persistenceService: PersistenceServicing
     @State private var selectedPhoto: PhotosPickerItem?
+    @State private var importedPlaylists: [ImportedPlaylist] = []
+    @State private var showImportPlaylists = false
     @State private var selectedImportURLs: [URL] = []
     @State private var playlistTitle: String = ""
     @State private var editMode: EditMode = .inactive
@@ -429,91 +444,89 @@ struct ImportTracksView: View {
         let viewModel: ImportManaging
 
         var body: some View {
-            GeometryReader { geometry in
-                let columnCount = (geometry.size.width > GlobalConstants.Screen.regularWidth)
-                ? Layout.regularColumnCount
-                : Layout.compactColumnCount
-                let columns = Array(repeating: GridItem(.flexible(), spacing: Layout.gridSpacing), count: columnCount)
+            let columns = Array(
+                repeating: GridItem(.flexible(), spacing: Layout.gridSpacing),
+                count: UIScreen.main.bounds.width > GlobalConstants.Screen.regularWidth ? 3 : 2
+            )
 
-                LazyVGrid(columns: columns, spacing: Layout.gridSpacing) {
-                    ForEach(viewModel.playlists) { playlist in
-                        PlaylistCell(
-                            playlist: playlist,
-                            onCellTap: {
-                                viewModel.playlistAction = .deleteTracks(playlist)
-                                viewMode = .removing
-                            },
-                            onPlayBtnTap: {
-                                print("")
-                            },
-                            onChangeCoverBtnTap: {
-                                showPhotoPicker = true
-                                viewModel.playlistAction = .changeCover(playlist)
-                            },
-                            onAddTracksBtnTap: {
-                                viewModel.playlistAction = .addTracks(playlist)
-                                showFileImporter = true
-                                importMode = .files
-                            },
-                            onRenamePlaylistBtnTap: {
-                                viewModel.playlistAction = .rename(playlist)
-                            },
-                            onDeletePlaylistBtnTap: {
-                                viewModel.playlistAction = .deletePlaylist(playlist)
-                            }
-                        )
-                        .confirmationDialog(
-                            "Delete Playlist?",
-                            isPresented: Binding(
-                                get: {
-                                    if case .deletePlaylist(let selected) = viewModel.playlistAction {
-                                        return selected.id == playlist.id
-                                    }
-                                    return false
-                                },
-                                set: { isPresented in
-                                    if !isPresented {
-                                        viewModel.playlistAction = nil
-                                    }
+            LazyVGrid(columns: columns, spacing: Layout.gridSpacing) {
+                ForEach(viewModel.playlists) { playlist in
+                    PlaylistCell(
+                        playlist: playlist,
+                        onCellTap: {
+                            viewModel.playlistAction = .deleteTracks(playlist)
+                            viewMode = .removing
+                        },
+                        onPlayBtnTap: {
+                            print("")
+                        },
+                        onChangeCoverBtnTap: {
+                            showPhotoPicker = true
+                            viewModel.playlistAction = .changeCover(playlist)
+                        },
+                        onAddTracksBtnTap: {
+                            viewModel.playlistAction = .addTracks(playlist)
+                            showFileImporter = true
+                            importMode = .files
+                        },
+                        onRenamePlaylistBtnTap: {
+                            viewModel.playlistAction = .rename(playlist)
+                        },
+                        onDeletePlaylistBtnTap: {
+                            viewModel.playlistAction = .deletePlaylist(playlist)
+                        }
+                    )
+                    .confirmationDialog(
+                        "Delete Playlist?",
+                        isPresented: Binding(
+                            get: {
+                                if case .deletePlaylist(let selected) = viewModel.playlistAction {
+                                    return selected.id == playlist.id
                                 }
-                            )
-                        ) {
-                            Button("Delete", role: .destructive) {
-                                if case .deletePlaylist(let playlist) = viewModel.playlistAction {
-                                    Task {
-                                        for track in playlist.tracks {
-                                            await viewModel.removeTrack(track: track, from: playlist)
-                                        }
-                                        viewModel.deletePlaylist(playlist)
-                                    }
+                                return false
+                            },
+                            set: { isPresented in
+                                if !isPresented {
                                     viewModel.playlistAction = nil
                                 }
                             }
-                        } message: {
-                            Text("This action cannot be undone")
-                        }
-                        .onChange(of: selectedPhoto) { _, item in
-                            Task {
-                                guard
-                                    let item,
-                                    let data = try? await item.loadTransferable(type: Data.self)
-                                else {
-                                    return
+                        )
+                    ) {
+                        Button("Delete", role: .destructive) {
+                            if case .deletePlaylist(let playlist) = viewModel.playlistAction {
+                                Task {
+                                    for track in playlist.tracks {
+                                        await viewModel.removeTrack(track: track, from: playlist)
+                                    }
+                                    viewModel.deletePlaylist(playlist)
                                 }
-
-                                if case .changeCover(let playlist) = viewModel.playlistAction {
-                                    viewModel.setCoverImage(data, playlist: playlist)
-                                }
-
                                 viewModel.playlistAction = nil
                             }
                         }
+                    } message: {
+                        Text("This action cannot be undone")
+                    }
+                    .onChange(of: selectedPhoto) { _, item in
+                        Task {
+                            guard
+                                let item,
+                                let data = try? await item.loadTransferable(type: Data.self)
+                            else {
+                                return
+                            }
+
+                            if case .changeCover(let playlist) = viewModel.playlistAction {
+                                viewModel.setCoverImage(data, playlist: playlist)
+                            }
+
+                            viewModel.playlistAction = nil
+                        }
                     }
                 }
-                .padding(.horizontal)
             }
             .frame(maxHeight: .infinity, alignment: .top)
             .padding(.top, 5)
+            .padding(.horizontal)
             .contentMargins(.bottom, 20)
         }
 
@@ -606,11 +619,62 @@ struct ImportTracksView: View {
                             Text("This is the last track. The playlist will also be deleted.")
                         }
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                    .frame(maxWidth: .infinity, alignment: .top)
 
                 default:
                     EmptyView()
             }
+        }
+    }
+
+    private struct ImportPlaylistsView: View {
+        @Binding var showImportPlaylists: Bool
+
+        let viewModel: ImportManaging
+        let playlists: [ImportedPlaylist]
+
+        var body: some View {
+            VStack(spacing: 10) {
+                HStack {
+                    Spacer()
+
+                    Button(
+                        action: {
+                            Task {
+                                await viewModel.createSelectedPlaylists()
+                                showImportPlaylists = false
+                            }
+                        }, label: {
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(.blue.opacity(0.6))
+                                .frame(width: 80, height: 40)
+                                .overlay {
+                                    Text("Import")
+                                        .foregroundStyle(.white)
+                                        .font(.system(size: 20, weight: .medium))
+                                }
+                        }
+                    )
+                    .disabled(viewModel.selectedPlaylists.isEmpty)
+                    .opacity(viewModel.selectedPlaylists.isEmpty ? 0.5 : 1)
+                }
+
+                ScrollView {
+                    LazyVStack(spacing: 12) {
+                        ForEach(playlists) { playlist in
+                            ImportedPlaylistCell(
+                                playlist: playlist,
+                                isSelected: viewModel.selectedPlaylists.contains(playlist),
+                                onCellTap: {
+                                    viewModel.toogleSelection(for: playlist)
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+            .padding(.top, 20)
+            .padding(.horizontal, 24)
         }
     }
 
@@ -629,15 +693,17 @@ struct ImportTracksView: View {
 
                 Menu {
                     ForEach(Constants.importMenuItems, id: \.title) { item in
-                        Button {
-                            importMode = item.mode
-                            showFileImporter = true
-                        } label: {
-                            Label(
-                                item.title,
-                                systemImage: item.icon
-                            )
-                        }
+                        Button(
+                            action: {
+                                importMode = item.mode
+                                showFileImporter = true
+                            }, label: {
+                                Label(
+                                    item.title,
+                                    systemImage: item.icon
+                                )
+                            }
+                        )
                     }
                 } label: {
                     Circle()

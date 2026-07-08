@@ -65,7 +65,7 @@ struct PlaylistCell: View {
                                 Label("Add Tracks", systemImage: "plus")
                             }
                         )
-
+                        
                         Button(
                             action: {
                                 onRenamePlaylistBtnTap()

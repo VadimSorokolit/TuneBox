@@ -79,6 +79,7 @@
 		5BA581942FD70BC300B498D7 /* EmptyGenreCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA581932FD70BC200B498D7 /* EmptyGenreCell.swift */; };
 		5BA581962FD8603500B498D7 /* HighlightedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA581952FD8603400B498D7 /* HighlightedText.swift */; };
 		5BC0DEAD2FDD000100503BA2 /* DownloadStateMergeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC0DEAC2FDD000100503BA2 /* DownloadStateMergeTests.swift */; };
+		5BC8D8F62FFD769300742822 /* ImportedPlaylistCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D8F52FFD769200742822 /* ImportedPlaylistCell.swift */; };
 		5BD0DAF72FBF6BA000268A48 /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0DAF62FBF6B9F00268A48 /* AudioService.swift */; };
 		5BD3BF312FF56EDC006FED4B /* PlaylistEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD3BF302FF56EDB006FED4B /* PlaylistEntity.swift */; };
 		5BD3BF332FF5711D006FED4B /* PersistencePlaylistServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD3BF322FF5711C006FED4B /* PersistencePlaylistServicing.swift */; };
@@ -202,6 +203,7 @@
 		5BA581952FD8603400B498D7 /* HighlightedText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightedText.swift; sourceTree = "<group>"; };
 		5BB9A56D2FC8AF45000B8127 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		5BC0DEAC2FDD000100503BA2 /* DownloadStateMergeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadStateMergeTests.swift; sourceTree = "<group>"; };
+		5BC8D8F52FFD769200742822 /* ImportedPlaylistCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportedPlaylistCell.swift; sourceTree = "<group>"; };
 		5BD0DAF62FBF6B9F00268A48 /* AudioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioService.swift; sourceTree = "<group>"; };
 		5BD3BF302FF56EDB006FED4B /* PlaylistEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistEntity.swift; sourceTree = "<group>"; };
 		5BD3BF322FF5711C006FED4B /* PersistencePlaylistServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistencePlaylistServicing.swift; sourceTree = "<group>"; };
@@ -693,6 +695,7 @@
 		5BD3BF342FF586A8006FED4B /* Cells */ = {
 			isa = PBXGroup;
 			children = (
+				5BC8D8F52FFD769200742822 /* ImportedPlaylistCell.swift */,
 				5BD3BF352FF586B2006FED4B /* PlaylistCell.swift */,
 			);
 			path = Cells;
@@ -1130,6 +1133,7 @@
 				5B6E4DBF2FD17B9000B4E663 /* SegmentedItem.swift in Sources */,
 				5B8382AB2FC4CF88003625CD /* PersistenceTrackServicing.swift in Sources */,
 				5B8382AF2FC4D01C003625CD /* PersistenceManaging.swift in Sources */,
+				5BC8D8F62FFD769300742822 /* ImportedPlaylistCell.swift in Sources */,
 				5B8860A52FB1CF910056BE9A /* NotificationNames+Extension.swift in Sources */,
 				5BFCA8432FCEE237009C6AD9 /* TransferPrioritizable.swift in Sources */,
 				5BFCA8492FCEE470009C6AD9 /* Launch.swift in Sources */,

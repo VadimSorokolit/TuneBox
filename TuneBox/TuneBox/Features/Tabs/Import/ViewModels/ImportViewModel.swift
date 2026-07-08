@@ -29,6 +29,7 @@ final class ImportViewModel: ImportManaging {
     private(set) var sections: [TracksSection] = []
     var selectedTrackIDs: Set<String> = []
     var selectedTracks: Set<TrackEntity> = []
+    var selectedPlaylists: Set<ImportedPlaylist> = []
     var playlistAction: PlaylistAction?
     private(set) var error: String?
 
@@ -125,6 +126,25 @@ final class ImportViewModel: ImportManaging {
         self.transferViewModel.onTracksChanged = nil
     }
 
+    func createSelectedPlaylists() async {
+        for importedPlaylist in selectedPlaylists {
+            do {
+                let playlist = try self.persistenceService.createPlaylist(
+                    title: importedPlaylist.title
+                )
+
+                for trackURL in importedPlaylist.trackURLs {
+                    await self.importFile(trackURL, into: playlist)
+                }
+            } catch {
+                self.handleError(error)
+            }
+        }
+
+        self.selectedPlaylists.removeAll()
+        self.fetchPlaylists()
+    }
+
     func createPlaylist(with urls: [URL]) async {
         for url in urls {
             if url.hasDirectoryPath {
@@ -146,14 +166,14 @@ final class ImportViewModel: ImportManaging {
                 guard mp3Files.isNotEmpty else { continue }
 
                 let title = url.lastPathComponent
-                guard let playlist = try? persistenceService.createPlaylist(title: title) else { continue }
+                guard let playlist = try? self.persistenceService.createPlaylist(title: title) else { continue }
 
                 for file in mp3Files {
-                    await importFile(file, into: playlist)
+                    await self.importFile(file, into: playlist)
                 }
 
             } else if url.pathExtension.lowercased() == "mp3" {
-                await importFile(url, into: nil)
+                await self.importFile(url, into: nil)
             } else {
                 continue
             }
@@ -184,25 +204,51 @@ final class ImportViewModel: ImportManaging {
             return
         }
 
-        guard let m3u = files.first(where: {
+        let playlists = files.filter {
+
             $0.pathExtension.lowercased() == "m3u"
-        }) else {
+        }
+
+        guard playlists.isNotEmpty else {
             return
         }
 
-        let trackURLs = self.loadPlaylist(from: m3u)
+//        let trackURLs = self.loadPlaylist(from: m3u)
 
-        do {
-            let playlist = try self.persistenceService.createPlaylist(
-                title: m3u.deletingPathExtension().lastPathComponent
+//        do {
+//            let playlist = try self.persistenceService.createPlaylist(
+//                title: m3u.deletingPathExtension().lastPathComponent
+//            )
+//
+//            for trackURL in trackURLs {
+//                await importFile(trackURL, into: playlist)
+//            }
+//            self.fetchPlaylists()
+//        } catch {
+//            self.handleError(error)
+//        }
+    }
+
+    func loadPlaylists(from folderURL: URL) -> [ImportedPlaylist] {
+        _ = folderURL.startAccessingSecurityScopedResource()
+
+        guard let files = try? FileManager.default.contentsOfDirectory(
+            at: folderURL,
+            includingPropertiesForKeys: nil
+        ) else {
+            return []
+        }
+
+        let m3uFiles = files.filter {
+            $0.pathExtension.lowercased() == "m3u"
+        }
+
+        return m3uFiles.map { file in
+            ImportedPlaylist(
+                title: file.deletingPathExtension().lastPathComponent,
+                fileURL: file,
+                trackURLs: loadPlaylist(from: file)
             )
-
-            for trackURL in trackURLs {
-                await importFile(trackURL, into: playlist)
-            }
-            self.fetchPlaylists()
-        } catch {
-            self.handleError(error)
         }
     }
 
@@ -211,6 +257,14 @@ final class ImportViewModel: ImportManaging {
             self.selectedTracks.remove(track)
         } else {
             self.selectedTracks.insert(track)
+        }
+    }
+
+    func toogleSelection(for playlist: ImportedPlaylist) {
+        if self.selectedPlaylists.contains(playlist) {
+            self.selectedPlaylists.remove(playlist)
+        } else {
+            self.selectedPlaylists.insert(playlist)
         }
     }
 
