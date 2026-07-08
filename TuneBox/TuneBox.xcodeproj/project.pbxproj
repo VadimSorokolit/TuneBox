@@ -80,6 +80,8 @@
 		5BA581962FD8603500B498D7 /* HighlightedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA581952FD8603400B498D7 /* HighlightedText.swift */; };
 		5BC0DEAD2FDD000100503BA2 /* DownloadStateMergeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC0DEAC2FDD000100503BA2 /* DownloadStateMergeTests.swift */; };
 		5BC8D8F62FFD769300742822 /* ImportedPlaylistCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D8F52FFD769200742822 /* ImportedPlaylistCell.swift */; };
+		5BC8D9022FFE966B00742822 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D9012FFE966A00742822 /* AppCoordinator.swift */; };
+		5BC8D9042FFE96B900742822 /* AppRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D9032FFE96B800742822 /* AppRoute.swift */; };
 		5BD0DAF72FBF6BA000268A48 /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0DAF62FBF6B9F00268A48 /* AudioService.swift */; };
 		5BD3BF312FF56EDC006FED4B /* PlaylistEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD3BF302FF56EDB006FED4B /* PlaylistEntity.swift */; };
 		5BD3BF332FF5711D006FED4B /* PersistencePlaylistServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD3BF322FF5711C006FED4B /* PersistencePlaylistServicing.swift */; };
@@ -204,6 +206,8 @@
 		5BB9A56D2FC8AF45000B8127 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		5BC0DEAC2FDD000100503BA2 /* DownloadStateMergeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadStateMergeTests.swift; sourceTree = "<group>"; };
 		5BC8D8F52FFD769200742822 /* ImportedPlaylistCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportedPlaylistCell.swift; sourceTree = "<group>"; };
+		5BC8D9012FFE966A00742822 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
+		5BC8D9032FFE96B800742822 /* AppRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRoute.swift; sourceTree = "<group>"; };
 		5BD0DAF62FBF6B9F00268A48 /* AudioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioService.swift; sourceTree = "<group>"; };
 		5BD3BF302FF56EDB006FED4B /* PlaylistEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistEntity.swift; sourceTree = "<group>"; };
 		5BD3BF322FF5711C006FED4B /* PersistencePlaylistServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistencePlaylistServicing.swift; sourceTree = "<group>"; };
@@ -684,6 +688,15 @@
 			path = ViewModels;
 			sourceTree = "<group>";
 		};
+		5BC8D9002FFE965600742822 /* Navigation */ = {
+			isa = PBXGroup;
+			children = (
+				5BC8D9012FFE966A00742822 /* AppCoordinator.swift */,
+				5BC8D9032FFE96B800742822 /* AppRoute.swift */,
+			);
+			path = Navigation;
+			sourceTree = "<group>";
+		};
 		5BD0DAF82FBF6C4A00268A48 /* AudioService */ = {
 			isa = PBXGroup;
 			children = (
@@ -728,6 +741,7 @@
 				5B4762782FAB3DA30069E41A /* API */,
 				5B586CB82FAC841100BCEAD2 /* DI */,
 				5BD579A92FAB272E00503BA2 /* Features */,
+				5BC8D9002FFE965600742822 /* Navigation */,
 				5BD579A82FAB26F800503BA2 /* Services */,
 				5B8382922FC4C6A9003625CD /* Common */,
 				5BD579A72FAB26C800503BA2 /* Resources */,
@@ -1097,6 +1111,7 @@
 				5BFCA7D62FCE118B009C6AD9 /* Theme+Extensions.swift in Sources */,
 				5B8382B32FC4D0D8003625CD /* StorageManaging.swift in Sources */,
 				5BFCA8412FCED9F6009C6AD9 /* FontStyle.swift in Sources */,
+				5BC8D9042FFE96B900742822 /* AppRoute.swift in Sources */,
 				5B8382A32FC4CB4D003625CD /* AudioServicing.swift in Sources */,
 				5B8382AD2FC4CFF1003625CD /* DownloadManaging.swift in Sources */,
 				5B586CB72FAC678700BCEAD2 /* TrackDTO.swift in Sources */,
@@ -1124,6 +1139,7 @@
 				5BFCA7D22FCE0DDE009C6AD9 /* AppTheme.swift in Sources */,
 				5BFBF2372FCCC2AB0013F6BB /* ImportTracksView.swift in Sources */,
 				5BFCA7D42FCE1148009C6AD9 /* ThemeManager.swift in Sources */,
+				5BC8D9022FFE966B00742822 /* AppCoordinator.swift in Sources */,
 				5B47627E2FAB49B00069E41A /* AppLogger.swift in Sources */,
 				5BA581892FD6A2B800B498D7 /* SettingsViewModel.swift in Sources */,
 				5BFCA83C2FCED7BF009C6AD9 /* Font+Family.swift in Sources */,

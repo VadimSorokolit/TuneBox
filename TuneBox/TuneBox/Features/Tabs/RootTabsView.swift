@@ -73,10 +73,10 @@ struct RootTabsView: View {
     // MARK: - Properties. Private
 
     @Environment(\.themeManager) private var theme
-    @State private var activeTab: CustomTab = .browse
+    @Environment(AppCoordinator.self) private var coordinator
 
     private var content: some View {
-        TabView(selection: $activeTab) {
+        TabView(selection: Bindable(coordinator).selectedTab) {
             BrowseView()
                 .tag(CustomTab.browse)
 
@@ -100,11 +100,11 @@ struct RootTabsView: View {
             ForEach(CustomTab.allCases) { tab in
                 TabItemView(
                     tab: tab,
-                    isSelected: activeTab == tab,
+                    isSelected: coordinator.selectedTab == tab,
                     activeColor: theme.tokens.tabIconActive,
                     inactiveColor: theme.tokens.tabIconInactive,
                     onTap: {
-                        activeTab = tab
+                        coordinator.switchToTab(tab)
                     }
                 )
             }

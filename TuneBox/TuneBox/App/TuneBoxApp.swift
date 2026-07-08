@@ -12,14 +12,16 @@ import Resolver
 struct TuneBoxApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @Environment(\.scenePhase) private var scenePhase
-    @Injected private var viewModel: TransferManaging
     @State private var themeManager = ThemeManager()
+    @State private var coordinator = AppCoordinator(root: .main)
+    @Injected private var viewModel: TransferManaging
 
     var body: some Scene {
         WindowGroup {
             RootTabsView()
                 .environment(\.themeManager, themeManager)
                 .applyTheme(themeManager)
+                .environment(coordinator)
                 .onChange(of: scenePhase) { _, newPhase in
                     switch newPhase {
                         case .active:
