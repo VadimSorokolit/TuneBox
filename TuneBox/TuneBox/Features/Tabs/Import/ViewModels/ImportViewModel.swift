@@ -336,18 +336,15 @@ final class ImportViewModel: ImportManaging {
         do {
             let downloadedTracks = try self.persistenceService.getRecentDownloadedTracks(limit: nil)
 
-            print("Downloaded tracks:", downloadedTracks.count)
-
             if downloadedTracks.isNotEmpty {
-                print("Calling createSystemPlaylist")
-
                 let systemPlaylist = try self.persistenceService.createSystemPlaylist()
-
-                print("Created/found:", systemPlaylist.title)
-
                 systemPlaylist.tracks = downloadedTracks
             } else {
-                print("No downloaded tracks")
+                let playlists = try self.persistenceService.fetchPlaylists()
+
+                if let playlist = playlists.first(where: { $0.type == .system }) {
+                    try self.persistenceService.deletePlaylist(playlist)
+                }
             }
 
             self.playlists = try self.persistenceService.fetchPlaylists()
