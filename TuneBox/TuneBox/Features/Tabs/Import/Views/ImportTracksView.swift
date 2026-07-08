@@ -619,7 +619,7 @@ struct ImportTracksView: View {
                             Text("This is the last track. The playlist will also be deleted.")
                         }
                     }
-                    .frame(maxWidth: .infinity, alignment: .top)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 
                 default:
                     EmptyView()
