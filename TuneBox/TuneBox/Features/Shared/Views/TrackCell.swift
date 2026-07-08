@@ -156,20 +156,17 @@ struct TrackCell: View {
 
     @ViewBuilder
     private var trackImage: some View {
-        if track.source == .imported {
-            if let artworkPath = track.imagePath,
-               let image = UIImage(contentsOfFile: artworkPath) {
+        if track.source == .imported,
+           let storedPath = track.imagePath,
+           let artworkURL = AudioMetadataService.artworkURL(for: storedPath),
+           let data = try? Data(contentsOf: artworkURL),
+           let image = UIImage(data: data) {
 
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(size: imageSize)
-                    .clipShape(RoundedRectangle(cornerRadius: imageCornerRadius))
-
-            } else {
-                customPlaceholder
-                    .clipShape(RoundedRectangle(cornerRadius: imageCornerRadius))
-            }
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFit()
+                .frame(size: imageSize)
+                .clipShape(RoundedRectangle(cornerRadius: imageCornerRadius))
         } else if let url = track.imageURL {
             WebImage(
                 url: url,

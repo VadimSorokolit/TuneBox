@@ -400,7 +400,7 @@ final class ImportViewModel: ImportManaging {
 
             if let artworkData = metadata?.artwork {
                 let fileURL = try AudioMetadataService.save(artworkData, trackID: id)
-                artworkPath = fileURL.path
+                artworkPath = fileURL.lastPathComponent
             }
 
             let duration: Int? = {

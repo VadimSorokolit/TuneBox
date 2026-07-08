@@ -35,6 +35,30 @@ final class AudioMetadataService: AudioMetadataServicing {
         )
     }
 
+    static func artworkDirectory() throws -> URL {
+        guard let directory = FileManager.default
+            .urls(for: .documentDirectory, in: .userDomainMask)
+            .first
+        else {
+            throw CocoaError(.fileNoSuchFile)
+        }
+        return directory
+    }
+
+    static func artworkURL(for storedPath: String) -> URL? {
+        if storedPath.hasPrefix("/") {
+            let url = URL(fileURLWithPath: storedPath)
+
+            if FileManager.default.fileExists(atPath: url.path) {
+                return url
+            }
+
+            return try? artworkDirectory().appendingPathComponent(url.lastPathComponent)
+        }
+
+        return try? artworkDirectory().appendingPathComponent(storedPath)
+    }
+
     static func save(_ data: Data, trackID: String) throws -> URL {
         guard let directory = FileManager.default
             .urls(for: .documentDirectory, in: .userDomainMask)
@@ -44,7 +68,6 @@ final class AudioMetadataService: AudioMetadataServicing {
         }
 
         let fileURL = directory.appendingPathComponent("\(trackID).jpg")
-
         try data.write(to: fileURL, options: .atomic)
 
         return fileURL
