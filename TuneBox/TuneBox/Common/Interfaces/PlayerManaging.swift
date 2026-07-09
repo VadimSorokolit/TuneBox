@@ -10,4 +10,5 @@ import Foundation
 protocol PlayerManaging: AnyObject, Sendable {
     func handlePlayAction(for track: TrackEntity)
     func isPlaying(_ track: TrackEntity) -> Bool
+    func loadPlaylist()
 }

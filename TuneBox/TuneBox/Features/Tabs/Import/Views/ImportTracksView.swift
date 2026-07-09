@@ -130,7 +130,8 @@ struct ImportTracksView: View {
         .alert(
             playlistDialogTitle,
             isPresented: Binding(
-                get: { showsPlaylistDialog },
+                get: { showsPlaylistDialog
+                },
                 set: { isPresented in
                     if !isPresented {
                         viewModel.playlistAction = nil
@@ -458,7 +459,8 @@ struct ImportTracksView: View {
                             viewMode = .removing
                         },
                         onPlayBtnTap: {
-                            print("")
+                            UserDefaults.standard.set(playlist.id, forKey: GlobalConstants.UserDefaultsKey.playlistID)
+                            coordinator.selectedTab = .player
                         },
                         onChangeCoverBtnTap: {
                             showPhotoPicker = true
@@ -537,6 +539,8 @@ struct ImportTracksView: View {
             static let regularColumnCount = 3
             static let gridSpacing: CGFloat = 16
         }
+
+        @Environment(AppCoordinator.self) private var coordinator
     }
 
     private struct RemoveTracksView: View {
