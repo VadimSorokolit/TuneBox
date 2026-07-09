@@ -418,7 +418,7 @@ struct ImportTracksView: View {
                     )
                     .offset(x: viewMode == .importing ? 0 : -UIScreen.main.bounds.width)
 
-                    RemoveTracksView(
+                    TracksView(
                         editMode: $editMode,
                         showDeletePlaylistDialog: $showDeletePlaylistDialog,
                         viewMode: $viewMode,
@@ -545,7 +545,7 @@ struct ImportTracksView: View {
         @Environment(AppCoordinator.self) private var coordinator
     }
 
-    private struct RemoveTracksView: View {
+    private struct TracksView: View {
         @Binding var editMode: EditMode
         @Binding var showDeletePlaylistDialog: Bool
         @Binding var viewMode: ViewMode
@@ -585,7 +585,7 @@ struct ImportTracksView: View {
                                     track: track,
                                     isSelected: viewModel.selectedTracks.contains(track),
                                     editMode: editMode,
-                                    onButtonTap: {
+                                    onDeleteFromPlaylistTap: {
                                         if playlist.tracks.count == 1 {
                                             showDeletePlaylistDialog = true
                                         } else {

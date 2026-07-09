@@ -16,7 +16,7 @@ enum PlaylistExtension: String {
 enum AudioFileExtension: String {
     case mp3
     case wav
-    case flac        
+    case flac
 }
 
 protocol AudioServicing: AnyObject {

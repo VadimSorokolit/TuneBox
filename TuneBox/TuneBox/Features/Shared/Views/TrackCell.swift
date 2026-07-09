@@ -17,7 +17,10 @@ struct TrackCell: View {
         searchQuery: String? = nil,
         isSelected: Bool = false,
         editMode: EditMode = .inactive,
-        onButtonTap: @escaping () -> Void,
+        onButtonTap: (() -> Void)? = nil,
+        onEditAudioTagsTap: (() -> Void)? = nil,
+        onDeleteFromPlaylistTap: (() -> Void)? = nil,
+        onDeleteFromDevice: @escaping () -> Void = {},
         onCellTap: (() -> Void)? = nil
     ) {
         self.track = track
@@ -25,6 +28,9 @@ struct TrackCell: View {
         self.isSelected = isSelected
         self.editMode = editMode
         self.onButtonTap = onButtonTap
+        self.onEditAudioTagsTap = onEditAudioTagsTap
+        self.onDeleteFromPlaylistTap = onDeleteFromPlaylistTap
+        self.onDeleteFromDeviceTap = onDeleteFromDevice
         self.onCellTap = onCellTap
     }
 
@@ -70,9 +76,10 @@ struct TrackCell: View {
 
                 Spacer()
 
-                if editMode == .inactive {
-                    Button(action: {
-                            onButtonTap()
+                if track.source == .api {
+                    Button(
+                        action: {
+                            onButtonTap?()
                         },
                         label: {
                             ZStack {
@@ -106,6 +113,46 @@ struct TrackCell: View {
                         }
                     )
                     .accessibilityHint(accessibilityLabel)
+                } else {
+                        Menu {
+                            Button(action: {
+                                onEditAudioTagsTap?()
+                            }, label: {
+                                Label("Edit audio tags", systemImage: "pencil")
+                            })
+
+                            Button(
+                                role: .destructive,
+                                action: {
+                                    onDeleteFromPlaylistTap?()
+                                },
+                                label: {
+                                    Label("Delete from playlist", systemImage: "minus.circle")
+                                }
+                            )
+
+                            Button(
+                                role: .destructive,
+                                action: {
+                                    onDeleteFromDeviceTap()
+                                },
+                                label: {
+                                    Label("Delete from iPhone", systemImage: "trash")
+                                }
+                            )
+                        } label: {
+                            Circle()
+                                .fill(.clear)
+                                .frame(width: 24, height: 24)
+                                .overlay {
+                                    Image(systemName: "ellipsis")
+                                        .font(.system(size: 20, weight: .regular))
+                                        .foregroundColor(.black)
+                                }
+                        }
+                        .disabled(editMode == .active)
+                        .opacity(editMode == .active ? 0.0 : 1)
+                        .padding(.leading, 5)
                 }
             }
             .padding(.horizontal)
@@ -126,8 +173,11 @@ struct TrackCell: View {
     private let searchQuery: String?
     private let editMode: EditMode
     private let isSelected: Bool
-    private let onButtonTap: () -> Void
+    private let onButtonTap: (() -> Void)?
     private let onCellTap: (() -> Void)?
+    private let onEditAudioTagsTap: (() -> Void)?
+    private let onDeleteFromPlaylistTap: (() -> Void)?
+    private let onDeleteFromDeviceTap: () -> Void
     private let cellCornerRadius: CGFloat = 10
     private let imageSize: CGFloat = 45
     private let imageCornerRadius: CGFloat = 10
@@ -246,7 +296,5 @@ struct TrackCell: View {
         size: 5_242_880
     )
 
-    return TrackCell(track: track) {
-        print("tap")
-    }
+    return TrackCell(track: track)
 }
