@@ -9,7 +9,7 @@ import Foundation
 
 protocol PersistencePlaylistServicing: AnyObject {
     func fetchPlaylists() throws -> [PlaylistEntity]
-    func getPlaylist(ID: String) throws -> PlaylistEntity?
+    func getPlaylist(id: String) throws -> PlaylistEntity?
     func createSystemPlaylist() throws -> PlaylistEntity
     func createPlaylist(title: String) throws -> PlaylistEntity
     func renamePlaylist(_ playlist: PlaylistEntity, newTitle: String) throws

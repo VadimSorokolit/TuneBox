@@ -15,7 +15,7 @@ enum GlobalConstants {
     enum Screen {
         static let regularWidth: CGFloat = 393
     }
-    
+
     enum UserDefaultsKey {
         static let playlistID: String = "UserDefaultsPlaylistIdKey"
     }

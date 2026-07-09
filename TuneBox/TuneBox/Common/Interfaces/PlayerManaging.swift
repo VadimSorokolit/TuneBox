@@ -8,7 +8,11 @@
 import Foundation
 
 protocol PlayerManaging: AnyObject, Sendable {
+    var playlist: PlaylistEntity? { get }
+
     func handlePlayAction(for track: TrackEntity)
     func isPlaying(_ track: TrackEntity) -> Bool
+    func playNext()
+    func playPrevious()
     func loadPlaylist()
 }

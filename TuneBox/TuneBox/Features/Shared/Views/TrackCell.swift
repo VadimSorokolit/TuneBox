@@ -43,8 +43,8 @@ struct TrackCell: View {
                             text: track.songName,
                             searchQuery: searchQuery
                         )
-                        .font(.satoshi.medium.size(14))
-                        .lineLimit(1)
+                        .font(.satoshi.medium.size(12))
+                        .lineLimit(2)
 
                         HStack(spacing: 6) {
                             HighlightedText(
@@ -114,7 +114,7 @@ struct TrackCell: View {
         .onTapGesture {
             onCellTap?()
         }
-        .frame(height: 50)
+        .frame(height: 60)
         .frame(maxWidth: .infinity)
         .padding(.horizontal)
     }
@@ -129,7 +129,7 @@ struct TrackCell: View {
     private let onButtonTap: () -> Void
     private let onCellTap: (() -> Void)?
     private let cellCornerRadius: CGFloat = 10
-    private let imageSize: CGFloat = 35
+    private let imageSize: CGFloat = 45
     private let imageCornerRadius: CGFloat = 10
 
     private var accessibilityLabel: String {

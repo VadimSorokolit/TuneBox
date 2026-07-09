@@ -9,12 +9,17 @@ import Foundation
 import Combine
 import Resolver
 
+private enum PlaybackDirection {
+    case next
+    case previous
+}
+
 @Observable
 final class PlayerViewModel: PlayerManaging {
 
     // MARK: Properties. Public
 
-    private(set) var tracks: [TrackEntity] = []
+    private(set) var playlist: PlaylistEntity?
     private(set) var error: String?
 
     // MARK: - Initializer
@@ -39,9 +44,8 @@ final class PlayerViewModel: PlayerManaging {
 
         if  let playlistID = UserDefaults.standard.string(forKey: GlobalConstants.UserDefaultsKey.playlistID) {
             do {
-                if let playlist = try self.persistenceService.getPlaylist(ID: playlistID) {
-                    self.tracks = playlist.tracks
-                    print(self.tracks.count)
+                if let playlist = try self.persistenceService.getPlaylist(id: playlistID) {
+                    self.playlist = playlist
                 }
             } catch {
                 self.handleError(error)
@@ -50,18 +54,39 @@ final class PlayerViewModel: PlayerManaging {
     }
 
     func handlePlayAction(for track: TrackEntity) {
-        do {
-            let url = try FileManagerService.makeDownloadedTrackURL(id: track.id)
+        switch track.source {
+            case .api:
+                do {
+                    let url = try FileManagerService.makeDownloadedTrackURL(id: track.id)
 
-            self.track = track
-            self.audioService.toggle(trackId: track.id, url: url, loop: false)
-        } catch {
-            AppLogger.audio.error("Failed to make track URL: \(String(describing: error))")
+                    self.track = track
+                    self.audioService.toggle(trackId: track.id, url: url, loop: false)
+                } catch {
+                    AppLogger.audio.error("Failed to make track URL: \(String(describing: error))")
+                }
+
+            case .imported:
+                guard let url = self.resolveImportedURL(for: track) else {
+                    AppLogger.audio.error("Imported file missing for track: \(track.id)")
+
+                    return
+                }
+
+                self.track = track
+                self.audioService.toggle(trackId: track.id, url: url, loop: false)
         }
     }
 
     func isPlaying(_ track: TrackEntity) -> Bool {
         self.track?.id == track.id && self.isPlaying
+    }
+
+    func playNext() {
+        self.playTrack(.next)
+    }
+
+    func playPrevious() {
+        self.playTrack(.previous)
     }
 
     // MARK: - Properties. Private
@@ -77,9 +102,48 @@ final class PlayerViewModel: PlayerManaging {
 
     // MARK: - Methods. Private
 
+    private func playTrack(_ direction: PlaybackDirection) {
+        guard let tracks = self.playlist?.tracks,
+              let firstTrack = tracks.first else {
+            return
+        }
+
+        guard let current = self.track,
+              let index = tracks.firstIndex(where: { $0.id == current.id }) else {
+            self.handlePlayAction(for: firstTrack)
+
+            return
+        }
+
+        let newIndex: Int
+
+        switch direction {
+            case .next:
+                newIndex = index + 1
+
+            case .previous:
+                newIndex = index - 1
+        }
+
+        guard tracks.indices.contains(newIndex) else { return }
+
+        self.handlePlayAction(for: tracks[newIndex])
+    }
+
     private func handleError(_ error: Error) {
         let message = error.localizedDescription
         self.error = message
         AppLogger.imported.warning("\(message)")
+    }
+
+    private func resolveImportedURL(for track: TrackEntity) -> URL? {
+        let ext = track.localFileURL?.pathExtension ?? AudioFileExtension.mp3.rawValue
+        guard let url = try? FileManagerService.makeImportedTrackURL(
+            id: track.id,
+            fileExtension: ext
+        ), FileManager.default.fileExists(atPath: url.path) else {
+            return nil
+        }
+        return url
     }
 }

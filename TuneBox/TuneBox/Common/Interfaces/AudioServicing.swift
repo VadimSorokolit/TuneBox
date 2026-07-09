@@ -12,6 +12,7 @@ enum AudioFileExtension: String {
     case mp3
     case wav
     case m4a
+    case flac
 }
 
 protocol AudioServicing: AnyObject {

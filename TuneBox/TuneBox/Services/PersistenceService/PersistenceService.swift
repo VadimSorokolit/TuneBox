@@ -239,9 +239,9 @@ final class PersistenceService: PersistenceServicing {
         print(playlist.title)
         return playlist
     }
-    
-    func getPlaylist(ID: String) throws -> PlaylistEntity? {
-        let playlistID = ID
+
+    func getPlaylist(id: String) throws -> PlaylistEntity? {
+        let playlistID = id
 
         var descriptor = FetchDescriptor<PlaylistEntity>(
             predicate: #Predicate {
@@ -254,7 +254,7 @@ final class PersistenceService: PersistenceServicing {
         do {
             return try self.modelContext.fetch(descriptor).first
         } catch {
-            AppLogger.storage.error("Failed to fetch playlist \(ID): \(error.localizedDescription)")
+            AppLogger.storage.error("Failed to fetch playlist \(id): \(error.localizedDescription)")
             throw error
         }
     }
@@ -305,7 +305,7 @@ final class PersistenceService: PersistenceServicing {
     }
 
     func setCoverImage(_ imageData: Data?, playlist: PlaylistEntity) throws {
-        guard let playlist = try self.getPlaylist(ID: playlist.id) else {
+        guard let playlist = try self.getPlaylist(id: playlist.id) else {
             return
         }
 

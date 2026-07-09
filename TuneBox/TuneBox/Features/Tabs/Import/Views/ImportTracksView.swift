@@ -521,6 +521,7 @@ struct ImportTracksView: View {
                                 viewModel.setCoverImage(data, playlist: playlist)
                             }
 
+                            selectedPhoto = nil
                             viewModel.playlistAction = nil
                         }
                     }
@@ -623,6 +624,7 @@ struct ImportTracksView: View {
                             Text("This is the last track. The playlist will also be deleted.")
                         }
                     }
+                    .padding(.top, 20)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 
                 default:

@@ -12,7 +12,6 @@ struct EmptyTrackCell: View {
 
     let isSelected: Bool
     let cornerRadius: CGFloat = 10
-    let height: CGFloat = 50
     let borderWidth: CGFloat = 0.5
 
     var body: some View {
@@ -23,7 +22,6 @@ struct EmptyTrackCell: View {
                     .stroke(borderColor, lineWidth: borderWidth)
             }
             .frame(maxWidth: .infinity)
-            .frame(height: height)
     }
 
     private var background: Color {

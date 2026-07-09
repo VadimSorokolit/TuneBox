@@ -16,7 +16,7 @@ struct PlayerView: View {
         VStack(spacing: 0) {
             HeaderView()
 
-            ContentView()
+            ContentView(viewModel: viewModel)
         }
         .onAppear {
             viewModel.loadPlaylist()
@@ -37,9 +37,48 @@ struct PlayerView: View {
     }
 
     private struct ContentView: View {
+        let viewModel: PlayerManaging
 
         var body: some View {
-            Text("Player")
+            HStack(spacing: 30) {
+                Button(action: {
+                    viewModel.playPrevious()
+                },
+                label: {
+                    Circle()
+                    .fill(Color.gray)
+                    .frame(width: 50, height: 50)
+                    .overlay {
+                        Image(systemName: "backward.end.fill")
+                    }
+                })
+
+                Button(action: {
+                    if let playlist = viewModel.playlist {
+                        viewModel.handlePlayAction(for: playlist.tracks.first!)
+                    }
+                },
+                    label: {
+                    Circle()
+                        .fill(Color.green)
+                        .frame(width: 50, height: 50)
+                        .overlay {
+                            Image(systemName: "play.fill")
+                        }
+                })
+
+                Button(action: {
+                    viewModel.playNext()
+                },
+                label: {
+                    Circle()
+                        .fill(Color.gray)
+                        .frame(width: 50, height: 50)
+                        .overlay {
+                            Image(systemName: "forward.end.fill")
+                        }
+                })
+            }
         }
     }
 }
