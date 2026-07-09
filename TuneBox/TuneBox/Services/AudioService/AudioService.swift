@@ -144,7 +144,7 @@ final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
         self.notifyProgress(clamped)
     }
 
-    func playEffect(name: String, ext: AudioFileExtension = GlobalConstants.trackExtension) {
+    func playEffect(name: String, ext: AudioFileExtension = .mp3) {
         guard let url = Bundle.main.url(forResource: name, withExtension: ext.rawValue) else {
             AppLogger.audio.error("Effect file not found: \(name).\(ext.rawValue)")
 
