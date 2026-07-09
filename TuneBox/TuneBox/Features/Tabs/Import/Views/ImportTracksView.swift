@@ -597,6 +597,8 @@ struct ImportTracksView: View {
                                     onCellTap: {
                                         if editMode == .active {
                                             viewModel.toogleSelection(for: track)
+                                        } else {
+                                            // TODO: Implement selected track playback
                                         }
                                     }
                                 )
