@@ -155,24 +155,23 @@ final class ImportViewModel: ImportManaging {
                     }
                 }
 
-                let mp3Files = (try? FileManager.default.contentsOfDirectory(
+                let trackFiles = (try? FileManager.default.contentsOfDirectory(
                     at: url,
                     includingPropertiesForKeys: [.isDirectoryKey]
                 ))?.filter { file in
                     let isDirectory = (try? file.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true
-                    return !isDirectory && file.pathExtension.lowercased() == "mp3"
+                    return !isDirectory && self.supportedTrackExtensions.contains(file.pathExtension.lowercased())
                 } ?? []
 
-                guard mp3Files.isNotEmpty else { continue }
+                guard trackFiles.isNotEmpty else { continue }
 
                 let title = url.lastPathComponent
                 guard let playlist = try? self.persistenceService.createPlaylist(title: title) else { continue }
 
-                for file in mp3Files {
+                for file in trackFiles {
                     await self.importFile(file, into: playlist)
                 }
-
-            } else if url.pathExtension.lowercased() == "mp3" {
+            } else if  self.supportedTrackExtensions.contains(url.pathExtension.lowercased()) {
                 await self.importFile(url, into: nil)
             } else {
                 continue
@@ -188,47 +187,6 @@ final class ImportViewModel: ImportManaging {
         self.fetchPlaylists()
     }
 
-    func importPlaylistFolder(_ folderURL: URL) async {
-        let needsStopAccess = folderURL.startAccessingSecurityScopedResource()
-
-        defer {
-            if needsStopAccess {
-                folderURL.stopAccessingSecurityScopedResource()
-            }
-        }
-
-        guard let files = try? FileManager.default.contentsOfDirectory(
-            at: folderURL,
-            includingPropertiesForKeys: nil
-        ) else {
-            return
-        }
-
-        let playlists = files.filter {
-
-            $0.pathExtension.lowercased() == "m3u"
-        }
-
-        guard playlists.isNotEmpty else {
-            return
-        }
-
-//        let trackURLs = self.loadPlaylist(from: m3u)
-
-//        do {
-//            let playlist = try self.persistenceService.createPlaylist(
-//                title: m3u.deletingPathExtension().lastPathComponent
-//            )
-//
-//            for trackURL in trackURLs {
-//                await importFile(trackURL, into: playlist)
-//            }
-//            self.fetchPlaylists()
-//        } catch {
-//            self.handleError(error)
-//        }
-    }
-
     func loadPlaylists(from folderURL: URL) -> [ImportedPlaylist] {
         _ = folderURL.startAccessingSecurityScopedResource()
 
@@ -239,11 +197,11 @@ final class ImportViewModel: ImportManaging {
             return []
         }
 
-        let m3uFiles = files.filter {
-            $0.pathExtension.lowercased() == "m3u"
+        let playlistFiles = files.filter {
+            self.supportedPlaylistExtensions.contains($0.pathExtension.lowercased())
         }
 
-        return m3uFiles.map { file in
+        return playlistFiles.map { file in
             ImportedPlaylist(
                 title: file.deletingPathExtension().lastPathComponent,
                 fileURL: file,
@@ -323,6 +281,8 @@ final class ImportViewModel: ImportManaging {
     @ObservationIgnored
     private var persistenceService: PersistenceServicing
     private var tracksObservationTask: Task<Void, Never>?
+    private let supportedPlaylistExtensions = ["m3u"]
+    private let supportedTrackExtensions = ["mp3", "wav", "flac"]
 
     // MARK: - Methods. Private
 

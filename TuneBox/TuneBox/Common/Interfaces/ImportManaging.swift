@@ -23,7 +23,6 @@ protocol ImportManaging: AnyObject {
     func renamePlaylist(_ playlist: PlaylistEntity, newTitle: String)
     func importFiles(_ urls: [URL], playlistTitle: String) async
     func loadPlaylists(from folderURL: URL) -> [ImportedPlaylist]
-    func importPlaylistFolder(_ folderURL: URL) async
     func deletePlaylist(_ playlist: PlaylistEntity)
     func setCoverImage(_ imageData: Data?, playlist: PlaylistEntity)
     func startObservingTracksChanges()
