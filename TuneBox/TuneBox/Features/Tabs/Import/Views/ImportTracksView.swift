@@ -584,6 +584,7 @@ struct ImportTracksView: View {
                                 TrackCell(
                                     track: track,
                                     isSelected: viewModel.selectedTracks.contains(track),
+                                    showsMenu: true,
                                     editMode: editMode,
                                     onDeleteFromPlaylistTap: {
                                         if playlist.tracks.count == 1 {

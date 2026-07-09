@@ -16,6 +16,7 @@ struct TrackCell: View {
         track: TrackEntity,
         searchQuery: String? = nil,
         isSelected: Bool = false,
+        showsMenu: Bool = false,
         editMode: EditMode = .inactive,
         onButtonTap: (() -> Void)? = nil,
         onEditAudioTagsTap: (() -> Void)? = nil,
@@ -26,6 +27,7 @@ struct TrackCell: View {
         self.track = track
         self.searchQuery = searchQuery
         self.isSelected = isSelected
+        self.showsMenu = showsMenu
         self.editMode = editMode
         self.onButtonTap = onButtonTap
         self.onEditAudioTagsTap = onEditAudioTagsTap
@@ -76,7 +78,49 @@ struct TrackCell: View {
 
                 Spacer()
 
-                if track.source == .api {
+                if showsMenu {
+                    Menu {
+                        if track.source == .imported {
+                            Button(action: {
+                                onEditAudioTagsTap?()
+                            }, label: {
+                                Label("Edit audio tags", systemImage: "pencil")
+                            })
+                        }
+
+                        Button(
+                            role: .destructive,
+                            action: {
+                                onDeleteFromPlaylistTap?()
+                            },
+                            label: {
+                                Label("Delete from playlist", systemImage: "minus.circle")
+                            }
+                        )
+
+                        Button(
+                            role: .destructive,
+                            action: {
+                                onDeleteFromDeviceTap()
+                            },
+                            label: {
+                                Label("Delete from iPhone", systemImage: "trash")
+                            }
+                        )
+                    } label: {
+                        Circle()
+                            .fill(.clear)
+                            .frame(width: 24, height: 24)
+                            .overlay {
+                                Image(systemName: "ellipsis")
+                                    .font(.system(size: 20, weight: .regular))
+                                    .foregroundColor(.black)
+                            }
+                    }
+                    .disabled(editMode == .active)
+                    .opacity(editMode == .active ? 0.0 : 1)
+                    .padding(.leading, 5)
+                } else {
                     Button(
                         action: {
                             onButtonTap?()
@@ -113,46 +157,6 @@ struct TrackCell: View {
                         }
                     )
                     .accessibilityHint(accessibilityLabel)
-                } else {
-                        Menu {
-                            Button(action: {
-                                onEditAudioTagsTap?()
-                            }, label: {
-                                Label("Edit audio tags", systemImage: "pencil")
-                            })
-
-                            Button(
-                                role: .destructive,
-                                action: {
-                                    onDeleteFromPlaylistTap?()
-                                },
-                                label: {
-                                    Label("Delete from playlist", systemImage: "minus.circle")
-                                }
-                            )
-
-                            Button(
-                                role: .destructive,
-                                action: {
-                                    onDeleteFromDeviceTap()
-                                },
-                                label: {
-                                    Label("Delete from iPhone", systemImage: "trash")
-                                }
-                            )
-                        } label: {
-                            Circle()
-                                .fill(.clear)
-                                .frame(width: 24, height: 24)
-                                .overlay {
-                                    Image(systemName: "ellipsis")
-                                        .font(.system(size: 20, weight: .regular))
-                                        .foregroundColor(.black)
-                                }
-                        }
-                        .disabled(editMode == .active)
-                        .opacity(editMode == .active ? 0.0 : 1)
-                        .padding(.leading, 5)
                 }
             }
             .padding(.horizontal)
@@ -173,6 +177,7 @@ struct TrackCell: View {
     private let searchQuery: String?
     private let editMode: EditMode
     private let isSelected: Bool
+    private let showsMenu: Bool
     private let onButtonTap: (() -> Void)?
     private let onCellTap: (() -> Void)?
     private let onEditAudioTagsTap: (() -> Void)?
