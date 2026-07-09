@@ -160,9 +160,15 @@ final class ImportViewModel: ImportManaging {
                     includingPropertiesForKeys: [.isDirectoryKey]
                 ))?.filter { file in
                     let isDirectory = (try? file.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true
-                    return !isDirectory && self.supportedTrackExtensions.contains(file.pathExtension.lowercased())
-                } ?? []
 
+                    guard !isDirectory,
+                          let fileExtension = AudioFileExtension(rawValue: file.pathExtension.lowercased())
+                    else {
+                        return false
+                    }
+
+                    return self.supportedTrackExtensions.contains(fileExtension)
+                } ?? []
                 guard trackFiles.isNotEmpty else { continue }
 
                 let title = url.lastPathComponent
@@ -171,7 +177,8 @@ final class ImportViewModel: ImportManaging {
                 for file in trackFiles {
                     await self.importFile(file, into: playlist)
                 }
-            } else if  self.supportedTrackExtensions.contains(url.pathExtension.lowercased()) {
+            } else if let fileExtension = AudioFileExtension(rawValue: url.pathExtension.lowercased()),
+                      self.supportedTrackExtensions.contains(fileExtension) {
                 await self.importFile(url, into: nil)
             } else {
                 continue
@@ -198,7 +205,11 @@ final class ImportViewModel: ImportManaging {
         }
 
         let playlistFiles = files.filter {
-            self.supportedPlaylistExtensions.contains($0.pathExtension.lowercased())
+            guard let fileExtension = PlaylistExtension(rawValue: $0.pathExtension.lowercased()) else {
+                return false
+            }
+
+            return self.supportedPlaylistExtensions.contains(fileExtension)
         }
 
         return playlistFiles.map { file in
@@ -281,8 +292,8 @@ final class ImportViewModel: ImportManaging {
     @ObservationIgnored
     private var persistenceService: PersistenceServicing
     private var tracksObservationTask: Task<Void, Never>?
-    private let supportedPlaylistExtensions = ["m3u"]
-    private let supportedTrackExtensions = ["mp3", "wav", "flac"]
+    private let supportedPlaylistExtensions: Set<PlaylistExtension> = [.m3u, .m3u8]
+    private let supportedTrackExtensions: Set<AudioFileExtension> = [.mp3, .wav, .flac]
 
     // MARK: - Methods. Private
 
@@ -306,7 +317,6 @@ final class ImportViewModel: ImportManaging {
                     try self.persistenceService.deletePlaylist(playlist)
                 }
             }
-
             self.playlists = try self.persistenceService.fetchPlaylists()
         } catch {
             self.handleError(error)
@@ -337,6 +347,14 @@ final class ImportViewModel: ImportManaging {
     }
 
     private func importFile(_ url: URL, into playlist: PlaylistEntity?) async {
+        let ext = url.pathExtension.lowercased()
+        guard let fileExtension = AudioFileExtension(rawValue: ext.lowercased()),
+              self.supportedTrackExtensions.contains(fileExtension)
+        else {
+            AppLogger.imported.warning("Unsupported format: \(ext)")
+            return
+        }
+
         do {
             let id = UUID().uuidString
 

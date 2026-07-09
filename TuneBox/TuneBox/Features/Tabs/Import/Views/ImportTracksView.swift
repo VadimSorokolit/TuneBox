@@ -187,6 +187,7 @@ struct ImportTracksView: View {
         static let createPlaylistIcon = "plus"
         static let importPlaylistIcon = "music.note.list"
         static let importFolderIcon = "folder"
+        static let flacUTType = UTType(filenameExtension: "flac") ?? .audio
 
         static let importMenuItems: [ImportMenuItem] = [
             .init(
@@ -231,7 +232,7 @@ struct ImportTracksView: View {
                 return [.folder]
 
             case .files:
-                return [.audio]
+                return [.mp3, .wav, Constants.flacUTType]
 
             case .playlist:
                 return [.folder]

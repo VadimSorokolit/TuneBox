@@ -8,11 +8,15 @@
 import Foundation
 import Combine
 
+enum PlaylistExtension: String {
+    case m3u
+    case m3u8
+}
+
 enum AudioFileExtension: String {
     case mp3
     case wav
-    case m4a
-    case flac
+    case flac        
 }
 
 protocol AudioServicing: AnyObject {
