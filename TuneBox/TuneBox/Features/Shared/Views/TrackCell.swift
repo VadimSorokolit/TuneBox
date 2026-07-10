@@ -86,17 +86,17 @@ struct TrackCell: View {
                             }, label: {
                                 Label("Edit audio tags", systemImage: "pencil")
                             })
-                        }
 
-                        Button(
-                            role: .destructive,
-                            action: {
-                                onDeleteFromPlaylistTap?()
-                            },
-                            label: {
-                                Label("Delete from playlist", systemImage: "minus.circle")
-                            }
-                        )
+                            Button(
+                                role: .destructive,
+                                action: {
+                                    onDeleteFromPlaylistTap?()
+                                },
+                                label: {
+                                    Label("Delete from playlist", systemImage: "minus.circle")
+                                }
+                            )
+                        }
 
                         Button(
                             role: .destructive,

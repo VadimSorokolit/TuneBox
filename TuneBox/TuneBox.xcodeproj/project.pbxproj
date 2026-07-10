@@ -82,6 +82,8 @@
 		5BC8D8F62FFD769300742822 /* ImportedPlaylistCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D8F52FFD769200742822 /* ImportedPlaylistCell.swift */; };
 		5BC8D9022FFE966B00742822 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D9012FFE966A00742822 /* AppCoordinator.swift */; };
 		5BC8D9042FFE96B900742822 /* AppRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D9032FFE96B800742822 /* AppRoute.swift */; };
+		5BC8D9063000ED5500742822 /* CompactPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D9053000ED4600742822 /* CompactPlayerView.swift */; };
+		5BC8D90830011ECD00742822 /* ExpandedPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D90730011EC000742822 /* ExpandedPlayerView.swift */; };
 		5BD0DAF72FBF6BA000268A48 /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0DAF62FBF6B9F00268A48 /* AudioService.swift */; };
 		5BD3BF312FF56EDC006FED4B /* PlaylistEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD3BF302FF56EDB006FED4B /* PlaylistEntity.swift */; };
 		5BD3BF332FF5711D006FED4B /* PersistencePlaylistServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD3BF322FF5711C006FED4B /* PersistencePlaylistServicing.swift */; };
@@ -208,6 +210,8 @@
 		5BC8D8F52FFD769200742822 /* ImportedPlaylistCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportedPlaylistCell.swift; sourceTree = "<group>"; };
 		5BC8D9012FFE966A00742822 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		5BC8D9032FFE96B800742822 /* AppRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRoute.swift; sourceTree = "<group>"; };
+		5BC8D9053000ED4600742822 /* CompactPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompactPlayerView.swift; sourceTree = "<group>"; };
+		5BC8D90730011EC000742822 /* ExpandedPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandedPlayerView.swift; sourceTree = "<group>"; };
 		5BD0DAF62FBF6B9F00268A48 /* AudioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioService.swift; sourceTree = "<group>"; };
 		5BD3BF302FF56EDB006FED4B /* PlaylistEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistEntity.swift; sourceTree = "<group>"; };
 		5BD3BF322FF5711C006FED4B /* PersistencePlaylistServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistencePlaylistServicing.swift; sourceTree = "<group>"; };
@@ -823,6 +827,8 @@
 			isa = PBXGroup;
 			children = (
 				5BD3BF342FF586A8006FED4B /* Cells */,
+				5BC8D9053000ED4600742822 /* CompactPlayerView.swift */,
+				5BC8D90730011EC000742822 /* ExpandedPlayerView.swift */,
 				5BFBF2362FCCC2AA0013F6BB /* ImportTracksView.swift */,
 			);
 			path = Views;
@@ -1116,6 +1122,7 @@
 				5B8382AD2FC4CFF1003625CD /* DownloadManaging.swift in Sources */,
 				5B586CB72FAC678700BCEAD2 /* TrackDTO.swift in Sources */,
 				5B3FEB3D2FB4539C00DC1562 /* TransferViewModel.swift in Sources */,
+				5BC8D90830011ECD00742822 /* ExpandedPlayerView.swift in Sources */,
 				5B8382A92FC4CF43003625CD /* NetworkServicing.swift in Sources */,
 				5BA5818C2FD6A33200B498D7 /* ImportViewModel.swift in Sources */,
 				5BD3BF332FF5711D006FED4B /* PersistencePlaylistServicing.swift in Sources */,
@@ -1159,6 +1166,7 @@
 				5BA581962FD8603500B498D7 /* HighlightedText.swift in Sources */,
 				5B6B8CD32FED1D9400C23D3E /* DismissKeyboardOnTapModifier.swift in Sources */,
 				5B88609E2FAE184C0056BE9A /* GlobalConstants.swift in Sources */,
+				5BC8D9063000ED5500742822 /* CompactPlayerView.swift in Sources */,
 				5B1875C62FD06EBD00D8A042 /* SearchBarView.swift in Sources */,
 				5B8382B52FC59381003625CD /* BrowseView+.swift in Sources */,
 				5BD579A22FAB25E300503BA2 /* TuneBoxApp.swift in Sources */,
@@ -1347,7 +1355,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1389,7 +1397,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

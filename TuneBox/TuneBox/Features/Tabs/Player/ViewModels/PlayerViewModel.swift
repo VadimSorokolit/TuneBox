@@ -8,18 +8,21 @@
 import Foundation
 import Combine
 import Resolver
+import Observation
 
 private enum PlaybackDirection {
     case next
     case previous
 }
 
+@MainActor
 @Observable
 final class PlayerViewModel: PlayerManaging {
 
     // MARK: Properties. Public
 
     private(set) var playlist: PlaylistEntity?
+    private(set) var progress: Double = 0
     private(set) var error: String?
 
     // MARK: - Initializer
@@ -31,6 +34,13 @@ final class PlayerViewModel: PlayerManaging {
                 self?.isPlaying = isPlaying
             }
             .store(in: &self.cancellables)
+
+        self.audioService.progressSubject
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] value in
+                self?.progress = value
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: - Methods. Public
@@ -75,6 +85,13 @@ final class PlayerViewModel: PlayerManaging {
                 self.track = track
                 self.audioService.toggle(trackId: track.id, url: url, loop: false)
         }
+    }
+
+    func resetPlayback() {
+        self.audioService.stop()
+        self.track = nil
+        self.progress = 0
+        self.isPlaying = false
     }
 
     func isPlaying(_ track: TrackEntity) -> Bool {

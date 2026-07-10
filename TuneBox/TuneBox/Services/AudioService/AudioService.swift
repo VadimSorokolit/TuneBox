@@ -49,26 +49,35 @@ final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
     // MARK: - Methods. Public
 
     func play(trackId: String, url: URL, loop: Bool = false) {
-        self.stopMainPlayer()
+        stopMainPlayer()
+        currentTrackId = trackId
 
-        do {
-            try AVAudioSession.sharedInstance().setActive(true)
+        let volume = storedVolume
 
-            let player = try AVAudioPlayer(contentsOf: url)
-            player.prepareToPlay()
-            player.numberOfLoops = loop ? -1 : 0
-            player.volume = self.storedVolume
-            player.delegate = self
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                let player = try AVAudioPlayer(contentsOf: url)
+                player.prepareToPlay()
+                player.numberOfLoops = loop ? -1 : 0
+                player.volume = volume
 
-            self.mainPlayer = player
-            self.currentTrackId = trackId
+                DispatchQueue.main.async {
+                    do {
+                        try AVAudioSession.sharedInstance().setActive(true)
+                    } catch {
+                        AppLogger.audio.error("Failed to activate session: \(error)")
+                    }
 
-            player.play()
+                    player.delegate = self
+                    self.mainPlayer = player
+                    player.play()
 
-            self.notifyStateChange(true)
-            self.startProgressTimer()
-        } catch {
-            AppLogger.audio.error("Failed to play audio: \(String(describing: error))")
+                    self.notifyStateChange(true)
+                    self.startProgressTimer()
+                }
+            } catch {
+                AppLogger.audio.error("Failed to play audio: \(String(describing: error))")
+            }
         }
     }
 

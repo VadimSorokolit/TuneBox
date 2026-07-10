@@ -27,6 +27,7 @@ final class ImportViewModel: ImportManaging {
 
     private(set) var playlists: [PlaylistEntity] = []
     private(set) var sections: [TracksSection] = []
+    var selectedTrack: TrackEntity?
     var selectedTrackIDs: Set<String> = []
     var selectedTracks: Set<TrackEntity> = []
     var selectedPlaylists: Set<ImportedPlaylist> = []

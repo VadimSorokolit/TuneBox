@@ -59,6 +59,19 @@ final class AudioMetadataService: AudioMetadataServicing {
         return try? artworkDirectory().appendingPathComponent(storedPath)
     }
 
+    func bitrate(for url: URL) async throws -> Int {
+        let asset = AVURLAsset(url: url)
+        let tracks = try await asset.loadTracks(withMediaType: .audio)
+
+        guard let track = tracks.first else {
+            throw NSError(domain: "NoAudioTrack", code: 0)
+        }
+
+        let bitrate = try await track.load(.estimatedDataRate)
+
+        return Int(bitrate / 1000)
+    }
+
     static func save(_ data: Data, trackID: String) throws -> URL {
         guard let directory = FileManager.default
             .urls(for: .documentDirectory, in: .userDomainMask)

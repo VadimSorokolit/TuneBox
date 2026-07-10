@@ -10,6 +10,7 @@ import Foundation
 protocol ImportManaging: AnyObject {
     var playlists: [PlaylistEntity] { get }
     var sections: [TracksSection] { get }
+    var selectedTrack: TrackEntity? { get set }
     var selectedTracks: Set<TrackEntity> { get set }
     var selectedPlaylists: Set<ImportedPlaylist> { get set }
     var selectedTrackIDs: Set<String> { get set }
