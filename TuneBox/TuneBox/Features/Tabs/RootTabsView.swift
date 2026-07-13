@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum CustomTab: Hashable, Identifiable, CaseIterable {
+enum CustomTab: String, Hashable, Identifiable, CaseIterable {
     case browse
     case downloads
     case player
@@ -74,6 +74,7 @@ struct RootTabsView: View {
 
     @Environment(\.themeManager) private var theme
     @Environment(AppCoordinator.self) private var coordinator
+    @AppStorage("startTab") private var startTab = CustomTab.browse.rawValue
 
     private var content: some View {
         TabView(selection: Bindable(coordinator).selectedTab) {
@@ -93,6 +94,10 @@ struct RootTabsView: View {
                 .tag(CustomTab.settings)
         }
         .toolbar(.hidden, for: .tabBar)
+        .onAppear {
+            coordinator.selectedTab = CustomTab(rawValue: startTab) ?? .browse
+
+        }
     }
 
     private var tabBar: some View {
