@@ -80,6 +80,14 @@ extension Resolver: @retroactive ResolverRegistering {
 
         self.register {
             MainActor.assumeIsolated {
+                TestViewModel()
+                as TestManaging
+            }
+        }
+        .scope(.application)
+
+        self.register {
+            MainActor.assumeIsolated {
                 PlayerViewModel()
                 as PlayerManaging
             }

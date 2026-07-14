@@ -1,0 +1,18 @@
+//
+//  TestManaging.swift
+//  TuneBox
+//
+//  Created by Vadim Sorokolit on 14.07.2026.
+//
+
+import Foundation
+
+protocol TestManaging: LoadStateManaging {
+    var editSectionModeEnabled: Bool { get set }
+    var hasLibrary: Bool { get }
+    var library: MusicLibrary? { get }
+    var sections: [ImportSectionModel] { get }
+
+    func fetchImportedTracks() async
+    func importFolder(_ url: URL) async
+}

@@ -290,19 +290,6 @@ struct BrowseView: View {
         }
     }
 
-    private struct CentralSpinnerModifier: ViewModifier {
-        let isVisible: Bool
-
-        func body(content: Content) -> some View {
-            content
-                .overlay {
-                    if isVisible {
-                        SpinnerView()
-                    }
-                }
-        }
-    }
-
     private func handleSearchStateBy(query: String) {
         if query.isEmpty {
             viewModel.clearSearchState()
