@@ -14,11 +14,27 @@ enum ImportSection: String, Hashable {
     case sources
 }
 
-enum LibraryItem: Hashable {
+enum LibraryItem: String, Hashable {
     case albums
     case artists
     case tracks
     case playlists
+
+    var systemImage: String {
+        switch self {
+            case .albums:
+                return "square.stack"
+
+            case .artists:
+                return "music.mic"
+
+            case .tracks:
+                return "music.note"
+
+            case .playlists:
+                return "music.note.list"
+        }
+    }
 }
 
 enum SourceKind: Hashable {
@@ -34,6 +50,19 @@ enum SourceKind: Hashable {
                 return "Sync from Mac"
             case .api:
                 return "Jamendo"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+            case .local:
+                return "folder"
+
+            case .sync:
+                return "desktopcomputer"
+
+            case .api:
+                return "globe"
         }
     }
 }
@@ -112,7 +141,13 @@ final class TestViewModel: TestManaging {
 
         do {
             let tracks = try self.persistenceService.getImportTracks()
-            self.library = self.parseLibrary(from: tracks)
+                .sorted {
+                    $0.songName.localizedCaseInsensitiveCompare($1.songName) == .orderedAscending
+                }
+
+            if tracks.isNotEmpty {
+                self.library = self.parseLibrary(from: tracks)
+            }
         } catch {
             self.handleError(error)
         }
@@ -151,7 +186,7 @@ final class TestViewModel: TestManaging {
     @ObservationIgnored
     private var persistenceService: PersistenceServicing
     private let supportedPlaylistExtensions: Set<PlaylistExtension> = [.m3u, .m3u8]
-    private let supportedTrackExtensions: Set<AudioFileExtension> = [.mp3, .wav, .flac]
+    private let supportedTrackExtensions: Set<AudioFileExtension> = [.mp3, .wav, .wv, .flac]
 
     // MARK: - Methods. Private
 
@@ -201,7 +236,9 @@ final class TestViewModel: TestManaging {
 
             var artworkPath: String?
 
-            if let artwork = metadata?.artwork {
+            let artwork = metadata?.artwork ?? folderArtwork(near: url)
+
+            if let artwork {
                 let artworkURL = try AudioMetadataService.save(
                     artwork,
                     trackID: id
@@ -213,13 +250,15 @@ final class TestViewModel: TestManaging {
                 Int($0.rounded())
             }
 
+            let fileBase = url.deletingPathExtension().lastPathComponent
+
             let track = TrackEntity(
                 id: id,
                 image: artworkPath,
-                songName: metadata?.title ?? url.deletingPathExtension().lastPathComponent,
+                songName: metadata?.title ?? fileBase,
                 duration: duration,
                 artistName: metadata?.artist ?? "",
-                albumName: metadata?.album ?? "",
+                albumName: metadata?.album ?? fileBase,
                 releaseDate: nil,
                 download: nil,
                 waveformData: nil,
@@ -235,6 +274,26 @@ final class TestViewModel: TestManaging {
         } catch {
             self.handleError(error)
         }
+    }
+
+    private func folderArtwork(near fileURL: URL) -> Data? {
+        let dir = fileURL.deletingLastPathComponent()
+        let preferred = ["cover.jpg", "folder.jpg", "Cover.jpg", "Folder.jpg"]
+        for name in preferred {
+            let url = dir.appendingPathComponent(name)
+            if let data = try? Data(contentsOf: url) {
+                return data
+            }
+        }
+        guard let files = try? FileManager.default.contentsOfDirectory(
+            at: dir,
+            includingPropertiesForKeys: nil
+        ) else {
+            return nil
+        }
+        return files
+            .first { $0.pathExtension.lowercased() == "jpg" || $0.pathExtension.lowercased() == "jpeg" }
+            .flatMap { try? Data(contentsOf: $0) }
     }
 
     private func collectFiles(from url: URL) throws -> [URL] {
@@ -273,7 +332,9 @@ final class TestViewModel: TestManaging {
                 cover: tracks.first?.imagePath
             )
         }
-        .sorted { $0.name < $1.name }
+        .sorted {
+            $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+        }
 
         let artists = Dictionary(grouping: tracks.filter { $0.artistName.isNotEmpty }) {
             $0.artistName
@@ -286,7 +347,9 @@ final class TestViewModel: TestManaging {
                 albums: Set(tracks.map(\.albumName).filter(\.isNotEmpty))
             )
         }
-        .sorted { $0.name < $1.name }
+        .sorted {
+            $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+        }
 
         return MusicLibrary(
             albums: albums,
@@ -301,5 +364,4 @@ final class TestViewModel: TestManaging {
         self.error = message
         AppLogger.imported.warning("\(message)")
     }
-
 }

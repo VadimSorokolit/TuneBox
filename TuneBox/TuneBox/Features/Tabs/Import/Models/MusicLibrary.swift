@@ -11,7 +11,7 @@ struct MusicLibrary {
     let tracks: [TrackEntity]
     let playlists: [PlaylistEntity]
 
-    struct Album: Identifiable {
+    struct Album: Identifiable, Hashable {
         let id: String
         let name: String
         let artist: String
@@ -19,7 +19,7 @@ struct MusicLibrary {
         let cover: String?
     }
 
-    struct Artist: Identifiable {
+    struct Artist: Identifiable, Hashable {
         let id: String
         let name: String
         let tracks: [TrackEntity]

@@ -11,4 +11,9 @@ enum AppRoute: Hashable {
     case launch
     case onboarding
     case main
+    case albums
+    case album(album: MusicLibrary.Album)
+    case artist
+    case tracks
+    case playlists
 }

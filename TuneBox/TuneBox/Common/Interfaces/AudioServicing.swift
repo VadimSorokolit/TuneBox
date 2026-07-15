@@ -17,6 +17,8 @@ enum AudioFileExtension: String {
     case mp3
     case wav
     case flac
+    // swiftlint:disable:next identifier_name
+    case wv
 }
 
 protocol AudioServicing: AnyObject {

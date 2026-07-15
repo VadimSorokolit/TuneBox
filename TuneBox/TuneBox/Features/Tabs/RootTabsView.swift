@@ -87,8 +87,30 @@ struct RootTabsView: View {
             PlayerView()
                 .tag(CustomTab.player)
 
-            ImportTracksView()
-                .tag(CustomTab.importFiles)
+            NavigationStack(path: coordinator.pathBinding) {
+                TestTracksView()
+                    .navigationDestination(for: AppRoute.self) { route in
+                        switch route {
+                            case .albums:
+                                AlbumsView()
+
+                            case .album(let album):
+                                AlbumDetailsView(album: album)
+
+                            case .artist:
+                                ArtistsView()
+
+                            case .tracks:
+                                TracksView()
+
+                            case .playlists:
+                                PlaylistsView()
+
+                            default: EmptyView()
+                        }
+                    }
+            }
+            .tag(CustomTab.importFiles)
 
             SettingsView()
                 .tag(CustomTab.settings)

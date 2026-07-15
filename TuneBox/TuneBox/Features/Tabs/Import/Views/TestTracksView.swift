@@ -169,6 +169,7 @@ struct TestTracksView: View {
 
         // MARK: - Properties. Public
 
+        @Environment(AppCoordinator.self) private var coordinator
         let viewModel: TestManaging
 
         // MARK: - Body
@@ -181,57 +182,31 @@ struct TestTracksView: View {
                             Section {
                                 switch section.kind {
                                     case .library:
-                                        VStack(spacing: 4) {
-                                            ForEach(library.albums) { album in
-                                                Color.clear
-                                                    .frame(height: 1)
-                                                    .onAppear {
-                                                        print(album.name)
-                                                    }
-                                            }
+                                        VStack(spacing: 0) {
+                                            ForEach(section.items, id: \.self) { item in
+                                                LibraryMenuCell(
+                                                    item: item,
+                                                    onTapGesture: {
+                                                        if case let .library(libraryItem) = item {
+                                                            switch libraryItem {
+                                                                case .albums:
+                                                                    coordinator.push(.albums)
 
-                                            Text("")
-                                                .frame(height: 1)
-                                                .onAppear {
-                                                    print("----------------")
-                                                }
+                                                                case .artists:
+                                                                    coordinator.push(.artist)
 
-                                            ForEach(library.artists) { artist in
-                                                Color.clear
-                                                    .frame(height: 1)
-                                                    .onAppear {
-                                                        print(artist.name)
-                                                    }
-                                            }
+                                                                case .tracks:
+                                                                    coordinator.push(.tracks)
 
-                                            Text("")
-                                                .frame(height: 1)
-                                                .onAppear {
-                                                    print("----------------")
-                                                }
-                                            
-                                            ForEach(library.tracks) { track in
-                                                Color.clear
-                                                    .frame(height: 1)
-                                                    .onAppear {
-                                                        print(track.songName)
+                                                                case .playlists:
+                                                                    coordinator.push(.playlists)
+                                                            }
+                                                        }
                                                     }
+                                                )
                                             }
-                                            
-                                            Text("")
-                                                .frame(height: 1)
-                                                .onAppear {
-                                                    print("----------------")
-                                                }
-//                                            
-//                                            ForEach(library.playlists) { playlist in
-//                                                Color.clear
-//                                                    .frame(height: 1)
-//                                                    .onAppear {
-//                                                        print(playlist.title)
-//                                                    }
-//                                            }
                                         }
+
                                     case .sources:
                                         EmptyView()
                                 }
