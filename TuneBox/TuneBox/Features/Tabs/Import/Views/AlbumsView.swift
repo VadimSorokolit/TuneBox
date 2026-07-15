@@ -30,7 +30,8 @@ struct AlbumsView: View {
                     Text(
                         "\(library.albums.count) "
                         + "\(library.albums.count == 1 ? "album" : "albums") · "
-                        + "\(viewModel.libraryTracksDuration.formattedDuration) · \(viewModel.libraryTracksSize.formattedFileSize)"
+                        + "\(viewModel.tracksDuration(library.albums.flatMap(\.tracks)).formattedDuration) · "
+                        + "\(viewModel.tracksSize(library.albums.flatMap(\.tracks)).formattedFileSize)"
                     )
                     .multilineTextAlignment(.center)
                     .font(.system(size: 16, weight: .regular))

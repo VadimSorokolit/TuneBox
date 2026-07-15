@@ -11,10 +11,10 @@ protocol TestManaging: LoadStateManaging {
     var editSectionModeEnabled: Bool { get set }
     var hasLibrary: Bool { get }
     var library: MusicLibrary? { get }
-    var libraryTracksSize: Int { get }
-    var libraryTracksDuration: Int { get }
     var sections: [ImportSectionModel] { get }
 
     func fetchImportedTracks() async
     func importFolder(_ url: URL) async
+    func tracksSize(_ tracks: [TrackEntity]) -> Int
+    func tracksDuration(_ tracks: [TrackEntity]) -> Int
 }

@@ -6,14 +6,20 @@
 //
 
 import SwiftUI
+import Resolver
 
 struct AlbumDetailsView: View {
+
+    // MARK: - Properties. Public
+
     let album: MusicLibrary.Album?
+
+    // MARK: - Main Body
 
     var body: some View {
         if let album {
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 10) {
+                LazyVStack(spacing: 10) {
                     ArtworkView(artworkPath: album.cover,
                                 size: 300,
                                 cornerRadius: 5
@@ -26,10 +32,21 @@ struct AlbumDetailsView: View {
                                      onTapGesture: {}
                         )
                     }
+
+                    Text(
+                        "\(album.tracks.count) "
+                        + "\(album.tracks.count == 1 ? "track" : "tracks") · "
+                        + "\(viewModel.tracksDuration(album.tracks).formattedDuration) · "
+                        + "\(viewModel.tracksSize(album.tracks).formattedFileSize)"
+                    )
+                    .padding(.top, 10)
+                    .multilineTextAlignment(.center)
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundStyle(.gray)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .contentMargins(.bottom, 80)
+            .contentMargins(.bottom, 40)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
@@ -49,4 +66,8 @@ struct AlbumDetailsView: View {
             }
         }
     }
+
+    // MARK: - Properties. Private
+
+    @Injected private var viewModel: TestManaging
 }

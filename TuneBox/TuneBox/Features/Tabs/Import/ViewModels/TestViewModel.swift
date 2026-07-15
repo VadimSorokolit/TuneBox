@@ -130,22 +130,6 @@ final class TestViewModel: TestManaging {
         self.library != nil
     }
 
-    var libraryTracksSize: Int {
-        guard let library else {
-            return 0
-        }
-
-        return library.tracks.reduce(0) { $0 + ($1.size ?? 0) }
-    }
-    
-    var libraryTracksDuration: Int {
-        guard let library else {
-            return 0
-        }
-        
-        return library.tracks.reduce(0) { $0 + ($1.duration ?? 0) }
-    }
-
     // MARK: - Methods. Public
 
     func fetchImportedTracks() async {
@@ -188,6 +172,14 @@ final class TestViewModel: TestManaging {
         } catch {
             self.handleError(error)
         }
+    }
+
+    func tracksSize(_ tracks: [TrackEntity]) -> Int {
+        tracks.reduce(0) { $0 + ($1.size ?? 0) }
+    }
+
+    func tracksDuration(_ tracks: [TrackEntity]) -> Int {
+        tracks.reduce(0) { $0 + ($1.duration ?? 0) }
     }
 
     // MARK: - Initializer
