@@ -125,7 +125,9 @@ final class TestViewModel: TestManaging {
     private(set) var error: String?
     private(set) var isLoading: Bool = false
     var selectedLibraryItems: Set<LibraryItem> = []
+    var libraryItemsOrder: [LibraryItem] = [.albums, .artists, .tracks, .playlists]
     var editSectionModeEnabled: Bool = false
+    var draggingLibraryItem: LibraryItem?
 
     var hasLibrary: Bool {
         self.library != nil
@@ -195,6 +197,23 @@ final class TestViewModel: TestManaging {
         self.selectedLibraryItems.contains(item)
     }
 
+    func moveLibraryItem(to target: LibraryItem) {
+        guard
+            let from = self.draggingLibraryItem,
+            from != target,
+            let fromIndex = self.libraryItemsOrder.firstIndex(of: from),
+            let toIndex = self.libraryItemsOrder.firstIndex(of: target)
+        else {
+            return
+        }
+
+        self.libraryItemsOrder.move(
+            fromOffsets: IndexSet(integer: fromIndex),
+            toOffset: toIndex > fromIndex ? toIndex + 1 : toIndex
+        )
+        self.ensureSections()
+    }
+
     func beginEditSections() {
         self.editSectionModeEnabled = true
         self.ensureSections()
@@ -202,13 +221,16 @@ final class TestViewModel: TestManaging {
 
     func finishEditSections() {
         self.editSectionModeEnabled = false
+        self.draggingLibraryItem = nil
         self.saveSelectedLibraryItems()
+        self.saveLibraryItemsOrder()
         self.ensureSections()
     }
 
     // MARK: - Initializer
 
     init() {
+        self.loadLibraryItemsOrder()
         self.loadSelectedLibraryItems()
         self.ensureSections()
     }
@@ -222,6 +244,7 @@ final class TestViewModel: TestManaging {
     private let supportedTrackExtensions: Set<AudioFileExtension> = [.mp3, .wav, .wv, .flac]
     private enum Keys {
         static let selectedLibraryItems = "importSelectedLibraryItems"
+        static let libraryItemsOrder = "importLibraryItemsOrder"
     }
 
     // MARK: - Methods. Private
@@ -401,6 +424,18 @@ final class TestViewModel: TestManaging {
         }
     }
 
+    private func loadLibraryItemsOrder() {
+        if let saved = UserDefaults.standard.stringArray(forKey: Keys.libraryItemsOrder) {
+            let parsed = saved.compactMap(LibraryItem.init(rawValue:))
+            if parsed.isNotEmpty {
+                self.libraryItemsOrder = parsed
+                return
+            }
+        }
+
+        self.libraryItemsOrder = [.albums, .artists, .tracks, .playlists]
+    }
+
     private func saveSelectedLibraryItems() {
         UserDefaults.standard.set(
             self.selectedLibraryItems.map(\.rawValue),
@@ -408,8 +443,15 @@ final class TestViewModel: TestManaging {
         )
     }
 
+    private func saveLibraryItemsOrder() {
+        UserDefaults.standard.set(
+            libraryItemsOrder.map(\.rawValue),
+            forKey: Keys.libraryItemsOrder
+        )
+    }
+
     private func librarySectionItems() -> [ImportItem] {
-        let all: [LibraryItem] = [.albums, .artists, .tracks, .playlists]
+        let all = libraryItemsOrder
 
         let visible = self.editSectionModeEnabled
         ? all

@@ -193,10 +193,11 @@ struct TestTracksView: View {
                                                         }
                                                         return false
                                                     }(),
+                                                    viewModel: viewModel,
                                                     onTapGesture: {
                                                         if case let .library(libraryItem) = item {
                                                             if viewModel.editSectionModeEnabled {
-                                                                            viewModel.toggleLibraryItem(libraryItem)
+                                                                viewModel.toggleLibraryItem(libraryItem)
                                                             } else {
                                                                 switch libraryItem {
                                                                     case .albums:
