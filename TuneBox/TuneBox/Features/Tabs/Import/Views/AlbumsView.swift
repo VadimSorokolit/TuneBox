@@ -13,22 +13,33 @@ struct AlbumsView: View {
     // MARK: - Main Body
 
     var body: some View {
-        if let libray = viewModel.library {
+        if let library = viewModel.library {
             ScrollView(showsIndicators: false) {
-                ForEach(libray.albums) { album in
-                    LazyVStack(spacing: 0) {
-                        AlbumCell(
-                            album: album,
-                            onTapGesture: {
-                                coordinator.push(.album(album: album))
-                            }
-                        )
+                LazyVStack(spacing: 20) {
+                    ForEach(library.albums) { album in
+                        LazyVStack(spacing: 0) {
+                            AlbumCell(
+                                album: album,
+                                onTapGesture: {
+                                    coordinator.push(.album(album: album))
+                                }
+                            )
+                        }
                     }
+
+                    Text(
+                        "\(library.albums.count) "
+                        + "\(library.albums.count == 1 ? "album" : "albums") · "
+                        + "\(viewModel.libraryTracksDuration.formattedDuration) · \(viewModel.libraryTracksSize.formattedFileSize)"
+                    )
+                    .multilineTextAlignment(.center)
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundStyle(.gray)
                 }
             }
             .navigationTitle("Albums")
             .padding(.top, 16)
-            .contentMargins(.bottom, 80)
+            .contentMargins(.bottom, 40)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
     }

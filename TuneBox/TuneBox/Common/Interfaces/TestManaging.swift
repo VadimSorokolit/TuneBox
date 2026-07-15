@@ -11,6 +11,8 @@ protocol TestManaging: LoadStateManaging {
     var editSectionModeEnabled: Bool { get set }
     var hasLibrary: Bool { get }
     var library: MusicLibrary? { get }
+    var libraryTracksSize: Int { get }
+    var libraryTracksDuration: Int { get }
     var sections: [ImportSectionModel] { get }
 
     func fetchImportedTracks() async

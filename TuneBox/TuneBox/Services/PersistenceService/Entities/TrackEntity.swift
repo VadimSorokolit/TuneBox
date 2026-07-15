@@ -32,7 +32,7 @@ final class TrackEntity {
     var downloadQueueIndex: Int?
     var genreRawValue: String?
     private var localFilePath: String?
-    private var duration: Int?
+    var duration: Int?
     private(set) var sourceRawValue: String = TrackSource.api.rawValue
     private(set) var downloadStateRawValue: String = DownloadState.idle.rawValue
     private var fileStateRawValue: String = FileStorageState.none.rawValue

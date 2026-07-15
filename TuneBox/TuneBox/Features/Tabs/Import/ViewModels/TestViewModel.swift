@@ -130,6 +130,22 @@ final class TestViewModel: TestManaging {
         self.library != nil
     }
 
+    var libraryTracksSize: Int {
+        guard let library else {
+            return 0
+        }
+
+        return library.tracks.reduce(0) { $0 + ($1.size ?? 0) }
+    }
+    
+    var libraryTracksDuration: Int {
+        guard let library else {
+            return 0
+        }
+        
+        return library.tracks.reduce(0) { $0 + ($1.duration ?? 0) }
+    }
+
     // MARK: - Methods. Public
 
     func fetchImportedTracks() async {
@@ -233,6 +249,9 @@ final class TestViewModel: TestManaging {
             )
 
             let metadata = try? await AudioMetadataService.extractMetadata(from: localURL)
+            let values = try localURL.resourceValues(forKeys: [.fileSizeKey])
+
+            let fileSize = values.fileSize
 
             var artworkPath: String?
 
@@ -262,7 +281,7 @@ final class TestViewModel: TestManaging {
                 releaseDate: nil,
                 download: nil,
                 waveformData: nil,
-                size: nil,
+                size: fileSize,
                 localFilePath: localURL.path,
                 sourceRawValue: TrackSource.imported.rawValue,
                 downloadStateRawValue: DownloadState.completed.rawValue,
