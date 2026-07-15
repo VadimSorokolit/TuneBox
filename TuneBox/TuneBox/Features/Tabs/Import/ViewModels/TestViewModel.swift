@@ -124,6 +124,7 @@ final class TestViewModel: TestManaging {
     private(set) var library: MusicLibrary?
     private(set) var error: String?
     private(set) var isLoading: Bool = false
+    var selectedLibraryItems: Set<LibraryItem> = []
     var editSectionModeEnabled: Bool = false
 
     var hasLibrary: Bool {
@@ -182,9 +183,33 @@ final class TestViewModel: TestManaging {
         tracks.reduce(0) { $0 + ($1.duration ?? 0) }
     }
 
+    func toggleLibraryItem(_ item: LibraryItem) {
+        if self.selectedLibraryItems.contains(item) {
+            self.selectedLibraryItems.remove(item)
+        } else {
+            self.selectedLibraryItems.insert(item)
+        }
+    }
+
+    func isLibraryItemSelected(_ item: LibraryItem) -> Bool {
+        self.selectedLibraryItems.contains(item)
+    }
+
+    func beginEditSections() {
+        self.editSectionModeEnabled = true
+        self.ensureSections()
+    }
+
+    func finishEditSections() {
+        self.editSectionModeEnabled = false
+        self.saveSelectedLibraryItems()
+        self.ensureSections()
+    }
+
     // MARK: - Initializer
 
     init() {
+        self.loadSelectedLibraryItems()
         self.ensureSections()
     }
 
@@ -195,21 +220,17 @@ final class TestViewModel: TestManaging {
     private var persistenceService: PersistenceServicing
     private let supportedPlaylistExtensions: Set<PlaylistExtension> = [.m3u, .m3u8]
     private let supportedTrackExtensions: Set<AudioFileExtension> = [.mp3, .wav, .wv, .flac]
+    private enum Keys {
+        static let selectedLibraryItems = "importSelectedLibraryItems"
+    }
 
     // MARK: - Methods. Private
 
     private func ensureSections() {
-        guard self.sections.isEmpty else { return }
-
-        self.sections = [
+        sections = [
             .init(
                 kind: .library,
-                items: [
-                    .library(.albums),
-                    .library(.artists),
-                    .library(.tracks),
-                    .library(.playlists)
-                ]
+                items: librarySectionItems()
             ),
             .init(
                 kind: .sources,
@@ -368,6 +389,33 @@ final class TestViewModel: TestManaging {
             tracks: tracks,
             playlists: []
         )
+    }
+
+    private func loadSelectedLibraryItems() {
+        if let saved = UserDefaults.standard.stringArray(forKey: Keys.selectedLibraryItems) {
+            self.selectedLibraryItems = Set(saved.compactMap(LibraryItem.init(rawValue:)))
+        }
+
+        if self.selectedLibraryItems.isEmpty {
+            self.selectedLibraryItems = [.albums, .artists, .tracks, .playlists]
+        }
+    }
+
+    private func saveSelectedLibraryItems() {
+        UserDefaults.standard.set(
+            self.selectedLibraryItems.map(\.rawValue),
+            forKey: Keys.selectedLibraryItems
+        )
+    }
+
+    private func librarySectionItems() -> [ImportItem] {
+        let all: [LibraryItem] = [.albums, .artists, .tracks, .playlists]
+
+        let visible = self.editSectionModeEnabled
+        ? all
+        : all.filter { self.selectedLibraryItems.contains($0) }
+
+        return visible.map { .library($0) }
     }
 
     private func handleError(_ error: Error) {

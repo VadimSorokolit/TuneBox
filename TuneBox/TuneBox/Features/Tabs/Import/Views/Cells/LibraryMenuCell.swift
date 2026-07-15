@@ -12,6 +12,8 @@ struct LibraryMenuCell: View {
     // MARK: - Properties. Public
 
     let item: ImportItem
+    let isEditMode: Bool
+    let isSelected: Bool
     let onTapGesture: () -> Void
 
     // MARK: - Body
@@ -22,6 +24,12 @@ struct LibraryMenuCell: View {
                 case .library(let libraryItem):
                     VStack(spacing: 15) {
                         HStack(spacing: 10) {
+                            if isEditMode {
+                                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                                       .foregroundStyle(isSelected ? .blue : .gray)
+                                       .font(.system(size: 22, weight: .medium))
+                            }
+
                             Image(systemName: libraryItem.systemImage)
                                 .foregroundStyle(.gray)
                                 .font(.system(size: 22, weight: .medium))
@@ -40,6 +48,7 @@ struct LibraryMenuCell: View {
                             .padding(.trailing, 26)
                     }
                     .padding(.top, 15)
+                    .background(isEditMode && isSelected ? .gray.opacity(0.5) : .clear)
 
                 case .source:
                     Text("Source")
@@ -58,6 +67,8 @@ struct LibraryMenuCell: View {
 #Preview {
     LibraryMenuCell(
         item: .library(.artists),
+        isEditMode: true,
+        isSelected: false,
         onTapGesture: {}
     )
 }

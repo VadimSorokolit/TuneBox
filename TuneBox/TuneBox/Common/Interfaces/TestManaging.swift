@@ -17,4 +17,8 @@ protocol TestManaging: LoadStateManaging {
     func importFolder(_ url: URL) async
     func tracksSize(_ tracks: [TrackEntity]) -> Int
     func tracksDuration(_ tracks: [TrackEntity]) -> Int
+    func toggleLibraryItem(_ item: LibraryItem)
+    func isLibraryItemSelected(_ item: LibraryItem) -> Bool
+    func beginEditSections()
+    func finishEditSections()
 }

@@ -77,7 +77,7 @@ struct TestTracksView: View {
                 if viewModel.editSectionModeEnabled {
                     Button(
                         action: {
-                            viewModel.editSectionModeEnabled = false
+                            viewModel.finishEditSections()
                         }, label: {
                             Image(systemName: "checkmark")
                                 .font(.system(size: imageFontSize, weight: .medium))
@@ -98,7 +98,7 @@ struct TestTracksView: View {
 
                         Button(
                             action: {
-                                viewModel.editSectionModeEnabled = true
+                                viewModel.beginEditSections()
                             }, label: {
                                 Label("Edit Sections", systemImage: "slider.horizontal.3")
                             }
@@ -186,20 +186,31 @@ struct TestTracksView: View {
                                             ForEach(section.items, id: \.self) { item in
                                                 LibraryMenuCell(
                                                     item: item,
+                                                    isEditMode: viewModel.editSectionModeEnabled,
+                                                    isSelected: {
+                                                        if case let .library(libraryItem) = item {
+                                                            return viewModel.isLibraryItemSelected(libraryItem)
+                                                        }
+                                                        return false
+                                                    }(),
                                                     onTapGesture: {
                                                         if case let .library(libraryItem) = item {
-                                                            switch libraryItem {
-                                                                case .albums:
-                                                                    coordinator.push(.albums)
+                                                            if viewModel.editSectionModeEnabled {
+                                                                            viewModel.toggleLibraryItem(libraryItem)
+                                                            } else {
+                                                                switch libraryItem {
+                                                                    case .albums:
+                                                                        coordinator.push(.albums)
 
-                                                                case .artists:
-                                                                    coordinator.push(.artist)
+                                                                    case .artists:
+                                                                        coordinator.push(.artist)
 
-                                                                case .tracks:
-                                                                    coordinator.push(.tracks)
+                                                                    case .tracks:
+                                                                        coordinator.push(.tracks)
 
-                                                                case .playlists:
-                                                                    coordinator.push(.playlists)
+                                                                    case .playlists:
+                                                                        coordinator.push(.playlists)
+                                                                }
                                                             }
                                                         }
                                                     }
