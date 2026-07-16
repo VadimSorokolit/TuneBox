@@ -87,6 +87,8 @@
 		5B88609E2FAE184C0056BE9A /* GlobalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B88609D2FAE18450056BE9A /* GlobalConstants.swift */; };
 		5B8860A52FB1CF910056BE9A /* NotificationNames+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8860A42FB1CF900056BE9A /* NotificationNames+Extension.swift */; };
 		5B899F782FCF13A8002D3232 /* RootTabsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B899F772FCF13A8002D3232 /* RootTabsView.swift */; };
+		5B992F5230090FE400276008 /* SegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B992F5130090FE200276008 /* SegmentedControl.swift */; };
+		5B992F54300913E800276008 /* View+segmentTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B992F53300913E700276008 /* View+segmentTransition.swift */; };
 		5B9C3DFA2FD03DA400138645 /* TrackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9C3DF92FD03DA300138645 /* TrackCell.swift */; };
 		5B9CE54B2FB32589001BE37F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9CE54A2FB32589001BE37F /* AppDelegate.swift */; };
 		5B9D45DA2FDF099D00F86C1B /* DownloadsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9D45D92FDF099C00F86C1B /* DownloadsViewModel.swift */; };
@@ -235,6 +237,8 @@
 		5B88609D2FAE18450056BE9A /* GlobalConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalConstants.swift; sourceTree = "<group>"; };
 		5B8860A42FB1CF900056BE9A /* NotificationNames+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationNames+Extension.swift"; sourceTree = "<group>"; };
 		5B899F772FCF13A8002D3232 /* RootTabsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabsView.swift; sourceTree = "<group>"; };
+		5B992F5130090FE200276008 /* SegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedControl.swift; sourceTree = "<group>"; };
+		5B992F53300913E700276008 /* View+segmentTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+segmentTransition.swift"; sourceTree = "<group>"; };
 		5B9C3DF92FD03DA300138645 /* TrackCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackCell.swift; sourceTree = "<group>"; };
 		5B9CE54A2FB32589001BE37F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5B9D45D92FDF099C00F86C1B /* DownloadsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsViewModel.swift; sourceTree = "<group>"; };
@@ -402,12 +406,13 @@
 			isa = PBXGroup;
 			children = (
 				5B0BC2CE3007DF7100E8F2A5 /* ArtworkView.swift */,
-				5BA581952FD8603400B498D7 /* HighlightedText.swift */,
 				5BA581912FD7055B00B498D7 /* EmptyTrackCell.swift */,
-				5B1875C82FD084CA00D8A042 /* SegmentedChipControl.swift */,
-				5B9C3DF92FD03DA300138645 /* TrackCell.swift */,
+				5BA581952FD8603400B498D7 /* HighlightedText.swift */,
 				5BA1F0002FE1000000503BA2 /* PaginationFooterView.swift */,
 				5B1875C52FD06EBC00D8A042 /* SearchBarView.swift */,
+				5B1875C82FD084CA00D8A042 /* SegmentedChipControl.swift */,
+				5B992F5130090FE200276008 /* SegmentedControl.swift */,
+				5B9C3DF92FD03DA300138645 /* TrackCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -590,6 +595,7 @@
 				5B6B8CD42FED1DEC00C23D3E /* View+dismissKeyboardOnTap.swift */,
 				5B3D227C2FF53A54004B8356 /* View+frame.swift */,
 				5B6B8CD62FED326700C23D3E /* View+sectionTracksTitle.swift */,
+				5B992F53300913E700276008 /* View+segmentTransition.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1226,6 +1232,7 @@
 				5BA5818C2FD6A33200B498D7 /* ImportViewModel.swift in Sources */,
 				5BD3BF332FF5711D006FED4B /* PersistencePlaylistServicing.swift in Sources */,
 				5B8382A72FC4CEF8003625CD /* FileManagerServicing.swift in Sources */,
+				5B992F5230090FE400276008 /* SegmentedControl.swift in Sources */,
 				5BD3BF362FF586B3006FED4B /* PlaylistCell.swift in Sources */,
 				5B0BC2AC300659F800E8F2A5 /* TestViewModel.swift in Sources */,
 				5B0FD0C42FD2FAD200753D3A /* Bool+Extensions.swift in Sources */,
@@ -1234,6 +1241,7 @@
 				5B9D45DA2FDF099D00F86C1B /* DownloadsViewModel.swift in Sources */,
 				5B586CB12FAB98EE00BCEAD2 /* NetworkService.swift in Sources */,
 				5B0BC2C13007829A00E8F2A5 /* PlaylistsView.swift in Sources */,
+				5B992F54300913E800276008 /* View+segmentTransition.swift in Sources */,
 				5B9C3DFA2FD03DA400138645 /* TrackCell.swift in Sources */,
 				5BA581902FD6A52100B498D7 /* ImportManaging.swift in Sources */,
 				5BA1F0012FE1000100503BA2 /* PaginationFooterView.swift in Sources */,

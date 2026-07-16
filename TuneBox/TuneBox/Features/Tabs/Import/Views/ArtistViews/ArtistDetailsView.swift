@@ -7,6 +7,20 @@
 
 import SwiftUI
 
+enum LibrarySegment: Int, CaseIterable, SegmentedItem {
+    case albums
+    case tracks
+
+    var title: String {
+        switch self {
+            case .albums:
+                "Albums"
+            case .tracks:
+                "Tracks"
+        }
+    }
+}
+
 struct ArtistDetailsView: View {
 
     // MARK: - Properties. Public
@@ -16,10 +30,14 @@ struct ArtistDetailsView: View {
     // MARK: - Main Body
 
     var body: some View {
-        if let artist, artist.albums.isEmpty {
-            TracksView(tracks: artist.tracks)
+        if let artist {
+            if artist.albums.isEmpty {
+                TracksView(tracks: artist.tracks)
+            } else {
+                ChipsView(artist: artist)
+            }
         } else {
-            ChipsView(albums: artist?.albums ?? [])
+            EmptyView()
         }
     }
 
@@ -42,15 +60,41 @@ struct ArtistDetailsView: View {
 
         // MARK: - Propeties. Public
 
-        let albums: Set<String>
+        let artist: MusicLibrary.Artist
 
         // MARK: - Body
 
         var body: some View {
-            Text("Chips View")
-                .onAppear {
-                    print(albums.count)
+            VStack(spacing: 20) {
+                SegmentedControl(
+                    selected: $selected,
+                    direction: $direction,
+                    items: LibrarySegment.allCases
+                )
+
+                ZStack {
+                    switch selected {
+                        case .albums:
+                            Text("Album content")
+                                .id(selected)
+                                .segmentTransition(direction)
+
+                        case .tracks:
+                            Text("Tracks content")
+                                .id(selected)
+                                .segmentTransition(direction)
+                    }
                 }
+                .animation(.easeInOut(duration: 0.25), value: selected)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .padding(.top, 26)
+            .padding(.horizontal, 26)
         }
+
+        // MARK: - Properties. Private
+
+        @State private var selected: LibrarySegment = .albums
+        @State private var direction: SlideDirection = .forward
     }
 }

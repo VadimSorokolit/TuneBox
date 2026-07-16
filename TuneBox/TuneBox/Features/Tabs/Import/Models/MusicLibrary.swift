@@ -23,6 +23,6 @@ struct MusicLibrary {
         let id: String
         let name: String
         let tracks: [TrackEntity]
-        let albums: Set<String>
+        let albums: [Album]
     }
 }

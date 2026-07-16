@@ -378,33 +378,43 @@ final class TestViewModel: TestManaging {
         let albums = Dictionary(grouping: tracks.filter { $0.albumName.isNotEmpty }) {
             $0.albumName
         }
-        .map { name, tracks in
-            MusicLibrary.Album(
-                id: name,
-                name: name,
-                artist: tracks.first?.artistName ?? "",
-                tracks: tracks,
-                cover: tracks.first?.imagePath
-            )
-        }
-        .sorted {
-            $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
-        }
+            .map { name, tracks in
+                MusicLibrary.Album(
+                    id: name,
+                    name: name,
+                    artist: tracks.first?.artistName ?? "",
+                    tracks: tracks,
+                    cover: tracks.first?.imagePath
+                )
+            }
+            .sorted {
+                $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+            }
 
         let artists = Dictionary(grouping: tracks.filter { $0.artistName.isNotEmpty }) {
             $0.artistName
         }
-        .map { name, tracks in
-            MusicLibrary.Artist(
-                id: name,
-                name: name,
-                tracks: tracks,
-                albums: Set(tracks.map(\.albumName).filter(\.isNotEmpty))
-            )
-        }
-        .sorted {
-            $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
-        }
+            .map { (name: String, artistTracks: [TrackEntity]) -> MusicLibrary.Artist in
+                let albumNames = Set(
+                    artistTracks
+                        .map(\.albumName)
+                        .filter { (albumName: String) in albumName.isNotEmpty }
+                )
+
+                let artistAlbums = albums.filter { (album: MusicLibrary.Album) in
+                    albumNames.contains(album.name)
+                }
+
+                return MusicLibrary.Artist(
+                    id: name,
+                    name: name,
+                    tracks: artistTracks,
+                    albums: artistAlbums
+                )
+            }
+            .sorted {
+                $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+            }
 
         return MusicLibrary(
             albums: albums,
