@@ -15,16 +15,14 @@ struct AlbumsView: View {
     var body: some View {
         if let library = viewModel.library {
             ScrollView(showsIndicators: false) {
-                LazyVStack(spacing: 20) {
+                LazyVStack(spacing: 0) {
                     ForEach(library.albums) { album in
-                        LazyVStack(spacing: 0) {
-                            AlbumCell(
-                                album: album,
-                                onTapGesture: {
-                                    coordinator.push(.album(album: album))
-                                }
-                            )
-                        }
+                        AlbumCell(
+                            album: album,
+                            onTapGesture: {
+                                coordinator.push(.album(album: album))
+                            }
+                        )
                     }
 
                     Text(
@@ -33,6 +31,7 @@ struct AlbumsView: View {
                         + "\(viewModel.tracksDuration(library.albums.flatMap(\.tracks)).formattedDuration) · "
                         + "\(viewModel.tracksSize(library.albums.flatMap(\.tracks)).formattedFileSize)"
                     )
+                    .padding(.top, 20)
                     .multilineTextAlignment(.center)
                     .font(.system(size: 16, weight: .regular))
                     .foregroundStyle(.gray)

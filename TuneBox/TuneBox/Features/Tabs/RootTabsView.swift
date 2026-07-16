@@ -97,8 +97,11 @@ struct RootTabsView: View {
                             case .album(let album):
                                 AlbumDetailsView(album: album)
 
-                            case .artist:
+                            case .artists:
                                 ArtistsView()
+
+                            case .artist(artist: let artist):
+                                ArtistDetailsView(artist: artist)
 
                             case .tracks:
                                 TracksView()

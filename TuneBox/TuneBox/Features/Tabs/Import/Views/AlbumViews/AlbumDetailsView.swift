@@ -19,18 +19,20 @@ struct AlbumDetailsView: View {
     var body: some View {
         if let album {
             ScrollView(showsIndicators: false) {
-                LazyVStack(spacing: 10) {
+                VStack(spacing: 10) {
                     ArtworkView(artworkPath: album.cover,
                                 size: 300,
                                 cornerRadius: 5
                     )
 
-                    ForEach(Array(album.tracks.enumerated()), id: \.element.id) { index, track in
-                        NewTrackCell(index: index + 1,
-                                     track: track,
-                                     isPlaying: false,
-                                     onTapGesture: {}
-                        )
+                    LazyVStack(spacing: 0) {
+                        ForEach(Array(album.tracks.enumerated()), id: \.element.id) { index, track in
+                            NewTrackCell(index: index + 1,
+                                         track: track,
+                                         isPlaying: false,
+                                         onTapGesture: {}
+                            )
+                        }
                     }
 
                     Text(

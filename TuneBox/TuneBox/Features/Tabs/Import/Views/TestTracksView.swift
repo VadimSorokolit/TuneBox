@@ -204,7 +204,7 @@ struct TestTracksView: View {
                                                                         coordinator.push(.albums)
 
                                                                     case .artists:
-                                                                        coordinator.push(.artist)
+                                                                        coordinator.push(.artists)
 
                                                                     case .tracks:
                                                                         coordinator.push(.tracks)
