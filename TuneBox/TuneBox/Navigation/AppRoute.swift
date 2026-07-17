@@ -12,9 +12,10 @@ enum AppRoute: Hashable {
     case onboarding
     case main
     case albums
-    case album(album: MusicLibrary.Album)
+    case album(_ album: MusicLibrary.Album)
     case artists
-    case artist(artist: MusicLibrary.Artist)
+    case artist(_ artist: MusicLibrary.Artist)
     case tracks
     case playlists
+    case playlist(_ playlist: PlaylistEntity)
 }

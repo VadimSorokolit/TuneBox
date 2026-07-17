@@ -20,7 +20,7 @@ struct AlbumsView: View {
                         AlbumCell(
                             album: album,
                             onTapGesture: {
-                                coordinator.push(.album(album: album))
+                                coordinator.push(.album(album))
                             }
                         )
                     }

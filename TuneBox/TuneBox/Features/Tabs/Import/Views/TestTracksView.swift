@@ -33,7 +33,7 @@ struct TestTracksView: View {
         .background(.gray.opacity(0.025))
         .task {
             if viewModel.hasLibrary.isFalse {
-                await viewModel.fetchImportedTracks()
+                await viewModel.fetchImportedData()
             }
         }
         .fileImporter(

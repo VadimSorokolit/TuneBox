@@ -14,7 +14,7 @@ protocol TestManaging: LoadStateManaging {
     var library: MusicLibrary? { get }
     var sections: [ImportSectionModel] { get }
 
-    func fetchImportedTracks() async
+    func fetchImportedData() async
     func importFolder(_ url: URL) async
     func tracksSize(_ tracks: [TrackEntity]) -> Int
     func tracksDuration(_ tracks: [TrackEntity]) -> Int

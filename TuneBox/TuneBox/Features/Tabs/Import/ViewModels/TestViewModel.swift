@@ -135,7 +135,7 @@ final class TestViewModel: TestManaging {
 
     // MARK: - Methods. Public
 
-    func fetchImportedTracks() async {
+    func fetchImportedData() async {
         self.isLoading = true
 
         defer {
@@ -143,14 +143,19 @@ final class TestViewModel: TestManaging {
         }
 
         do {
-            let tracks = try self.persistenceService.getImportTracks()
+            async let tracks = try self.persistenceService.getImportTracks()
                 .sorted {
                     $0.songName.localizedCaseInsensitiveCompare($1.songName) == .orderedAscending
                 }
 
-            if tracks.isNotEmpty {
-                self.library = self.parseLibrary(from: tracks)
-            }
+            async let playlists = try self.persistenceService.fetchPlaylists()
+                .sorted {
+                    $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending
+                }
+
+            let (allTracks, allPlaylists) = try await (tracks, playlists)
+
+            self.library = self.parseLibrary(from: allTracks, playlists: allPlaylists)
         } catch {
             self.handleError(error)
         }
@@ -166,11 +171,27 @@ final class TestViewModel: TestManaging {
         do {
             let fileURLs = try self.collectFiles(from: url)
 
-            for fileURL in fileURLs {
-                await self.importTrack(from: fileURL)
+            let trackFiles = fileURLs.filter { url in
+                guard let ext = AudioFileExtension(rawValue: url.pathExtension.lowercased()) else { return false }
+
+                return self.supportedTrackExtensions.contains(ext)
             }
 
-            await self.fetchImportedTracks()
+            let playlistFiles = fileURLs.filter { url in
+                guard let ext = PlaylistExtension(rawValue: url.pathExtension.lowercased()) else { return false }
+
+                return self.supportedPlaylistExtensions.contains(ext)
+            }
+
+            for file in trackFiles {
+                await self.importTrack(from: file)
+            }
+
+            for playlistFile in playlistFiles {
+                await self.importPlaylist(from: playlistFile)
+            }
+
+            await self.fetchImportedData()
 
         } catch {
             self.handleError(error)
@@ -266,7 +287,7 @@ final class TestViewModel: TestManaging {
         ]
     }
 
-    private func importTrack(from url: URL) async {
+    private func importTrack(from url: URL, into playlist: PlaylistEntity? = nil) async {
         let ext = url.pathExtension.lowercased()
 
         guard
@@ -326,9 +347,38 @@ final class TestViewModel: TestManaging {
 
             try self.persistenceService.insert(tracks: [track])
 
+            if let playlist {
+                try self.persistenceService.addTrack(track, to: playlist)
+            }
         } catch {
             self.handleError(error)
         }
+    }
+
+    private func importPlaylist(from url: URL) async {
+        let title = url.deletingPathExtension().lastPathComponent
+        let trackURLs = self.loadPlaylist(from: url)
+
+        guard trackURLs.isNotEmpty else { return }
+
+        do {
+            let playlist = try self.persistenceService.createPlaylist(title: title)
+
+            for trackURL in trackURLs {
+                await self.importTrack(from: trackURL, into: playlist)
+            }
+        } catch {
+            self.handleError(error)
+        }
+    }
+
+    private func loadPlaylist(from url: URL) -> [URL] {
+        guard let content = try? String(contentsOf: url, encoding: .utf8) else { return [] }
+
+        return content
+            .components(separatedBy: .newlines)
+            .filter { !$0.isEmpty && !$0.hasPrefix("#") }
+            .map { url.deletingLastPathComponent().appendingPathComponent($0) }
     }
 
     private func folderArtwork(near fileURL: URL) -> Data? {
@@ -374,7 +424,7 @@ final class TestViewModel: TestManaging {
         return files
     }
 
-    private func parseLibrary(from tracks: [TrackEntity]) -> MusicLibrary {
+    private func parseLibrary(from tracks: [TrackEntity], playlists: [PlaylistEntity]) -> MusicLibrary {
         let albums = Dictionary(grouping: tracks.filter { $0.albumName.isNotEmpty }) {
             $0.albumName
         }
@@ -420,7 +470,7 @@ final class TestViewModel: TestManaging {
             albums: albums,
             artists: artists,
             tracks: tracks,
-            playlists: []
+            playlists: playlists
         )
     }
 

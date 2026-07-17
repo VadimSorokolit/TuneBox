@@ -123,7 +123,7 @@ struct ArtistDetailsView: View {
                         AlbumCell(
                             album: album,
                             onTapGesture: {
-                                coorditaor.push(.album(album: album))
+                                coorditaor.push(.album(album))
                             }
                         )
                     }

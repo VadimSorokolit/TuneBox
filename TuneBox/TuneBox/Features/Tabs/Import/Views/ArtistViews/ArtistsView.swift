@@ -20,7 +20,7 @@ struct ArtistsView: View {
                         ArtistCell(
                             artist: artist,
                             onTapGesture: {
-                                coordinator.push(.artist(artist: artist))
+                                coordinator.push(.artist(artist))
                             }
                         )
                     }

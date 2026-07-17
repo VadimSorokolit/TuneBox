@@ -109,6 +109,9 @@ struct RootTabsView: View {
                             case .playlists:
                                 PlaylistsView()
 
+                            case .playlist(playlist: let playlist):
+                                PlaylistDetailsView(playlist: playlist)
+
                             default: EmptyView()
                         }
                     }
