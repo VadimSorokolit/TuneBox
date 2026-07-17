@@ -15,7 +15,7 @@ struct LibraryMenuCell: View {
     let item: ImportItem
     let isEditMode: Bool
     let isSelected: Bool
-    let viewModel: TestManaging
+    let viewModel: ImportManaging
     let onTapGesture: () -> Void
 
     // MARK: - Body
@@ -150,7 +150,7 @@ struct LibraryMenuCell: View {
         // MARK: - Properties. Public
 
         let target: LibraryItem
-        let viewModel: TestManaging
+        let viewModel: ImportManaging
 
         // MARK: - Methods. Public
 
@@ -179,7 +179,7 @@ struct LibraryMenuCell: View {
         item: .library(.artists),
         isEditMode: true,
         isSelected: false,
-        viewModel: TestViewModel(),
+        viewModel: ImportViewModel(),
         onTapGesture: {}
     )
 }

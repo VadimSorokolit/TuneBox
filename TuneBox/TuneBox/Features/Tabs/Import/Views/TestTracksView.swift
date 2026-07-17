@@ -56,7 +56,7 @@ struct TestTracksView: View {
 
     // MARK: - Properties. Private
 
-    @Injected private var viewModel: TestManaging
+    @Injected private var viewModel: ImportManaging
     @State private var isFileImporterPresented: Bool = false
 
     // MARK: - Objects. Private
@@ -66,7 +66,7 @@ struct TestTracksView: View {
         // MARK: - Properties. Public
 
         @Binding var isFileImporterPresented: Bool
-        let viewModel: TestManaging
+        let viewModel: ImportManaging
 
         // MARK: - Body
 
@@ -170,7 +170,7 @@ struct TestTracksView: View {
         // MARK: - Properties. Public
 
         @Environment(AppCoordinator.self) private var coordinator
-        let viewModel: TestManaging
+        let viewModel: ImportManaging
 
         // MARK: - Body
 

@@ -54,7 +54,7 @@ struct ArtistDetailsView: View {
 
     // MARK: - Properties. Private
 
-    @Injected private var viewModel: TestManaging
+    @Injected private var viewModel: ImportManaging
 
     // MARK: - Private. Objects
 
@@ -62,7 +62,7 @@ struct ArtistDetailsView: View {
 
         // MARK: - Propeties. Public
 
-        let viewModel: TestManaging
+        let viewModel: ImportManaging
         let artist: MusicLibrary.Artist
 
         // MARK: - Body
@@ -111,7 +111,7 @@ struct ArtistDetailsView: View {
 
         // MARK: - Properties. Public
 
-        let viewModel: TestManaging
+        let viewModel: ImportManaging
         let albums: [MusicLibrary.Album]
 
         // MARK: - Body
@@ -151,7 +151,7 @@ struct ArtistDetailsView: View {
 
         // MARK: - Properties. Public
 
-        let viewModel: TestManaging
+        let viewModel: ImportManaging
         let tracks: [TrackEntity]
 
         // MARK: - Body

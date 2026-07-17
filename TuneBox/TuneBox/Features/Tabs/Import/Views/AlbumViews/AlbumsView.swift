@@ -46,6 +46,6 @@ struct AlbumsView: View {
 
     // MARK: - Properties. Private
 
-    @Injected private var viewModel: TestManaging
+    @Injected private var viewModel: ImportManaging
     @Environment(AppCoordinator.self) private var coordinator
 }

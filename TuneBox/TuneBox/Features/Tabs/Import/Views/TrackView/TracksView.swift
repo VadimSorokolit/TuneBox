@@ -43,5 +43,5 @@ struct TracksView: View {
 
     // MARK: - Properties. Private
 
-    @Injected private var viewModel: TestManaging
+    @Injected private var viewModel: ImportManaging
 }

@@ -72,16 +72,16 @@ extension Resolver: @retroactive ResolverRegistering {
 
         self.register {
             MainActor.assumeIsolated {
-                ImportViewModel()
-                as ImportManaging
+                ImportViewModelV1()
+                as ImportManagingV1
             }
         }
         .scope(.application)
 
         self.register {
             MainActor.assumeIsolated {
-                TestViewModel()
-                as TestManaging
+                ImportViewModel()
+                as ImportManaging
             }
         }
         .scope(.application)

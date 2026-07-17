@@ -47,5 +47,5 @@ struct ArtistsView: View {
     // MARK: - Properties. Private
 
     @Environment(AppCoordinator.self) private var coordinator
-    @Injected var viewModel: TestManaging
+    @Injected var viewModel: ImportManaging
 }

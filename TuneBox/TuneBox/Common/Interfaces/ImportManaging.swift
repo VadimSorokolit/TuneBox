@@ -1,37 +1,30 @@
 //
-//  ImportManaging.swift
+//  TestManaging.swift
 //  TuneBox
 //
-//  Created by Vadim Sorokolit on 08.06.2026.
+//  Created by Vadim Sorokolit on 14.07.2026.
 //
 
 import Foundation
 
-protocol ImportManaging: AnyObject {
-    var playlists: [PlaylistEntity] { get }
-    var sections: [TracksSection] { get }
-    var selectedTrack: TrackEntity? { get set }
-    var selectedTracks: Set<TrackEntity> { get set }
-    var selectedPlaylists: Set<ImportedPlaylist> { get set }
-    var selectedTrackIDs: Set<String> { get set }
-    var showsEmptyState: Bool { get }
-    var playlistAction: PlaylistAction? { get set }
+protocol ImportManaging: LoadStateManaging {
+    var editSectionModeEnabled: Bool { get set }
+    var draggingLibraryItem: LibraryItem? { get set }
+    var hasLibrary: Bool { get }
+    var library: MusicLibrary? { get }
+    var sections: [ImportSectionModel] { get }
+    var sources: [ImportSource] { get }
 
-    func load() async
-    func fetchPlaylists()
-    func createPlaylist(title: String)
-    func createSelectedPlaylists() async
-    func renamePlaylist(_ playlist: PlaylistEntity, newTitle: String)
-    func importFiles(_ urls: [URL], playlistTitle: String) async
-    func loadPlaylists(from folderURL: URL) -> [ImportedPlaylist]
-    func deletePlaylist(_ playlist: PlaylistEntity)
-    func setCoverImage(_ imageData: Data?, playlist: PlaylistEntity)
-    func startObservingTracksChanges()
-    func stopObservingTracksChanges()
-    func createPlaylist(with urls: [URL]) async
-    func addFiles(_ urls: [URL], to playlist: PlaylistEntity) async
-    func toogleSelection(for track: TrackEntity)
-    func toogleSelection(for playlist: ImportedPlaylist)
-    func deleteSelectedTracks(from playlist: PlaylistEntity) async
-    func removeTrack(track: TrackEntity, from playlist: PlaylistEntity) async
+    func source(for id: ImportSource.ID) -> ImportSource?
+    func playlist(for url: URL) -> PlaylistEntity?
+    func fetchImportedData() async
+    func folderItems(sourceID: ImportSource.ID, path: String?) -> [SourceFolderItem]
+    func importFolder(_ url: URL) async
+    func tracksSize(_ tracks: [TrackEntity]) -> Int
+    func tracksDuration(_ tracks: [TrackEntity]) -> Int
+    func toggleLibraryItem(_ item: LibraryItem)
+    func isLibraryItemSelected(_ item: LibraryItem) -> Bool
+    func moveLibraryItem(to target: LibraryItem)
+    func beginEditSections()
+    func finishEditSections()
 }

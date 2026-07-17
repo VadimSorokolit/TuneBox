@@ -211,7 +211,7 @@ struct ImportTracksView: View {
         ]
     }
 
-    @Injected private var importViewModel: ImportManaging
+    @Injected private var importViewModel: ImportManagingV1
     @Injected private var playerViewModel: PlayerManaging
     @State private var playlistTitle: String = ""
     @State private var selectedPhoto: PhotosPickerItem?
@@ -299,7 +299,7 @@ struct ImportTracksView: View {
         @Binding var showsToolbarDeleteConfirmation: Bool
         @Binding var showFileImporter: Bool
 
-        let importViewModel: ImportManaging
+        let importViewModel: ImportManagingV1
         let playerViewModel: PlayerManaging
 
         // MARK: - Body
@@ -408,7 +408,7 @@ struct ImportTracksView: View {
         @Binding var showFileImporter: Bool
         @Binding var showPhotoPicker: Bool
 
-        let importViewModel: ImportManaging
+        let importViewModel: ImportManagingV1
         let playerViewModel: PlayerManaging
 
         // MARK: - Body
@@ -455,7 +455,7 @@ struct ImportTracksView: View {
         @Binding var showFileImporter: Bool
         @Binding var showPhotoPicker: Bool
 
-        let importViewModel: ImportManaging
+        let importViewModel: ImportManagingV1
 
         var body: some View {
             GeometryReader { geometry in
@@ -563,7 +563,7 @@ struct ImportTracksView: View {
         @Binding var showDeletePlaylistDialog: Bool
         @Binding var isShowingExpandedPlayer: Bool
 
-        let importViewModel: ImportManaging
+        let importViewModel: ImportManagingV1
 
         var body: some View {
             switch importViewModel.playlistAction {
@@ -679,7 +679,7 @@ struct ImportTracksView: View {
     private struct ImportPlaylistsView: View {
         @Binding var showImportPlaylists: Bool
 
-        let viewModel: ImportManaging
+        let viewModel: ImportManagingV1
         let playlists: [ImportedPlaylist]
 
         var body: some View {

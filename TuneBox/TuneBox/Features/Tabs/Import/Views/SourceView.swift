@@ -38,7 +38,7 @@ struct SourceView: View {
     // MARK: - Properties. Private
 
     @Environment(AppCoordinator.self) private var coordinator
-    @Injected private var viewModel: TestManaging
+    @Injected private var viewModel: ImportManaging
     @State private var items: [SourceFolderItem] = []
 
     // MARK: - Methods. Private

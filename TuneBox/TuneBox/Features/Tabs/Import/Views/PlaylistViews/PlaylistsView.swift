@@ -45,5 +45,5 @@ struct PlaylistsView: View {
     // MARK: - Properties. Private
 
     @Environment(AppCoordinator.self) private var coordinator
-    @Injected private var viewModel: TestManaging
+    @Injected private var viewModel: ImportManaging
 }
