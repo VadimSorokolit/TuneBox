@@ -10,7 +10,6 @@ import SwiftUI
 enum CustomTab: String, Hashable, Identifiable, CaseIterable {
     case browse
     case downloads
-    case player
     case importFiles
     case settings
 
@@ -23,9 +22,6 @@ enum CustomTab: String, Hashable, Identifiable, CaseIterable {
 
             case .downloads:
                 "arrow.down.circle"
-
-            case .player:
-                "play.circle"
 
             case .importFiles:
                 "folder.circle"
@@ -42,9 +38,6 @@ enum CustomTab: String, Hashable, Identifiable, CaseIterable {
 
             case .downloads:
                 "arrow.down.circle.fill"
-
-            case .player:
-                "play.circle.fill"
 
             case .importFiles:
                 "folder.circle.fill"
@@ -83,9 +76,6 @@ struct RootTabsView: View {
 
             DownloadsView()
                 .tag(CustomTab.downloads)
-
-            PlayerView()
-                .tag(CustomTab.player)
 
             NavigationStack(path: coordinator.pathBinding) {
                 TestTracksView()
