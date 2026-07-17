@@ -417,6 +417,22 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		5B2AEF3C300A2A9A00436CD3 /* TrackView */ = {
+			isa = PBXGroup;
+			children = (
+				5B0BC2BE3007829500E8F2A5 /* TracksView.swift */,
+			);
+			path = TrackView;
+			sourceTree = "<group>";
+		};
+		5B2AEF3D300A2AC500436CD3 /* PlaylistViews */ = {
+			isa = PBXGroup;
+			children = (
+				5B0BC2C03007829800E8F2A5 /* PlaylistsView.swift */,
+			);
+			path = PlaylistViews;
+			sourceTree = "<group>";
+		};
 		5B2CF45C2FBC7A8E00C5BA4C /* Concurrency */ = {
 			isa = PBXGroup;
 			children = (
@@ -917,12 +933,12 @@
 				5BD3BF342FF586A8006FED4B /* Cells */,
 				5B0BC2DA3008D8C400E8F2A5 /* AlbumViews */,
 				5B0BC2DB3008D8EA00E8F2A5 /* ArtistViews */,
-				5BC8D9053000ED4600742822 /* CompactPlayerView.swift */,
+				5B2AEF3D300A2AC500436CD3 /* PlaylistViews */,
+				5B2AEF3C300A2A9A00436CD3 /* TrackView */,
 				5BC8D90730011EC000742822 /* ExpandedPlayerView.swift */,
+				5BC8D9053000ED4600742822 /* CompactPlayerView.swift */,
 				5B0BC2A230051A7100E8F2A5 /* ImportTracksView.swift */,
-				5B0BC2C03007829800E8F2A5 /* PlaylistsView.swift */,
 				5B0BC2AF3006636A00E8F2A5 /* TestTracksView.swift */,
-				5B0BC2BE3007829500E8F2A5 /* TracksView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
