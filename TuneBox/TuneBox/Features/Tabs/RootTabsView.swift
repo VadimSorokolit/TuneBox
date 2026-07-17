@@ -112,6 +112,9 @@ struct RootTabsView: View {
                             case .playlist(playlist: let playlist):
                                 PlaylistDetailsView(playlist: playlist)
 
+                            case .sourceFolder(let sourceID, let path):
+                                SourceView(sourceID: sourceID, path: path)
+
                             default: EmptyView()
                         }
                     }

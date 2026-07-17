@@ -220,7 +220,33 @@ struct TestTracksView: View {
                                         }
 
                                     case .sources:
-                                        EmptyView()
+                                        VStack(spacing: 0) {
+                                            ForEach(section.items, id: \.self) { item in
+                                                LibraryMenuCell(
+                                                    item: item,
+                                                    isEditMode: false,
+                                                    isSelected: false,
+                                                    viewModel: viewModel,
+                                                    onTapGesture: {
+                                                        switch item {
+                                                            case .source(let id):
+                                                                coordinator.push(
+                                                                    .sourceFolder(
+                                                                        sourceID: id,
+                                                                        path: nil
+                                                                    )
+                                                                )
+
+                                                            case .addSource(.local):
+                                                                break
+
+                                                            default:
+                                                                break
+                                                        }
+                                                    }
+                                                )
+                                            }
+                                        }
                                 }
                             } header: {
                                 sectionTracksTitle(section.kind.rawValue.capitalized)

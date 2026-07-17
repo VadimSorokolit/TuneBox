@@ -18,4 +18,5 @@ enum AppRoute: Hashable {
     case tracks
     case playlists
     case playlist(_ playlist: PlaylistEntity)
+    case sourceFolder(sourceID: ImportSource.ID, path: String?)
 }

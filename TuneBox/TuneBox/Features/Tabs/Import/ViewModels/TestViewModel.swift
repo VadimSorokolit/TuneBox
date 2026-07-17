@@ -37,17 +37,59 @@ enum LibraryItem: String, Hashable {
     }
 }
 
-enum SourceKind: Hashable {
+enum SourceKind: Hashable, Codable {
     case local
     case sync(SyncType)
     case api
+
+    private enum CodingKeys: String, CodingKey {
+        case type
+        case syncType
+    }
+
+    private enum Kind: String, Codable {
+        case local, sync, api
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let kind = try container.decode(Kind.self, forKey: .type)
+        switch kind {
+            case .local:
+                self = .local
+
+            case .api:
+                self = .api
+
+            case .sync:
+                let syncType = try container.decode(SyncType.self, forKey: .syncType)
+                self = .sync(syncType)
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+            case .local:
+                try container.encode(Kind.local, forKey: .type)
+
+            case .api:
+                try container.encode(Kind.api, forKey: .type)
+
+            case .sync(let syncType):
+                try container.encode(Kind.sync, forKey: .type)
+                try container.encode(syncType, forKey: .syncType)
+        }
+    }
 
     var addTitle: String {
         switch self {
             case .local:
                 return "Add Folder"
+
             case .sync(.mac):
                 return "Sync from Mac"
+
             case .api:
                 return "Jamendo"
         }
@@ -67,11 +109,11 @@ enum SourceKind: Hashable {
     }
 }
 
-enum SyncType: Hashable {
+enum SyncType: String, Hashable, Codable {
     case mac
 }
 
-struct ImportSource: Identifiable, Hashable {
+struct ImportSource: Identifiable, Hashable, Codable {
     let id: UUID
     let kind: SourceKind
     let title: String
@@ -122,6 +164,7 @@ final class TestViewModel: TestManaging {
 
     private(set) var sections: [ImportSectionModel] = []
     private(set) var library: MusicLibrary?
+    private(set) var sources: [ImportSource] = []
     private(set) var error: String?
     private(set) var isLoading: Bool = false
     var selectedLibraryItems: Set<LibraryItem> = []
@@ -163,6 +206,87 @@ final class TestViewModel: TestManaging {
         }
     }
 
+    func folderItems(
+        sourceID: ImportSource.ID,
+        path: String?
+    ) -> [SourceFolderItem] {
+        guard
+            let source = self.source(for: sourceID),
+            let bookmarkData = source.bookmarkData
+        else {
+            return []
+        }
+
+        var isStale = false
+
+        guard let rootURL = try? URL(
+            resolvingBookmarkData: bookmarkData,
+            options: .withoutUI,
+            relativeTo: nil,
+            bookmarkDataIsStale: &isStale
+        ) else {
+            return []
+        }
+
+        guard rootURL.startAccessingSecurityScopedResource() else {
+            return []
+        }
+
+        defer {
+            rootURL.stopAccessingSecurityScopedResource()
+        }
+
+        let currentURL: URL
+
+        if let path, path.isNotEmpty {
+            currentURL = rootURL.appendingPathComponent(path)
+        } else {
+            currentURL = rootURL
+        }
+
+        guard let urls = try? FileManager.default.contentsOfDirectory(
+            at: currentURL,
+            includingPropertiesForKeys: [.isDirectoryKey],
+            options: [.skipsHiddenFiles]
+        ) else {
+            return []
+        }
+
+        return urls.compactMap { url in
+            let values = try? url.resourceValues(forKeys: [.isDirectoryKey])
+
+            if values?.isDirectory == true {
+                return SourceFolderItem(url: url, kind: .folder)
+            }
+
+            let extensionName = url.pathExtension.lowercased()
+
+            if let ext = AudioFileExtension(rawValue: extensionName),
+               self.supportedTrackExtensions.contains(ext) {
+                return SourceFolderItem(url: url, kind: .track)
+            }
+
+            if let ext = PlaylistExtension(rawValue: extensionName),
+               self.supportedPlaylistExtensions.contains(ext) {
+                return SourceFolderItem(url: url, kind: .playlist)
+            }
+
+            return nil
+        }
+        .sorted {
+            $0.url.lastPathComponent
+                .localizedStandardCompare($1.url.lastPathComponent) == .orderedAscending
+        }
+    }
+
+    func playlist(for url: URL) -> PlaylistEntity? {
+        let title = url.deletingPathExtension().lastPathComponent
+
+        return self.library?.playlists.first {
+            $0.title == title
+        }
+    }
+
     func importFolder(_ url: URL) async {
         guard url.startAccessingSecurityScopedResource() else { return }
 
@@ -171,6 +295,19 @@ final class TestViewModel: TestManaging {
         }
 
         do {
+            let bookmarkData = try url.bookmarkData(
+                options: .minimalBookmark,
+                includingResourceValuesForKeys: nil,
+                relativeTo: nil
+            )
+            let source = ImportSource(
+                id: UUID(),
+                kind: .local,
+                title: url.lastPathComponent,
+                bookmarkData: bookmarkData
+            )
+            self.addOrUpdateSource(source)
+
             let fileURLs = try self.collectFiles(from: url)
 
             let trackFiles = fileURLs.filter { url in
@@ -198,6 +335,10 @@ final class TestViewModel: TestManaging {
         } catch {
             self.handleError(error)
         }
+    }
+
+    func source(for id: ImportSource.ID) -> ImportSource? {
+        self.sources.first { $0.id == id }
     }
 
     func tracksSize(_ tracks: [TrackEntity]) -> Int {
@@ -255,6 +396,7 @@ final class TestViewModel: TestManaging {
     init() {
         self.loadLibraryItemsOrder()
         self.loadSelectedLibraryItems()
+        self.loadSources()
         self.ensureSections()
     }
 
@@ -268,6 +410,7 @@ final class TestViewModel: TestManaging {
     private enum Keys {
         static let selectedLibraryItems = "importSelectedLibraryItems"
         static let libraryItemsOrder = "importLibraryItemsOrder"
+        static let importSources = "importSources"
     }
 
     // MARK: - Methods. Private
@@ -280,7 +423,8 @@ final class TestViewModel: TestManaging {
             ),
             .init(
                 kind: .sources,
-                items: [
+                items: sources.map { .source($0.id) }
+                + [
                     .addSource(.local),
                     .addSource(.sync(.mac)),
                     .addSource(.api)
@@ -510,6 +654,31 @@ final class TestViewModel: TestManaging {
             libraryItemsOrder.map(\.rawValue),
             forKey: Keys.libraryItemsOrder
         )
+    }
+
+    private func addOrUpdateSource(_ source: ImportSource) {
+        if let index = sources.firstIndex(where: { $0.title == source.title }) {
+            sources[index] = source
+        } else {
+            sources.append(source)
+        }
+        saveSources()
+        ensureSections()
+    }
+    private func saveSources() {
+        if let data = try? JSONEncoder().encode(sources) {
+            UserDefaults.standard.set(data, forKey: Keys.importSources)
+        }
+    }
+    private func loadSources() {
+        guard
+            let data = UserDefaults.standard.data(forKey: Keys.importSources),
+            let saved = try? JSONDecoder().decode([ImportSource].self, from: data)
+        else {
+            sources = []
+            return
+        }
+        sources = saved
     }
 
     private func librarySectionItems() -> [ImportItem] {

@@ -90,16 +90,66 @@ struct LibraryMenuCell: View {
                         )
                     )
 
-                case .source:
-                    Text("Source")
+                case .source(let id):
+                    if let source = viewModel.source(for: id) {
+                        menuRow(
+                            icon: source.kind.systemImage,
+                            title: source.title,
+                            showsChevron: true
+                        )
+                    }
 
                 case .addSource(let sourceKind):
-                    Text(sourceKind.addTitle)
+                    menuRow(
+                        icon: sourceKind.systemImage,
+                        title: sourceKind.addTitle,
+                        showsChevron: false
+                    )
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
+    private func menuRow(
+        icon: String,
+        title: String,
+        showsChevron: Bool = false
+    ) -> some View {
+        VStack(spacing: 15) {
+            HStack {
+                HStack(spacing: 10) {
+                    Image(systemName: icon)
+                        .foregroundStyle(.gray)
+                        .font(.system(size: 22, weight: .medium))
+                        .frame(width: 22, height: 22)
+
+                    Text(title)
+                        .font(.system(size: 18, weight: .regular))
+                }
+
+                Spacer()
+
+                if showsChevron {
+                    Image(systemName: "chevron.right")
+                        .foregroundStyle(.gray)
+                        .font(.system(size: 13, weight: .medium))
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 26)
+
+            Rectangle()
+                .fill(Color.gray.opacity(0.2))
+                .frame(height: 1)
+                .padding(.leading, 58)
+                .padding(.trailing, 26)
+        }
+        .padding(.top, 15)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            onTapGesture()
+        }
+    }
     // MARK: - Private. Objects
 
     private struct LibraryReorderDropDelegate: DropDelegate {

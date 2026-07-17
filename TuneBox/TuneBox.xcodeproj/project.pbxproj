@@ -117,6 +117,8 @@
 		5BD579A02FAB25E300503BA2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5BD5799C2FAB25E300503BA2 /* Assets.xcassets */; };
 		5BD579A22FAB25E300503BA2 /* TuneBoxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD5799E2FAB25E300503BA2 /* TuneBoxApp.swift */; };
 		5BD579A52FAB25EE00503BA2 /* NetworkServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD579A32FAB25EE00503BA2 /* NetworkServiceTests.swift */; };
+		5BDA04C8300A5DA900C7B763 /* SourceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDA04C7300A5DA700C7B763 /* SourceView.swift */; };
+		5BDA04CA300A677F00C7B763 /* SourceFolderItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDA04C9300A677F00C7B763 /* SourceFolderItem.swift */; };
 		5BFCA7D22FCE0DDE009C6AD9 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA7D12FCE0DDD009C6AD9 /* AppTheme.swift */; };
 		5BFCA7D42FCE1148009C6AD9 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA7D32FCE1130009C6AD9 /* ThemeManager.swift */; };
 		5BFCA7D62FCE118B009C6AD9 /* Theme+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA7D52FCE118A009C6AD9 /* Theme+Extensions.swift */; };
@@ -274,6 +276,8 @@
 		5BD5799E2FAB25E300503BA2 /* TuneBoxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneBoxApp.swift; sourceTree = "<group>"; };
 		5BD579A32FAB25EE00503BA2 /* NetworkServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkServiceTests.swift; sourceTree = "<group>"; };
 		5BD579AB2FAB27A000503BA2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5BDA04C7300A5DA700C7B763 /* SourceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceView.swift; sourceTree = "<group>"; };
+		5BDA04C9300A677F00C7B763 /* SourceFolderItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceFolderItem.swift; sourceTree = "<group>"; };
 		5BFCA7D12FCE0DDD009C6AD9 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		5BFCA7D32FCE1130009C6AD9 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
 		5BFCA7D52FCE118A009C6AD9 /* Theme+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Theme+Extensions.swift"; sourceTree = "<group>"; };
@@ -341,6 +345,7 @@
 			isa = PBXGroup;
 			children = (
 				5B0BC2B63006AF7E00E8F2A5 /* MusicLibrary.swift */,
+				5BDA04C9300A677F00C7B763 /* SourceFolderItem.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -942,6 +947,7 @@
 				5B2AEF3D300A2AC500436CD3 /* PlaylistViews */,
 				5B2AEF3C300A2A9A00436CD3 /* TrackView */,
 				5BC8D90730011EC000742822 /* ExpandedPlayerView.swift */,
+				5BDA04C7300A5DA700C7B763 /* SourceView.swift */,
 				5BC8D9053000ED4600742822 /* CompactPlayerView.swift */,
 				5B0BC2A230051A7100E8F2A5 /* ImportTracksView.swift */,
 				5B0BC2AF3006636A00E8F2A5 /* TestTracksView.swift */,
@@ -1286,6 +1292,7 @@
 				5BA581892FD6A2B800B498D7 /* SettingsViewModel.swift in Sources */,
 				5B0BC2B73006AF7F00E8F2A5 /* MusicLibrary.swift in Sources */,
 				5BFCA83C2FCED7BF009C6AD9 /* Font+Family.swift in Sources */,
+				5BDA04C8300A5DA900C7B763 /* SourceView.swift in Sources */,
 				5B2CF45E2FBC7AA400C5BA4C /* TransferDownloadSlotLimiter.swift in Sources */,
 				5B0BC2B430068B6900E8F2A5 /* LoadStateManaging.swift in Sources */,
 				5BA5818E2FD6A45800B498D7 /* SettingsManaging.swift in Sources */,
@@ -1308,6 +1315,7 @@
 				5BC8D9063000ED5500742822 /* CompactPlayerView.swift in Sources */,
 				5B1875C62FD06EBD00D8A042 /* SearchBarView.swift in Sources */,
 				5B8382B52FC59381003625CD /* BrowseView+.swift in Sources */,
+				5BDA04CA300A677F00C7B763 /* SourceFolderItem.swift in Sources */,
 				5BD579A22FAB25E300503BA2 /* TuneBoxApp.swift in Sources */,
 				5B3FEB4D2FB454C900DC1562 /* SettingsView.swift in Sources */,
 				5B0BC2BF3007829600E8F2A5 /* TracksView.swift in Sources */,

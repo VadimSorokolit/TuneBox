@@ -13,8 +13,12 @@ protocol TestManaging: LoadStateManaging {
     var hasLibrary: Bool { get }
     var library: MusicLibrary? { get }
     var sections: [ImportSectionModel] { get }
+    var sources: [ImportSource] { get }
 
+    func source(for id: ImportSource.ID) -> ImportSource?
+    func playlist(for url: URL) -> PlaylistEntity?
     func fetchImportedData() async
+    func folderItems(sourceID: ImportSource.ID, path: String?) -> [SourceFolderItem]
     func importFolder(_ url: URL) async
     func tracksSize(_ tracks: [TrackEntity]) -> Int
     func tracksDuration(_ tracks: [TrackEntity]) -> Int
