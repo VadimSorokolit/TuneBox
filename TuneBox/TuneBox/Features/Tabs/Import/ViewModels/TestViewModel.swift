@@ -153,9 +153,11 @@ final class TestViewModel: TestManaging {
                     $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending
                 }
 
-            let (allTracks, allPlaylists) = try await (tracks, playlists)
+            let (downloadedTracks, downloadedPlaylists) = try await (tracks, playlists)
 
-            self.library = self.parseLibrary(from: allTracks, playlists: allPlaylists)
+            if downloadedTracks.isNotEmpty {
+                self.library = self.parseLibrary(from: downloadedTracks, playlists: downloadedPlaylists)
+            }
         } catch {
             self.handleError(error)
         }

@@ -17,7 +17,7 @@ struct NewPlaylistCell: View {
     // MARK: - Main Body
 
     var body: some View {
-        VStack(spacing: 5) {
+        VStack(spacing: 12) {
             HStack {
                 HStack(spacing: 10) {
                     Image(systemName: "music.note.list")
@@ -46,7 +46,7 @@ struct NewPlaylistCell: View {
                 .padding(.leading, 60)
                 .padding(.trailing, 26)
         }
-        .padding(.top, 5)
+        .padding(.top, 12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .onTapGesture {
             onTapGesture()

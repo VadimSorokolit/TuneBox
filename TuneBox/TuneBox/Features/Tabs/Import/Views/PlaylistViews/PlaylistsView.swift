@@ -24,8 +24,20 @@ struct PlaylistsView: View {
                             }
                         )
                     }
+
+                    Text(
+                        "\(library.playlists.count) "
+                        + "\(library.playlists.count == 1 ? "playlist" : "playlist") · "
+                        + "\(viewModel.tracksDuration(library.playlists.flatMap(\.tracks)).formattedDuration) · "
+                        + "\(viewModel.tracksSize(library.playlists.flatMap(\.tracks)).formattedFileSize)"
+                    )
+                    .padding(.top, 10)
+                    .multilineTextAlignment(.center)
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundStyle(.gray)
                 }
             }
+            .padding(.top, 10)
             .contentMargins(.bottom, 26)
         }
     }
