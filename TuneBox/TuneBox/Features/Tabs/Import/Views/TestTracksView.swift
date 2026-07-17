@@ -175,7 +175,6 @@ struct TestTracksView: View {
         // MARK: - Body
 
         var body: some View {
-            if let library = viewModel.library {
                 ScrollView(showsIndicators: false) {
                     LazyVStack(spacing: 10, pinnedViews: [.sectionHeaders]) {
                         ForEach(viewModel.sections) { section in
@@ -237,9 +236,6 @@ struct TestTracksView: View {
                                                                     )
                                                                 )
 
-                                                            case .addSource(.local):
-                                                                break
-
                                                             default:
                                                                 break
                                                         }
@@ -254,7 +250,6 @@ struct TestTracksView: View {
                         }
                     }
                 }
-            }
         }
     }
 }

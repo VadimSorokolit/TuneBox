@@ -39,7 +39,7 @@ enum LibraryItem: String, Hashable {
 
 enum SourceKind: Hashable, Codable {
     case local
-    case sync(SyncType)
+    case sync
     case api
 
     private enum CodingKeys: String, CodingKey {
@@ -62,8 +62,7 @@ enum SourceKind: Hashable, Codable {
                 self = .api
 
             case .sync:
-                let syncType = try container.decode(SyncType.self, forKey: .syncType)
-                self = .sync(syncType)
+                self = .sync
         }
     }
 
@@ -76,22 +75,8 @@ enum SourceKind: Hashable, Codable {
             case .api:
                 try container.encode(Kind.api, forKey: .type)
 
-            case .sync(let syncType):
+            case .sync:
                 try container.encode(Kind.sync, forKey: .type)
-                try container.encode(syncType, forKey: .syncType)
-        }
-    }
-
-    var addTitle: String {
-        switch self {
-            case .local:
-                return "Add Folder"
-
-            case .sync(.mac):
-                return "Sync from Mac"
-
-            case .api:
-                return "Jamendo"
         }
     }
 
@@ -101,16 +86,12 @@ enum SourceKind: Hashable, Codable {
                 return "folder"
 
             case .sync:
-                return "desktopcomputer"
+                return "network"
 
             case .api:
                 return "globe"
         }
     }
-}
-
-enum SyncType: String, Hashable, Codable {
-    case mac
 }
 
 struct ImportSource: Identifiable, Hashable, Codable {
@@ -126,7 +107,6 @@ struct ImportSource: Identifiable, Hashable, Codable {
 enum ImportItem: Hashable {
     case library(LibraryItem)
     case source(ImportSource.ID)
-    case addSource(SourceKind)
 }
 
 // MARK: - Section model
@@ -300,9 +280,14 @@ final class TestViewModel: TestManaging {
                 includingResourceValuesForKeys: nil,
                 relativeTo: nil
             )
+
+            let kind: SourceKind = self.isNetworkFolder(url)
+                ? .sync
+                : .local
+
             let source = ImportSource(
                 id: UUID(),
-                kind: .local,
+                kind: kind,
                 title: url.lastPathComponent,
                 bookmarkData: bookmarkData
             )
@@ -424,13 +409,30 @@ final class TestViewModel: TestManaging {
             .init(
                 kind: .sources,
                 items: sources.map { .source($0.id) }
-                + [
-                    .addSource(.local),
-                    .addSource(.sync(.mac)),
-                    .addSource(.api)
-                ]
             )
         ]
+    }
+
+    private func isNetworkFolder(_ url: URL) -> Bool {
+        guard let values = try? url.resourceValues(
+            forKeys:
+                [
+                    .volumeIsLocalKey,
+                    .isUbiquitousItemKey
+                ]
+        ) else {
+            return false
+        }
+
+        if values.isUbiquitousItem == true {
+            return true
+        }
+
+        if values.volumeIsLocal == false {
+            return true
+        }
+
+        return false
     }
 
     private func importTrack(from url: URL, into playlist: PlaylistEntity? = nil) async {

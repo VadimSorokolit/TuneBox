@@ -98,13 +98,6 @@ struct LibraryMenuCell: View {
                             showsChevron: true
                         )
                     }
-
-                case .addSource(let sourceKind):
-                    menuRow(
-                        icon: sourceKind.systemImage,
-                        title: sourceKind.addTitle,
-                        showsChevron: false
-                    )
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
