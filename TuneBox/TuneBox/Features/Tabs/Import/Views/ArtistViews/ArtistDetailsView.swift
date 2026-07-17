@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Resolver
 
 enum LibrarySegment: Int, CaseIterable, SegmentedItem {
     case albums
@@ -32,34 +33,36 @@ struct ArtistDetailsView: View {
     var body: some View {
         if let artist {
             if artist.albums.isEmpty {
-                TracksView(tracks: artist.tracks)
+                TracksContentView(
+                    viewModel: viewModel,
+                    tracks: artist.tracks
+                )
             } else {
-                ChipsView(artist: artist)
+                ChipsView(
+                    viewModel: viewModel,
+                    artist: artist
+                )
             }
         } else {
-            EmptyView()
+            ContentUnavailableView(
+                "Artist not found",
+                systemImage: "person.crop.circle.badge.exclamationmark",
+                description: Text("The selected artist is unavailable")
+            )
         }
     }
+
+    // MARK: - Properties. Private
+
+    @Injected private var viewModel: TestManaging
 
     // MARK: - Private. Objects
-
-    private struct TracksView: View {
-
-        // MARK: - Properties. Public
-
-        let tracks: [TrackEntity]
-
-        // MARK: - Body
-
-        var body: some View {
-            Text("Tracks View")
-        }
-    }
 
     private struct ChipsView: View {
 
         // MARK: - Propeties. Public
 
+        let viewModel: TestManaging
         let artist: MusicLibrary.Artist
 
         // MARK: - Body
@@ -75,14 +78,20 @@ struct ArtistDetailsView: View {
                 ZStack {
                     switch selected {
                         case .albums:
-                            Text("Album content")
-                                .id(selected)
-                                .segmentTransition(direction)
+                            AlbumsContentView(
+                                viewModel: viewModel,
+                                albums: artist.albums
+                            )
+                            .id(selected)
+                            .segmentTransition(direction)
 
                         case .tracks:
-                            Text("Tracks content")
-                                .id(selected)
-                                .segmentTransition(direction)
+                            TracksContentView(
+                                viewModel: viewModel,
+                                tracks: artist.tracks
+                            )
+                            .id(selected)
+                            .segmentTransition(direction)
                     }
                 }
                 .animation(.easeInOut(duration: 0.25), value: selected)
@@ -96,5 +105,84 @@ struct ArtistDetailsView: View {
 
         @State private var selected: LibrarySegment = .albums
         @State private var direction: SlideDirection = .forward
+    }
+
+    private struct AlbumsContentView: View {
+
+        // MARK: - Properties. Public
+
+        let viewModel: TestManaging
+        let albums: [MusicLibrary.Album]
+
+        // MARK: - Body
+
+        var body: some View {
+            ScrollView(showsIndicators: false) {
+                LazyVStack(spacing: 0) {
+                    ForEach(albums) { album in
+                        AlbumCell(
+                            album: album,
+                            onTapGesture: {
+                                coorditaor.push(.album(album: album))
+                            }
+                        )
+                    }
+
+                    Text(
+                        "\(albums.count) "
+                        + "\(albums.count == 1 ? "album" : "albums") · "
+                        + "\(viewModel.tracksDuration(albums.flatMap(\.tracks)).formattedDuration) · "
+                        + "\(viewModel.tracksSize(albums.flatMap(\.tracks)).formattedFileSize)"
+                    )
+                    .padding(.top, 20)
+                    .multilineTextAlignment(.center)
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundStyle(.gray)
+                }
+            }
+        }
+
+        // MARK: - Properties. Private
+
+        @Environment(AppCoordinator.self) private var coorditaor
+    }
+
+    private struct TracksContentView: View {
+
+        // MARK: - Properties. Public
+
+        let viewModel: TestManaging
+        let tracks: [TrackEntity]
+
+        // MARK: - Body
+
+        var body: some View {
+            ScrollView(showsIndicators: false) {
+                LazyVStack(spacing: 0) {
+                    ForEach(Array(tracks.enumerated()), id: \.element.id) { index, track in
+                        NewTrackCell(index: index + 1,
+                                     track: track,
+                                     isPlaying: false,
+                                     onTapGesture: {}
+                        )
+                    }
+                }
+
+                Text(
+                    "\(tracks.count) "
+                    + "\(tracks.count == 1 ? "track" : "tracks") · "
+                    + "\(viewModel.tracksDuration(tracks).formattedDuration) · "
+                    + "\(viewModel.tracksSize(tracks).formattedFileSize)"
+                )
+                .padding(.top, 10)
+                .multilineTextAlignment(.center)
+                .font(.system(size: 16, weight: .regular))
+                .foregroundStyle(.gray)
+            }
+        }
+
+        // MARK: - Properties. Private
+
+        @Environment(AppCoordinator.self) private var coorditaor
     }
 }
