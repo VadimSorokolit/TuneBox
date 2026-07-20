@@ -21,7 +21,7 @@ protocol ImportManaging: LoadStateManaging {
     func stopObservingTracksChanges()
     func source(for id: ImportSource.ID) -> ImportSource?
     func playlist(for url: URL) -> PlaylistEntity?
-    func folderItems(sourceID: ImportSource.ID, path: String?) -> [SourceFolderItem]
+    func fetchfolderItems(sourceID: ImportSource.ID, path: String?) async -> [SourceFolderItem]?
     func importFolder(_ url: URL) async
     func tracksSize(_ tracks: [TrackEntity]) -> Int
     func tracksDuration(_ tracks: [TrackEntity]) -> Int
@@ -30,4 +30,5 @@ protocol ImportManaging: LoadStateManaging {
     func moveLibraryItem(to target: LibraryItem)
     func beginEditSections()
     func finishEditSections()
+    func dismissError()
 }

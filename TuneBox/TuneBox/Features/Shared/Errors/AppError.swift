@@ -165,4 +165,27 @@ enum AppError: Error {
         case missingDirectory
     }
 
+    enum Source: LocalizedError {
+        case networkUnavailable
+        case accessDenied
+        case bookmarkInvalid
+        case readFailed(Error)
+
+        var errorDescription: String? {
+            switch self {
+                case .networkUnavailable:
+                    return "Network folder is unavailable. Check your connection and try again."
+
+                case .accessDenied:
+                    return "Cannot access this folder"
+
+                case .bookmarkInvalid:
+                    return "Saved folder reference is invalid. Re-add the folder."
+
+                case .readFailed(let error):
+                    return error.localizedDescription
+            }
+        }
+    }
+
 }

@@ -28,10 +28,8 @@ struct SourceView: View {
         .navigationTitle(path?.components(separatedBy: "/").last ?? viewModel.source(for: sourceID)?.title ?? "Source")
         .padding(.top, 16)
         .task(id: path) {
-            items = viewModel.folderItems(
-                sourceID: sourceID,
-                path: path
-            )
+            guard let items = await viewModel.fetchfolderItems(sourceID: sourceID, path: path) else { return }
+            self.items = items
         }
     }
 

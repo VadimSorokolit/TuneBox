@@ -198,76 +198,70 @@ final class ImportViewModel: ImportManaging {
         self.transferViewModel.onTracksChanged = nil
     }
 
-    func folderItems(
-        sourceID: ImportSource.ID,
-        path: String?
-    ) -> [SourceFolderItem] {
-        guard
-            let source = self.source(for: sourceID),
-            let bookmarkData = source.bookmarkData
-        else {
-            return []
+    func fetchfolderItems(sourceID: ImportSource.ID, path: String?) async -> [SourceFolderItem]? {
+        guard let source = source(for: sourceID), let bookmarkData = source.bookmarkData else {
+            let error = AppError.Source.bookmarkInvalid
+            self.handleError(error)
+            return nil
         }
 
         var isStale = false
-
         guard let rootURL = try? URL(
             resolvingBookmarkData: bookmarkData,
             options: .withoutUI,
             relativeTo: nil,
             bookmarkDataIsStale: &isStale
         ) else {
-            return []
+            let error = AppError.Source.bookmarkInvalid
+            self.handleError(error)
+            return nil
         }
 
         guard rootURL.startAccessingSecurityScopedResource() else {
-            return []
-        }
-
-        defer {
-            rootURL.stopAccessingSecurityScopedResource()
-        }
-
-        let currentURL: URL
-
-        if let path, path.isNotEmpty {
-            currentURL = rootURL.appendingPathComponent(path)
-        } else {
-            currentURL = rootURL
-        }
-
-        guard let urls = try? FileManager.default.contentsOfDirectory(
-            at: currentURL,
-            includingPropertiesForKeys: [.isDirectoryKey],
-            options: [.skipsHiddenFiles]
-        ) else {
-            return []
-        }
-
-        return urls.compactMap { url in
-            let values = try? url.resourceValues(forKeys: [.isDirectoryKey])
-
-            if values?.isDirectory == true {
-                return SourceFolderItem(url: url, kind: .folder)
-            }
-
-            let extensionName = url.pathExtension.lowercased()
-
-            if let ext = AudioFileExtension(rawValue: extensionName),
-               self.supportedTrackExtensions.contains(ext) {
-                return SourceFolderItem(url: url, kind: .track)
-            }
-
-            if let ext = PlaylistExtension(rawValue: extensionName),
-               self.supportedPlaylistExtensions.contains(ext) {
-                return SourceFolderItem(url: url, kind: .playlist)
-            }
-
+            let error = AppError.Source.accessDenied
+            self.handleError(error)
             return nil
         }
-        .sorted {
-            $0.url.lastPathComponent
-                .localizedStandardCompare($1.url.lastPathComponent) == .orderedAscending
+        defer { rootURL.stopAccessingSecurityScopedResource() }
+
+        let currentURL = path.map { rootURL.appendingPathComponent($0) } ?? rootURL
+
+        do {
+            let urls = try FileManager.default.contentsOfDirectory(
+                at: currentURL,
+                includingPropertiesForKeys: [.isDirectoryKey],
+                options: [.skipsHiddenFiles]
+            )
+
+            return urls.compactMap { url in
+                let values = try? url.resourceValues(forKeys: [.isDirectoryKey])
+
+                if values?.isDirectory == true {
+                    return SourceFolderItem(url: url, kind: .folder)
+                }
+                let extensionName = url.pathExtension.lowercased()
+
+                if let ext = AudioFileExtension(rawValue: extensionName),
+                   self.supportedTrackExtensions.contains(ext) {
+                    return SourceFolderItem(url: url, kind: .track)
+                }
+                if let ext = PlaylistExtension(rawValue: extensionName),
+                   self.supportedPlaylistExtensions.contains(ext) {
+                    return SourceFolderItem(url: url, kind: .playlist)
+                }
+                return nil
+            }
+            .sorted {
+                $0.url.lastPathComponent
+                    .localizedStandardCompare($1.url.lastPathComponent) == .orderedAscending
+            }
+        } catch {
+            if source.kind == .sync {
+                self.handleError(AppError.Source.networkUnavailable)
+            } else {
+                self.handleError(AppError.Source.readFailed(error))
+            }
+            return nil
         }
     }
 
@@ -386,6 +380,10 @@ final class ImportViewModel: ImportManaging {
         self.saveSelectedLibraryItems()
         self.saveLibraryItemsOrder()
         self.ensureSections()
+    }
+
+    func dismissError() {
+        self.error = nil
     }
 
     // MARK: - Initializer

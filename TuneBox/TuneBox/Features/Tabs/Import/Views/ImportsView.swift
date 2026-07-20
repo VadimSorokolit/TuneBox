@@ -60,6 +60,16 @@ struct ImportsView: View {
                 }
             }
         )
+        .onChange(of: viewModel.error) { _, newValue in
+            isErrorPresented = newValue != nil
+        }
+        .alert("Error", isPresented: $isErrorPresented) {
+            Button("OK", role: .cancel) {
+                viewModel.dismissError()
+            }
+        } message: {
+            Text(viewModel.error ?? "")
+        }
         .modifier(CentralSpinnerModifier(isVisible: viewModel.isLoading))
     }
 
@@ -67,6 +77,7 @@ struct ImportsView: View {
 
     @Injected private var viewModel: ImportManaging
     @State private var isFileImporterPresented: Bool = false
+    @State private var isErrorPresented = false
 
     // MARK: - Objects. Private
 
@@ -238,12 +249,19 @@ struct ImportsView: View {
                                                     onTapGesture: {
                                                         switch item {
                                                             case .source(let id):
-                                                                coordinator.push(
-                                                                    .sourceFolder(
+                                                                Task {
+                                                                    if (await viewModel.fetchfolderItems(
                                                                         sourceID: id,
                                                                         path: nil
-                                                                    )
-                                                                )
+                                                                    )) != nil {
+                                                                        coordinator.push(
+                                                                            .sourceFolder(
+                                                                                sourceID: id,
+                                                                                path: nil
+                                                                            )
+                                                                        )
+                                                                    }
+                                                                }
 
                                                             default:
                                                                 break
