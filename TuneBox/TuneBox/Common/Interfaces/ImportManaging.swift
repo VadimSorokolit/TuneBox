@@ -15,9 +15,12 @@ protocol ImportManaging: LoadStateManaging {
     var sections: [ImportSectionModel] { get }
     var sources: [ImportSource] { get }
 
+    func fetchImportedData() async
+    func fetchDownloadedData() async
+    func startObservingTracksChanges()
+    func stopObservingTracksChanges()
     func source(for id: ImportSource.ID) -> ImportSource?
     func playlist(for url: URL) -> PlaylistEntity?
-    func fetchImportedData() async
     func folderItems(sourceID: ImportSource.ID, path: String?) -> [SourceFolderItem]
     func importFolder(_ url: URL) async
     func tracksSize(_ tracks: [TrackEntity]) -> Int

@@ -8,7 +8,7 @@
 import SwiftUI
 import Resolver
 
-struct TestTracksView: View {
+struct ImportsView: View {
 
     // MARK: - Main Body
 
@@ -31,6 +31,15 @@ struct TestTracksView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(.gray.opacity(0.025))
+        .onAppear {
+            Task {
+                viewModel.startObservingTracksChanges()
+                await viewModel.fetchDownloadedData()
+            }
+        }
+        .onDisappear {
+            viewModel.stopObservingTracksChanges()
+        }
         .task {
             if viewModel.hasLibrary.isFalse {
                 await viewModel.fetchImportedData()
@@ -255,5 +264,5 @@ struct TestTracksView: View {
 }
 
 #Preview {
-    TestTracksView()
+    ImportsView()
 }

@@ -78,7 +78,7 @@ struct RootTabsView: View {
                 .tag(CustomTab.downloads)
 
             NavigationStack(path: coordinator.pathBinding) {
-                TestTracksView()
+                ImportsView()
                     .navigationDestination(for: AppRoute.self) { route in
                         switch route {
                             case .albums:

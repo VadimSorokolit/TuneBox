@@ -125,8 +125,8 @@ final class ImportViewModel: ImportManaging {
     private(set) var sources: [ImportSource] = []
     private(set) var error: String?
     private(set) var isLoading: Bool = false
-    var selectedLibraryItems: Set<LibraryItem> = []
-    var libraryItemsOrder: [LibraryItem] = [.albums, .artists, .tracks, .playlists]
+    private(set) var selectedLibraryItems: Set<LibraryItem> = []
+    private(set) var libraryItemsOrder: [LibraryItem] = [.albums, .artists, .tracks, .playlists]
     var editSectionModeEnabled: Bool = false
     var draggingLibraryItem: LibraryItem?
 
@@ -162,6 +162,40 @@ final class ImportViewModel: ImportManaging {
         } catch {
             self.handleError(error)
         }
+    }
+
+    func fetchDownloadedData() async {
+        do {
+            let tracks = try self.persistenceService.getRecentDownloadedTracks(limit: nil)
+
+            self.library = self.parseLibrary(from: tracks, playlists: [])
+        } catch {
+            self.handleError(error)
+        }
+    }
+
+    func startObservingTracksChanges() {
+        self.tracksObservationTask?.cancel()
+
+        self.tracksObservationTask = Task { [weak self] in
+            guard let self else { return }
+
+            await self.fetchDownloadedData()
+
+            self.transferViewModel.onTracksChanged = { [weak self] in
+                guard let self else { return }
+
+                Task {
+                    await self.fetchDownloadedData()
+                }
+            }
+        }
+    }
+
+    func stopObservingTracksChanges() {
+        self.tracksObservationTask?.cancel()
+        self.tracksObservationTask = nil
+        self.transferViewModel.onTracksChanged = nil
     }
 
     func folderItems(
@@ -367,7 +401,11 @@ final class ImportViewModel: ImportManaging {
 
     @Injected
     @ObservationIgnored
+    private var transferViewModel: TransferManaging
+    @Injected
+    @ObservationIgnored
     private var persistenceService: PersistenceServicing
+    private var tracksObservationTask: Task<Void, Never>?
     private let supportedPlaylistExtensions: Set<PlaylistExtension> = [.m3u, .m3u8]
     private let supportedTrackExtensions: Set<AudioFileExtension> = [.mp3, .wav, .wv, .flac]
     private enum Keys {

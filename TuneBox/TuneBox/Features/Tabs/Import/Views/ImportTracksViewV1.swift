@@ -34,7 +34,7 @@ struct ImportedPlaylist: Identifiable, Hashable {
     let trackURLs: [URL]
 }
 
-struct ImportTracksView: View {
+struct ImportTracksViewV1: View {
 
     // MARK: - Main Body
 

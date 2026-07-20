@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5B0BC2A330051A8300E8F2A5 /* ImportTracksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0BC2A230051A7100E8F2A5 /* ImportTracksView.swift */; };
+		5B0BC2A330051A8300E8F2A5 /* ImportTracksViewV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0BC2A230051A7100E8F2A5 /* ImportTracksViewV1.swift */; };
 		5B0BC2AA3005481C00E8F2A5 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5B0BC2A8300539BC00E8F2A5 /* Settings.bundle */; };
 		5B0BC2AC300659F800E8F2A5 /* ImportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0BC2AB300659EA00E8F2A5 /* ImportViewModel.swift */; };
 		5B0BC2AE30065A5000E8F2A5 /* ImportManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0BC2AD30065A4E00E8F2A5 /* ImportManaging.swift */; };
-		5B0BC2B03006638700E8F2A5 /* TestTracksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0BC2AF3006636A00E8F2A5 /* TestTracksView.swift */; };
+		5B0BC2B03006638700E8F2A5 /* ImportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0BC2AF3006636A00E8F2A5 /* ImportsView.swift */; };
 		5B0BC2B230068A4A00E8F2A5 /* CentralSpinnerModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0BC2B130068A4800E8F2A5 /* CentralSpinnerModifier.swift */; };
 		5B0BC2B430068B6900E8F2A5 /* LoadStateManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0BC2B330068B6700E8F2A5 /* LoadStateManaging.swift */; };
 		5B0BC2B73006AF7F00E8F2A5 /* MusicLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0BC2B63006AF7E00E8F2A5 /* MusicLibrary.swift */; };
@@ -168,11 +168,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		5B0BC2A230051A7100E8F2A5 /* ImportTracksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportTracksView.swift; sourceTree = "<group>"; };
+		5B0BC2A230051A7100E8F2A5 /* ImportTracksViewV1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportTracksViewV1.swift; sourceTree = "<group>"; };
 		5B0BC2A8300539BC00E8F2A5 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		5B0BC2AB300659EA00E8F2A5 /* ImportViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportViewModel.swift; sourceTree = "<group>"; };
 		5B0BC2AD30065A4E00E8F2A5 /* ImportManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportManaging.swift; sourceTree = "<group>"; };
-		5B0BC2AF3006636A00E8F2A5 /* TestTracksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestTracksView.swift; sourceTree = "<group>"; };
+		5B0BC2AF3006636A00E8F2A5 /* ImportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportsView.swift; sourceTree = "<group>"; };
 		5B0BC2B130068A4800E8F2A5 /* CentralSpinnerModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CentralSpinnerModifier.swift; sourceTree = "<group>"; };
 		5B0BC2B330068B6700E8F2A5 /* LoadStateManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadStateManaging.swift; sourceTree = "<group>"; };
 		5B0BC2B63006AF7E00E8F2A5 /* MusicLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicLibrary.swift; sourceTree = "<group>"; };
@@ -949,8 +949,8 @@
 				5BC8D90730011EC000742822 /* ExpandedPlayerView.swift */,
 				5BDA04C7300A5DA700C7B763 /* SourceView.swift */,
 				5BC8D9053000ED4600742822 /* CompactPlayerView.swift */,
-				5B0BC2A230051A7100E8F2A5 /* ImportTracksView.swift */,
-				5B0BC2AF3006636A00E8F2A5 /* TestTracksView.swift */,
+				5B0BC2A230051A7100E8F2A5 /* ImportTracksViewV1.swift */,
+				5B0BC2AF3006636A00E8F2A5 /* ImportsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1226,7 +1226,7 @@
 				5BA581942FD70BC300B498D7 /* EmptyGenreCell.swift in Sources */,
 				5BFCA83A2FCED71E009C6AD9 /* Color+hex.swift in Sources */,
 				5B0BC2B230068A4A00E8F2A5 /* CentralSpinnerModifier.swift in Sources */,
-				5B0BC2A330051A8300E8F2A5 /* ImportTracksView.swift in Sources */,
+				5B0BC2A330051A8300E8F2A5 /* ImportTracksViewV1.swift in Sources */,
 				5B3D227D2FF53A55004B8356 /* View+frame.swift in Sources */,
 				5B0BC2D53007FFA800E8F2A5 /* Int+formattedFileSize.swift in Sources */,
 				5B8382912FC495F9003625CD /* PlayerViewModel.swift in Sources */,
@@ -1240,7 +1240,7 @@
 				5B586CBA2FAC842200BCEAD2 /* Resolver+Injection.swift in Sources */,
 				5B2CF4612FBC7C6B00C5BA4C /* TransferDownloadObserverTokens.swift in Sources */,
 				5B2AEF43300A3B8B00436CD3 /* PlaylistDetailsView.swift in Sources */,
-				5B0BC2B03006638700E8F2A5 /* TestTracksView.swift in Sources */,
+				5B0BC2B03006638700E8F2A5 /* ImportsView.swift in Sources */,
 				5BA581922FD7055C00B498D7 /* EmptyTrackCell.swift in Sources */,
 				5B586CC32FAC912500BCEAD2 /* MoyaProvider+Async.swift in Sources */,
 				5B0BC2C73007A3AA00E8F2A5 /* AlbumDetailsView.swift in Sources */,
