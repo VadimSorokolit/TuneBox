@@ -15,8 +15,7 @@ protocol ImportManaging: LoadStateManaging {
     var sections: [ImportSectionModel] { get }
     var sources: [ImportSource] { get }
 
-    func fetchImportedData() async
-    func fetchDownloadedData() async
+    func refreshLibrary() async
     func startObservingTracksChanges()
     func stopObservingTracksChanges()
     func source(for id: ImportSource.ID) -> ImportSource?

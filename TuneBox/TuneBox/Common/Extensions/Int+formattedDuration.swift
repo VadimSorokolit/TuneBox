@@ -13,8 +13,8 @@ extension Int {
         let seconds = self % 60
 
         return hours > 0
-        ? "\(hours) hours \(minutes) minutes \(seconds) seconds"
-        : "\(minutes) minutes \(seconds) seconds"
+        ? "\(hours) h \(minutes) m \(seconds) s"
+        : "\(minutes) m \(seconds) s"
     }
 
 }

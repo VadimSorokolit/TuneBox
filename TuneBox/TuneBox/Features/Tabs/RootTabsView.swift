@@ -93,8 +93,8 @@ struct RootTabsView: View {
                             case .artist(artist: let artist):
                                 ArtistDetailsView(artist: artist)
 
-                            case .tracks:
-                                TracksView()
+                            case .tracks(let onlyAPI):
+                                TracksView(onlyAPI: onlyAPI)
 
                             case .playlists:
                                 PlaylistsView()

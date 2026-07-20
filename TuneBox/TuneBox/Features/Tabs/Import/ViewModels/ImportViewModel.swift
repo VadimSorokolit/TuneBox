@@ -136,41 +136,27 @@ final class ImportViewModel: ImportManaging {
 
     // MARK: - Methods. Public
 
-    func fetchImportedData() async {
-        self.isLoading = true
-
-        defer {
-            self.isLoading = false
-        }
-
+    func refreshLibrary() async {
         do {
-            async let tracks = try self.persistenceService.getImportTracks()
+            let imported = try persistenceService.getImportTracks()
+            let downloaded = try persistenceService.getRecentDownloadedTracks(limit: nil)
+            let playlists = try persistenceService.fetchPlaylists()
+
+            let allTracks = (imported + downloaded)
                 .sorted {
                     $0.songName.localizedCaseInsensitiveCompare($1.songName) == .orderedAscending
                 }
 
-            async let playlists = try self.persistenceService.fetchPlaylists()
-                .sorted {
-                    $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending
-                }
-
-            let (downloadedTracks, downloadedPlaylists) = try await (tracks, playlists)
-
-            if downloadedTracks.isNotEmpty {
-                self.library = self.parseLibrary(from: downloadedTracks, playlists: downloadedPlaylists)
+            if allTracks.isNotEmpty || playlists.isNotEmpty {
+                library = parseLibrary(from: allTracks, playlists: playlists)
+            } else {
+                library = nil
             }
-        } catch {
-            self.handleError(error)
-        }
-    }
 
-    func fetchDownloadedData() async {
-        do {
-            let tracks = try self.persistenceService.getRecentDownloadedTracks(limit: nil)
-
-            self.library = self.parseLibrary(from: tracks, playlists: [])
+            syncDownloadsSource(hasTracks: downloaded.isNotEmpty)
+            ensureSections()
         } catch {
-            self.handleError(error)
+            handleError(error)
         }
     }
 
@@ -180,13 +166,13 @@ final class ImportViewModel: ImportManaging {
         self.tracksObservationTask = Task { [weak self] in
             guard let self else { return }
 
-            await self.fetchDownloadedData()
+            await self.refreshLibrary()
 
             self.transferViewModel.onTracksChanged = { [weak self] in
                 guard let self else { return }
 
                 Task {
-                    await self.fetchDownloadedData()
+                    await self.refreshLibrary()
                 }
             }
         }
@@ -321,7 +307,7 @@ final class ImportViewModel: ImportManaging {
                 await self.importPlaylist(from: playlistFile)
             }
 
-            await self.fetchImportedData()
+            await self.refreshLibrary()
 
         } catch {
             self.handleError(error)
@@ -410,12 +396,13 @@ final class ImportViewModel: ImportManaging {
         static let selectedLibraryItems = "importSelectedLibraryItems"
         static let libraryItemsOrder = "importLibraryItemsOrder"
         static let importSources = "importSources"
+        static let downloadsSourceTitle = "Downloads"
     }
 
     // MARK: - Methods. Private
 
     private func ensureSections() {
-        sections = [
+        self.sections = [
             .init(
                 kind: .library,
                 items: librarySectionItems()
@@ -447,6 +434,26 @@ final class ImportViewModel: ImportManaging {
         }
 
         return false
+    }
+
+    private func syncDownloadsSource(hasTracks: Bool) {
+        if hasTracks {
+            if self.sources.first(where: { $0.kind == .api }) != nil {
+                return
+            }
+
+            let source = ImportSource(
+                id: UUID(),
+                kind: .api,
+                title: Keys.downloadsSourceTitle,
+                bookmarkData: nil
+            )
+            self.addOrUpdateSource(source)
+        } else {
+            self.sources.removeAll { $0.kind == .api }
+            self.saveSources()
+            self.ensureSections()
+        }
     }
 
     private func importTrack(from url: URL, into playlist: PlaylistEntity? = nil) async {

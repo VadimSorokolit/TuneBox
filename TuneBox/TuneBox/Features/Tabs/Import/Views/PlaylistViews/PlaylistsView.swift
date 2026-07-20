@@ -37,6 +37,7 @@ struct PlaylistsView: View {
                     .foregroundStyle(.gray)
                 }
             }
+            navigationTitle("Playlists")
             .padding(.top, 10)
             .contentMargins(.bottom, 26)
         }

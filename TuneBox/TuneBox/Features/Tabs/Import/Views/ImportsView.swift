@@ -34,7 +34,7 @@ struct ImportsView: View {
         .onAppear {
             Task {
                 viewModel.startObservingTracksChanges()
-                await viewModel.fetchDownloadedData()
+                await viewModel.refreshLibrary()
             }
         }
         .onDisappear {
@@ -42,7 +42,7 @@ struct ImportsView: View {
         }
         .task {
             if viewModel.hasLibrary.isFalse {
-                await viewModel.fetchImportedData()
+                await viewModel.refreshLibrary()
             }
         }
         .fileImporter(
@@ -226,7 +226,7 @@ struct ImportsView: View {
                                                                         coordinator.push(.artists)
 
                                                                     case .tracks:
-                                                                        coordinator.push(.tracks)
+                                                                        coordinator.push(.tracks())
 
                                                                     case .playlists:
                                                                         coordinator.push(.playlists)
@@ -250,16 +250,17 @@ struct ImportsView: View {
                                                         switch item {
                                                             case .source(let id):
                                                                 Task {
-                                                                    if (await viewModel.fetchfolderItems(
-                                                                        sourceID: id,
-                                                                        path: nil
-                                                                    )) != nil {
-                                                                        coordinator.push(
-                                                                            .sourceFolder(
-                                                                                sourceID: id,
-                                                                                path: nil
-                                                                            )
-                                                                        )
+                                                                    guard let source = viewModel.source(for: id) else { return }
+
+                                                                    switch source.kind {
+                                                                        case .api:
+                                                                            coordinator.push(.tracks(onlyAPI: true))
+
+                                                                        case .local, .sync:
+                                                                            if await viewModel.fetchfolderItems(
+                                                                                sourceID: id, path: nil) != nil {
+                                                                                coordinator.push(.sourceFolder(sourceID: id, path: nil))
+                                                                            }
                                                                     }
                                                                 }
 
