@@ -13,7 +13,8 @@ protocol DownloadStateProviding: AnyObject {
     var sections: [TracksSection] { get }
     var selectedGenre: Genre { get set }
     var inProgressTrackIDs: Set<String> { get }
-    var inProgressTracksCount: Int { get }
+    var inProgressActiveTracksCount: Int { get }
+    var inProgressPausedTracksCount: Int { get }
     var isRefreshing: Bool { get }
     var isSearchMode: Bool { get }
     var showsEmptyState: Bool { get }

@@ -75,18 +75,27 @@ struct BrowseView: View {
 
                 Spacer()
 
-                Button(action: {
-                    viewModel.cancelAllDownloads()
-                }, label: {
+                Menu {
+                    Button(action: {
+                        viewModel.cancelAllActiveDownloads()
+                    }, label: {
+                        Label("Remove all active tracks", systemImage: "")
+                    })
+                    .disabled(viewModel.inProgressActiveTracksCount == .zero)
+
+                    Button(action: {
+                        viewModel.cancelAllPausedDownloads()
+                    }, label: {
+                        Label("Remove all paused tracks", systemImage: "")
+                    })
+                    .disabled(viewModel.inProgressPausedTracksCount == .zero)
+                } label: {
                     Image(systemName: "xmark.circle")
                         .symbolRenderingMode(.hierarchical)
                         .font(.system(size: 30, weight: .ultraLight))
-                        .foregroundColor(viewModel.inProgressTracksCount > .zero
-                                         ? theme.tokens.clearAllDownloadsActive
-                                         : theme.tokens.clearAllDownloadsInactive
-                        )
-                })
-                .disabled(viewModel.inProgressTracksCount == .zero)
+                }
+                .disabled(viewModel.inProgressActiveTracksCount == .zero && viewModel.inProgressPausedTracksCount == .zero)
+                .opacity(viewModel.inProgressActiveTracksCount == .zero && viewModel.inProgressPausedTracksCount == .zero ? 0.5 : 1)
             }
             .padding(.horizontal, horizontalPadding)
         }
@@ -99,44 +108,41 @@ struct BrowseView: View {
         private let headerLeadingPadding: CGFloat = 26
 
         var body: some View {
-            ScrollView(
-                showsIndicators: false,
-                content: {
-                    LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
-                        SegmentedChipControl(
-                            selected: Binding(
-                                get: {
-                                    viewModel.selectedGenre
-                                },
-                                set: {
-                                    viewModel.selectGenre($0)
-                                }
-                            ),
-                            direction: $slideDirection,
-                            items: Genre.allCases
-                        )
+            ScrollView(showsIndicators: true) {
+                LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
+                    SegmentedChipControl(
+                        selected: Binding(
+                            get: {
+                                viewModel.selectedGenre
+                            },
+                            set: {
+                                viewModel.selectGenre($0)
+                            }
+                        ),
+                        direction: $slideDirection,
+                        items: Genre.allCases
+                    )
 
-                        Group {
-                            ForEach(viewModel.sections) { section in
-                                switch section.type {
-                                    case .search:
-                                        searchSectionView(section)
+                    Group {
+                        ForEach(viewModel.sections) { section in
+                            switch section.type {
+                                case .search:
+                                    searchSectionView(section)
 
-                                    case .genre:
-                                        genreSectionView(section)
+                                case .genre:
+                                    genreSectionView(section)
 
-                                    case .popular:
-                                        popularSectionView(section)
+                                case .popular:
+                                    popularSectionView(section)
 
-                                    case .recents, .all, .imported:
-                                        EmptyView()
-                                }
+                                case .recents, .all, .imported:
+                                    EmptyView()
                             }
                         }
-                        .modifier(EmptyTracksStateModifier(showsEmptyState: viewModel.showsEmptyState))
                     }
+                    .modifier(EmptyTracksStateModifier(showsEmptyState: viewModel.showsEmptyState))
                 }
-            )
+            }
             .padding(.top, 10)
             .contentMargins(.bottom, 20)
             .refreshable {
@@ -199,7 +205,7 @@ struct BrowseView: View {
                 Section(
                     content: {
                         ScrollViewReader { horizontalProxy in
-                            ScrollView(.horizontal, showsIndicators: false) {
+                            ScrollView(.horizontal, showsIndicators: true) {
                                 LazyHStack(spacing: 8) {
                                     ForEach(section.tracks, id: \.id) { track in
                                         GenreCell(

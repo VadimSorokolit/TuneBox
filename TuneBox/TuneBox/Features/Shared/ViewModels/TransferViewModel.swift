@@ -61,7 +61,8 @@ protocol TransferManaging: AnyObject, Sendable,
     func loadNextBy(genre: Genre?)
     func startDownload(_ track: TrackEntity) async
     func clearSearchState()
-    func cancelAllDownloads()
+    func cancelAllActiveDownloads()
+    func cancelAllPausedDownloads()
     func resetTransferState() async
     func selectGenre(_ genre: Genre)
     func saveTransferState()
@@ -103,8 +104,12 @@ final class TransferViewModel: TransferManaging {
     @ObservationIgnored
     var onTracksChanged: (() -> Void)?
 
-    var inProgressTracksCount: Int {
+    var inProgressActiveTracksCount: Int {
         self.inProgressTrackIDs.count
+    }
+    
+    var inProgressPausedTracksCount: Int {
+        self.allTracks.filter({ $0.downloadState == .paused }).count
     }
 
     var isFetchTracks: Bool {
@@ -549,7 +554,7 @@ final class TransferViewModel: TransferManaging {
         await self.networkService.snapshotResumeDataForRelaunch()
     }
 
-    func cancelAllDownloads() {
+    func cancelAllActiveDownloads() {
         Task {
             await self.networkService.cancelAllDownloads()
         }
@@ -570,6 +575,23 @@ final class TransferViewModel: TransferManaging {
 
                     break
             }
+        }
+
+        self.persistDownloadSession(force: true)
+    }
+
+    func cancelAllPausedDownloads() {
+        let pausedTracks = self.allTracks.filter {
+            $0.downloadState == .paused
+        }
+
+        for track in pausedTracks {
+            self.networkService.clearPersistedResumeData(trackId: track.id)
+            self.resetTrackState(
+                track,
+                to: .idle,
+                fileState: FileStorageState.none
+            )
         }
 
         self.persistDownloadSession(force: true)
