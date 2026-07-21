@@ -107,7 +107,7 @@ final class TransferViewModel: TransferManaging {
     var inProgressActiveTracksCount: Int {
         self.inProgressTrackIDs.count
     }
-    
+
     var inProgressPausedTracksCount: Int {
         self.allTracks.filter({ $0.downloadState == .paused }).count
     }
@@ -821,11 +821,8 @@ final class TransferViewModel: TransferManaging {
 
         self.offsetPopular = offsetZero
 
-        if self.tracks(for: .popular).isEmpty {
-            self.set(loadedTracks, for: .popular)
-        } else {
-            self.mergeTracks(loadedTracks, for: .popular)
-        }
+        self.set(loadedTracks, for: .popular)
+
         self.offsetPopular = self.tracks(for: .popular).count
         self.reachedPopularTracksEnd = (loadedTracks.count < self.limit)
     }
