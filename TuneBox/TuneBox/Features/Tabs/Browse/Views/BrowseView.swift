@@ -234,6 +234,7 @@ struct BrowseView: View {
                                         style: .carousel
                                     )
                                 }
+                                .padding(.bottom, 12)
                                 .padding(.horizontal)
                                 .id("featuredLeft")
                             }
@@ -292,6 +293,7 @@ struct BrowseView: View {
                         sectionTracksTitle(section.title)
                     }
                 )
+                .padding(.top, -3)
             }
         }
     }
