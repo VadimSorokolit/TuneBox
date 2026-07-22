@@ -119,6 +119,7 @@
 		5BD579A52FAB25EE00503BA2 /* NetworkServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD579A32FAB25EE00503BA2 /* NetworkServiceTests.swift */; };
 		5BDA04C8300A5DA900C7B763 /* SourceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDA04C7300A5DA700C7B763 /* SourceView.swift */; };
 		5BDA04CA300A677F00C7B763 /* SourceFolderItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDA04C9300A677F00C7B763 /* SourceFolderItem.swift */; };
+		5BECD77C3010E0750028FC67 /* LibrarySummaryFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BECD77B3010E0740028FC67 /* LibrarySummaryFooter.swift */; };
 		5BFCA7D22FCE0DDE009C6AD9 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA7D12FCE0DDD009C6AD9 /* AppTheme.swift */; };
 		5BFCA7D42FCE1148009C6AD9 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA7D32FCE1130009C6AD9 /* ThemeManager.swift */; };
 		5BFCA7D62FCE118B009C6AD9 /* Theme+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA7D52FCE118A009C6AD9 /* Theme+Extensions.swift */; };
@@ -278,6 +279,7 @@
 		5BD579AB2FAB27A000503BA2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5BDA04C7300A5DA700C7B763 /* SourceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceView.swift; sourceTree = "<group>"; };
 		5BDA04C9300A677F00C7B763 /* SourceFolderItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceFolderItem.swift; sourceTree = "<group>"; };
+		5BECD77B3010E0740028FC67 /* LibrarySummaryFooter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibrarySummaryFooter.swift; sourceTree = "<group>"; };
 		5BFCA7D12FCE0DDD009C6AD9 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		5BFCA7D32FCE1130009C6AD9 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
 		5BFCA7D52FCE118A009C6AD9 /* Theme+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Theme+Extensions.swift"; sourceTree = "<group>"; };
@@ -417,6 +419,7 @@
 				5B0BC2CE3007DF7100E8F2A5 /* ArtworkView.swift */,
 				5BA581912FD7055B00B498D7 /* EmptyTrackCell.swift */,
 				5BA581952FD8603400B498D7 /* HighlightedText.swift */,
+				5BECD77B3010E0740028FC67 /* LibrarySummaryFooter.swift */,
 				5BA1F0002FE1000000503BA2 /* PaginationFooterView.swift */,
 				5B1875C52FD06EBC00D8A042 /* SearchBarView.swift */,
 				5B1875C82FD084CA00D8A042 /* SegmentedChipControl.swift */,
@@ -1283,6 +1286,7 @@
 				5B0BC2DD3008D91C00E8F2A5 /* ArtistDetailsView.swift in Sources */,
 				5B0BC2C53007940A00E8F2A5 /* AlbumCell.swift in Sources */,
 				5B47627A2FAB3DC30069E41A /* TuneBoxRouter.swift in Sources */,
+				5BECD77C3010E0750028FC67 /* LibrarySummaryFooter.swift in Sources */,
 				5B8382BC2FC5D97F003625CD /* PlayerManaging.swift in Sources */,
 				5BD3BF312FF56EDC006FED4B /* PlaylistEntity.swift in Sources */,
 				5BFCA7D22FCE0DDE009C6AD9 /* AppTheme.swift in Sources */,

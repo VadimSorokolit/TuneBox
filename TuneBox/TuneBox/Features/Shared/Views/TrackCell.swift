@@ -149,7 +149,7 @@ struct TrackCell: View {
                                         )
                                         .rotationEffect(.degrees(-90))
                                 }
-                                
+
                                 buttonImage
                                     .font(.system(size: 14, weight: .medium))
                                     .frame(size: 25)

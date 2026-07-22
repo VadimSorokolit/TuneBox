@@ -36,10 +36,10 @@ struct LibraryMenuCell: View {
                                 Image(systemName: libraryItem.systemImage)
                                     .foregroundStyle(.gray)
                                     .font(.system(size: 22, weight: .medium))
-                                    .frame(width: 22, height: 22)
+                                    .frame(size: 22)
 
                                 Text(libraryItem.rawValue.capitalized)
-                                    .font(.system(size: 18, weight: .regular))
+                                    .font(.system(size: 16, weight: .regular))
                             }
                             .contentShape(Rectangle())
                             .onTapGesture {
@@ -114,10 +114,10 @@ struct LibraryMenuCell: View {
                     Image(systemName: icon)
                         .foregroundStyle(.gray)
                         .font(.system(size: 22, weight: .medium))
-                        .frame(width: 22, height: 22)
+                        .frame(size: 22)
 
                     Text(title)
-                        .font(.system(size: 18, weight: .regular))
+                        .font(.system(size: 16, weight: .regular))
                 }
 
                 Spacer()
@@ -129,12 +129,13 @@ struct LibraryMenuCell: View {
                 }
             }
             .frame(maxWidth: .infinity)
-            .padding(.horizontal, 26)
+            .padding(.trailing, 26)
+            .padding(.leading, 34)
 
             Rectangle()
                 .fill(Color.gray.opacity(0.2))
                 .frame(height: 1)
-                .padding(.leading, 58)
+                .padding(.leading, 66)
                 .padding(.trailing, 26)
         }
         .padding(.top, 15)
@@ -177,7 +178,7 @@ struct LibraryMenuCell: View {
 #Preview {
     LibraryMenuCell(
         item: .library(.artists),
-        isEditMode: true,
+        isEditMode: false,
         isSelected: false,
         viewModel: ImportViewModel(),
         onTapGesture: {}

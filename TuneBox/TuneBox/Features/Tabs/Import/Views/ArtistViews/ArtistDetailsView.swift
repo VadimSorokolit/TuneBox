@@ -117,7 +117,7 @@ struct ArtistDetailsView: View {
         // MARK: - Body
 
         var body: some View {
-            ScrollView(showsIndicators: false) {
+            ScrollView {
                 LazyVStack(spacing: 0) {
                     ForEach(albums) { album in
                         AlbumCell(

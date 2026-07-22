@@ -12,14 +12,16 @@ extension View {
     func sectionTracksTitle(
         _ title: String,
         suffix: String? = nil,
+        background: Color = Color(.systemBackground),
+        foregroundStyle: Color = Color(.label),
         horizontalPadding: CGFloat = 26
     ) -> some View {
         Text("\(title) \(suffix ?? "")")
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, horizontalPadding)
             .padding(.vertical, 10)
-            .background(Color(.systemBackground))
-            .foregroundStyle(Color(.label))
+            .background(background)
+            .foregroundStyle(foregroundStyle)
             .font(.headline)
     }
 

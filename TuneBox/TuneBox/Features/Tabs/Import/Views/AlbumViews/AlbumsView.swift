@@ -14,32 +14,39 @@ struct AlbumsView: View {
 
     var body: some View {
         if let library = viewModel.library {
-            ScrollView(showsIndicators: false) {
-                LazyVStack(spacing: 0) {
-                    ForEach(library.albums) { album in
-                        AlbumCell(
-                            album: album,
-                            onTapGesture: {
-                                coordinator.push(.album(album))
+            Group {
+                if library.albums.isNotEmpty {
+                    ScrollView(showsIndicators: false) {
+                        LazyVStack(spacing: 0) {
+                            ForEach(library.albums) { album in
+                                AlbumCell(
+                                    album: album,
+                                    onTapGesture: {
+                                        coordinator.push(.album(album))
+                                    }
+                                )
                             }
-                        )
-                    }
 
-                    Text(
-                        "\(library.albums.count) "
-                        + "\(library.albums.count == 1 ? "album" : "albums") · "
-                        + "\(viewModel.tracksDuration(library.albums.flatMap(\.tracks)).formattedDuration) · "
-                        + "\(viewModel.tracksSize(library.albums.flatMap(\.tracks)).formattedFileSize)"
-                    )
-                    .padding(.top, 20)
-                    .multilineTextAlignment(.center)
-                    .font(.system(size: 16, weight: .regular))
-                    .foregroundStyle(.gray)
+                            LibrarySummaryFooter(
+                                count: library.albums.count,
+                                unitSingular: "album",
+                                unitPlural: "albums",
+                                duration: viewModel.tracksDuration(library.albums.flatMap(\.tracks)),
+                                size: viewModel.tracksSize(library.albums.flatMap(\.tracks))
+                            )
+                        }
+                    }
+                    .padding(.top, 16)
+                    .contentMargins(.bottom, 40)
+                } else {
+                    ContentUnavailableView {
+                        Image(systemName: "rectangle.stack")
+                    } description: {
+                        Text("Albums you add to your library will appear here.")
+                    }
                 }
             }
             .navigationTitle("Albums")
-            .padding(.top, 16)
-            .contentMargins(.bottom, 40)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
     }

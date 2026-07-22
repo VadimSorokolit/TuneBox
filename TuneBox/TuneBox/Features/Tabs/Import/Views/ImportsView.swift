@@ -195,7 +195,7 @@ struct ImportsView: View {
         // MARK: - Body
 
         var body: some View {
-                ScrollView(showsIndicators: false) {
+                ScrollView {
                     LazyVStack(spacing: 10, pinnedViews: [.sectionHeaders]) {
                         ForEach(viewModel.sections) { section in
                             Section {
@@ -273,7 +273,11 @@ struct ImportsView: View {
                                         }
                                 }
                             } header: {
-                                sectionTracksTitle(section.kind.rawValue.capitalized)
+                                sectionTracksTitle(
+                                    section.kind.rawValue.capitalized,
+                                    background: .clear,
+                                    foregroundStyle: .gray
+                                )
                             }
                         }
                     }

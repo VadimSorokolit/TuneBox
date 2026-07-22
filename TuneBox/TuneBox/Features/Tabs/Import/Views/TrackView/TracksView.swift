@@ -42,6 +42,15 @@ struct TracksView: View {
         .navigationTitle("Tracks")
         .padding(.top, 16)
         .contentMargins(.bottom, 16)
+        .onAppear {
+            Task {
+                viewModel.startObservingTracksChanges()
+                await viewModel.refreshLibrary()
+            }
+        }
+        .onDisappear {
+            viewModel.stopObservingTracksChanges()
+        }
     }
 
     // MARK: - Properties. Private
