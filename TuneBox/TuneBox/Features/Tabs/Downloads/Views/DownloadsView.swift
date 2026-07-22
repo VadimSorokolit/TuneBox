@@ -95,35 +95,38 @@ struct DownloadsView: View {
 
                 Spacer()
 
-                Menu(
-                    content: {
-                        Button(action: {
-                            viewModel.setType(.active)
-                        }, label: {
-                            Label(
-                                "Active Downloads",
-                                systemImage: viewModel.selectedTracksType == .active
-                                ? "checkmark"
-                                : ""
-                            )
-                        })
-
-                        Button(action: {
-                            viewModel.setType(.downloaded)
-                        }, label: {
-                            Label(
-                                "Downloaded",
-                                systemImage: viewModel.selectedTracksType == .downloaded
-                                ? "checkmark"
-                                : ""
-                            )
-                        })
+                Menu {
+                    Button(action: {
+                        viewModel.setType(.active)
                     }, label: {
-                        Image(systemName: "line.3.horizontal.decrease.circle")
-                            .font(.system(size: 24))
-                            .foregroundStyle(theme.tokens.browseHeaderText)
-                    }
-                )
+                        Label(
+                            "Active Downloads",
+                            systemImage: viewModel.selectedTracksType == .active
+                            ? "checkmark"
+                            : ""
+                        )
+                    })
+
+                    Button(action: {
+                        viewModel.setType(.downloaded)
+                    }, label: {
+                        Label(
+                            "Downloaded",
+                            systemImage: viewModel.selectedTracksType == .downloaded
+                            ? "checkmark"
+                            : ""
+                        )
+                    })
+                } label: {
+                    Circle()
+                        .frame(size: 34)
+                        .foregroundStyle(.clear)
+                        .overlay {
+                            Image(systemName: "line.3.horizontal.decrease.circle")
+                                .font(.system(size: 24))
+                                .foregroundStyle(theme.tokens.browseHeaderText)
+                        }
+                }
             }
             .padding(.horizontal, horizontalPadding)
         }
@@ -166,26 +169,22 @@ struct DownloadsView: View {
         private func searchSectionView(_ section: TracksSection) -> some View {
             if section.tracks.isNotEmpty,
                viewModel.isSearchMode {
-
-                Section(
-                    content: {
-                        LazyVStack(spacing: 4) {
-                            ForEach(section.tracks, id: \.id) { track in
-                                TrackCell(
-                                    track: track,
-                                    searchQuery: viewModel.completedSearchQuery,
-                                    onButtonTap: {
-                                        Task {
-                                            await viewModel.handleDownloadAction(for: track)
-                                        }
-                                    })
-                            }
+                Section {
+                    LazyVStack(spacing: 4) {
+                        ForEach(section.tracks, id: \.id) { track in
+                            TrackCell(
+                                track: track,
+                                searchQuery: viewModel.completedSearchQuery,
+                                onButtonTap: {
+                                    Task {
+                                        await viewModel.handleDownloadAction(for: track)
+                                    }
+                                })
                         }
-                    },
-                    header: {
-                        sectionTracksTitle(section.title)
                     }
-                )
+                } header: {
+                    sectionTracksTitle(section.title)
+                }
             }
         }
 
@@ -193,28 +192,25 @@ struct DownloadsView: View {
         private func recentsSectionView(_ section: TracksSection) -> some View {
             if section.tracks.isNotEmpty,
                viewModel.isSearchMode.isFalse {
-
-                Section(
-                    content: {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            LazyHStack(spacing: 4) {
-                                ForEach(section.tracks, id: \.id) { track in
-                                    GenreCell(
-                                        track: track,
-                                        onButtonTap: {
-                                            Task {
-                                                await viewModel.handleDownloadAction(for: track)
-                                            }
+                Section {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        LazyHStack(spacing: 4) {
+                            ForEach(section.tracks, id: \.id) { track in
+                                GenreCell(
+                                    track: track,
+                                    onButtonTap: {
+                                        Task {
+                                            await viewModel.handleDownloadAction(for: track)
                                         }
-                                    )
-                                }
+                                    }
+                                )
                             }
-                            .padding(.horizontal)
                         }
-                    }, header: {
-                        sectionTracksTitle(section.title)
+                        .padding(.horizontal)
                     }
-                )
+                } header: {
+                    sectionTracksTitle(section.title)
+                }
             }
         }
 

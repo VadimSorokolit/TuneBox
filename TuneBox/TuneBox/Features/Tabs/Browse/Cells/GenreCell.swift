@@ -90,27 +90,33 @@ struct GenreCell: View {
 
     private var downloadButton: some View {
         let progress = min(max(track.downloadingProgress, 0), 1)
+        let buttonSize: CGFloat = 25
 
         return ZStack {
             if track.downloadState != .completed,
                track.downloadState != .idle {
                 Circle()
-                    .stroke(Color.secondary.opacity(0.4), lineWidth: 1.2)
+                    .stroke(Color.white, lineWidth: 0.8)
 
                 Circle()
                     .trim(from: 0, to: progress)
                     .stroke(
                         Color.green,
-                        style: StrokeStyle(lineWidth: 2, lineCap: .round)
+                        style: StrokeStyle(lineWidth: 1, lineCap: .round)
                     )
                     .rotationEffect(.degrees(-90))
             }
 
-            stateImage
-                .font(.system(size: 10, weight: .medium))
-                .foregroundStyle(iconColor)
+            Circle()
+                .fill(.clear)
+                .frame(size: buttonSize)
+                .overlay {
+                    stateImage
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(iconColor)
+                }
         }
-        .frame(width: 28, height: 28)
+        .frame(size: buttonSize)
     }
 
     private var accessibilityLabel: String {
