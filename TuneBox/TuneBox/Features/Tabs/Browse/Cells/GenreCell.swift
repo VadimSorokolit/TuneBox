@@ -107,14 +107,10 @@ struct GenreCell: View {
                     .rotationEffect(.degrees(-90))
             }
 
-            Circle()
-                .fill(.clear)
+            stateImage
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(iconColor)
                 .frame(size: buttonSize)
-                .overlay {
-                    stateImage
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(iconColor)
-                }
         }
         .frame(size: buttonSize)
     }

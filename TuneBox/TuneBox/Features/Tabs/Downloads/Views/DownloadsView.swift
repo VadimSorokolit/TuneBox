@@ -118,14 +118,9 @@ struct DownloadsView: View {
                         )
                     })
                 } label: {
-                    Circle()
-                        .frame(size: 34)
-                        .foregroundStyle(.clear)
-                        .overlay {
-                            Image(systemName: "line.3.horizontal.decrease.circle")
-                                .font(.system(size: 24))
-                                .foregroundStyle(theme.tokens.browseHeaderText)
-                        }
+                    Image(systemName: "line.3.horizontal.decrease.circle")
+                        .font(.system(size: 26))
+                        .foregroundStyle(theme.tokens.browseHeaderText)
                 }
             }
             .padding(.horizontal, horizontalPadding)
@@ -136,28 +131,25 @@ struct DownloadsView: View {
         let viewModel: DownloadsPresenting
 
         var body: some View {
-            ScrollView(
-                showsIndicators: false,
-                content: {
-                    LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
-                        ForEach(viewModel.sections) { section in
-                            switch section.type {
-                                case .search:
-                                    searchSectionView(section)
+            ScrollView(showsIndicators: false) {
+                LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
+                    ForEach(viewModel.sections) { section in
+                        switch section.type {
+                            case .search:
+                                searchSectionView(section)
 
-                                case .recents:
-                                    recentsSectionView(section)
+                            case .recents:
+                                recentsSectionView(section)
 
-                                case .all:
-                                    filteredSectionView(section)
+                            case .all:
+                                filteredSectionView(section)
 
-                                default:
-                                    EmptyView()
-                            }
+                            default:
+                                EmptyView()
                         }
                     }
                 }
-            )
+            }
             .padding(.top, 5)
             .contentMargins(.bottom, 20)
             .modifier(EmptyTracksStateModifier(showsEmptyState: viewModel.showsEmptyState))

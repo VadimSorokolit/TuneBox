@@ -149,14 +149,10 @@ struct TrackCell: View {
                                         )
                                         .rotationEffect(.degrees(-90))
                                 }
-
-                                Circle()
-                                    .fill(.clear)
+                                
+                                buttonImage
+                                    .font(.system(size: 14, weight: .medium))
                                     .frame(size: 25)
-                                    .overlay {
-                                        buttonImage
-                                            .font(.system(size: 14, weight: .medium))
-                                    }
                             }
                             .frame(size: 25)
                         }
