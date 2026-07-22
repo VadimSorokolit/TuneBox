@@ -8,9 +8,10 @@
 import Foundation
 
 protocol ImportManaging: LoadStateManaging {
-    var editSectionModeEnabled: Bool { get set }
-    var draggingLibraryItem: LibraryItem? { get set }
+    var isEditSectionModeEnabled: Bool { get }
+    var draggingItem: ImportItem? { get set }
     var hasLibrary: Bool { get }
+    var hasVisibleItems: Bool { get }
     var library: MusicLibrary? { get }
     var sections: [ImportSectionModel] { get }
     var sources: [ImportSource] { get }
@@ -24,9 +25,9 @@ protocol ImportManaging: LoadStateManaging {
     func importFolder(_ url: URL) async
     func tracksSize(_ tracks: [TrackEntity]) -> Int
     func tracksDuration(_ tracks: [TrackEntity]) -> Int
-    func toggleLibraryItem(_ item: LibraryItem)
-    func isLibraryItemSelected(_ item: LibraryItem) -> Bool
-    func moveLibraryItem(to target: LibraryItem)
+    func toggleItem(_ item: ImportItem)
+    func isItemSelected(_ item: ImportItem) -> Bool
+    func moveItem(to target: ImportItem)
     func beginEditSections()
     func finishEditSections()
     func dismissError()

@@ -126,21 +126,26 @@ final class ImportViewModel: ImportManaging {
     private(set) var error: String?
     private(set) var isLoading: Bool = false
     private(set) var selectedLibraryItems: Set<LibraryItem> = []
+    private(set) var selectedSourceIDs: Set<ImportSource.ID> = []
     private(set) var libraryItemsOrder: [LibraryItem] = [.albums, .artists, .tracks, .playlists]
-    var editSectionModeEnabled: Bool = false
-    var draggingLibraryItem: LibraryItem?
+    private(set) var isEditSectionModeEnabled: Bool = false
+    var draggingItem: ImportItem?
 
     var hasLibrary: Bool {
         self.library != nil
+    }
+
+    var hasVisibleItems: Bool {
+        self.sections.contains { $0.items.isNotEmpty }
     }
 
     // MARK: - Methods. Public
 
     func refreshLibrary() async {
         do {
-            let imported = try persistenceService.getImportTracks()
-            let downloaded = try persistenceService.getRecentDownloadedTracks(limit: nil)
-            let playlists = try persistenceService.fetchPlaylists()
+            let imported = try self.persistenceService.getImportTracks()
+            let downloaded = try self.persistenceService.getRecentDownloadedTracks(limit: nil)
+            let playlists = try self.persistenceService.fetchPlaylists()
 
             let allTracks = (imported + downloaded)
                 .sorted {
@@ -148,15 +153,15 @@ final class ImportViewModel: ImportManaging {
                 }
 
             if allTracks.isNotEmpty || playlists.isNotEmpty {
-                library = parseLibrary(from: allTracks, playlists: playlists)
+                self.library = self.parseLibrary(from: allTracks, playlists: playlists)
             } else {
-                library = nil
+                self.library = nil
             }
 
             syncDownloadsSource(hasTracks: downloaded.isNotEmpty)
-            ensureSections()
+            self.ensureSections()
         } catch {
-            handleError(error)
+            self.handleError(error)
         }
     }
 
@@ -326,44 +331,78 @@ final class ImportViewModel: ImportManaging {
         tracks.reduce(0) { $0 + ($1.duration ?? 0) }
     }
 
-    func toggleLibraryItem(_ item: LibraryItem) {
-        if self.selectedLibraryItems.contains(item) {
-            self.selectedLibraryItems.remove(item)
-        } else {
-            self.selectedLibraryItems.insert(item)
+    func isItemSelected(_ item: ImportItem) -> Bool {
+        switch item {
+            case .library(let libraryItem):
+                return self.selectedLibraryItems.contains(libraryItem)
+
+            case .source(let id):
+                return self.selectedSourceIDs.contains(id)
         }
     }
 
-    func isLibraryItemSelected(_ item: LibraryItem) -> Bool {
-        self.selectedLibraryItems.contains(item)
+    func toggleItem(_ item: ImportItem) {
+        switch item {
+            case .library(let libraryItem):
+                if self.selectedLibraryItems.contains(libraryItem) {
+                    self.selectedLibraryItems.remove(libraryItem)
+                } else {
+                    self.selectedLibraryItems.insert(libraryItem)
+                }
+
+            case .source(let id):
+                if self.selectedSourceIDs.contains(id) {
+                    self.selectedSourceIDs.remove(id)
+                } else {
+                    self.selectedSourceIDs.insert(id)
+                }
+        }
     }
 
-    func moveLibraryItem(to target: LibraryItem) {
-        guard
-            let from = self.draggingLibraryItem,
-            from != target,
-            let fromIndex = self.libraryItemsOrder.firstIndex(of: from),
-            let toIndex = self.libraryItemsOrder.firstIndex(of: target)
-        else {
-            return
-        }
+    func moveItem(to target: ImportItem) {
+        guard let from = draggingItem, from != target else { return }
 
-        self.libraryItemsOrder.move(
-            fromOffsets: IndexSet(integer: fromIndex),
-            toOffset: toIndex > fromIndex ? toIndex + 1 : toIndex
-        )
-        self.ensureSections()
+        switch (from, target) {
+            case (.library(let fromItem), .library(let toItem)):
+                guard
+                    let fromIndex = self.libraryItemsOrder.firstIndex(of: fromItem),
+                    let toIndex = self.libraryItemsOrder.firstIndex(of: toItem)
+                else { return }
+
+                self.libraryItemsOrder.move(
+                    fromOffsets: IndexSet(integer: fromIndex),
+                    toOffset: toIndex > fromIndex ? toIndex + 1 : toIndex
+                )
+                self.ensureSections()
+
+            case (.source(let fromID), .source(let toID)):
+                guard
+                    let fromIndex = self.sources.firstIndex(where: { $0.id == fromID }),
+                    let toIndex = self.sources.firstIndex(where: { $0.id == toID })
+                else { return }
+
+                self.sources.move(
+                    fromOffsets: IndexSet(integer: fromIndex),
+                    toOffset: toIndex > fromIndex ? toIndex + 1 : toIndex
+                )
+                self.saveSources()
+                self.ensureSections()
+
+            default:
+                break
+        }
     }
 
     func beginEditSections() {
-        self.editSectionModeEnabled = true
+        self.isEditSectionModeEnabled = true
         self.ensureSections()
     }
 
     func finishEditSections() {
-        self.editSectionModeEnabled = false
-        self.draggingLibraryItem = nil
+        self.isEditSectionModeEnabled = false
+        self.draggingItem = nil
         self.saveSelectedLibraryItems()
+        self.saveSelectedSourceIDs()
         self.saveLibraryItemsOrder()
         self.ensureSections()
     }
@@ -378,6 +417,7 @@ final class ImportViewModel: ImportManaging {
         self.loadLibraryItemsOrder()
         self.loadSelectedLibraryItems()
         self.loadSources()
+        self.loadSelectedSourceIDs()
         self.ensureSections()
     }
 
@@ -394,6 +434,7 @@ final class ImportViewModel: ImportManaging {
     private let supportedTrackExtensions: Set<AudioFileExtension> = [.mp3, .wav, .wv, .flac]
     private enum Keys {
         static let selectedLibraryItems = "importSelectedLibraryItems"
+        static let selectedSourceIDs = "importSelectedSourceIDs"
         static let libraryItemsOrder = "importLibraryItemsOrder"
         static let importSources = "importSources"
         static let downloadsSourceTitle = "Downloads"
@@ -409,7 +450,7 @@ final class ImportViewModel: ImportManaging {
             ),
             .init(
                 kind: .sources,
-                items: sources.map { .source($0.id) }
+                items: sourceSectionItems()
             )
         ]
     }
@@ -450,7 +491,10 @@ final class ImportViewModel: ImportManaging {
             )
             self.addOrUpdateSource(source)
         } else {
+            let removedIDs = Set(sources.filter { $0.kind == .api }.map(\.id))
             self.sources.removeAll { $0.kind == .api }
+            self.selectedSourceIDs.subtract(removedIDs)
+            self.saveSelectedSourceIDs()
             self.saveSources()
             self.ensureSections()
         }
@@ -644,13 +688,13 @@ final class ImportViewModel: ImportManaging {
     }
 
     private func loadSelectedLibraryItems() {
-        if let saved = UserDefaults.standard.stringArray(forKey: Keys.selectedLibraryItems) {
-            self.selectedLibraryItems = Set(saved.compactMap(LibraryItem.init(rawValue:)))
+        guard UserDefaults.standard.object(forKey: Keys.selectedLibraryItems) != nil else {
+            self.selectedLibraryItems = [.albums, .artists, .tracks, .playlists]
+            return
         }
 
-        if self.selectedLibraryItems.isEmpty {
-            self.selectedLibraryItems = [.albums, .artists, .tracks, .playlists]
-        }
+        let saved = UserDefaults.standard.stringArray(forKey: Keys.selectedLibraryItems) ?? []
+        self.selectedLibraryItems = Set(saved.compactMap(LibraryItem.init(rawValue:)))
     }
 
     private func loadLibraryItemsOrder() {
@@ -679,39 +723,71 @@ final class ImportViewModel: ImportManaging {
         )
     }
 
-    private func addOrUpdateSource(_ source: ImportSource) {
-        if let index = sources.firstIndex(where: { $0.title == source.title }) {
-            sources[index] = source
-        } else {
-            sources.append(source)
+    private func loadSelectedSourceIDs() {
+        guard UserDefaults.standard.object(forKey: Keys.selectedSourceIDs) != nil else {
+            self.selectedSourceIDs = Set(sources.map(\.id))
+            return
         }
-        saveSources()
-        ensureSections()
+
+        let saved = (UserDefaults.standard.array(forKey: Keys.selectedSourceIDs) as? [String]) ?? []
+        self.selectedSourceIDs = Set(saved.compactMap(UUID.init(uuidString:)))
+
+        let existing = Set(sources.map(\.id))
+        self.selectedSourceIDs = self.selectedSourceIDs.intersection(existing)
     }
+
+    private func saveSelectedSourceIDs() {
+        UserDefaults.standard.set(
+            selectedSourceIDs.map(\.uuidString),
+            forKey: Keys.selectedSourceIDs
+        )
+    }
+
+    private func addOrUpdateSource(_ source: ImportSource) {
+        if let index = self.sources.firstIndex(where: { $0.title == source.title }) {
+            self.sources[index] = source
+        } else {
+            self.sources.append(source)
+            self.selectedSourceIDs.insert(source.id)
+            self.saveSelectedSourceIDs()
+        }
+        self.saveSources()
+        self.ensureSections()
+    }
+
     private func saveSources() {
         if let data = try? JSONEncoder().encode(sources) {
             UserDefaults.standard.set(data, forKey: Keys.importSources)
         }
     }
+
     private func loadSources() {
         guard
             let data = UserDefaults.standard.data(forKey: Keys.importSources),
             let saved = try? JSONDecoder().decode([ImportSource].self, from: data)
         else {
-            sources = []
+            self.sources = []
             return
         }
-        sources = saved
+        self.sources = saved
     }
 
     private func librarySectionItems() -> [ImportItem] {
         let all = libraryItemsOrder
 
-        let visible = self.editSectionModeEnabled
+        let visible = self.isEditSectionModeEnabled
         ? all
         : all.filter { self.selectedLibraryItems.contains($0) }
 
         return visible.map { .library($0) }
+    }
+
+    private func sourceSectionItems() -> [ImportItem] {
+        let visible = self.isEditSectionModeEnabled
+        ? self.sources
+        : self.sources.filter { self.selectedSourceIDs.contains($0.id) }
+
+        return visible.map { .source($0.id) }
     }
 
     private func handleError(_ error: Error) {

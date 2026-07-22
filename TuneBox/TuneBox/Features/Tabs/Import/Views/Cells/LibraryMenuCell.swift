@@ -12,105 +12,58 @@ struct LibraryMenuCell: View {
 
     // MARK: - Properties. Public
 
-    let item: ImportItem
+    let title: String
+    let icon: String
+    let dragID: String
     let isEditMode: Bool
     let isSelected: Bool
-    let viewModel: ImportManaging
+    let showsChevron: Bool
     let onTapGesture: () -> Void
+    let onDragStarted: () -> Void
+    let onDropEntered: () -> Void
+    let onDropEnded: () -> Void
 
-    // MARK: - Body
+    // MARK: - Main Body
 
     var body: some View {
-        HStack {
-            switch item {
-                case .library(let libraryItem):
-                    VStack(spacing: 15) {
-                        HStack {
-                            HStack(spacing: 10) {
-                                if isEditMode {
-                                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                                        .foregroundStyle(isSelected ? .blue : .gray)
-                                        .font(.system(size: 22, weight: .medium))
-                                }
+        rowContent
+            .padding(.top, 15)
+            .background(isEditMode && isSelected ? .gray.opacity(0.5) : .clear)
+            .onDrag {
+                guard isEditMode else {
+                    return NSItemProvider()
+                }
 
-                                Image(systemName: libraryItem.systemImage)
-                                    .foregroundStyle(.gray)
-                                    .font(.system(size: 22, weight: .medium))
-                                    .frame(size: 22)
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                onDragStarted()
 
-                                Text(libraryItem.rawValue.capitalized)
-                                    .font(.system(size: 16, weight: .regular))
-                            }
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                onTapGesture()
-                            }
-
-                            Spacer()
-
-                            if isEditMode {
-                                Image(systemName: "line.3.horizontal")
-                                    .foregroundStyle(.gray)
-                                    .font(.system(size: 14, weight: .regular))
-                                    .padding(15)
-                                    .contentShape(Rectangle())
-                            }
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.horizontal, 26)
-
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.2))
-                            .frame(height: 1)
-                            .padding(.leading, 58)
-                            .padding(.trailing, 26)
-                    }
-                    .padding(.top, 15)
-                    .background(isEditMode && isSelected ? .gray.opacity(0.5) : .clear)
-                    .onDrag {
-                        guard isEditMode else {
-                            return NSItemProvider()
-                        }
-
-                        let generator = UIImpactFeedbackGenerator(style: .medium)
-                        generator.prepare()
-                        generator.impactOccurred()
-
-                        viewModel.draggingLibraryItem = libraryItem
-                        return NSItemProvider(object: libraryItem.rawValue as NSString)
-                    } preview: {
-                        Color.clear
-                            .frame(width: 1, height: 1)
-                    }
-                    .onDrop(
-                        of: [UTType.text],
-                        delegate: LibraryReorderDropDelegate(
-                            target: libraryItem,
-                            viewModel: viewModel
-                        )
-                    )
-
-                case .source(let id):
-                    if let source = viewModel.source(for: id) {
-                        menuRow(
-                            icon: source.kind.systemImage,
-                            title: source.title,
-                            showsChevron: true
-                        )
-                    }
+                return NSItemProvider(object: dragID as NSString)
+            } preview: {
+                Color.clear
+                    .frame(width: 1, height: 1)
             }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
+            .onDrop(
+                of: [UTType.text],
+                delegate: ItemReorderDropDelegate(
+                    isEditMode: isEditMode,
+                    onDropEntered: onDropEntered,
+                    onDropEnded: onDropEnded
+                )
+            )
     }
 
-    private func menuRow(
-        icon: String,
-        title: String,
-        showsChevron: Bool = false
-    ) -> some View {
+    // MARK: - Properties. Private
+
+    private var rowContent: some View {
         VStack(spacing: 15) {
             HStack {
                 HStack(spacing: 10) {
+                    if isEditMode {
+                        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                            .foregroundStyle(isSelected ? .blue : .gray)
+                            .font(.system(size: 22, weight: .medium))
+                    }
+
                     Image(systemName: icon)
                         .foregroundStyle(.gray)
                         .font(.system(size: 22, weight: .medium))
@@ -119,52 +72,56 @@ struct LibraryMenuCell: View {
                     Text(title)
                         .font(.system(size: 16, weight: .regular))
                 }
+                .contentShape(Rectangle())
+                .onTapGesture(perform: onTapGesture)
 
                 Spacer()
 
-                if showsChevron {
+                if isEditMode {
+                    Image(systemName: "line.3.horizontal")
+                        .foregroundStyle(.gray)
+                        .font(.system(size: 14, weight: .regular))
+                        .padding(15)
+                } else if showsChevron {
                     Image(systemName: "chevron.right")
                         .foregroundStyle(.gray)
                         .font(.system(size: 13, weight: .medium))
                 }
             }
             .frame(maxWidth: .infinity)
-            .padding(.trailing, 26)
-            .padding(.leading, 34)
+            .padding(.horizontal, 26)
 
             Rectangle()
                 .fill(Color.gray.opacity(0.2))
                 .frame(height: 1)
-                .padding(.leading, 66)
+                .padding(.leading, 58)
                 .padding(.trailing, 26)
         }
-        .padding(.top, 15)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            onTapGesture()
-        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
+
     // MARK: - Private. Objects
 
-    private struct LibraryReorderDropDelegate: DropDelegate {
+    private struct ItemReorderDropDelegate: DropDelegate {
 
         // MARK: - Properties. Public
 
-        let target: LibraryItem
-        let viewModel: ImportManaging
+        let isEditMode: Bool
+        let onDropEntered: () -> Void
+        let onDropEnded: () -> Void
 
         // MARK: - Methods. Public
 
         func performDrop(info: DropInfo) -> Bool {
-            viewModel.draggingLibraryItem = nil
+            onDropEnded()
             return true
         }
 
         func dropEntered(info: DropInfo) {
-            guard viewModel.editSectionModeEnabled else { return }
+            guard isEditMode else { return }
 
             withAnimation(.snappy) {
-                viewModel.moveLibraryItem(to: target)
+                onDropEntered()
             }
             UISelectionFeedbackGenerator().selectionChanged()
         }
@@ -177,10 +134,15 @@ struct LibraryMenuCell: View {
 
 #Preview {
     LibraryMenuCell(
-        item: .library(.artists),
+        title: "Artists",
+        icon: "music.mic",
+        dragID: "artists",
         isEditMode: false,
         isSelected: false,
-        viewModel: ImportViewModel(),
-        onTapGesture: {}
+        showsChevron: false,
+        onTapGesture: {},
+        onDragStarted: {},
+        onDropEntered: {},
+        onDropEnded: {}
     )
 }
