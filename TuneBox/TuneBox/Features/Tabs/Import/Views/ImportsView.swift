@@ -210,6 +210,7 @@ struct ImportsView: View {
                                 } header: {
                                     sectionTracksTitle(
                                         section.kind.rawValue.capitalized,
+                                        font: .system(size: 14, weight: .bold),
                                         foregroundStyle: .gray
                                     )
                                 }

@@ -12,6 +12,7 @@ extension View {
     func sectionTracksTitle(
         _ title: String,
         suffix: String? = nil,
+        font: Font = .headline,
         background: Color = Color(.systemBackground),
         foregroundStyle: Color = Color(.label),
         horizontalPadding: CGFloat = 26
@@ -22,7 +23,7 @@ extension View {
             .padding(.vertical, 10)
             .background(background)
             .foregroundStyle(foregroundStyle)
-            .font(.headline)
+            .font(font)
     }
 
 }
