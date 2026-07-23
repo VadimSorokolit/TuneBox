@@ -265,11 +265,16 @@ struct ImportsView: View {
                     dragStartIndex = currentItems(for: section.kind).firstIndex(of: item)
                 },
                 onDragChanged: { translationHeight, rowHeight in
-                    swapIfNeeded(
-                        dragging: item,
+                    let clampedHeight = clampedTranslation(
                         translationHeight: translationHeight,
                         rowHeight: rowHeight
                     )
+                    swapIfNeeded(
+                        dragging: item,
+                        translationHeight: clampedHeight,
+                        rowHeight: rowHeight
+                    )
+                    return clampedHeight
                 },
                 onDragEnded: {
                     viewModel.draggingItem = nil
@@ -277,6 +282,26 @@ struct ImportsView: View {
                     dragSectionKind = nil
                 }
             )
+        }
+
+        private func clampedTranslation(
+            translationHeight: CGFloat,
+            rowHeight: CGFloat
+        ) -> CGFloat {
+            guard
+                let sectionKind = dragSectionKind,
+                let startIndex = dragStartIndex
+            else {
+                return translationHeight
+            }
+
+            let items = currentItems(for: sectionKind)
+            guard items.count > 1 else { return 0 }
+
+            let safeRowHeight = max(rowHeight, 1)
+            let maxUp = CGFloat(startIndex) * safeRowHeight
+            let maxDown = CGFloat(items.count - 1 - startIndex) * safeRowHeight
+            return min(max(translationHeight, -maxUp), maxDown)
         }
 
         private func swapIfNeeded(

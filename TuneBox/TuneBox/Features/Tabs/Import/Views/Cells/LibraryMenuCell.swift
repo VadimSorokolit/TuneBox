@@ -18,8 +18,8 @@ struct LibraryMenuCell: View {
     let showsChevron: Bool
     let onTapGesture: () -> Void
     let onDragStarted: () -> Void
-    /// Reports finger translation height and the measured row height.
-    let onDragChanged: (_ translationHeight: CGFloat, _ rowHeight: CGFloat) -> Void
+    /// Reports finger translation and returns the translation clamped to the section bounds.
+    let onDragChanged: (_ translationHeight: CGFloat, _ rowHeight: CGFloat) -> CGFloat
     let onDragEnded: () -> Void
 
     // MARK: - Properties. Private
@@ -76,7 +76,7 @@ struct LibraryMenuCell: View {
             }
     }
 
-    // MARK: - Gestures. Private
+    // MARK: - Properties. Private
 
     private var reorderGesture: some Gesture {
         LongPressGesture(minimumDuration: 0.35, maximumDistance: 12)
@@ -97,8 +97,8 @@ struct LibraryMenuCell: View {
                 }
 
                 let translation = drag?.translation ?? .zero
-                dragTranslation = translation
-                onDragChanged(translation.height, rowHeight)
+                let clampedY = onDragChanged(translation.height, rowHeight)
+                dragTranslation = CGSize(width: 0, height: clampedY)
             }
             .onEnded { _ in
                 // Cell is already in its final list slot. Clearing the offset
@@ -181,7 +181,7 @@ struct LibraryMenuCell: View {
         showsChevron: false,
         onTapGesture: {},
         onDragStarted: {},
-        onDragChanged: { _, _ in },
+        onDragChanged: { translation, _ in translation },
         onDragEnded: {}
     )
 }
