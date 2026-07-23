@@ -407,6 +407,24 @@ final class ImportViewModel: ImportManaging {
         self.ensureSections()
     }
 
+    func removeSource(_ id: ImportSource.ID) {
+        guard let source = sources.first(where: { $0.id == id }) else { return }
+        if source.kind == .api {
+
+        } else {
+            self.sources.removeAll { $0.id == id }
+            self.selectedSourceIDs.remove(id)
+
+            if case .source(id) = draggingItem {
+                draggingItem = nil
+            }
+
+            self.saveSelectedSourceIDs()
+            self.saveSources()
+            self.ensureSections()
+        }
+    }
+
     func dismissError() {
         self.error = nil
     }

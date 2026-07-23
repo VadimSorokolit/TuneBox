@@ -21,6 +21,7 @@ struct ImportsView: View {
 
             if viewModel.hasLibrary {
                 ContentView(
+                    sourceIDToDelete: $sourceIDToDelete,
                     viewModel: viewModel
                 )
             } else {
@@ -78,6 +79,7 @@ struct ImportsView: View {
     @Injected private var viewModel: ImportManaging
     @State private var isFileImporterPresented: Bool = false
     @State private var isErrorPresented = false
+    @State private var sourceIDToDelete: ImportSource.ID?
 
     // MARK: - Objects. Private
 
@@ -187,6 +189,7 @@ struct ImportsView: View {
         // MARK: - Properties. Public
 
         @Environment(AppCoordinator.self) private var coordinator
+        @Binding var sourceIDToDelete: ImportSource.ID?
         let viewModel: ImportManaging
 
         // MARK: - Body
@@ -200,7 +203,9 @@ struct ImportsView: View {
                                 Section {
                                     VStack(spacing: 0) {
                                         ForEach(section.items, id: \.self) { item in
-                                            menuCell(for: item, in: section)
+                                            menuCell(for: item,
+                                                     in: section
+                                            )
                                         }
                                     }
                                     .animation(
@@ -249,7 +254,10 @@ struct ImportsView: View {
 
         // MARK: - Private. Methods
 
-        private func menuCell(for item: ImportItem, in section: ImportSectionModel) -> some View {
+        private func menuCell(
+            for item: ImportItem,
+            in section: ImportSectionModel
+        ) -> some View {
             LibraryMenuCell(
                 title: title(for: item),
                 icon: icon(for: item),
@@ -282,6 +290,40 @@ struct ImportsView: View {
                     dragSectionKind = nil
                 }
             )
+            .contextMenu {
+                if case .source(let id) = item, viewModel.isEditSectionModeEnabled.isFalse {
+                    Button(role: .destructive) {
+                        sourceIDToDelete = id
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                }
+            }
+            .confirmationDialog(
+                "Delete Folder?",
+                isPresented: Binding(
+                    get: {
+                        if case .source(let id) = item {
+                            return sourceIDToDelete == id
+                        }
+                        return false
+                    },
+                    set: { if !$0 { sourceIDToDelete = nil } }
+                ),
+                titleVisibility: .visible
+            ) {
+                Button("Delete", role: .destructive) {
+                    if let id = sourceIDToDelete {
+                        viewModel.removeSource(id)
+                    }
+                    sourceIDToDelete = nil
+                }
+                Button("Cancel", role: .cancel) {
+                    sourceIDToDelete = nil
+                }
+            } message: {
+                Text("This source and all files associated with it will be permanently deleted.")
+            }
         }
 
         private func clampedTranslation(

@@ -30,5 +30,6 @@ protocol ImportManaging: LoadStateManaging {
     func moveItem(to target: ImportItem)
     func beginEditSections()
     func finishEditSections()
+    func removeSource(_ id: ImportSource.ID)
     func dismissError()
 }
