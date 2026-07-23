@@ -259,7 +259,7 @@ final class PersistenceService: PersistenceServicing {
         }
     }
 
-    func createPlaylist(title: String) throws -> PlaylistEntity {
+    func createPlaylist(title: String, importSourceID: String?) throws -> PlaylistEntity {
         let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
 
         let safeName: String
@@ -278,6 +278,7 @@ final class PersistenceService: PersistenceServicing {
         }
 
         let playlist = PlaylistEntity(title: safeName)
+        playlist.importSourceID = importSourceID
 
         self.modelContext.insert(playlist)
         try self.modelContext.save()
@@ -345,6 +346,32 @@ final class PersistenceService: PersistenceServicing {
             AppLogger.storage.error("Failed to save context: \(error.localizedDescription)")
             throw error
         }
+    }
+
+    func deleteAllData(forSourceID sourceID: String) throws {
+        let tracksDescriptor = FetchDescriptor<TrackEntity>(
+            predicate: #Predicate<TrackEntity> { track in
+                track.importSourceID == sourceID
+            }
+        )
+        let playlistsDescriptor = FetchDescriptor<PlaylistEntity>(
+            predicate: #Predicate<PlaylistEntity> { playlist in
+                playlist.importSourceID == sourceID
+            }
+        )
+
+        let tracks = try modelContext.fetch(tracksDescriptor)
+        let playlists = try modelContext.fetch(playlistsDescriptor)
+
+        for track in tracks {
+            self.modelContext.delete(track)
+        }
+
+        for playlist in playlists {
+            self.modelContext.delete(playlist)
+        }
+
+        try self.modelContext.save()
     }
 
     func delete(track: TrackEntity) throws {

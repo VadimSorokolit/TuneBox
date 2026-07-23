@@ -56,7 +56,7 @@ final class ImportViewModelV1: ImportManagingV1 {
                 throw AppError.Playlist.emptyTitle
             }
 
-            _ = try self.persistenceService.createPlaylist(title: title)
+            _ = try self.persistenceService.createPlaylist(title: title, importSourceID: nil)
             self.fetchPlaylists()
         } catch {
             self.handleError(error)
@@ -131,7 +131,7 @@ final class ImportViewModelV1: ImportManagingV1 {
         for importedPlaylist in selectedPlaylists {
             do {
                 let playlist = try self.persistenceService.createPlaylist(
-                    title: importedPlaylist.title
+                    title: importedPlaylist.title, importSourceID: nil
                 )
 
                 for trackURL in importedPlaylist.trackURLs {
@@ -173,7 +173,7 @@ final class ImportViewModelV1: ImportManagingV1 {
                 guard trackFiles.isNotEmpty else { continue }
 
                 let title = url.lastPathComponent
-                guard let playlist = try? self.persistenceService.createPlaylist(title: title) else { continue }
+                guard let playlist = try? self.persistenceService.createPlaylist(title: title, importSourceID: nil) else { continue }
 
                 for file in trackFiles {
                     await self.importFile(file, into: playlist)
@@ -446,7 +446,7 @@ final class ImportViewModelV1: ImportManagingV1 {
             guard title.isNotEmpty else {
                 throw AppError.Playlist.emptyTitle
             }
-            let playlist = try self.persistenceService.createPlaylist(title: title)
+            let playlist = try self.persistenceService.createPlaylist(title: title, importSourceID: nil)
 
             for url in urls {
                 await self.importFile(url, into: playlist)

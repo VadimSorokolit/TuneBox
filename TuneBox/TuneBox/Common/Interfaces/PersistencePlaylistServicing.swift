@@ -11,7 +11,7 @@ protocol PersistencePlaylistServicing: AnyObject {
     func fetchPlaylists() throws -> [PlaylistEntity]
     func getPlaylist(id: String) throws -> PlaylistEntity?
     func createSystemPlaylist() throws -> PlaylistEntity
-    func createPlaylist(title: String) throws -> PlaylistEntity
+    func createPlaylist(title: String, importSourceID: String?) throws -> PlaylistEntity
     func renamePlaylist(_ playlist: PlaylistEntity, newTitle: String) throws
     func deletePlaylist(_ playlist: PlaylistEntity) throws
     func addTrack(_ track: TrackEntity, to playlist: PlaylistEntity) throws
@@ -20,4 +20,5 @@ protocol PersistencePlaylistServicing: AnyObject {
     func removeTracks(from playlist: PlaylistEntity) throws
     func setCoverImage(_ imageData: Data?, playlist: PlaylistEntity) throws
     func removeCoverImage(for playlist: PlaylistEntity) throws
+    func deleteAllData(forSourceID sourceID: String) throws
 }

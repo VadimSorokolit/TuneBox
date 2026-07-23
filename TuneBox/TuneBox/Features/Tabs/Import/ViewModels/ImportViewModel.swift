@@ -304,12 +304,14 @@ final class ImportViewModel: ImportManaging {
                 return self.supportedPlaylistExtensions.contains(ext)
             }
 
+            let sourceID = source.id.uuidString
+
             for file in trackFiles {
-                await self.importTrack(from: file)
+                await self.importTrack(from: file, importSourceID: sourceID)
             }
 
             for playlistFile in playlistFiles {
-                await self.importPlaylist(from: playlistFile)
+                await self.importPlaylist(from: playlistFile, importSourceID: sourceID)
             }
 
             await self.refreshLibrary()
@@ -407,11 +409,10 @@ final class ImportViewModel: ImportManaging {
         self.ensureSections()
     }
 
-    func removeSource(_ id: ImportSource.ID) {
-        guard let source = sources.first(where: { $0.id == id }) else { return }
-        if source.kind == .api {
-
-        } else {
+    func removeSource(_ id: ImportSource.ID) async {
+        guard sources.contains(where: { $0.id == id }) else { return }
+        do {
+            try persistenceService.deleteAllData(forSourceID: id.uuidString)
             self.sources.removeAll { $0.id == id }
             self.selectedSourceIDs.remove(id)
 
@@ -421,7 +422,9 @@ final class ImportViewModel: ImportManaging {
 
             self.saveSelectedSourceIDs()
             self.saveSources()
-            self.ensureSections()
+            await self.refreshLibrary()
+        } catch {
+            self.handleError(error)
         }
     }
 
@@ -518,7 +521,7 @@ final class ImportViewModel: ImportManaging {
         }
     }
 
-    private func importTrack(from url: URL, into playlist: PlaylistEntity? = nil) async {
+    private func importTrack(from url: URL, importSourceID: String?, into playlist: PlaylistEntity? = nil) async {
         let ext = url.pathExtension.lowercased()
 
         guard
@@ -570,6 +573,7 @@ final class ImportViewModel: ImportManaging {
                 download: nil,
                 waveformData: nil,
                 size: fileSize,
+                importSourceID: importSourceID,
                 localFilePath: localURL.path,
                 sourceRawValue: TrackSource.imported.rawValue,
                 downloadStateRawValue: DownloadState.completed.rawValue,
@@ -586,17 +590,17 @@ final class ImportViewModel: ImportManaging {
         }
     }
 
-    private func importPlaylist(from url: URL) async {
+    private func importPlaylist(from url: URL, importSourceID: String?) async {
         let title = url.deletingPathExtension().lastPathComponent
         let trackURLs = self.loadPlaylist(from: url)
 
         guard trackURLs.isNotEmpty else { return }
 
         do {
-            let playlist = try self.persistenceService.createPlaylist(title: title)
+            let playlist = try self.persistenceService.createPlaylist(title: title, importSourceID: importSourceID)
 
             for trackURL in trackURLs {
-                await self.importTrack(from: trackURL, into: playlist)
+                await self.importTrack(from: trackURL, importSourceID: importSourceID, into: playlist)
             }
         } catch {
             self.handleError(error)

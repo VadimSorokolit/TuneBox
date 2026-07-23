@@ -314,7 +314,9 @@ struct ImportsView: View {
             ) {
                 Button("Delete", role: .destructive) {
                     if let id = sourceIDToDelete {
-                        viewModel.removeSource(id)
+                        Task {
+                            await viewModel.removeSource(id)
+                        }
                     }
                     sourceIDToDelete = nil
                 }

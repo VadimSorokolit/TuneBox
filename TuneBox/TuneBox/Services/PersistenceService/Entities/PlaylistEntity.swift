@@ -21,6 +21,7 @@ final class PlaylistEntity: Identifiable {
     var title: String
     var coverImageData: Data?
     var tracks: [TrackEntity]
+    var importSourceID: String?
 
     var type: PlaylistType {
         get {
@@ -37,12 +38,14 @@ final class PlaylistEntity: Identifiable {
         title: String,
         isProtected: Bool = false,
         coverImageData: Data? = nil,
-        tracks: [TrackEntity] = []
+        tracks: [TrackEntity] = [],
+        importSourceID: String? = nil
     ) {
         self.id = id
         self.typeRawValue = type.rawValue
         self.title = title
         self.coverImageData = coverImageData
         self.tracks = tracks
+        self.importSourceID = importSourceID
     }
 }

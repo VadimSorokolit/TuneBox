@@ -28,6 +28,7 @@ final class TrackEntity {
     var size: Int?
     var isPopular: Bool?
     var downloadingSize: Int = 0
+    var importSourceID: String?
     var lastStateChangeAt: Date?
     var downloadQueueIndex: Int?
     var genreRawValue: String?
@@ -144,6 +145,7 @@ final class TrackEntity {
         size: Int?,
         isPopular: Bool? = nil,
         downloadingSize: Int = 0,
+        importSourceID: String? = nil,
         genreRawValue: String? = nil,
         localFilePath: String? = nil,
         sourceRawValue: String = TrackSource.api.rawValue,
@@ -163,6 +165,7 @@ final class TrackEntity {
         self.size = size
         self.isPopular = isPopular
         self.downloadingSize = downloadingSize
+        self.importSourceID = importSourceID
         self.genreRawValue = genreRawValue
         self.localFilePath = localFilePath
         self.sourceRawValue = sourceRawValue
@@ -185,7 +188,8 @@ extension TrackEntity {
             releaseDate: track.releaseDate,
             download: track.download,
             waveformData: WaveformMapper.encode(track.waveform),
-            size: track.size
+            size: track.size,
+            importSourceID: nil
         )
     }
 
