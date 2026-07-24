@@ -410,14 +410,24 @@ final class ImportViewModel: ImportManaging {
     }
 
     func removeSource(_ id: ImportSource.ID) async {
-        guard sources.contains(where: { $0.id == id }) else { return }
+        guard let source = self.sources.first(where: { $0.id == id }) else { return }
+
         do {
-            try persistenceService.deleteAllData(forSourceID: id.uuidString)
+            if source.kind == .api {
+                let tracks = try self.persistenceService.getRecentDownloadedTracks(limit: nil)
+
+                for track in tracks {
+                    self.transferViewModel.deleteDownloadedTrack(track: track)
+                }
+            } else {
+                try self.persistenceService.deleteAllData(forSourceID: id.uuidString)
+            }
+
             self.sources.removeAll { $0.id == id }
             self.selectedSourceIDs.remove(id)
 
-            if case .source(id) = draggingItem {
-                draggingItem = nil
+            if case .source(id) = self.draggingItem {
+                self.draggingItem = nil
             }
 
             self.saveSelectedSourceIDs()
