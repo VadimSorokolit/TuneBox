@@ -22,17 +22,6 @@ struct LibraryMenuCell: View {
     let onDragChanged: (_ translationHeight: CGFloat, _ rowHeight: CGFloat) -> CGFloat
     let onDragEnded: () -> Void
 
-    // MARK: - Properties. Private
-
-    @State private var dragTranslation: CGSize = .zero
-    @State private var reorderCompensation: CGFloat = 0
-    @State private var isDragging: Bool = false
-    @State private var rowHeight: CGFloat = 70
-
-    private var dragOffsetY: CGFloat {
-        dragTranslation.height + reorderCompensation
-    }
-
     // MARK: - Main Body
 
     var body: some View {
@@ -77,6 +66,15 @@ struct LibraryMenuCell: View {
     }
 
     // MARK: - Properties. Private
+    
+    @State private var dragTranslation: CGSize = .zero
+    @State private var reorderCompensation: CGFloat = 0
+    @State private var isDragging: Bool = false
+    @State private var rowHeight: CGFloat = 70
+
+    private var dragOffsetY: CGFloat {
+        dragTranslation.height + reorderCompensation
+    }
 
     private var reorderGesture: some Gesture {
         LongPressGesture(minimumDuration: 0.35, maximumDistance: 12)

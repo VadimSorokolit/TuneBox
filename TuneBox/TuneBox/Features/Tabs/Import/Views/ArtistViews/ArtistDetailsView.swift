@@ -157,7 +157,7 @@ struct ArtistDetailsView: View {
             ScrollView(showsIndicators: false) {
                 LazyVStack(spacing: 0) {
                     ForEach(Array(tracks.enumerated()), id: \.element.id) { index, track in
-                        NewTrackCell(index: index + 1,
+                        NumberedTrackCell(index: index + 1,
                                      track: track,
                                      isPlaying: false,
                                      onTapGesture: {}

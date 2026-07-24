@@ -32,12 +32,15 @@ struct TracksView: View {
                                 section.letter,
                                 font: .system(size: 16, weight: .regular),
                                 foregroundStyle: .gray,
-                                verticalPadding: 0,
-                                horizontalPadding: 0
+                                topPadding: 10,
+                                bottomPadding: 0,
+                                horizontalPadding: 26,
+                                hasSeparator: true
                             )
+                            .listRowInsets(EdgeInsets())
 
                             ForEach(section.tracks) { item in
-                                NewTrackCell(
+                                TrackArtworkCell(
                                     index: item.index,
                                     track: item.track,
                                     isPlaying: false,
@@ -68,7 +71,8 @@ struct TracksView: View {
                     .listSectionSeparator(.hidden)
                 }
                 .listStyle(.plain)
-                .contentMargins(.bottom, 16)
+                .environment(\.defaultMinListRowHeight, 1)
+                .contentMargins(.bottom, 20)
             }
         }
         .navigationTitle("Tracks")

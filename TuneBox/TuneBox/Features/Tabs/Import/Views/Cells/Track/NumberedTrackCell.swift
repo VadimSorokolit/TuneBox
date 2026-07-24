@@ -1,5 +1,5 @@
 //
-//  NewTrackCell.swift
+//  NumberedTrackCell.swift
 //  TuneBox
 //
 //  Created by Vadiy Sorokolit on 15.07.2026.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct NewTrackCell: View {
+struct NumberedTrackCell: View {
 
     // MARK: - Properties. Public
 
@@ -61,7 +61,7 @@ struct NewTrackCell: View {
 }
 
 #Preview {
-    NewTrackCell(
+    NumberedTrackCell(
         index: 1,
         track: TrackEntity(
             id: "1",
