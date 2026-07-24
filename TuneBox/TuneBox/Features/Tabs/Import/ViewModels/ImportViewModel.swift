@@ -102,6 +102,11 @@ struct ImportSource: Identifiable, Hashable, Codable {
     let bookmarkData: Data?
 }
 
+private struct DeduplicationKey: Hashable {
+    let songName: String
+    let artistName: String
+}
+
 enum ImportItem: Hashable {
     case library(LibraryItem)
     case source(ImportSource.ID)
@@ -323,6 +328,23 @@ final class ImportViewModel: ImportManaging {
 
     func source(for id: ImportSource.ID) -> ImportSource? {
         self.sources.first { $0.id == id }
+    }
+
+    func libraryTracks(onlyAPI: Bool) -> [TrackEntity] {
+        let filtered = onlyAPI
+        ? library?.tracks.filter { $0.source == .api }
+        : library?.tracks
+
+        var seen = Set<DeduplicationKey>()
+
+        return filtered?.filter { track in
+            seen.insert(
+                DeduplicationKey(
+                    songName: track.songName,
+                    artistName: track.artistName
+                )
+            ).inserted
+        } ?? []
     }
 
     func tracksSize(_ tracks: [TrackEntity]) -> Int {

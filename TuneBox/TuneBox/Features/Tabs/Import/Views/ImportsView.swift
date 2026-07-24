@@ -399,7 +399,7 @@ struct ImportsView: View {
                     coordinator.push(.artists)
 
                 case .library(.tracks):
-                    coordinator.push(.tracks())
+                    coordinator.push(.tracks(viewModel.libraryTracks()))
 
                 case .library(.playlists):
                     coordinator.push(.playlists)
@@ -410,7 +410,7 @@ struct ImportsView: View {
 
                         switch source.kind {
                             case .api:
-                                coordinator.push(.tracks(onlyAPI: true))
+                                coordinator.push(.tracks(viewModel.libraryTracks(onlyAPI: true)))
 
                             case .local, .sync:
                                 if await viewModel.fetchfolderItems(

@@ -12,7 +12,7 @@ struct TracksView: View {
 
     // MARK: - Properties. Public
 
-    var onlyAPI: Bool = false
+    var tracks: [TrackEntity] = []
 
     // MARK: - Main Body
 
@@ -92,24 +92,6 @@ struct TracksView: View {
 
     @Injected private var viewModel: ImportManaging
 
-    private var tracks: [TrackEntity] {
-        let all = viewModel.library?.tracks ?? []
-        let filtered = onlyAPI
-            ? all.filter { $0.source == .api }
-            : all
-
-        var seen = Set<DeduplicationKey>()
-
-        return filtered.filter { track in
-            seen.insert(
-                DeduplicationKey(
-                    songName: track.songName,
-                    artistName: track.artistName
-                )
-            ).inserted
-        }
-    }
-
     private var sectionedTracks: [TrackAlphabetSection] {
         let grouped = Dictionary(grouping: tracks) { track -> String in
             let trimmed = track.songName.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -139,11 +121,6 @@ struct TracksView: View {
     }
 
     // MARK: - Private. Objects
-
-    private struct DeduplicationKey: Hashable {
-        let songName: String
-        let artistName: String
-    }
 
     private struct TrackAlphabetSection: Identifiable {
         let letter: String

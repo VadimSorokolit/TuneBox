@@ -28,8 +28,17 @@ protocol ImportManaging: LoadStateManaging {
     func toggleItem(_ item: ImportItem)
     func isItemSelected(_ item: ImportItem) -> Bool
     func moveItem(to target: ImportItem)
+    func libraryTracks(onlyAPI: Bool) -> [TrackEntity]
     func beginEditSections()
     func finishEditSections()
     func removeSource(_ id: ImportSource.ID) async
     func dismissError()
+}
+
+extension ImportManaging {
+
+    func libraryTracks(onlyAPI: Bool = false) -> [TrackEntity] {
+        libraryTracks(onlyAPI: onlyAPI)
+    }
+
 }

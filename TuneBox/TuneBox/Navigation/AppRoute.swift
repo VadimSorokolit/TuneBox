@@ -15,7 +15,7 @@ enum AppRoute: Hashable {
     case album(_ album: MusicLibrary.Album)
     case artists
     case artist(_ artist: MusicLibrary.Artist)
-    case tracks(onlyAPI: Bool = false)
+    case tracks(_ tracks: [TrackEntity])
     case playlists
     case playlist(_ playlist: PlaylistEntity)
     case sourceFolder(sourceID: ImportSource.ID, path: String?)

@@ -66,7 +66,7 @@ struct LibraryMenuCell: View {
     }
 
     // MARK: - Properties. Private
-    
+
     @State private var dragTranslation: CGSize = .zero
     @State private var reorderCompensation: CGFloat = 0
     @State private var isDragging: Bool = false

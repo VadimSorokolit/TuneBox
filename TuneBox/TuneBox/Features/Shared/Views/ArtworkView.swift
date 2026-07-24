@@ -50,7 +50,7 @@ struct ArtworkView: View {
                 }
         }
     }
-    
+
     // MARK: - Properties. Private
 
     private var placeholder: some View {
