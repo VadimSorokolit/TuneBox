@@ -128,16 +128,13 @@ struct ArtistDetailsView: View {
                         )
                     }
 
-                    Text(
-                        "\(albums.count) "
-                        + "\(albums.count == 1 ? "album" : "albums") · "
-                        + "\(viewModel.tracksDuration(albums.flatMap(\.tracks)).formattedDuration) · "
-                        + "\(viewModel.tracksSize(albums.flatMap(\.tracks)).formattedFileSize)"
+                    LibrarySummaryFooter(
+                        count: albums.count,
+                        unitSingular: "album",
+                        unitPlural: "albums",
+                        duration: viewModel.tracksDuration(albums.flatMap(\.tracks)),
+                        size: viewModel.tracksSize(albums.flatMap(\.tracks))
                     )
-                    .padding(.top, 20)
-                    .multilineTextAlignment(.center)
-                    .font(.system(size: 16, weight: .regular))
-                    .foregroundStyle(.gray)
                 }
             }
         }
@@ -168,16 +165,13 @@ struct ArtistDetailsView: View {
                     }
                 }
 
-                Text(
-                    "\(tracks.count) "
-                    + "\(tracks.count == 1 ? "track" : "tracks") · "
-                    + "\(viewModel.tracksDuration(tracks).formattedDuration) · "
-                    + "\(viewModel.tracksSize(tracks).formattedFileSize)"
+                LibrarySummaryFooter(
+                    count: tracks.count,
+                    unitSingular: "track",
+                    unitPlural: "tracks",
+                    duration: viewModel.tracksDuration(tracks),
+                    size: viewModel.tracksSize(tracks)
                 )
-                .padding(.top, 10)
-                .multilineTextAlignment(.center)
-                .font(.system(size: 16, weight: .regular))
-                .foregroundStyle(.gray)
             }
         }
 

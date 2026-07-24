@@ -25,16 +25,13 @@ struct ArtistsView: View {
                         )
                     }
 
-                    Text(
-                        "\(library.artists.count) "
-                        + "\(library.artists.count == 1 ? "artist" : "artists") · "
-                        + "\(viewModel.tracksDuration(library.artists.flatMap(\.tracks)).formattedDuration) · "
-                        + "\(viewModel.tracksSize(library.artists.flatMap(\.tracks)).formattedFileSize)"
+                    LibrarySummaryFooter(
+                        count: library.artists.count,
+                        unitSingular: "artist",
+                        unitPlural: "artists",
+                        duration: viewModel.tracksDuration(library.artists.flatMap(\.tracks)),
+                        size: viewModel.tracksSize(library.artists.flatMap(\.tracks))
                     )
-                    .padding(.top, 20)
-                    .multilineTextAlignment(.center)
-                    .font(.system(size: 16, weight: .regular))
-                    .foregroundStyle(.gray)
                 }
             }
             .navigationTitle("Artists")

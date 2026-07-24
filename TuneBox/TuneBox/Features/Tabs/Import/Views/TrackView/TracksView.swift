@@ -28,16 +28,14 @@ struct TracksView: View {
                     )
                 }
             }
-            Text(
-                "\(tracks.count) "
-                + "\(tracks.count == 1 ? "track" : "tracks") · "
-                + "\(viewModel.tracksDuration(tracks).formattedDuration) · "
-                + "\(viewModel.tracksSize(tracks).formattedFileSize)"
+
+            LibrarySummaryFooter(
+                count: tracks.count,
+                unitSingular: "track",
+                unitPlural: "tracks",
+                duration: viewModel.tracksDuration(tracks),
+                size: viewModel.tracksSize(tracks)
             )
-            .padding(.top, 10)
-            .multilineTextAlignment(.center)
-            .font(.system(size: 16, weight: .regular))
-            .foregroundStyle(.gray)
         }
         .navigationTitle("Tracks")
         .padding(.top, 16)
@@ -59,6 +57,26 @@ struct TracksView: View {
 
     private var tracks: [TrackEntity] {
         let all = viewModel.library?.tracks ?? []
-        return onlyAPI ? all.filter { $0.source == .api } : all
+        let filtered = onlyAPI
+            ? all.filter { $0.source == .api }
+            : all
+
+        var seen = Set<DeduplicationKey>()
+
+        return filtered.filter { track in
+            seen.insert(
+                DeduplicationKey(
+                    songName: track.songName,
+                    artistName: track.artistName
+                )
+            ).inserted
+        }
+    }
+
+    // MARK: - Private. Objects
+
+    private struct DeduplicationKey: Hashable {
+        let songName: String
+        let artistName: String
     }
 }

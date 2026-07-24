@@ -35,16 +35,13 @@ struct AlbumDetailsView: View {
                         }
                     }
 
-                    Text(
-                        "\(album.tracks.count) "
-                        + "\(album.tracks.count == 1 ? "track" : "tracks") · "
-                        + "\(viewModel.tracksDuration(album.tracks).formattedDuration) · "
-                        + "\(viewModel.tracksSize(album.tracks).formattedFileSize)"
+                    LibrarySummaryFooter(
+                        count: album.tracks.count,
+                        unitSingular: "track",
+                        unitPlural: "tracks",
+                        duration: viewModel.tracksDuration(album.tracks),
+                        size: viewModel.tracksSize(album.tracks)
                     )
-                    .padding(.top, 10)
-                    .multilineTextAlignment(.center)
-                    .font(.system(size: 16, weight: .regular))
-                    .foregroundStyle(.gray)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)

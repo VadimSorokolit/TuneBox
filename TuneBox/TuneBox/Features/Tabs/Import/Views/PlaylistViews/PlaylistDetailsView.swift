@@ -29,16 +29,13 @@ struct PlaylistDetailsView: View {
                     }
                 }
 
-                Text(
-                    "\(playlist.tracks.count) "
-                    + "\(playlist.tracks.count == 1 ? "track" : "tracks") · "
-                    + "\(viewModel.tracksDuration(playlist.tracks).formattedDuration) · "
-                    + "\(viewModel.tracksSize(playlist.tracks).formattedFileSize)"
+                LibrarySummaryFooter(
+                    count: playlist.tracks.count,
+                    unitSingular: "track",
+                    unitPlural: "tracks",
+                    duration: viewModel.tracksDuration(playlist.tracks),
+                    size: viewModel.tracksSize(playlist.tracks)
                 )
-                .padding(.top, 10)
-                .multilineTextAlignment(.center)
-                .font(.system(size: 16, weight: .regular))
-                .foregroundStyle(.gray)
             }
             .padding(.top, 16)
             .contentMargins(.bottom, 24)

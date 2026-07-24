@@ -25,16 +25,13 @@ struct PlaylistsView: View {
                         )
                     }
 
-                    Text(
-                        "\(library.playlists.count) "
-                        + "\(library.playlists.count == 1 ? "playlist" : "playlist") · "
-                        + "\(viewModel.tracksDuration(library.playlists.flatMap(\.tracks)).formattedDuration) · "
-                        + "\(viewModel.tracksSize(library.playlists.flatMap(\.tracks)).formattedFileSize)"
+                    LibrarySummaryFooter(
+                        count: library.playlists.count,
+                        unitSingular: "playlist",
+                        unitPlural: "playlists",
+                        duration: viewModel.tracksDuration(library.playlists.flatMap(\.tracks)),
+                        size: viewModel.tracksSize(library.playlists.flatMap(\.tracks))
                     )
-                    .padding(.top, 10)
-                    .multilineTextAlignment(.center)
-                    .font(.system(size: 16, weight: .regular))
-                    .foregroundStyle(.gray)
                 }
             }
             .navigationTitle("Playlists")
