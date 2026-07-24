@@ -68,10 +68,10 @@ struct SourceView: View {
 
             case .playlist:
                 if let playlist = viewModel.playlist(for: item.url) {
-                    NewPlaylistCell(
+                    PlaylistCell(
                         playlist: playlist,
                         onTapGesture: {
-                            coordinator.push(.playlist(playlist))
+                            coordinator.push(.tracks(playlist.title, playlist.tracks))
                         }
                     )
                 }
@@ -95,7 +95,7 @@ struct SourceView: View {
             return
         }
 
-        coordinator.push(.playlist(playlist))
+        coordinator.push(.tracks(playlist.title, playlist.tracks))
     }
 
     private func sourceRow(

@@ -93,14 +93,11 @@ struct RootTabsView: View {
                             case .artist(artist: let artist):
                                 ArtistDetailsView(artist: artist)
 
-                            case .tracks(let tracks):
-                                TracksView(tracks: tracks)
+                            case .tracks(let title, let tracks):
+                                TracksView(navigationTitle: title ?? "Tracks", tracks: tracks)
 
                             case .playlists:
                                 PlaylistsView()
-
-                            case .playlist(playlist: let playlist):
-                                PlaylistDetailsView(playlist: playlist)
 
                             case .sourceFolder(let sourceID, let path):
                                 SourceView(sourceID: sourceID, path: path)

@@ -1,8 +1,8 @@
 //
-//  PlaylistCell.swift
+//  NewPlaylistCell.swift
 //  TuneBox
 //
-//  Created by Vadim Sorokolit on 01.07.2026.
+//  Created by Vadim Sorokolit on 17.07.2026.
 //
 
 import SwiftUI
@@ -12,137 +12,57 @@ struct PlaylistCell: View {
     // MARK: - Properties. Public
 
     let playlist: PlaylistEntity
-    let onCellTap: () -> Void
-    let onPlayBtnTap: () -> Void
-    let onChangeCoverBtnTap: () -> Void
-    let onAddTracksBtnTap: () -> Void
-    let onRenamePlaylistBtnTap: () -> Void
-    let onDeletePlaylistBtnTap: () -> Void
+    let onTapGesture: () -> Void
 
     // MARK: - Main Body
 
     var body: some View {
-        VStack(spacing: 0) {
-            coverView
+        VStack(spacing: 12) {
+            HStack {
+                HStack(spacing: 10) {
+                    Image(systemName: "music.note.list")
+                        .foregroundStyle(.gray)
+                        .font(.system(size: 18, weight: .medium))
+                        .frame(size: 18)
 
-            Text(playlist.title)
-                .lineLimit(2)
-                .font(.headline)
-                .padding(.top, customPadding)
+                    VStack(spacing: 0) {
+                        Text("\(playlist.title)")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .lineLimit(1)
+                                .font(.system(size: 15, weight: .medium))
+                                .foregroundStyle(.black.opacity(0.8))
 
-            Spacer()
-
-            HStack(alignment: .bottom) {
-                Text("\(playlist.tracks.count)")
-                    .lineLimit(1)
-                    .frame(width: 60, alignment: .leading)
-                    .offset(y: -3)
-
-                Spacer()
-
-                Menu {
-                    Button(
-                        action: {
-                            onPlayBtnTap()
-                        }, label: {
-                            Label("Play all", systemImage: "play.fill")
-                        }
-                    )
-
-                    Button(
-                        action: {
-                            onChangeCoverBtnTap()
-                        }, label: {
-                            Label("Change Cover", systemImage: "photo")
-                        }
-                    )
-
-                    if playlist.type == .custom {
-                        Button(
-                            action: {
-                                onAddTracksBtnTap()
-                            }, label: {
-                                Label("Add Tracks", systemImage: "plus")
-                            }
-                        )
-
-                        Button(
-                            action: {
-                                onRenamePlaylistBtnTap()
-                            }, label: {
-                                Label("Rename Playlist", systemImage: "pencil")
-                            }
-                        )
+                        Text("\(playlist.tracks.count) \(playlist.tracks.count == 1 ? "track" : "tracks")")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .lineLimit(1)
+                            .font(.system(size: 10, weight: .regular))
+                            .foregroundStyle(.gray)
                     }
-
-                    Button(
-                        role: .destructive,
-                        action: {
-                            onDeletePlaylistBtnTap()
-                        },
-                        label: {
-                            Label("Delete Playlist", systemImage: "trash")
-                        }
-                    )
-                } label: {
-                    Circle()
-                        .fill(.clear)
-                        .frame(width: 24, height: 24)
-                        .overlay {
-                            Image(systemName: "ellipsis")
-                                .font(.system(size: 20, weight: .regular))
-                                .foregroundColor(.white)
-                        }
-
+                    .padding(.trailing, 26)
                 }
+                .padding(.leading, 26)
             }
+
+            Rectangle()
+                .fill(Color.gray.opacity(0.2))
+                .frame(height: 1)
+                .padding(.leading, 60)
+                .padding(.trailing, 26)
         }
-        .frame(height: cellHeight)
-        .frame(maxWidth: .infinity)
-        .padding(customPadding)
-        .background(Color.red)
-        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
-        .contentShape(RoundedRectangle(cornerRadius: cornerRadius))
+        .padding(.top, 12)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .onTapGesture {
-            onCellTap()
+            onTapGesture()
         }
-    }
-
-    // MARK: - Properties. Private
-
-    private let customPadding: CGFloat = 10
-    private let cornerRadius: CGFloat = 12
-    private let cellHeight: CGFloat = 230
-
-    @ViewBuilder
-    private var coverView: some View {
-        RoundedRectangle(cornerRadius: cornerRadius)
-            .fill(Color.gray.opacity(0.1))
-            .aspectRatio(1, contentMode: .fit)
-            .overlay {
-                if let data = playlist.coverImageData,
-                   let uiImage = UIImage(data: data) {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .scaledToFill()
-                } else {
-                    Image(systemName: "music.note")
-                        .font(.system(size: 36))
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
     }
 }
 
 #Preview {
     PlaylistCell(
-        playlist: PlaylistEntity(title: "Default"),
-        onCellTap: {},
-        onPlayBtnTap: {},
-        onChangeCoverBtnTap: {},
-        onAddTracksBtnTap: {},
-        onRenamePlaylistBtnTap: {},
-        onDeletePlaylistBtnTap: {}
+        playlist: PlaylistEntity(
+            title: "Favorites",
+            tracks: []
+        ),
+        onTapGesture: {}
     )
 }

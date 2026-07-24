@@ -17,10 +17,10 @@ struct PlaylistsView: View {
             ScrollView(showsIndicators: false) {
                 LazyVStack(spacing: 0) {
                     ForEach(library.playlists) { playlist in
-                        NewPlaylistCell(
+                        PlaylistCell(
                             playlist: playlist,
                             onTapGesture: {
-                                coordinator.push(.playlist(playlist))
+                                coordinator.push(.tracks(playlist.title, playlist.tracks))
                             }
                         )
                     }

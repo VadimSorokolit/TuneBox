@@ -15,8 +15,18 @@ enum AppRoute: Hashable {
     case album(_ album: MusicLibrary.Album)
     case artists
     case artist(_ artist: MusicLibrary.Artist)
-    case tracks(_ tracks: [TrackEntity])
+    case tracks(_ navigationTitle: String?, _ tracks: [TrackEntity])
     case playlists
-    case playlist(_ playlist: PlaylistEntity)
     case sourceFolder(sourceID: ImportSource.ID, path: String?)
+}
+
+extension AppRoute {
+
+    static func tracks(
+        navigationTitle: String? = nil,
+        _ tracks: [TrackEntity]
+    ) -> AppRoute {
+        .tracks(navigationTitle, tracks)
+    }
+
 }

@@ -467,7 +467,7 @@ struct ImportTracksViewV1: View {
                 ScrollView(showsIndicators: false) {
                     LazyVGrid(columns: columns, spacing: Layout.gridSpacing) {
                         ForEach(importViewModel.playlists) { playlist in
-                            PlaylistCell(
+                            PlaylistCellV1(
                                 playlist: playlist,
                                 onCellTap: {
                                     importViewModel.playlistAction = .deleteTracks(playlist)

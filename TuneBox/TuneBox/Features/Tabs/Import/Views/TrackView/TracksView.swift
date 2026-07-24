@@ -12,6 +12,7 @@ struct TracksView: View {
 
     // MARK: - Properties. Public
 
+    var navigationTitle: String
     var tracks: [TrackEntity] = []
 
     // MARK: - Main Body
@@ -75,7 +76,7 @@ struct TracksView: View {
                 .contentMargins(.bottom, 20)
             }
         }
-        .navigationTitle("Tracks")
+        .navigationTitle(navigationTitle)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .onAppear {
             Task {
