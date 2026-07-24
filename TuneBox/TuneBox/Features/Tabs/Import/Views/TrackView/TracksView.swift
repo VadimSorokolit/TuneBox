@@ -17,29 +17,62 @@ struct TracksView: View {
     // MARK: - Main Body
 
     var body: some View {
-        ScrollView(showsIndicators: false) {
-            LazyVStack(spacing: 0) {
-                ForEach(Array(tracks.enumerated()), id: \.element.id) { index, track in
-                    NewTrackCell(
-                        index: index + 1,
-                        track: track,
-                        isPlaying: false,
-                        onTapGesture: {}
-                    )
+        Group {
+            if tracks.isEmpty {
+                ContentUnavailableView {
+                    Image(systemName: "music.note.list")
+                } description: {
+                    Text("Tracks you add to your library will appear here.")
                 }
-            }
+            } else {
+                List {
+                    ForEach(sectionedTracks) { section in
+                        Section {
+                            sectionTracksTitle(
+                                section.letter,
+                                font: .system(size: 16, weight: .regular),
+                                foregroundStyle: .gray,
+                                verticalPadding: 0,
+                                horizontalPadding: 0
+                            )
 
-            LibrarySummaryFooter(
-                count: tracks.count,
-                unitSingular: "track",
-                unitPlural: "tracks",
-                duration: viewModel.tracksDuration(tracks),
-                size: viewModel.tracksSize(tracks)
-            )
+                            ForEach(section.tracks) { item in
+                                NewTrackCell(
+                                    index: item.index,
+                                    track: item.track,
+                                    isPlaying: false,
+                                    onTapGesture: {}
+                                )
+                                .listRowInsets(EdgeInsets())
+                                .listRowBackground(Color.clear)
+                                .listRowSeparator(.hidden)
+                            }
+                        }
+                        .sectionIndexLabel(section.letter)
+                        .listSectionSeparator(.hidden)
+                    }
+
+                    Section {
+                        LibrarySummaryFooter(
+                            count: tracks.count,
+                            unitSingular: "track",
+                            unitPlural: "tracks",
+                            duration: viewModel.tracksDuration(tracks),
+                            size: viewModel.tracksSize(tracks),
+                            topPadding: 10
+                        )
+                        .frame(maxWidth: .infinity)
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
+                    }
+                    .listSectionSeparator(.hidden)
+                }
+                .listStyle(.plain)
+                .contentMargins(.bottom, 16)
+            }
         }
         .navigationTitle("Tracks")
-        .padding(.top, 16)
-        .contentMargins(.bottom, 16)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .onAppear {
             Task {
                 viewModel.startObservingTracksChanges()
@@ -73,10 +106,52 @@ struct TracksView: View {
         }
     }
 
+    private var sectionedTracks: [TrackAlphabetSection] {
+        let grouped = Dictionary(grouping: tracks) { track -> String in
+            let trimmed = track.songName.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard let first = trimmed.first else { return "#" }
+
+            let letter = String(first).uppercased()
+            return letter.rangeOfCharacter(from: .letters) != nil ? letter : "#"
+        }
+
+        let sortedLetters = grouped.keys.sorted { lhs, rhs in
+            if lhs == "#" { return false }
+            if rhs == "#" { return true }
+            return lhs.localizedStandardCompare(rhs) == .orderedAscending
+        }
+
+        var nextIndex = 1
+
+        return sortedLetters.map { letter in
+            let sectionTracks = (grouped[letter] ?? []).map { track in
+                let item = IndexedTrack(index: nextIndex, track: track)
+                nextIndex += 1
+                return item
+            }
+
+            return TrackAlphabetSection(letter: letter, tracks: sectionTracks)
+        }
+    }
+
     // MARK: - Private. Objects
 
     private struct DeduplicationKey: Hashable {
         let songName: String
         let artistName: String
+    }
+
+    private struct TrackAlphabetSection: Identifiable {
+        let letter: String
+        let tracks: [IndexedTrack]
+
+        var id: String { letter }
+    }
+
+    private struct IndexedTrack: Identifiable {
+        let index: Int
+        let track: TrackEntity
+
+        var id: String { track.id }
     }
 }

@@ -15,12 +15,13 @@ extension View {
         font: Font = .headline,
         background: Color = Color(.systemBackground),
         foregroundStyle: Color = Color(.label),
+        verticalPadding: CGFloat = 10,
         horizontalPadding: CGFloat = 26
     ) -> some View {
         Text("\(title) \(suffix ?? "")")
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, horizontalPadding)
-            .padding(.vertical, 10)
+            .padding(.vertical, verticalPadding)
             .background(background)
             .foregroundStyle(foregroundStyle)
             .font(font)

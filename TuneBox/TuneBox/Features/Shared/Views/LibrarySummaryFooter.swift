@@ -23,7 +23,7 @@ struct LibrarySummaryFooter: View {
         )
         .padding(.top, topPadding)
         .multilineTextAlignment(.center)
-        .font(.system(size: 16, weight: .regular))
+        .font(.system(size: 13, weight: .regular))
         .foregroundStyle(.gray)
     }
 }
