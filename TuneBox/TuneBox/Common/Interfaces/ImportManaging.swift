@@ -24,6 +24,7 @@ protocol ImportManaging: LoadStateManaging {
     func fetchfolderItems(sourceID: ImportSource.ID, path: String?) async -> [SourceFolderItem]?
     func importFolder(_ url: URL) async
     func tracksSize(_ tracks: [TrackEntity]) -> Int
+    func sourceStorageSize(for item: ImportItem) -> String?
     func tracksDuration(_ tracks: [TrackEntity]) -> Int
     func toggleItem(_ item: ImportItem)
     func isItemSelected(_ item: ImportItem) -> Bool

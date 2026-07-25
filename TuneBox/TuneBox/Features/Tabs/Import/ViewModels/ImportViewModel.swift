@@ -351,6 +351,31 @@ final class ImportViewModel: ImportManaging {
         tracks.reduce(0) { $0 + ($1.size ?? 0) }
     }
 
+    func sourceStorageSize(for item: ImportItem) -> String? {
+        guard
+            case .source(let sourceID) = item,
+            let source = self.source(for: sourceID)
+        else {
+            return nil
+        }
+
+        let tracks: [TrackEntity]
+
+        switch source.kind {
+            case .local, .sync:
+                tracks = self.library?.tracks.filter {
+                    $0.importSourceID == sourceID.uuidString
+                } ?? []
+
+            case .api:
+                tracks = self.library?.tracks.filter {
+                    $0.source == .api
+                } ?? []
+        }
+
+        return self.tracksSize(tracks).formattedFileSize
+    }
+
     func tracksDuration(_ tracks: [TrackEntity]) -> Int {
         tracks.reduce(0) { $0 + ($1.duration ?? 0) }
     }

@@ -264,6 +264,7 @@ struct ImportsView: View {
                 isEditMode: viewModel.isEditSectionModeEnabled,
                 isSelected: viewModel.isItemSelected(item),
                 showsChevron: showsChevron(for: item),
+                sourceStorageSize: viewModel.sourceStorageSize(for: item),
                 onTapGesture: {
                     handleTap(for: item)
                 },

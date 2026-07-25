@@ -16,6 +16,7 @@ struct LibraryMenuCell: View {
     let isEditMode: Bool
     let isSelected: Bool
     let showsChevron: Bool
+    let sourceStorageSize: String?
     let onTapGesture: () -> Void
     let onDragStarted: () -> Void
     /// Reports finger translation and returns the translation clamped to the section bounds.
@@ -132,32 +133,41 @@ struct LibraryMenuCell: View {
                     .contentShape(Rectangle())
                 }
 
-                HStack(spacing: 10) {
-                    Image(systemName: icon)
-                        .foregroundStyle(.gray)
-                        .font(.system(size: 22, weight: .medium))
-                        .frame(size: 22)
+                Image(systemName: icon)
+                    .foregroundStyle(.gray)
+                    .font(.system(size: 22, weight: .medium))
+                    .frame(size: 22)
 
+                VStack(spacing: 0) {
                     Text(title)
                         .font(.system(size: 16, weight: .regular))
+                        .frame(maxWidth: .infinity, alignment: .leading)
 
-                    Spacer()
-
-                    if isEditMode {
-                        Image(systemName: "line.3.horizontal")
+                    if let sourceStorageSize {
+                        Text(sourceStorageSize)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .font(.system(size: 10, weight: .regular))
                             .foregroundStyle(.gray)
-                            .font(.system(size: 14, weight: .regular))
-                            .padding(.leading, 15)
-                    } else if showsChevron {
-                        Image(systemName: "chevron.right")
-                            .foregroundStyle(.gray)
-                            .font(.system(size: 13, weight: .medium))
                     }
                 }
                 .contentShape(Rectangle())
                 .highPriorityGesture(reorderGesture, isEnabled: isEditMode)
+
+                Spacer()
+
+                if isEditMode {
+                    Image(systemName: "line.3.horizontal")
+                        .foregroundStyle(.gray)
+                        .font(.system(size: 14, weight: .regular))
+                        .padding(.leading, 15)
+                } else if showsChevron {
+                    Image(systemName: "chevron.right")
+                        .foregroundStyle(.gray)
+                        .font(.system(size: 13, weight: .medium))
+                }
             }
             .frame(maxWidth: .infinity)
+            .frame(height: 22)
             .padding(.horizontal, 26)
 
             Rectangle()
@@ -177,6 +187,7 @@ struct LibraryMenuCell: View {
         isEditMode: false,
         isSelected: false,
         showsChevron: false,
+        sourceStorageSize: nil,
         onTapGesture: {},
         onDragStarted: {},
         onDragChanged: { translation, _ in translation },
