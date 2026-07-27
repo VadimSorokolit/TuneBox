@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 enum GlobalConstants {
     static let bytesInGigabyte: Double = 1e9
@@ -17,5 +18,9 @@ enum GlobalConstants {
 
     enum UserDefaultsKey {
         static let playlistID: String = "UserDefaultsPlaylistIdKey"
+    }
+
+    enum AppColor {
+        static let defaultBackground = SwiftUI.Color(hex: 0xFCFCFC)
     }
 }

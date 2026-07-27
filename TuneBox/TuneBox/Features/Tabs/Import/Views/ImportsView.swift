@@ -216,6 +216,7 @@ struct ImportsView: View {
                                     sectionTracksTitle(
                                         section.kind.rawValue.capitalized,
                                         font: .system(size: 14, weight: .bold),
+                                        background: GlobalConstants.AppColor.defaultBackground,
                                         foregroundStyle: .gray
                                     )
                                 }
@@ -325,7 +326,7 @@ struct ImportsView: View {
                     sourceIDToDelete = nil
                 }
             } message: {
-                Text("This source and all files associated with it will be permanently deleted.")
+                Text("This source will be removed from your library, but the original file will remain on your device.")
             }
         }
 

@@ -26,44 +26,54 @@ struct LibraryMenuCell: View {
     // MARK: - Main Body
 
     var body: some View {
-        rowContent
-            .padding(.top, 15)
-            .background(isEditMode && isSelected ? Color.gray.opacity(0.5) : Color.clear)
-            .contentShape(Rectangle())
-            .offset(y: dragOffsetY)
-            .scaleEffect(isDragging ? 1.02 : 1)
-            .shadow(
-                color: .black.opacity(isDragging ? 0.15 : 0),
-                radius: isDragging ? 8 : 0
-            )
-            .zIndex(isDragging ? 1 : 0)
-            .transaction { transaction in
-                // While dragging, ignore list reorder animations on this row —
-                // otherwise SwiftUI replays the move from the original index.
-                if isDragging {
+        Button {
+            guard suppressNextTap.isFalse else {
+                suppressNextTap = false
+                return
+            }
+            onTapGesture()
+        } label: {
+            rowContent
+                .padding(.top, 15)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(isEditMode && isSelected ? Color.gray.opacity(0.5) : Color.clear)
+                .transaction { transaction in
                     transaction.animation = nil
                 }
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .simultaneousGesture(reorderGesture, isEnabled: isEditMode)
+        .offset(y: dragOffsetY)
+        .scaleEffect(isDragging ? 1.02 : 1)
+        .shadow(
+            color: .black.opacity(isDragging ? 0.15 : 0),
+            radius: isDragging ? 8 : 0
+        )
+        .zIndex(isDragging ? 1 : 0)
+        .transaction { transaction in
+            // While dragging, ignore list reorder animations on this row —
+            // otherwise SwiftUI replays the move from the original index.
+            if isDragging {
+                transaction.animation = nil
             }
-            .background {
-                GeometryReader { geometry in
-                    Color.clear
-                        .onAppear {
-                            rowHeight = max(geometry.size.height, 1)
-                        }
-                        .onChange(of: geometry.size.height) { _, newValue in
-                            rowHeight = max(newValue, 1)
-                        }
-                        .onChange(of: geometry.frame(in: .global).minY) { oldValue, newValue in
-                            // Keep the dragged row under the finger after a live swap.
-                            guard isDragging else { return }
-                            reorderCompensation += oldValue - newValue
-                        }
-                }
+        }
+        .background {
+            GeometryReader { geometry in
+                Color.clear
+                    .onAppear {
+                        rowHeight = max(geometry.size.height, 1)
+                    }
+                    .onChange(of: geometry.size.height) { _, newValue in
+                        rowHeight = max(newValue, 1)
+                    }
+                    .onChange(of: geometry.frame(in: .global).minY) { oldValue, newValue in
+                        // Keep the dragged row under the finger after a live swap.
+                        guard isDragging else { return }
+                        reorderCompensation += oldValue - newValue
+                    }
             }
-            .onTapGesture {
-                guard isEditMode.isFalse, isDragging.isFalse else { return }
-                onTapGesture()
-            }
+        }
     }
 
     // MARK: - Properties. Private
@@ -71,6 +81,7 @@ struct LibraryMenuCell: View {
     @State private var dragTranslation: CGSize = .zero
     @State private var reorderCompensation: CGFloat = 0
     @State private var isDragging: Bool = false
+    @State private var suppressNextTap: Bool = false
     @State private var rowHeight: CGFloat = 70
 
     private var dragOffsetY: CGFloat {
@@ -100,6 +111,8 @@ struct LibraryMenuCell: View {
                 dragTranslation = CGSize(width: 0, height: clampedY)
             }
             .onEnded { _ in
+                let wasDragging = isDragging
+
                 // Cell is already in its final list slot. Clearing the offset
                 // with animation would fly it from the gesture start position.
                 var transaction = Transaction()
@@ -109,6 +122,11 @@ struct LibraryMenuCell: View {
                     reorderCompensation = 0
                     isDragging = false
                 }
+
+                guard wasDragging else { return }
+
+                // Long-press drag release also triggers Button; skip that tap.
+                suppressNextTap = true
                 onDragEnded()
             }
     }
@@ -119,18 +137,12 @@ struct LibraryMenuCell: View {
         VStack(spacing: 15) {
             HStack(spacing: 10) {
                 if isEditMode {
-                    Button(action: {
-                        onTapGesture()
-                    }, label: {
-                        Image(systemName: isSelected
-                              ? "checkmark.circle.fill"
-                              : "circle"
-                        )
-                        .foregroundStyle(isSelected ? .blue : .gray)
-                        .font(.system(size: 22, weight: .medium))
-                    })
-                    .buttonStyle(.plain)
-                    .contentShape(Rectangle())
+                    Image(systemName: isSelected
+                          ? "checkmark.circle.fill"
+                          : "circle"
+                    )
+                    .foregroundStyle(isSelected ? .blue : .gray)
+                    .font(.system(size: 22, weight: .medium))
                 }
 
                 Image(systemName: icon)
@@ -150,8 +162,6 @@ struct LibraryMenuCell: View {
                             .foregroundStyle(.gray)
                     }
                 }
-                .contentShape(Rectangle())
-                .highPriorityGesture(reorderGesture, isEnabled: isEditMode)
 
                 Spacer()
 
