@@ -442,6 +442,30 @@ final class ImportViewModel: ImportManaging {
         }
     }
 
+    func sectionedTracks(from tracks: [TrackEntity]) -> [TrackAlphabetSection] {
+        let grouped = Dictionary(grouping: tracks) { track -> String in
+            let trimmed = track.songName.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard let first = trimmed.first else { return "#" }
+
+            let letter = String(first).uppercased()
+            return letter.rangeOfCharacter(from: .letters) != nil ? letter : "#"
+        }
+
+        let sortedLetters = grouped.keys.sorted { lhs, rhs in
+            if lhs == "#" { return false }
+            if rhs == "#" { return true }
+
+            return lhs.localizedStandardCompare(rhs) == .orderedAscending
+        }
+
+        return sortedLetters.map { letter in
+            TrackAlphabetSection(
+                letter: letter,
+                tracks: grouped[letter] ?? []
+            )
+        }
+    }
+
     func beginEditSections() {
         self.isEditSectionModeEnabled = true
         self.ensureSections()

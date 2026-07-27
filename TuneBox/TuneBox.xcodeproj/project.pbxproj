@@ -36,6 +36,7 @@
 		5B11C3372FB500AC0089BAD2 /* DownloadStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11C3362FB500AB0089BAD2 /* DownloadStore.swift */; };
 		5B11C33B2FB719A80089BAD2 /* TrackEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11C33A2FB719A60089BAD2 /* TrackEntity.swift */; };
 		5B11C3412FB728390089BAD2 /* PersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11C3402FB728380089BAD2 /* PersistenceService.swift */; };
+		5B1214283017505A00987F16 /* TrackAlphabetSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1214273017505800987F16 /* TrackAlphabetSection.swift */; };
 		5B1875C62FD06EBD00D8A042 /* SearchBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1875C52FD06EBC00D8A042 /* SearchBarView.swift */; };
 		5B1875C92FD084CB00D8A042 /* SegmentedChipControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1875C82FD084CA00D8A042 /* SegmentedChipControl.swift */; };
 		5B2AEF41300A35BC00436CD3 /* PlaylistCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2AEF40300A35B400436CD3 /* PlaylistCell.swift */; };
@@ -198,6 +199,7 @@
 		5B11C3362FB500AB0089BAD2 /* DownloadStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadStore.swift; sourceTree = "<group>"; };
 		5B11C33A2FB719A60089BAD2 /* TrackEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackEntity.swift; sourceTree = "<group>"; };
 		5B11C3402FB728380089BAD2 /* PersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceService.swift; sourceTree = "<group>"; };
+		5B1214273017505800987F16 /* TrackAlphabetSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackAlphabetSection.swift; sourceTree = "<group>"; };
 		5B1875C52FD06EBC00D8A042 /* SearchBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBarView.swift; sourceTree = "<group>"; };
 		5B1875C82FD084CA00D8A042 /* SegmentedChipControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedChipControl.swift; sourceTree = "<group>"; };
 		5B2AEF40300A35B400436CD3 /* PlaylistCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistCell.swift; sourceTree = "<group>"; };
@@ -348,6 +350,7 @@
 			children = (
 				5B0BC2B63006AF7E00E8F2A5 /* MusicLibrary.swift */,
 				5BDA04C9300A677F00C7B763 /* SourceFolderItem.swift */,
+				5B1214273017505800987F16 /* TrackAlphabetSection.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1246,6 +1249,7 @@
 			files = (
 				5B8382B12FC4D05E003625CD /* DownloadStateProviding.swift in Sources */,
 				5B586CB52FAC618500BCEAD2 /* FileManagerService.swift in Sources */,
+				5B1214283017505A00987F16 /* TrackAlphabetSection.swift in Sources */,
 				5BECD77E301380E10028FC67 /* TrackArtworkCell.swift in Sources */,
 				5B0FD0C62FD2FD0600753D3A /* Collection+isNotEmpty.swift in Sources */,
 				5B1875C92FD084CB00D8A042 /* SegmentedChipControl.swift in Sources */,

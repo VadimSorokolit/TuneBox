@@ -29,6 +29,7 @@ protocol ImportManaging: LoadStateManaging {
     func toggleItem(_ item: ImportItem)
     func isItemSelected(_ item: ImportItem) -> Bool
     func moveItem(to target: ImportItem)
+    func sectionedTracks(from tracks: [TrackEntity]) -> [TrackAlphabetSection]
     func libraryTracks(onlyAPI: Bool) -> [TrackEntity]
     func beginEditSections()
     func finishEditSections()

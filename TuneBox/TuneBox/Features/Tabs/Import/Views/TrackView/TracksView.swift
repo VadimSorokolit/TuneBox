@@ -27,7 +27,7 @@ struct TracksView: View {
                 }
             } else {
                 List {
-                    ForEach(sectionedTracks) { section in
+                    ForEach(viewModel.sectionedTracks(from: tracks)) { section in
                         Section {
                             sectionTracksTitle(
                                 section.letter,
@@ -40,10 +40,9 @@ struct TracksView: View {
                             )
                             .listRowInsets(EdgeInsets())
 
-                            ForEach(section.tracks) { item in
+                            ForEach(section.tracks) { track in
                                 TrackArtworkCell(
-                                    index: item.index,
-                                    track: item.track,
+                                    track: track,
                                     isPlaying: false,
                                     onTapGesture: {}
                                 )
@@ -92,48 +91,4 @@ struct TracksView: View {
     // MARK: - Properties. Private
 
     @Injected private var viewModel: ImportManaging
-
-    private var sectionedTracks: [TrackAlphabetSection] {
-        let grouped = Dictionary(grouping: tracks) { track -> String in
-            let trimmed = track.songName.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard let first = trimmed.first else { return "#" }
-
-            let letter = String(first).uppercased()
-            return letter.rangeOfCharacter(from: .letters) != nil ? letter : "#"
-        }
-
-        let sortedLetters = grouped.keys.sorted { lhs, rhs in
-            if lhs == "#" { return false }
-            if rhs == "#" { return true }
-            return lhs.localizedStandardCompare(rhs) == .orderedAscending
-        }
-
-        var nextIndex = 1
-
-        return sortedLetters.map { letter in
-            let sectionTracks = (grouped[letter] ?? []).map { track in
-                let item = IndexedTrack(index: nextIndex, track: track)
-                nextIndex += 1
-                return item
-            }
-
-            return TrackAlphabetSection(letter: letter, tracks: sectionTracks)
-        }
-    }
-
-    // MARK: - Private. Objects
-
-    private struct TrackAlphabetSection: Identifiable {
-        let letter: String
-        let tracks: [IndexedTrack]
-
-        var id: String { letter }
-    }
-
-    private struct IndexedTrack: Identifiable {
-        let index: Int
-        let track: TrackEntity
-
-        var id: String { track.id }
-    }
 }

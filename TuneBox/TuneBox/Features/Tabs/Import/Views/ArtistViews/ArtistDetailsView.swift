@@ -32,17 +32,20 @@ struct ArtistDetailsView: View {
 
     var body: some View {
         if let artist {
-            if artist.albums.isEmpty {
-                TracksContentView(
-                    viewModel: viewModel,
-                    tracks: artist.tracks
-                )
-            } else {
-                ChipsView(
-                    viewModel: viewModel,
-                    artist: artist
-                )
+            Group {
+                if artist.albums.isEmpty {
+                    TracksContentView(
+                        viewModel: viewModel,
+                        tracks: artist.tracks
+                    )
+                } else {
+                    ChipsView(
+                        viewModel: viewModel,
+                        artist: artist
+                    )
+                }
             }
+            .navigationTitle(artist.name)
         } else {
             ContentUnavailableView(
                 "Artist not found",
@@ -74,6 +77,7 @@ struct ArtistDetailsView: View {
                     direction: $direction,
                     items: LibrarySegment.allCases
                 )
+                .padding(.horizontal, 26)
 
                 ZStack {
                     switch selected {
@@ -98,7 +102,6 @@ struct ArtistDetailsView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .padding(.top, 26)
-            .padding(.horizontal, 26)
         }
 
         // MARK: - Properties. Private
@@ -156,11 +159,11 @@ struct ArtistDetailsView: View {
         var body: some View {
             ScrollView(showsIndicators: false) {
                 LazyVStack(spacing: 0) {
-                    ForEach(Array(tracks.enumerated()), id: \.element.id) { index, track in
-                        NumberedTrackCell(index: index + 1,
-                                     track: track,
-                                     isPlaying: false,
-                                     onTapGesture: {}
+                    ForEach(tracks) { track in
+                        TrackArtworkCell(
+                            track: track,
+                            isPlaying: false,
+                            onTapGesture: {}
                         )
                     }
                 }

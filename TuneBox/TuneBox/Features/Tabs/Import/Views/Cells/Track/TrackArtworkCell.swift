@@ -11,7 +11,6 @@ struct TrackArtworkCell: View {
 
     // MARK: - Properties. Public
 
-    let index: Int
     let track: TrackEntity
     let isPlaying: Bool
     let onTapGesture: () -> Void
@@ -64,7 +63,6 @@ struct TrackArtworkCell: View {
 
 #Preview {
     TrackArtworkCell(
-        index: 1,
         track: TrackEntity(
             id: "1",
             image: nil,
