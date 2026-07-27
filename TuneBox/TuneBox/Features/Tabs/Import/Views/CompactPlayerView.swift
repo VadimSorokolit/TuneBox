@@ -22,9 +22,11 @@ struct CompactPlayerView: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             HStack(spacing: 12) {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(.gray.opacity(0.3))
-                    .frame(width: 44, height: 44)
+                ArtworkView(
+                    artworkPath: track?.imagePath,
+                    size: 44,
+                    cornerRadius: 8
+                )
 
                 VStack(alignment: .leading, spacing: track?.artistName.isEmpty == true ? 0 : 2) {
                     Text(track?.songName ?? "")
