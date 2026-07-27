@@ -68,7 +68,6 @@ struct AlbumDetailsView: View {
                 }
             }
             .safeAreaInset(edge: .bottom) {
-                ZStack {
                     if selectedTrack != nil {
                         CompactPlayerView(
                             track: selectedTrack,
@@ -88,7 +87,6 @@ struct AlbumDetailsView: View {
                         )
                         .padding(.bottom, 20)
                     }
-                }
             }
             .sheet(isPresented: $isShowingExpandedPlayer) {
                 Text("Expanded player")
