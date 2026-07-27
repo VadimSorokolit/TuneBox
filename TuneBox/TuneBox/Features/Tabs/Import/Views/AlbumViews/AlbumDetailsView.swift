@@ -27,10 +27,14 @@ struct AlbumDetailsView: View {
 
                     LazyVStack(spacing: 0) {
                         ForEach(Array(album.tracks.enumerated()), id: \.element.id) { index, track in
-                            NumberedTrackCell(index: index + 1,
-                                         track: track,
-                                         isPlaying: false,
-                                         onTapGesture: {}
+                            NumberedTrackCell(
+                                index: index + 1,
+                                track: track,
+                                isPlaying: selectedTrack == track,
+                                onTapGesture: {
+                                    selectedTrack = track
+                                    playerViewModel.handlePlayAction(for: track)
+                                }
                             )
                         }
                     }
@@ -63,10 +67,40 @@ struct AlbumDetailsView: View {
                     .frame(width: 200, alignment: .center)
                 }
             }
+            .safeAreaInset(edge: .bottom) {
+                ZStack {
+                    if selectedTrack != nil {
+                        CompactPlayerView(
+                            track: selectedTrack,
+                            isPlaying: selectedTrack.map { playerViewModel.isPlaying($0) } ?? false,
+                            progress: playerViewModel.progress,
+                            onRewindTap: {
+                                AudioService.shared.seek(by: -10)
+                            }, onPlayPauseTap: {
+                                guard let track = selectedTrack else { return }
+                                playerViewModel.handlePlayAction(for: track)
+                            }, onForwardTap: {
+                                AudioService.shared.seek(by: 10)
+                            },
+                            onProgressTap: {
+                                isShowingExpandedPlayer = true
+                            }
+                        )
+                        .padding(.bottom, 20)
+                    }
+                }
+            }
+            .sheet(isPresented: $isShowingExpandedPlayer) {
+                Text("Expanded player")
+            }
+            .animation(.easeInOut(duration: 0.25), value: isShowingExpandedPlayer)
         }
     }
 
     // MARK: - Properties. Private
 
     @Injected private var viewModel: ImportManaging
+    @Injected private var playerViewModel: PlayerManaging
+    @State private var isShowingExpandedPlayer: Bool = false
+    @State private var selectedTrack: TrackEntity?
 }

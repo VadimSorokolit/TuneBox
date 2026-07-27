@@ -81,11 +81,11 @@ struct CompactPlayerView: View {
                     onProgressTap()
                 }, label: {
                     Color.clear
-                        .frame(height: 18)
                         .frame(maxHeight: .infinity)
                 })
             }
-            .frame(height: 3)
+            .frame(height: 15)
+            .frame(maxWidth: .infinity)
             .padding(.horizontal, 24)
         }
         .frame(height: 60)
@@ -114,7 +114,7 @@ struct CompactPlayerView: View {
             size: 5_242_880
         ),
         isPlaying: true,
-        progress: 0.3,
+        progress: 0.5,
         onRewindTap: {},
         onPlayPauseTap: {},
         onForwardTap: {},

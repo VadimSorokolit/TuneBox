@@ -92,6 +92,7 @@ extension Resolver: @retroactive ResolverRegistering {
                 as PlayerManaging
             }
         }
+        .scope(.application)
     }
 
 }
