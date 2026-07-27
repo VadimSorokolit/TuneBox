@@ -20,7 +20,7 @@ struct PlaylistsView: View {
                         PlaylistCell(
                             playlist: playlist,
                             onTapGesture: {
-                                coordinator.push(.tracks(playlist.title, playlist.tracks))
+                                coordinator.push(.tracks(playlist.title, .fixed(playlist.tracks)))
                             }
                         )
                     }

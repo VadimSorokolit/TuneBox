@@ -8,12 +8,18 @@
 import SwiftUI
 import Resolver
 
+enum TracksContent: Hashable {
+    case library
+    case downloads
+    case fixed([TrackEntity])
+}
+
 struct TracksView: View {
 
     // MARK: - Properties. Public
 
     var navigationTitle: String
-    var tracks: [TrackEntity] = []
+    var content: TracksContent
 
     // MARK: - Main Body
 
@@ -80,7 +86,6 @@ struct TracksView: View {
         .onAppear {
             Task {
                 viewModel.startObservingTracksChanges()
-                await viewModel.refreshLibrary()
             }
         }
         .onDisappear {
@@ -91,4 +96,17 @@ struct TracksView: View {
     // MARK: - Properties. Private
 
     @Injected private var viewModel: ImportManaging
+
+    private var tracks: [TrackEntity] {
+        switch content {
+            case .library:
+                viewModel.libraryTracks()
+
+            case .downloads:
+                viewModel.libraryTracks(onlyAPI: true)
+
+            case .fixed(let tracks):
+                tracks
+        }
+    }
 }
