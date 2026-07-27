@@ -20,7 +20,7 @@ struct TrackArtworkCell: View {
     var body: some View {
         VStack(spacing: 10) {
             HStack {
-                HStack(spacing: 10) {
+                HStack(spacing: 12) {
                     ArtworkView(
                         artworkPath: track.imagePath,
                         size: 36,
@@ -29,7 +29,7 @@ struct TrackArtworkCell: View {
 
                     VStack(alignment: .leading, spacing: 0) {
                         Text("\(track.songName)")
-                            .lineLimit(1)
+                            .lineLimit(4)
                             .font(.system(size: 20, weight: .regular))
 
                         Text("\(track.albumName)")
@@ -66,7 +66,7 @@ struct TrackArtworkCell: View {
         track: TrackEntity(
             id: "1",
             image: nil,
-            songName: "Believer",
+            songName: "Believer Believer Believer Believer Believer Believer Believer Believer",
             duration: 200,
             artistName: "Imagine Dragons",
             albumName: "Evolve",

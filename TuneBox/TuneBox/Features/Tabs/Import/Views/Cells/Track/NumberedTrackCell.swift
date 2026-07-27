@@ -21,24 +21,20 @@ struct NumberedTrackCell: View {
     var body: some View {
         VStack(spacing: 10) {
             HStack {
-                HStack(spacing: 10) {
-                    Rectangle()
-                        .fill(.clear)
-                        .frame(size: 30)
+                HStack(spacing: 12) {
+                    Circle()
+                        .stroke(.gray, lineWidth: 1)
+                        .frame(size: 36)
                         .overlay {
-                            Circle()
-                                .stroke(.gray, lineWidth: 1)
-                                .frame(width: 25, height: 25)
-                                .overlay {
-                                    Text("\(index)")
-                                        .font(.system(size: 16, weight: .regular))
-                                }
+                            Text("\(index)")
+                                .font(.system(size: 16, weight: .regular))
                         }
 
                     Text("\(track.songName)")
-                        .lineLimit(1)
+                        .lineLimit(4)
                         .font(.system(size: 20, weight: .regular))
                 }
+
                 Spacer()
 
                 Text(track.formattedDuration)
@@ -66,7 +62,7 @@ struct NumberedTrackCell: View {
         track: TrackEntity(
             id: "1",
             image: nil,
-            songName: "Believer",
+            songName: "Believer Believer Believer Believer Believer Believer Believer Believer Believer Believer Believer Believer",
             duration: 200,
             artistName: "Imagine Dragons",
             albumName: "Evolve",

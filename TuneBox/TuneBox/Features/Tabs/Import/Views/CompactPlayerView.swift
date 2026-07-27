@@ -30,10 +30,11 @@ struct CompactPlayerView: View {
                     cornerRadius: 8
                 )
 
-                VStack(alignment: .leading, spacing: track?.artistName.isEmpty == true ? 0 : 2) {
-                    MarqueeText(
-                        text: track?.songName ?? ""
-                    )
+                VStack(
+                    alignment: .leading,
+                    spacing: track?.artistName.isEmpty == true ? 0 : 2
+                ) {
+                    MarqueeText(text: track?.songName ?? "")
 
                     Text(track?.artistName ?? "")
                         .font(.caption)
@@ -41,6 +42,7 @@ struct CompactPlayerView: View {
                         .lineLimit(1)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .layoutPriority(-1)
 
                 PlaybackControls(
                     isPlaying: isPlaying,
@@ -49,6 +51,7 @@ struct CompactPlayerView: View {
                     onPlayPauseTap: onPlayPauseTap,
                     onForwardTap: onForwardTap
                 )
+                .fixedSize()
             }
             .padding(.horizontal, 16)
             .frame(height: 60)
@@ -79,6 +82,8 @@ struct CompactPlayerView: View {
 // MARK: - Private. Objects
 
 private struct PlaybackControls: View {
+
+    // MARK: - Properties. Public
 
     let isPlaying: Bool
     let progress: Double
@@ -174,7 +179,9 @@ private struct MarqueeText: View {
             .overlay {
                 GeometryReader { geometry in
                     let containerWidth = geometry.size.width
-                    let canScroll = textWidth > 0 && containerWidth > 0 && !text.isEmpty
+                    let canScroll = textWidth > 0
+                        && containerWidth > 0
+                        && !text.isEmpty
 
                     Group {
                         if canScroll {
@@ -188,9 +195,7 @@ private struct MarqueeText: View {
                                     textView
                                     textView
                                 }
-                                .offset(
-                                    x: offset(at: context.date)
-                                )
+                                .offset(x: offset(at: context.date))
                             }
                         } else {
                             textView
@@ -201,7 +206,6 @@ private struct MarqueeText: View {
                         height: geometry.size.height,
                         alignment: .leading
                     )
-                    .clipped()
                 }
             }
             .background(alignment: .leading) {
@@ -217,13 +221,18 @@ private struct MarqueeText: View {
                         }
                     }
             }
-            .onPreferenceChange(MarqueeTextWidthKey.self) { textWidth = $0 }
+            .onPreferenceChange(MarqueeTextWidthKey.self) { newWidth in
+                guard textWidth != newWidth else { return }
+                textWidth = newWidth
+            }
             .onChange(of: text) { _, _ in
                 cycleStartedAt = Date()
             }
             .frame(height: 22, alignment: .leading)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .clipped()
+            .mask {
+                fadeMask
+            }
     }
 
     // MARK: - Properties. Private
@@ -231,9 +240,10 @@ private struct MarqueeText: View {
     @State private var textWidth: CGFloat = 0
     @State private var cycleStartedAt: Date = Date()
 
-    private let speed: CGFloat = 40
-    private let textSpacing: CGFloat = 40
+    private let speed: CGFloat = 100
+    private let textSpacing: CGFloat = 100
     private let pauseDuration: TimeInterval = 1.5
+    private let fadeWidth: CGFloat = 0
 
     private var textView: some View {
         Text(text)
@@ -245,10 +255,29 @@ private struct MarqueeText: View {
             )
     }
 
+    private var fadeMask: some View {
+        HStack(spacing: 0) {
+            LinearGradient(
+                colors: [.clear, .black],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+            .frame(width: fadeWidth)
+
+            Rectangle()
+                .fill(.black)
+
+            LinearGradient(
+                colors: [.black, .clear],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+            .frame(width: fadeWidth)
+        }
+    }
+
     // MARK: - Methods. Private
 
-    /// Progress-driven parent re-renders must not own this animation.
-    /// Offset is derived from wall-clock time so playback ticks cannot reset it.
     private func offset(at date: Date) -> CGFloat {
         guard textWidth > 0 else {
             return 0
