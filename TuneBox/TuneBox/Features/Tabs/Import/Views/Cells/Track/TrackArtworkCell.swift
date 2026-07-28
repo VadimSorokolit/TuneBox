@@ -23,7 +23,7 @@ struct TrackArtworkCell: View {
                 HStack(spacing: 12) {
                     ArtworkView(
                         artworkPath: track.imagePath,
-                        size: 36,
+                        size: 40,
                         cornerRadius: 8
                     )
 
@@ -32,7 +32,7 @@ struct TrackArtworkCell: View {
                             .lineLimit(4)
                             .font(.system(size: 20, weight: .regular))
 
-                        Text("\(track.albumName)")
+                        Text("\(track.artistName)")
                             .lineLimit(1)
                             .font(.system(size: 12, weight: .regular))
                             .foregroundStyle(.gray)
