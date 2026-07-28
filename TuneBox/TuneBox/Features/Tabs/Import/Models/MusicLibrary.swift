@@ -15,6 +15,7 @@ struct MusicLibrary {
         let id: String
         let name: String
         let artist: String
+        let date: String?
         let tracks: [TrackEntity]
         let cover: String?
     }

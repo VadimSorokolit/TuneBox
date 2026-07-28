@@ -78,7 +78,7 @@ struct ArtistDetailsView: View {
                     items: LibrarySegment.allCases
                 )
                 .padding(.horizontal, 26)
-                
+
                 ScrollView {
                     ZStack {
                         switch selected {
@@ -89,7 +89,7 @@ struct ArtistDetailsView: View {
                                 )
                                 .id(selected)
                                 .segmentTransition(direction)
-                                
+
                             case .tracks:
                                 TracksContentView(
                                     viewModel: viewModel,

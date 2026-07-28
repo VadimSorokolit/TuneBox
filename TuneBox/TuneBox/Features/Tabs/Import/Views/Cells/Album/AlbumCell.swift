@@ -27,17 +27,17 @@ struct AlbumCell: View {
                     )
 
                     VStack(spacing: album.artist.isEmpty ? 0 : 4) {
-                        if album.artist.isNotEmpty {
-                            Text("\(album.artist)")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .lineLimit(1)
-                                .font(.system(size: 10, weight: .regular))
-                        }
-
                         Text("\(album.name)")
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .lineLimit(album.artist.isEmpty ? 2 : 1)
                             .font(.system(size: 16, weight: .medium))
+
+                        if let date = album.date, date.isNotEmpty {
+                            Text("\(date)")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .lineLimit(1)
+                                .font(.system(size: 10, weight: .regular))
+                        }
                     }
                     .padding(.trailing, 26)
                 }
@@ -64,6 +64,7 @@ struct AlbumCell: View {
             id: "1",
             name: "Random Access Memories",
             artist: "Daft Punk",
+            date: "2026",
             tracks: [],
             cover: nil
         ),

@@ -650,7 +650,7 @@ final class ImportViewModel: ImportManaging {
                 duration: duration,
                 artistName: metadata?.artist ?? "",
                 albumName: metadata?.album ?? fileBase,
-                releaseDate: nil,
+                releaseDate: metadata?.date ?? nil,
                 download: nil,
                 waveformData: nil,
                 size: fileSize,
@@ -698,23 +698,52 @@ final class ImportViewModel: ImportManaging {
     }
 
     private func folderArtwork(near fileURL: URL) -> Data? {
-        let dir = fileURL.deletingLastPathComponent()
-        let preferred = ["cover.jpg", "folder.jpg", "Cover.jpg", "Folder.jpg"]
-        for name in preferred {
-            let url = dir.appendingPathComponent(name)
+        let directory = fileURL.deletingLastPathComponent()
+        let preferredNames: Set<String> = [
+            "cover.jpg", "cover.jpeg",
+            "folder.jpg", "folder.jpeg",
+            "Cover.jpg", "Folder.jpg"
+        ]
+
+        for name in preferredNames {
+            let url = directory.appendingPathComponent(name)
             if let data = try? Data(contentsOf: url) {
                 return data
             }
         }
-        guard let files = try? FileManager.default.contentsOfDirectory(
-            at: dir,
-            includingPropertiesForKeys: nil
+
+        guard let enumerator = FileManager.default.enumerator(
+            at: directory,
+            includingPropertiesForKeys: [.isDirectoryKey],
+            options: [.skipsHiddenFiles]
         ) else {
             return nil
         }
-        return files
-            .first { $0.pathExtension.lowercased() == "jpg" || $0.pathExtension.lowercased() == "jpeg" }
-            .flatMap { try? Data(contentsOf: $0) }
+
+        var preferredCandidate: URL?
+        var anyJPEGCandidate: URL?
+
+        for case let url as URL in enumerator {
+            let values = try? url.resourceValues(forKeys: [.isDirectoryKey])
+            if values?.isDirectory == true { continue }
+
+            let name = url.lastPathComponent
+            let ext = url.pathExtension.lowercased()
+
+            if preferredNames.contains(name) {
+                preferredCandidate = url
+                break
+            }
+
+            if anyJPEGCandidate == nil,
+               ext == "jpg" || ext == "jpeg" {
+                anyJPEGCandidate = url
+            }
+        }
+
+        let chosen = preferredCandidate ?? anyJPEGCandidate
+
+        return chosen.flatMap { try? Data(contentsOf: $0) }
     }
 
     private func collectFiles(from url: URL) throws -> [URL] {
@@ -749,6 +778,9 @@ final class ImportViewModel: ImportManaging {
                     id: name,
                     name: name,
                     artist: tracks.first?.artistName ?? "",
+                    date: tracks
+                        .compactMap(\.releaseDate)
+                        .first { !$0.isEmpty },
                     tracks: tracks,
                     cover: tracks.first?.imagePath
                 )

@@ -12,6 +12,7 @@ struct TrackMetadata {
     let title: String?
     let artist: String?
     let album: String?
+    let date: String?
     let duration: Double?
     let artwork: Data?
 }
@@ -42,10 +43,19 @@ final class AudioMetadataService: AudioMetadataServicing {
             ?? Self.additionalValue(for: ["ALBUM"], in: additional)
         )
 
+        let date = Self.cleanMetadataValue(
+            metadata.releaseDate
+            ?? Self.additionalValue(
+                for: ["DATE", "YEAR", "ORIGINALDATE"],
+                in: additional
+            )
+        )
+
         return TrackMetadata(
             title: title,
             artist: artist,
             album: album,
+            date: date,
             duration: file.properties.duration,
             artwork: metadata.attachedPictures.first?.data
         )
