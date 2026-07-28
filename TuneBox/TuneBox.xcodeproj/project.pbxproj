@@ -98,6 +98,7 @@
 		5B9D45DF2FDF123200F86C1B /* DownloadsPresenting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9D45DE2FDF122F00F86C1B /* DownloadsPresenting.swift */; };
 		5BA1F0012FE1000100503BA2 /* PaginationFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA1F0002FE1000000503BA2 /* PaginationFooterView.swift */; };
 		5BA48CFC3018B74500192BAF /* SwiftTagLib in Frameworks */ = {isa = PBXBuildFile; productRef = 5BA48CFB3018B74500192BAF /* SwiftTagLib */; };
+		5BA48CFE3018BDBA00192BAF /* View+bottomContentMargin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA48CFD3018BDB900192BAF /* View+bottomContentMargin.swift */; };
 		5BA581892FD6A2B800B498D7 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA581882FD6A2B700B498D7 /* SettingsViewModel.swift */; };
 		5BA5818C2FD6A33200B498D7 /* ImportViewModelV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA5818B2FD6A33000B498D7 /* ImportViewModelV1.swift */; };
 		5BA5818E2FD6A45800B498D7 /* SettingsManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA5818D2FD6A45700B498D7 /* SettingsManaging.swift */; };
@@ -254,6 +255,7 @@
 		5B9D45DB2FDF0B1B00F86C1B /* TracksSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TracksSection.swift; sourceTree = "<group>"; };
 		5B9D45DE2FDF122F00F86C1B /* DownloadsPresenting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsPresenting.swift; sourceTree = "<group>"; };
 		5BA1F0002FE1000000503BA2 /* PaginationFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaginationFooterView.swift; sourceTree = "<group>"; };
+		5BA48CFD3018BDB900192BAF /* View+bottomContentMargin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+bottomContentMargin.swift"; sourceTree = "<group>"; };
 		5BA581882FD6A2B700B498D7 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		5BA5818B2FD6A33000B498D7 /* ImportViewModelV1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportViewModelV1.swift; sourceTree = "<group>"; };
 		5BA5818D2FD6A45700B498D7 /* SettingsManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsManaging.swift; sourceTree = "<group>"; };
@@ -624,6 +626,7 @@
 				5B586CC22FAC912400BCEAD2 /* MoyaProvider+Async.swift */,
 				5B8382B62FC5AE9F003625CD /* Notifications */,
 				5BFCA8442FCEE251009C6AD9 /* TransferPrioritizable+mergePriority.swift */,
+				5BA48CFD3018BDB900192BAF /* View+bottomContentMargin.swift */,
 				5BFCA83D2FCED841009C6AD9 /* View+cornerRadius.swift */,
 				5B6B8CD42FED1DEC00C23D3E /* View+dismissKeyboardOnTap.swift */,
 				5B3D227C2FF53A54004B8356 /* View+frame.swift */,
@@ -1318,6 +1321,7 @@
 				5B9C3DFA2FD03DA400138645 /* TrackCell.swift in Sources */,
 				5BA581902FD6A52100B498D7 /* ImportManagingV1.swift in Sources */,
 				5BA1F0012FE1000100503BA2 /* PaginationFooterView.swift in Sources */,
+				5BA48CFE3018BDBA00192BAF /* View+bottomContentMargin.swift in Sources */,
 				5B74DF9D2FF444BE007EB36D /* AudioMetadataService.swift in Sources */,
 				5B11C3412FB728390089BAD2 /* PersistenceService.swift in Sources */,
 				5B8382B82FC5AEA9003625CD /* Notification+value.swift in Sources */,
@@ -1561,9 +1565,9 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_OBJC_INTEROP_MODE = objcxx;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_INTEROP_MODE = objcxx;
 				SWIFT_STRICT_CONCURRENCY = minimal;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = NO;
 				SWIFT_VERSION = 5.0;
@@ -1604,9 +1608,9 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_OBJC_INTEROP_MODE = objcxx;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_INTEROP_MODE = objcxx;
 				SWIFT_STRICT_CONCURRENCY = minimal;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = NO;
 				SWIFT_VERSION = 5.0;

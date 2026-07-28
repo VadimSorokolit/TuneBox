@@ -78,27 +78,30 @@ struct ArtistDetailsView: View {
                     items: LibrarySegment.allCases
                 )
                 .padding(.horizontal, 26)
-
-                ZStack {
-                    switch selected {
-                        case .albums:
-                            AlbumsContentView(
-                                viewModel: viewModel,
-                                albums: artist.albums
-                            )
-                            .id(selected)
-                            .segmentTransition(direction)
-
-                        case .tracks:
-                            TracksContentView(
-                                viewModel: viewModel,
-                                tracks: artist.tracks
-                            )
-                            .id(selected)
-                            .segmentTransition(direction)
+                
+                ScrollView {
+                    ZStack {
+                        switch selected {
+                            case .albums:
+                                AlbumsContentView(
+                                    viewModel: viewModel,
+                                    albums: artist.albums
+                                )
+                                .id(selected)
+                                .segmentTransition(direction)
+                                
+                            case .tracks:
+                                TracksContentView(
+                                    viewModel: viewModel,
+                                    tracks: artist.tracks
+                                )
+                                .id(selected)
+                                .segmentTransition(direction)
+                        }
                     }
+                    .animation(.easeInOut(duration: 0.25), value: selected)
                 }
-                .animation(.easeInOut(duration: 0.25), value: selected)
+                .bottomContentMargin()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .padding(.top, 26)
@@ -120,25 +123,23 @@ struct ArtistDetailsView: View {
         // MARK: - Body
 
         var body: some View {
-            ScrollView {
-                LazyVStack(spacing: 0) {
-                    ForEach(albums) { album in
-                        AlbumCell(
-                            album: album,
-                            onTapGesture: {
-                                coorditaor.push(.album(album))
-                            }
-                        )
-                    }
-
-                    LibrarySummaryFooter(
-                        count: albums.count,
-                        unitSingular: "album",
-                        unitPlural: "albums",
-                        duration: viewModel.tracksDuration(albums.flatMap(\.tracks)),
-                        size: viewModel.tracksSize(albums.flatMap(\.tracks))
+            LazyVStack(spacing: 0) {
+                ForEach(albums) { album in
+                    AlbumCell(
+                        album: album,
+                        onTapGesture: {
+                            coorditaor.push(.album(album))
+                        }
                     )
                 }
+
+                LibrarySummaryFooter(
+                    count: albums.count,
+                    unitSingular: "album",
+                    unitPlural: "albums",
+                    duration: viewModel.tracksDuration(albums.flatMap(\.tracks)),
+                    size: viewModel.tracksSize(albums.flatMap(\.tracks))
+                )
             }
         }
 
@@ -157,15 +158,13 @@ struct ArtistDetailsView: View {
         // MARK: - Body
 
         var body: some View {
-            ScrollView(showsIndicators: false) {
-                LazyVStack(spacing: 0) {
-                    ForEach(tracks) { track in
-                        TrackArtworkCell(
-                            track: track,
-                            isPlaying: false,
-                            onTapGesture: {}
-                        )
-                    }
+            LazyVStack(spacing: 0) {
+                ForEach(tracks) { track in
+                    TrackArtworkCell(
+                        track: track,
+                        isPlaying: false,
+                        onTapGesture: {}
+                    )
                 }
 
                 LibrarySummaryFooter(
