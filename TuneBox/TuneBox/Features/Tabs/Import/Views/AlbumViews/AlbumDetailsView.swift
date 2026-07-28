@@ -44,27 +44,27 @@ struct AlbumDetailsView: View {
                         unitSingular: "track",
                         unitPlural: "tracks",
                         duration: viewModel.tracksDuration(album.tracks),
-                        size: viewModel.tracksSize(album.tracks)
+                        size: viewModel.tracksSize(album.tracks),
                     )
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .contentMargins(.bottom, 40)
+            .contentMargins(.bottom, 20)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     VStack(spacing: album.artist.isEmpty ? 0 : 2) {
+                        Text(album.name)
+                            .lineLimit(album.artist.isEmpty ? 2 : 1)
+                            .font(.headline)
+
                         if album.artist.isNotEmpty {
                             Text(album.artist)
                                 .lineLimit(1)
                                 .font(.caption)
                         }
-
-                        Text(album.name)
-                            .lineLimit(album.artist.isEmpty ? 2 : 1)
-                            .font(.headline)
                     }
-                    .frame(width: 200, alignment: .center)
+                    .frame(maxWidth: .infinity, alignment: .center)
                 }
             }
             .safeAreaInset(edge: .bottom) {

@@ -33,12 +33,13 @@ struct AlbumsView: View {
                                 unitSingular: "album",
                                 unitPlural: "albums",
                                 duration: viewModel.tracksDuration(library.albums.flatMap(\.tracks)),
-                                size: viewModel.tracksSize(library.albums.flatMap(\.tracks))
+                                size: viewModel.tracksSize(library.albums.flatMap(\.tracks)),
+                                topPadding: 10
                             )
                         }
                     }
                     .padding(.top, 16)
-                    .contentMargins(.bottom, 40)
+                    .contentMargins(.bottom, 20)
                 } else {
                     ContentUnavailableView {
                         Image(systemName: "rectangle.stack")

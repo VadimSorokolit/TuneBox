@@ -17,25 +17,31 @@ struct PlaylistCell: View {
     // MARK: - Main Body
 
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 5) {
             HStack {
                 HStack(spacing: 10) {
                     Image(systemName: "music.note.list")
                         .foregroundStyle(.gray)
-                        .font(.system(size: 18, weight: .medium))
-                        .frame(size: 18)
+                        .font(.system(size: GlobalConstants.Cell.imageSize, weight: .medium))
+                        .frame(size: GlobalConstants.Cell.imageSize)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: GlobalConstants.Cell.imageCornerRadius)
+                                .stroke(.clear, lineWidth: 1)
+                        }
 
-                    VStack(spacing: 0) {
-                        Text("\(playlist.title)")
+                    VStack(spacing: 2) {
+                        if playlist.title.isNotEmpty {
+                            Text("\(playlist.title)")
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .lineLimit(1)
-                                .font(.system(size: 15, weight: .medium))
+                                .lineLimit(GlobalConstants.Cell.textLineLimit)
+                                .font(GlobalConstants.Cell.titleFont)
                                 .foregroundStyle(.black.opacity(0.8))
+                        }
 
                         Text("\(playlist.tracks.count) \(playlist.tracks.count == 1 ? "track" : "tracks")")
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .lineLimit(1)
-                            .font(.system(size: 10, weight: .regular))
+                            .lineLimit(GlobalConstants.Cell.textLineLimit)
+                            .font(GlobalConstants.Cell.subtitleFont)
                             .foregroundStyle(.gray)
                     }
                     .padding(.trailing, 26)
@@ -49,7 +55,7 @@ struct PlaylistCell: View {
                 .padding(.leading, 60)
                 .padding(.trailing, 26)
         }
-        .padding(.top, 12)
+        .padding(.top, 5)
         .frame(maxWidth: .infinity, alignment: .leading)
         .onTapGesture {
             onTapGesture()

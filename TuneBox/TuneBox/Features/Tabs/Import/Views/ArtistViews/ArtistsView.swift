@@ -30,13 +30,13 @@ struct ArtistsView: View {
                         unitSingular: "artist",
                         unitPlural: "artists",
                         duration: viewModel.tracksDuration(library.artists.flatMap(\.tracks)),
-                        size: viewModel.tracksSize(library.artists.flatMap(\.tracks))
+                        size: viewModel.tracksSize(library.artists.flatMap(\.tracks)),
                     )
                 }
             }
             .navigationTitle("Artists")
             .padding(.top, 16)
-            .contentMargins(.bottom, 40)
+            .contentMargins(.bottom, 20)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
     }

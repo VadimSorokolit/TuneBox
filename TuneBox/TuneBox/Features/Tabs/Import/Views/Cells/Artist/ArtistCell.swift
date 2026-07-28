@@ -17,23 +17,22 @@ struct ArtistCell: View {
     // MARK: - Main Body
 
     var body: some View {
-        VStack(spacing: 15) {
+        VStack(spacing: 5) {
             HStack {
                 HStack(spacing: 10) {
                     Image(systemName: LibraryItem.artists.systemImage)
                         .foregroundStyle(.gray)
-                        .font(.system(size: 22, weight: .medium))
-                        .frame(size: 22)
+                        .font(.system(size: GlobalConstants.Cell.imageSize, weight: .medium))
+                        .frame(size: GlobalConstants.Cell.imageSize)
                         .overlay {
-                            RoundedRectangle(cornerRadius: 8)
+                            RoundedRectangle(cornerRadius: GlobalConstants.Cell.imageCornerRadius)
                                 .stroke(.gray, lineWidth: 1)
-                                .frame(size: 30)
+                                .frame(size: GlobalConstants.Cell.imageSize)
                         }
 
                     Text(artist.name)
-                        .font(.system(size: 18, weight: .regular))
+                        .font(GlobalConstants.Cell.titleFont)
                 }
-                .contentShape(Rectangle())
 
                 Spacer()
             }
@@ -43,10 +42,10 @@ struct ArtistCell: View {
             Rectangle()
                 .fill(Color.gray.opacity(0.2))
                 .frame(height: 1)
-                .padding(.leading, 58)
+                .padding(.leading, 82)
                 .padding(.trailing, 26)
         }
-        .padding(.top, 15)
+        .padding(.top, 5)
         .onTapGesture {
             onTapGesture()
         }

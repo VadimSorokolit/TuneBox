@@ -23,4 +23,12 @@ enum GlobalConstants {
     enum AppColor {
         static let defaultBackground = SwiftUI.Color(hex: 0xFCFCFC)
     }
+
+    enum Cell {
+        static let imageSize: CGFloat = 46
+        static let imageCornerRadius: CGFloat = 8
+        static let textLineLimit: Int = 4
+        static let titleFont: Font = .system(size: 16, weight: .medium)
+        static let subtitleFont: Font = .system(size: 10, weight: .regular)
+    }
 }

@@ -28,21 +28,23 @@ struct AlbumCell: View {
                 HStack(spacing: 10) {
                     ArtworkView(
                         artworkPath: album.cover,
-                        size: 46,
-                        cornerRadius: 8
+                        size: GlobalConstants.Cell.imageSize,
+                        cornerRadius: GlobalConstants.Cell.imageCornerRadius
                     )
 
                     VStack(spacing: subtitle?.isNotEmpty == true ? 4 : 0) {
-                        Text(album.name)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .lineLimit(4)
-                            .font(.system(size: 16, weight: .medium))
+                        if title.isNotEmpty {
+                            Text(title)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .lineLimit(GlobalConstants.Cell.textLineLimit)
+                                .font(titleFont)
+                        }
 
                         if let subtitle, subtitle.isNotEmpty {
                             Text(subtitle)
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .lineLimit(4)
-                                .font(.system(size: 10, weight: .regular))
+                                .lineLimit(GlobalConstants.Cell.textLineLimit)
+                                .font(subtitleFont)
                         }
                     }
                     .padding(.trailing, 26)
@@ -65,14 +67,24 @@ struct AlbumCell: View {
 
     // MARK: - Properties. Private
 
-    private var subtitle: String? {
-        switch displayContext {
-            case .artist:
-                album.date
+    private var title: String {
+        displayContext == .artist ? album.name : album.artist
+    }
 
-            case .album:
-                album.artist
-        }
+    private var subtitle: String? {
+        displayContext == .artist ? album.date : album.name
+    }
+
+    private var titleFont: Font {
+        displayContext == .artist
+            ? GlobalConstants.Cell.titleFont
+            : GlobalConstants.Cell.subtitleFont
+    }
+
+    private var subtitleFont: Font {
+        displayContext == .artist
+            ? GlobalConstants.Cell.subtitleFont
+            : GlobalConstants.Cell.titleFont
     }
 }
 

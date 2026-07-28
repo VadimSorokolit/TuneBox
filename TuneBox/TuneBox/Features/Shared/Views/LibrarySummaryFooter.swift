@@ -13,7 +13,7 @@ struct LibrarySummaryFooter: View {
     let unitPlural: String
     let duration: Int
     let size: Int
-    var topPadding: CGFloat = 20
+    var topPadding: CGFloat = 0
 
     var body: some View {
         Text(

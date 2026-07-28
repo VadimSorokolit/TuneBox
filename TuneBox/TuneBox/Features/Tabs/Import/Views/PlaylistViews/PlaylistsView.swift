@@ -30,13 +30,14 @@ struct PlaylistsView: View {
                         unitSingular: "playlist",
                         unitPlural: "playlists",
                         duration: viewModel.tracksDuration(library.playlists.flatMap(\.tracks)),
-                        size: viewModel.tracksSize(library.playlists.flatMap(\.tracks))
+                        size: viewModel.tracksSize(library.playlists.flatMap(\.tracks)),
+                        topPadding: 10
                     )
                 }
             }
             .navigationTitle("Playlists")
             .padding(.top, 10)
-            .contentMargins(.bottom, 26)
+            .contentMargins(.bottom, 20)
         }
     }
 

@@ -18,24 +18,26 @@ struct TrackArtworkCell: View {
     // MARK: - Main Body
 
     var body: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 5) {
             HStack {
-                HStack(spacing: 12) {
+                HStack(spacing: 10) {
                     ArtworkView(
                         artworkPath: track.imagePath,
-                        size: 40,
-                        cornerRadius: 8
+                        size: GlobalConstants.Cell.imageSize,
+                        cornerRadius: GlobalConstants.Cell.imageCornerRadius
                     )
 
-                    VStack(alignment: .leading, spacing: 0) {
+                    VStack(alignment: .leading, spacing: track.artistName.isNotEmpty ? 4 : 0) {
                         Text("\(track.songName)")
-                            .lineLimit(4)
-                            .font(.system(size: 20, weight: .regular))
+                            .lineLimit(GlobalConstants.Cell.textLineLimit)
+                            .font(GlobalConstants.Cell.titleFont)
 
-                        Text("\(track.artistName)")
-                            .lineLimit(4)
-                            .font(.system(size: 12, weight: .regular))
-                            .foregroundStyle(.gray)
+                        if track.artistName.isNotEmpty {
+                            Text("\(track.artistName)")
+                                .lineLimit(GlobalConstants.Cell.textLineLimit)
+                                .font(GlobalConstants.Cell.subtitleFont)
+                                .foregroundStyle(.gray)
+                        }
                     }
                 }
 
@@ -50,10 +52,10 @@ struct TrackArtworkCell: View {
             Rectangle()
                 .fill(.gray.opacity(0.2))
                 .frame(height: 1)
-                .padding(.leading, 75)
+                .padding(.leading, 82)
                 .padding(.trailing, 26)
         }
-        .padding(.top, 10)
+        .padding(.top, 5)
         .frame(maxWidth: .infinity)
         .onTapGesture {
             onTapGesture()

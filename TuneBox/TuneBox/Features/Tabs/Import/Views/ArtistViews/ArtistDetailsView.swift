@@ -63,7 +63,7 @@ struct ArtistDetailsView: View {
 
     private struct ChipsView: View {
 
-        // MARK: - Propeties. Public
+        // MARK: - Properties. Public
 
         let viewModel: ImportManaging
         let artist: MusicLibrary.Artist
