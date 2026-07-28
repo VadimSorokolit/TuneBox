@@ -6,6 +6,7 @@
 //
 
 import AVFoundation
+import SwiftTagLib
 
 struct TrackMetadata {
     let title: String?
@@ -18,20 +19,35 @@ struct TrackMetadata {
 final class AudioMetadataService: AudioMetadataServicing {
 
     static func extractMetadata(from url: URL) async throws -> TrackMetadata {
-        let asset = AVURLAsset(url: url)
-        let metadata = try await asset.load(.commonMetadata)
-        let duration = try await asset.load(.duration)
-        let title = try await metadata.first(where: {$0.commonKey == .commonKeyTitle})?.load(.stringValue)
-        let artist = try await metadata.first(where: {$0.commonKey == .commonKeyArtist})?.load(.stringValue)
-        let album = try await metadata.first(where: {$0.commonKey == .commonKeyAlbumName})?.load(.stringValue)
-        let artwork = try await metadata.first(where: {$0.commonKey == .commonKeyArtwork})?.load(.dataValue)
+        let file = try AudioFile(url: url)
+        let metadata = file.metadata
+        let additional = metadata.additional
+
+        let title = Self.cleanMetadataValue(
+            metadata.title
+            ?? Self.additionalValue(for: ["TITLE"], in: additional)
+        )
+
+        let artist = Self.cleanMetadataValue(
+            metadata.artist
+            ?? metadata.albumArtist
+            ?? Self.additionalValue(
+                for: ["ARTIST", "ALBUMARTIST", "ALBUM ARTIST", "PERFORMER"],
+                in: additional
+            )
+        )
+
+        let album = Self.cleanMetadataValue(
+            metadata.albumTitle
+            ?? Self.additionalValue(for: ["ALBUM"], in: additional)
+        )
 
         return TrackMetadata(
             title: title,
             artist: artist,
             album: album,
-            duration: CMTimeGetSeconds(duration),
-            artwork: artwork
+            duration: file.properties.duration,
+            artwork: metadata.attachedPictures.first?.data
         )
     }
 
@@ -84,5 +100,33 @@ final class AudioMetadataService: AudioMetadataServicing {
         try data.write(to: fileURL, options: .atomic)
 
         return fileURL
+    }
+
+    private static func cleanMetadataValue(_ value: String?) -> String? {
+        guard let value else {
+            return nil
+        }
+
+        let cleaned = value
+            .replacingOccurrences(of: "\0", with: " ")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(
+                of: #"\s+"#,
+                with: " ",
+                options: .regularExpression
+            )
+
+        return cleaned.isEmpty ? nil : cleaned
+    }
+
+    private static func additionalValue(
+        for keys: [String],
+        in pairs: [AudioFile.Metadata.AdditionalMetadataPair]
+    ) -> String? {
+        let wanted = Set(keys.map { $0.uppercased() })
+
+        return pairs
+            .first { wanted.contains($0.key.uppercased()) }
+            .map(\.value)
     }
 }

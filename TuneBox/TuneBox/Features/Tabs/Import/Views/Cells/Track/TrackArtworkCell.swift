@@ -33,7 +33,7 @@ struct TrackArtworkCell: View {
                             .font(.system(size: 20, weight: .regular))
 
                         Text("\(track.artistName)")
-                            .lineLimit(1)
+                            .lineLimit(4)
                             .font(.system(size: 12, weight: .regular))
                             .foregroundStyle(.gray)
                     }

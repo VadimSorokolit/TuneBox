@@ -615,12 +615,12 @@ final class ImportViewModel: ImportManaging {
         do {
             let id = UUID().uuidString
 
+            let metadata = try? await AudioMetadataService.extractMetadata(from: url)
+
             let localURL = try FileManagerService.storeImportedFile(
                 from: url,
                 id: id
             )
-
-            let metadata = try? await AudioMetadataService.extractMetadata(from: localURL)
             let values = try localURL.resourceValues(forKeys: [.fileSizeKey])
 
             let fileSize = values.fileSize

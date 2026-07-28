@@ -359,12 +359,12 @@ final class ImportViewModelV1: ImportManagingV1 {
         do {
             let id = UUID().uuidString
 
+            let metadata = try? await AudioMetadataService.extractMetadata(from: url)
+
             let localURL = try FileManagerService.storeImportedFile(
                 from: url,
                 id: id
             )
-
-            let metadata = try? await AudioMetadataService.extractMetadata(from: localURL)
             let name = metadata?.title ?? url.deletingPathExtension().lastPathComponent
             let artist = metadata?.artist ?? ""
 
