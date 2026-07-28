@@ -7,11 +7,17 @@
 
 import SwiftUI
 
+enum AlbumDisplayContext {
+    case artist
+    case album
+}
+
 struct AlbumCell: View {
 
     // MARK: - Properties. Public
 
     let album: MusicLibrary.Album
+    let displayContext: AlbumDisplayContext
     let onTapGesture: () -> Void
 
     // MARK: - Main Body
@@ -26,16 +32,16 @@ struct AlbumCell: View {
                         cornerRadius: 8
                     )
 
-                    VStack(spacing: album.artist.isEmpty ? 0 : 4) {
-                        Text("\(album.name)")
+                    VStack(spacing: subtitle?.isNotEmpty == true ? 4 : 0) {
+                        Text(album.name)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .lineLimit(album.artist.isEmpty ? 2 : 1)
+                            .lineLimit(4)
                             .font(.system(size: 16, weight: .medium))
 
-                        if let date = album.date, date.isNotEmpty {
-                            Text("\(date)")
+                        if let subtitle, subtitle.isNotEmpty {
+                            Text(subtitle)
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .lineLimit(1)
+                                .lineLimit(4)
                                 .font(.system(size: 10, weight: .regular))
                         }
                     }
@@ -56,6 +62,18 @@ struct AlbumCell: View {
             onTapGesture()
         }
     }
+
+    // MARK: - Properties. Private
+
+    private var subtitle: String? {
+        switch displayContext {
+            case .artist:
+                album.date
+
+            case .album:
+                album.artist
+        }
+    }
 }
 
 #Preview {
@@ -68,6 +86,7 @@ struct AlbumCell: View {
             tracks: [],
             cover: nil
         ),
+        displayContext: .album,
         onTapGesture: {}
     )
 }

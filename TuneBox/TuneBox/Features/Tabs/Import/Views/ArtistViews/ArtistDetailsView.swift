@@ -127,6 +127,7 @@ struct ArtistDetailsView: View {
                 ForEach(albums) { album in
                     AlbumCell(
                         album: album,
+                        displayContext: .artist,
                         onTapGesture: {
                             coorditaor.push(.album(album))
                         }

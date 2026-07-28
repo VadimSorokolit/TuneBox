@@ -21,6 +21,7 @@ struct AlbumsView: View {
                             ForEach(library.albums) { album in
                                 AlbumCell(
                                     album: album,
+                                    displayContext: .album,
                                     onTapGesture: {
                                         coordinator.push(.album(album))
                                     }
