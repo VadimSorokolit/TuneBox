@@ -31,6 +31,7 @@ struct ArtistsView: View {
                         unitPlural: "artists",
                         duration: viewModel.tracksDuration(library.artists.flatMap(\.tracks)),
                         size: viewModel.tracksSize(library.artists.flatMap(\.tracks)),
+                        topPadding: 10
                     )
                 }
             }

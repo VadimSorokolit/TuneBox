@@ -40,9 +40,9 @@ struct TracksView: View {
                                 font: .system(size: 16, weight: .regular),
                                 foregroundStyle: .gray,
                                 topPadding: 10,
-                                bottomPadding: 0,
+                                bottomPadding: 5,
                                 horizontalPadding: 26,
-                                hasSeparator: true
+                                hasSeparator: false
                             )
                             .listRowInsets(EdgeInsets())
 
