@@ -25,9 +25,10 @@ enum GlobalConstants {
     }
 
     enum Cell {
-        static let imageSize: CGFloat = 46
+        static let imageSize: CGFloat = 21
         static let imageCornerRadius: CGFloat = 8
         static let textLineLimit: Int = 4
+        static let defaultPadding: CGFloat = 19
         static let titleFont: Font = .system(size: 16, weight: .medium)
         static let subtitleFont: Font = .system(size: 10, weight: .regular)
     }

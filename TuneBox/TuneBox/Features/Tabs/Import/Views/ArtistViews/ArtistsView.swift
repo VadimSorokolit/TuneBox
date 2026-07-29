@@ -36,7 +36,6 @@ struct ArtistsView: View {
                 }
             }
             .navigationTitle("Artists")
-            .padding(.top, 16)
             .contentMargins(.bottom, 20)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }

@@ -13,6 +13,7 @@ struct TrackArtworkCell: View {
 
     let track: TrackEntity
     let isPlaying: Bool
+    let defaultPadding: CGFloat = GlobalConstants.Cell.defaultPadding
     let onTapGesture: () -> Void
 
     // MARK: - Main Body
@@ -47,13 +48,13 @@ struct TrackArtworkCell: View {
                     .font(.system(size: 12, weight: .light))
                     .foregroundStyle(.gray)
             }
-            .padding(.horizontal, 26)
+            .padding(.horizontal, defaultPadding)
 
             Rectangle()
                 .fill(.gray.opacity(0.2))
                 .frame(height: 1)
                 .padding(.leading, 82)
-                .padding(.trailing, 26)
+                .padding(.trailing, defaultPadding)
         }
         .padding(.top, 5)
         .frame(maxWidth: .infinity)

@@ -38,7 +38,6 @@ struct AlbumsView: View {
                             )
                         }
                     }
-                    .padding(.top, 16)
                     .contentMargins(.bottom, 20)
                 } else {
                     ContentUnavailableView {

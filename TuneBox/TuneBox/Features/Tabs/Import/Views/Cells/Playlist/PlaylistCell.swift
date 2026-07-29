@@ -12,13 +12,13 @@ struct PlaylistCell: View {
     // MARK: - Properties. Public
 
     let playlist: PlaylistEntity
+    let defaultPadding: CGFloat = GlobalConstants.Cell.defaultPadding
     let onTapGesture: () -> Void
 
     // MARK: - Main Body
 
     var body: some View {
         VStack(spacing: 5) {
-            HStack {
                 HStack(spacing: 10) {
                     Image(systemName: "music.note.list")
                         .foregroundStyle(.gray)
@@ -44,10 +44,8 @@ struct PlaylistCell: View {
                             .font(GlobalConstants.Cell.subtitleFont)
                             .foregroundStyle(.gray)
                     }
-                    .padding(.trailing, 26)
                 }
-                .padding(.leading, 26)
-            }
+                .padding(.horizontal, defaultPadding)
 
             Rectangle()
                 .fill(Color.gray.opacity(0.2))

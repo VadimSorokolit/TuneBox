@@ -12,6 +12,7 @@ struct ArtistCell: View {
     // MARK: - Properties. Public
 
     let artist: MusicLibrary.Artist
+    let defaultPadding: CGFloat = GlobalConstants.Cell.defaultPadding
     let onTapGesture: () -> Void
 
     // MARK: - Main Body
@@ -26,7 +27,7 @@ struct ArtistCell: View {
                         .frame(size: GlobalConstants.Cell.imageSize)
                         .overlay {
                             RoundedRectangle(cornerRadius: GlobalConstants.Cell.imageCornerRadius)
-                                .stroke(.gray, lineWidth: 1)
+                                .stroke(.gray.opacity(0.5), lineWidth: 1)
                                 .frame(size: GlobalConstants.Cell.imageSize)
                         }
 
@@ -36,14 +37,13 @@ struct ArtistCell: View {
 
                 Spacer()
             }
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, 26)
+            .padding(.horizontal, defaultPadding)
 
             Rectangle()
                 .fill(Color.gray.opacity(0.2))
                 .frame(height: 1)
                 .padding(.leading, 82)
-                .padding(.trailing, 26)
+                .padding(.trailing, defaultPadding)
         }
         .padding(.top, 5)
         .onTapGesture {

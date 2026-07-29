@@ -18,45 +18,43 @@ struct AlbumCell: View {
 
     let album: MusicLibrary.Album
     let displayContext: AlbumDisplayContext
+    let defaultPadding: CGFloat = GlobalConstants.Cell.defaultPadding
     let onTapGesture: () -> Void
 
     // MARK: - Main Body
 
     var body: some View {
         VStack(spacing: 5) {
-            HStack {
-                HStack(spacing: 10) {
-                    ArtworkView(
-                        artworkPath: album.cover,
-                        size: GlobalConstants.Cell.imageSize,
-                        cornerRadius: GlobalConstants.Cell.imageCornerRadius
-                    )
+            HStack(spacing: 10) {
+                ArtworkView(
+                    artworkPath: album.cover,
+                    size: GlobalConstants.Cell.imageSize,
+                    cornerRadius: GlobalConstants.Cell.imageCornerRadius
+                )
 
-                    VStack(spacing: subtitle?.isNotEmpty == true ? 4 : 0) {
-                        if title.isNotEmpty {
-                            Text(title)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .lineLimit(GlobalConstants.Cell.textLineLimit)
-                                .font(titleFont)
-                        }
-
-                        if let subtitle, subtitle.isNotEmpty {
-                            Text(subtitle)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .lineLimit(GlobalConstants.Cell.textLineLimit)
-                                .font(subtitleFont)
-                        }
+                VStack(spacing: subtitle?.isNotEmpty == true ? 4 : 0) {
+                    if title.isNotEmpty {
+                        Text(title)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .lineLimit(GlobalConstants.Cell.textLineLimit)
+                            .font(titleFont)
                     }
-                    .padding(.trailing, 26)
+
+                    if let subtitle, subtitle.isNotEmpty {
+                        Text(subtitle)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .lineLimit(GlobalConstants.Cell.textLineLimit)
+                            .font(subtitleFont)
+                    }
                 }
-                .padding(.leading, 26)
             }
+            .padding(.horizontal, defaultPadding)
 
             Rectangle()
                 .fill(Color.gray.opacity(0.2))
                 .frame(height: 1)
                 .padding(.leading, 82)
-                .padding(.trailing, 26)
+                .padding(.trailing, defaultPadding)
         }
         .padding(.top, 5)
         .frame(maxWidth: .infinity, alignment: .leading)

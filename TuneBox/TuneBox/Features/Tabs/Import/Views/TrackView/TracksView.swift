@@ -41,7 +41,7 @@ struct TracksView: View {
                                 foregroundStyle: .gray,
                                 topPadding: 10,
                                 bottomPadding: 5,
-                                horizontalPadding: 26,
+                                horizontalPadding: GlobalConstants.Cell.defaultPadding,
                                 hasSeparator: false
                             )
                             .listRowInsets(EdgeInsets())
