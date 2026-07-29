@@ -19,7 +19,7 @@ struct AlbumDetailsView: View {
     var body: some View {
         if let album {
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 10) {
+                VStack(spacing: 20) {
                     ArtworkView(artworkPath: album.cover,
                                 size: 300,
                                 cornerRadius: 5
@@ -50,6 +50,7 @@ struct AlbumDetailsView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .contentMargins(.bottom, 20)
+            .contentMargins(.top, 20)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {

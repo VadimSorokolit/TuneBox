@@ -23,22 +23,24 @@ struct NumberedTrackCell: View {
             HStack {
                 HStack(spacing: 12) {
                     Circle()
-                        .stroke(.gray, lineWidth: 1)
-                        .frame(size: 36)
+                        .stroke(.gray.opacity(0.8), lineWidth: 1.5)
+                        .frame(size: 20)
                         .overlay {
                             Text("\(index)")
-                                .font(.system(size: 16, weight: .regular))
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundStyle(.gray)
                         }
 
                     Text("\(track.songName)")
                         .lineLimit(4)
-                        .font(.system(size: 20, weight: .regular))
+                        .font(.system(size: 18, weight: .regular))
                 }
 
                 Spacer()
 
                 Text(track.formattedDuration)
                     .font(.system(size: 14, weight: .light))
+                    .foregroundStyle(.gray)
             }
             .padding(.horizontal, 26)
 
@@ -58,7 +60,7 @@ struct NumberedTrackCell: View {
 
 #Preview {
     NumberedTrackCell(
-        index: 1,
+        index: 12,
         track: TrackEntity(
             id: "1",
             image: nil,
