@@ -153,9 +153,6 @@ final class ImportViewModel: ImportManaging {
             let playlists = try self.persistenceService.fetchPlaylists()
 
             let allTracks = (imported + downloaded)
-                .sorted {
-                    $0.songName.localizedCaseInsensitiveCompare($1.songName) == .orderedAscending
-                }
 
             if allTracks.isNotEmpty || playlists.isNotEmpty {
                 self.library = self.parseLibrary(from: allTracks, playlists: playlists)
@@ -163,7 +160,7 @@ final class ImportViewModel: ImportManaging {
                 self.library = nil
             }
 
-            syncDownloadsSource(hasTracks: downloaded.isNotEmpty)
+            self.syncDownloadsSource(hasTracks: downloaded.isNotEmpty)
             self.ensureSections()
         } catch {
             self.handleError(error)
@@ -463,6 +460,12 @@ final class ImportViewModel: ImportManaging {
                 letter: letter,
                 tracks: grouped[letter] ?? []
             )
+        }
+    }
+
+    func sortedTracksAlphabetically(_ tracks: [TrackEntity]) -> [TrackEntity] {
+        tracks.sorted {
+            $0.songName.localizedCaseInsensitiveCompare($1.songName) == .orderedAscending
         }
     }
 
@@ -845,17 +848,15 @@ final class ImportViewModel: ImportManaging {
     }
 
     private func saveSelectedLibraryItems() {
-        UserDefaults.standard.set(
-            self.selectedLibraryItems.map(\.rawValue),
-            forKey: Keys.selectedLibraryItems
-        )
+        UserDefaults.standard.set(self.selectedLibraryItems.map(\.rawValue), forKey: Keys.selectedLibraryItems)
     }
 
     private func saveLibraryItemsOrder() {
-        UserDefaults.standard.set(
-            libraryItemsOrder.map(\.rawValue),
-            forKey: Keys.libraryItemsOrder
-        )
+        UserDefaults.standard.set(self.libraryItemsOrder.map(\.rawValue), forKey: Keys.libraryItemsOrder)
+    }
+
+    private func saveSelectedSourceIDs() {
+        UserDefaults.standard.set(self.selectedSourceIDs.map(\.uuidString), forKey: Keys.selectedSourceIDs)
     }
 
     private func loadSelectedSourceIDs() {
@@ -869,13 +870,6 @@ final class ImportViewModel: ImportManaging {
 
         let existing = Set(sources.map(\.id))
         self.selectedSourceIDs = self.selectedSourceIDs.intersection(existing)
-    }
-
-    private func saveSelectedSourceIDs() {
-        UserDefaults.standard.set(
-            selectedSourceIDs.map(\.uuidString),
-            forKey: Keys.selectedSourceIDs
-        )
     }
 
     private func addOrUpdateSource(_ source: ImportSource) {
@@ -908,7 +902,7 @@ final class ImportViewModel: ImportManaging {
     }
 
     private func librarySectionItems() -> [ImportItem] {
-        let all = libraryItemsOrder
+        let all = self.libraryItemsOrder
 
         let visible = self.isEditSectionModeEnabled
         ? all

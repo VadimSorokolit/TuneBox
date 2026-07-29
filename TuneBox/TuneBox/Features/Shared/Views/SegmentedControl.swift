@@ -37,14 +37,14 @@ struct SegmentedControl<T>: View where T: SegmentedItem & RawRepresentable, T.Ra
                         )
                         .animation(nil, value: selected)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 40)
+                        .frame(height: 22)
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .background {
                     if selected == segment {
                         RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 12))
+                            .glassEffect(.identity.interactive(), in: .rect(cornerRadius: 12))
                             .matchedGeometryEffect(id: "segmentPill", in: namespace)
                     }
                 }

@@ -71,13 +71,13 @@ struct ArtistDetailsView: View {
         // MARK: - Body
 
         var body: some View {
-            VStack(spacing: 20) {
+            VStack(spacing: 10) {
                 SegmentedControl(
                     selected: $selected,
                     direction: $direction,
                     items: LibrarySegment.allCases
                 )
-                .padding(.horizontal, 26)
+                .padding(.horizontal, 10)
 
                 ScrollView {
                     ZStack {
@@ -93,7 +93,7 @@ struct ArtistDetailsView: View {
                             case .tracks:
                                 TracksContentView(
                                     viewModel: viewModel,
-                                    tracks: artist.tracks
+                                    tracks: viewModel.sortedTracksAlphabetically(artist.tracks),
                                 )
                                 .id(selected)
                                 .segmentTransition(direction)
@@ -104,7 +104,7 @@ struct ArtistDetailsView: View {
                 .bottomContentMargin()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .padding(.top, 26)
+            .padding(.top, 16)
         }
 
         // MARK: - Properties. Private
