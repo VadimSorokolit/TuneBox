@@ -649,7 +649,7 @@ final class ImportViewModel: ImportManaging {
                 songName: metadata?.title ?? fileBase,
                 duration: duration,
                 artistName: metadata?.artist ?? "",
-                albumName: metadata?.album ?? fileBase,
+                albumName: metadata?.album ?? "",
                 releaseDate: metadata?.date ?? nil,
                 download: nil,
                 waveformData: nil,

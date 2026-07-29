@@ -23,7 +23,7 @@ struct ArtistCell: View {
                 HStack(spacing: 10) {
                     Image(systemName: LibraryItem.artists.systemImage)
                         .foregroundStyle(.gray)
-                        .font(.system(size: GlobalConstants.Cell.imageSize, weight: .medium))
+                        .font(.system(size: GlobalConstants.Cell.imageSize / 2.2, weight: .medium))
                         .frame(size: GlobalConstants.Cell.imageSize)
                         .overlay {
                             RoundedRectangle(cornerRadius: GlobalConstants.Cell.imageCornerRadius)
