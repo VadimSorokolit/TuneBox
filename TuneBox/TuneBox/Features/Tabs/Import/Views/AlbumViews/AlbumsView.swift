@@ -30,8 +30,8 @@ struct AlbumsView: View {
 
                             LibrarySummaryFooter(
                                 count: library.albums.count,
-                                unitSingular: "album",
-                                unitPlural: "albums",
+                                unitSingular: String(LibraryItem.albums.rawValue.dropLast()),
+                                unitPlural: LibraryItem.albums.rawValue,
                                 duration: viewModel.tracksDuration(library.albums.flatMap(\.tracks)),
                                 size: viewModel.tracksSize(library.albums.flatMap(\.tracks)),
                                 topPadding: 10
@@ -40,14 +40,10 @@ struct AlbumsView: View {
                     }
                     .contentMargins(.bottom, 20)
                 } else {
-                    ContentUnavailableView {
-                        Image(systemName: "rectangle.stack")
-                    } description: {
-                        Text("Albums you add to your library will appear here.")
-                    }
+                    LibraryEmptyStateView(item: LibraryItem.albums)
                 }
             }
-            .navigationTitle("Albums")
+            .navigationTitle(LibraryItem.albums.rawValue.capitalized)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
     }

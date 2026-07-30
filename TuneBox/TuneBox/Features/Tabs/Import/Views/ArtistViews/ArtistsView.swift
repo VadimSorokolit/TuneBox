@@ -13,7 +13,7 @@ struct ArtistsView: View {
     // MARK: - Main Body
 
     var body: some View {
-        if let library = viewModel.library {
+        if let library = viewModel.library, library.artists.isNotEmpty {
             ScrollView(showsIndicators: false) {
                 LazyVStack(spacing: 0) {
                     ForEach(library.artists) { artist in
@@ -27,17 +27,19 @@ struct ArtistsView: View {
 
                     LibrarySummaryFooter(
                         count: library.artists.count,
-                        unitSingular: "artist",
-                        unitPlural: "artists",
+                        unitSingular: String(LibraryItem.artists.rawValue.dropLast()),
+                        unitPlural: LibraryItem.artists.rawValue,
                         duration: viewModel.tracksDuration(library.artists.flatMap(\.tracks)),
                         size: viewModel.tracksSize(library.artists.flatMap(\.tracks)),
                         topPadding: 10
                     )
                 }
             }
-            .navigationTitle("Artists")
+            .navigationTitle(LibraryItem.artists.rawValue.capitalized)
             .contentMargins(.bottom, 20)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        } else {
+            LibraryEmptyStateView(item: LibraryItem.artists)
         }
     }
 

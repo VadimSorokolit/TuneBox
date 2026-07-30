@@ -27,9 +27,9 @@ struct TracksView: View {
         Group {
             if tracks.isEmpty {
                 ContentUnavailableView {
-                    Image(systemName: "music.note.list")
+                    Image(systemName: LibraryItem.tracks.systemImage)
                 } description: {
-                    Text("Tracks you add to your library will appear here.")
+                    Text("\(LibraryItem.tracks.rawValue.capitalized) you add to your library will appear here.")
                 }
             } else {
                 List {

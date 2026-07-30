@@ -19,6 +19,18 @@ enum AudioFileExtension: String {
     case flac
     // swiftlint:disable:next identifier_name
     case wv
+    case dsf
+    case dff
+    case m4a
+    case aac
+    case aiff
+    case aif
+    case caf
+    case ape
+    case ogg
+    case opus
+    case mpc
+    case tta
 }
 
 protocol AudioServicing: AnyObject {

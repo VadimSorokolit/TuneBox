@@ -536,7 +536,11 @@ final class ImportViewModel: ImportManaging {
     private var persistenceService: PersistenceServicing
     private var tracksObservationTask: Task<Void, Never>?
     private let supportedPlaylistExtensions: Set<PlaylistExtension> = [.m3u, .m3u8]
-    private let supportedTrackExtensions: Set<AudioFileExtension> = [.mp3, .wav, .wv, .flac]
+    private let supportedTrackExtensions: Set<AudioFileExtension> = [
+        .mp3, .wav, .flac, .wv, .dsf, .dff,
+        .m4a, .aac, .aiff, .aif, .caf, .ape,
+        .ogg, .opus, .mpc, .tta
+    ]
     private enum Keys {
         static let selectedLibraryItems = "importSelectedLibraryItems"
         static let selectedSourceIDs = "importSelectedSourceIDs"
