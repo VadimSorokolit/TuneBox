@@ -54,7 +54,8 @@ struct PlaylistCell: View {
                 .padding(.trailing, 26)
         }
         .padding(.top, 5)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity)
+        .contentShape(Rectangle())
         .onTapGesture {
             onTapGesture()
         }

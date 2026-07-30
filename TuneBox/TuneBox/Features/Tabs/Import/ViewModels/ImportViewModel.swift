@@ -327,6 +327,30 @@ final class ImportViewModel: ImportManaging {
         self.sources.first { $0.id == id }
     }
 
+    func tracks(for sourceID: ImportSource.ID) -> [TrackEntity] {
+        guard let source = source(for: sourceID) else { return [] }
+
+        switch source.kind {
+            case .local, .sync:
+                return self.library?.tracks.filter {
+                    $0.importSourceID == sourceID.uuidString
+                } ?? []
+
+            case .api:
+                return self.libraryTracks(onlyAPI: true)
+        }
+    }
+
+    func sourceTracksSummary(for sourceID: ImportSource.ID) -> (count: Int, duration: Int, size: Int) {
+        let tracks = self.tracks(for: sourceID)
+
+        return (
+            tracks.count,
+            self.tracksDuration(tracks),
+            self.tracksSize(tracks)
+        )
+    }
+
     func libraryTracks(onlyAPI: Bool) -> [TrackEntity] {
         let filtered = onlyAPI
         ? library?.tracks.filter { $0.source == .api }

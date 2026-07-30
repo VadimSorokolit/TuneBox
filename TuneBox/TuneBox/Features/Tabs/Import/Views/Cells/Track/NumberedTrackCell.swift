@@ -52,6 +52,7 @@ struct NumberedTrackCell: View {
         }
         .padding(.top, 10)
         .frame(maxWidth: .infinity)
+        .contentShape(Rectangle())
         .onTapGesture {
             onTapGesture()
         }

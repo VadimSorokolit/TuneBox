@@ -46,6 +46,7 @@ struct ArtistCell: View {
                 .padding(.trailing, defaultPadding)
         }
         .padding(.top, 5)
+        .contentShape(Rectangle())
         .onTapGesture {
             onTapGesture()
         }

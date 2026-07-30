@@ -57,7 +57,8 @@ struct AlbumCell: View {
                 .padding(.trailing, defaultPadding)
         }
         .padding(.top, 5)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity)
+        .contentShape(Rectangle())
         .onTapGesture {
             onTapGesture()
         }

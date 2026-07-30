@@ -23,9 +23,23 @@ struct SourceView: View {
                 ForEach(items) { item in
                     row(for: item)
                 }
+
+                let tracks = viewModel.tracks(for: sourceID)
+                LibrarySummaryFooter(
+                    count: tracks.count,
+                    unitSingular: String(LibraryItem.tracks.rawValue.dropLast()),
+                    unitPlural: LibraryItem.tracks.rawValue,
+                    duration: viewModel.tracksDuration(tracks),
+                    size: viewModel.tracksSize(tracks),
+                    topPadding: 10
+                )
             }
         }
-        .navigationTitle(path?.components(separatedBy: "/").last ?? viewModel.source(for: sourceID)?.title ?? "Source")
+        .contentMargins(.bottom, 20)
+        .navigationTitle(
+            path?.components(separatedBy: "/").last
+            ?? viewModel.source(for: sourceID)?.title ?? ImportSection.sources.rawValue.capitalized
+        )
         .task(id: path) {
             guard let items = await viewModel.fetchfolderItems(sourceID: sourceID, path: path) else { return }
             self.items = items
@@ -60,7 +74,7 @@ struct SourceView: View {
 
             case .track:
                 sourceRow(
-                    icon: "music.note",
+                    icon: LibraryItem.tracks.systemImage,
                     title: item.url.deletingPathExtension().lastPathComponent,
                     onTapGesture: {}
                 )

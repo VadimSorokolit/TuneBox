@@ -58,6 +58,7 @@ struct TrackArtworkCell: View {
         }
         .padding(.top, 5)
         .frame(maxWidth: .infinity)
+        .contentShape(Rectangle())
         .onTapGesture {
             onTapGesture()
         }
