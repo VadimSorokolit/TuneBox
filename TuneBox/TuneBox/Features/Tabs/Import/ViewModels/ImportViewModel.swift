@@ -23,7 +23,7 @@ enum LibraryItem: String, Hashable {
     var systemImage: String {
         switch self {
             case .albums:
-                return "square.stack"
+                return "opticaldisc"
 
             case .artists:
                 return "music.mic"

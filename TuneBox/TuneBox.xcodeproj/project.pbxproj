@@ -97,7 +97,6 @@
 		5B9D45DC2FDF0B1C00F86C1B /* TracksSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9D45DB2FDF0B1B00F86C1B /* TracksSection.swift */; };
 		5B9D45DF2FDF123200F86C1B /* DownloadsPresenting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9D45DE2FDF122F00F86C1B /* DownloadsPresenting.swift */; };
 		5BA1F0012FE1000100503BA2 /* PaginationFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA1F0002FE1000000503BA2 /* PaginationFooterView.swift */; };
-		5BA48CFC3018B74500192BAF /* SwiftTagLib in Frameworks */ = {isa = PBXBuildFile; productRef = 5BA48CFB3018B74500192BAF /* SwiftTagLib */; };
 		5BA48CFE3018BDBA00192BAF /* View+bottomContentMargin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA48CFD3018BDB900192BAF /* View+bottomContentMargin.swift */; };
 		5BA581892FD6A2B800B498D7 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA581882FD6A2B700B498D7 /* SettingsViewModel.swift */; };
 		5BA5818C2FD6A33200B498D7 /* ImportViewModelV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA5818B2FD6A33000B498D7 /* ImportViewModelV1.swift */; };
@@ -112,7 +111,7 @@
 		5BC8D9042FFE96B900742822 /* AppRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D9032FFE96B800742822 /* AppRoute.swift */; };
 		5BC8D9063000ED5500742822 /* CompactPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D9053000ED4600742822 /* CompactPlayerView.swift */; };
 		5BC8D90830011ECD00742822 /* ExpandedPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D90730011EC000742822 /* ExpandedPlayerView.swift */; };
-		5BCF3F90301B7D9A003AF4AF /* SFBAudioEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 5BCF3F8F301B7D9A003AF4AF /* SFBAudioEngine */; };
+		5BCF3F93301B80AD003AF4AF /* SFBAudioEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 5BCF3F92301B80AD003AF4AF /* SFBAudioEngine */; };
 		5BD0DAF72FBF6BA000268A48 /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0DAF62FBF6B9F00268A48 /* AudioService.swift */; };
 		5BD3BF312FF56EDC006FED4B /* PlaylistEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD3BF302FF56EDB006FED4B /* PlaylistEntity.swift */; };
 		5BD3BF332FF5711D006FED4B /* PersistencePlaylistServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD3BF322FF5711C006FED4B /* PersistencePlaylistServicing.swift */; };
@@ -325,8 +324,7 @@
 				5B7E1DAD2FE2A4FA00561D67 /* SDWebImageSwiftUI in Frameworks */,
 				5B586CBD2FAC846900BCEAD2 /* Resolver in Frameworks */,
 				5B4762872FAB5C570069E41A /* RxMoya in Frameworks */,
-				5BA48CFC3018B74500192BAF /* SwiftTagLib in Frameworks */,
-				5BCF3F90301B7D9A003AF4AF /* SFBAudioEngine in Frameworks */,
+				5BCF3F93301B80AD003AF4AF /* SFBAudioEngine in Frameworks */,
 				5B4762812FAB5C570069E41A /* CombineMoya in Frameworks */,
 				5B4762852FAB5C570069E41A /* ReactiveMoya in Frameworks */,
 				5B84C01C2FAB353200ACE75A /* CustomAlerts in Frameworks */,
@@ -1108,8 +1106,7 @@
 				5B4762862FAB5C570069E41A /* RxMoya */,
 				5B586CBC2FAC846900BCEAD2 /* Resolver */,
 				5B7E1DAC2FE2A4FA00561D67 /* SDWebImageSwiftUI */,
-				5BA48CFB3018B74500192BAF /* SwiftTagLib */,
-				5BCF3F8F301B7D9A003AF4AF /* SFBAudioEngine */,
+				5BCF3F92301B80AD003AF4AF /* SFBAudioEngine */,
 			);
 			productName = TuneBox;
 			productReference = 5BD579722FAB25BF00503BA2 /* TuneBox.app */;
@@ -1193,8 +1190,7 @@
 				5B47627F2FAB5C570069E41A /* XCRemoteSwiftPackageReference "moya" */,
 				5B586CBB2FAC846900BCEAD2 /* XCRemoteSwiftPackageReference "Resolver" */,
 				5B7E1DAB2FE2A4FA00561D67 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
-				5BA48CFA3018B74500192BAF /* XCRemoteSwiftPackageReference "SwiftTagLib" */,
-				5BCF3F8E301B7D9A003AF4AF /* XCRemoteSwiftPackageReference "SFBAudioEngine" */,
+				5BCF3F91301B80AD003AF4AF /* XCRemoteSwiftPackageReference "SFBAudioEngine" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5BD579732FAB25BF00503BA2 /* Products */;
@@ -1788,17 +1784,9 @@
 				minimumVersion = 1.10.21;
 			};
 		};
-		5BA48CFA3018B74500192BAF /* XCRemoteSwiftPackageReference "SwiftTagLib" */ = {
+		5BCF3F91301B80AD003AF4AF /* XCRemoteSwiftPackageReference "SFBAudioEngine" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Anywhere-Music-Player/SwiftTagLib.cpp";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.3.2;
-			};
-		};
-		5BCF3F8E301B7D9A003AF4AF /* XCRemoteSwiftPackageReference "SFBAudioEngine" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/sbooth/SFBAudioEngine?utm_source=chatgpt.com";
+			repositoryURL = "https://github.com/sbooth/SFBAudioEngine";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 0.13.0;
@@ -1847,14 +1835,9 @@
 			package = 5B84C01A2FAB353200ACE75A /* XCRemoteSwiftPackageReference "CustomAlerts" */;
 			productName = CustomAlerts;
 		};
-		5BA48CFB3018B74500192BAF /* SwiftTagLib */ = {
+		5BCF3F92301B80AD003AF4AF /* SFBAudioEngine */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 5BA48CFA3018B74500192BAF /* XCRemoteSwiftPackageReference "SwiftTagLib" */;
-			productName = SwiftTagLib;
-		};
-		5BCF3F8F301B7D9A003AF4AF /* SFBAudioEngine */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 5BCF3F8E301B7D9A003AF4AF /* XCRemoteSwiftPackageReference "SFBAudioEngine" */;
+			package = 5BCF3F91301B80AD003AF4AF /* XCRemoteSwiftPackageReference "SFBAudioEngine" */;
 			productName = SFBAudioEngine;
 		};
 /* End XCSwiftPackageProductDependency section */

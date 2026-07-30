@@ -1,5 +1,5 @@
 {
-  "originHash" : "d8f81e392af6a995b8d06c56e5ba148218dcbeac1611003eda092368f71d0b8e",
+  "originHash" : "cac55054d7e21b0ec740b55fef55f4d07ca330ef9b9ab9103b0ae0e8dc1014ac",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -227,9 +227,9 @@
       }
     },
     {
-      "identity" : "sfbaudioengine?utm_source=chatgpt.com",
+      "identity" : "sfbaudioengine",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/sbooth/SFBAudioEngine?utm_source=chatgpt.com",
+      "location" : "https://github.com/sbooth/SFBAudioEngine",
       "state" : {
         "revision" : "5a74dde3089060bac35f0a16970d91fc8402e751",
         "version" : "0.13.0"
@@ -287,15 +287,6 @@
       "state" : {
         "revision" : "88952528a590ed366c6f76f6bfb980b5ebdcefc1",
         "version" : "0.63.2"
-      }
-    },
-    {
-      "identity" : "swifttaglib.cpp",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Anywhere-Music-Player/SwiftTagLib.cpp",
-      "state" : {
-        "revision" : "086f6170b97784be90a8456b3cda1e07f11f4ef7",
-        "version" : "1.3.2"
       }
     },
     {

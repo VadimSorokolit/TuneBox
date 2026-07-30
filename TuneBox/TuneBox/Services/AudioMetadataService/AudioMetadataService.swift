@@ -6,7 +6,7 @@
 //
 
 import AVFoundation
-import SwiftTagLib
+import SFBAudioEngine
 
 struct TrackMetadata {
     let title: String?
@@ -20,9 +20,9 @@ struct TrackMetadata {
 final class AudioMetadataService: AudioMetadataServicing {
 
     static func extractMetadata(from url: URL) async throws -> TrackMetadata {
-        let file = try AudioFile(url: url)
+        let file = try AudioFile(readingPropertiesAndMetadataFrom: url)
         let metadata = file.metadata
-        let additional = metadata.additional
+        let additional = metadata.additionalMetadata
 
         let title = Self.cleanMetadataValue(
             metadata.title
@@ -57,7 +57,7 @@ final class AudioMetadataService: AudioMetadataServicing {
             album: album,
             date: date,
             duration: file.properties.duration,
-            artwork: metadata.attachedPictures.first?.data
+            artwork: metadata.attachedPictures.first?.imageData
         )
     }
 
@@ -131,12 +131,16 @@ final class AudioMetadataService: AudioMetadataServicing {
 
     private static func additionalValue(
         for keys: [String],
-        in pairs: [AudioFile.Metadata.AdditionalMetadataPair]
+        in dict: [AnyHashable: Any]?
     ) -> String? {
+        guard let dict else { return nil }
         let wanted = Set(keys.map { $0.uppercased() })
-
-        return pairs
-            .first { wanted.contains($0.key.uppercased()) }
-            .map(\.value)
+        for (key, value) in dict {
+            guard let keyString = key as? String,
+                  wanted.contains(keyString.uppercased())
+            else { continue }
+            return "\(value)"
+        }
+        return nil
     }
 }
