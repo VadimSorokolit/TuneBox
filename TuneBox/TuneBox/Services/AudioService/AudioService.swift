@@ -2,38 +2,36 @@
 //  AudioService.swift
 //  TuneBox
 //
-//  Created by Vadim Sorokolit on 21.05.2026.
+//  Created by Vadim Sorokolit on 30.07.2026.
 //
 
 import Foundation
-import AVFoundation
 import Combine
-import os
+import SFBAudioEngine
 
-final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
+final class AudioService: NSObject, AudioServicing {
 
     // MARK: - Properties. Public
 
-    static let shared: AudioService = AudioService()
+    static let shared = AudioService()
+
     private(set) var currentTrackId: String?
     private(set) var stateChangeSubject = CurrentValueSubject<Bool, Never>(false)
     private(set) var progressSubject = PassthroughSubject<Double, Never>()
 
     var duration: TimeInterval {
-        self.mainPlayer?.duration ?? 0
+        self.player.totalTime ?? 0
     }
 
     var currentTime: TimeInterval {
-        self.mainPlayer?.currentTime ?? 0
+        self.player.currentTime ?? 0
     }
 
     var volume: Float {
-        get {
-            self.storedVolume
-        }
+        get { self.storedVolume }
         set {
             self.storedVolume = self.clampVolume(newValue)
-            self.mainPlayer?.volume = self.storedVolume
+            self.applyVolume()
         }
     }
 
@@ -41,66 +39,47 @@ final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
 
     private override init() {
         super.init()
-
+        self.player.delegate = self
         self.configureAudioSession()
-        self.setupAudioSessionObservers()
     }
 
     // MARK: - Methods. Public
 
     func play(trackId: String, url: URL, loop: Bool = false) {
-        stopMainPlayer()
-        currentTrackId = trackId
+        self.stopProgressTimer()
+        self.currentTrackId = trackId
+        self.shouldLoop = loop
+        self.loopURL = loop ? url : nil
 
-        let volume = storedVolume
-
-        DispatchQueue.global(qos: .userInitiated).async {
-            do {
-                let player = try AVAudioPlayer(contentsOf: url)
-                player.prepareToPlay()
-                player.numberOfLoops = loop ? -1 : 0
-                player.volume = volume
-
-                DispatchQueue.main.async {
-                    do {
-                        try AVAudioSession.sharedInstance().setActive(true)
-                    } catch {
-                        AppLogger.audio.error("Failed to activate session: \(error)")
-                    }
-
-                    player.delegate = self
-                    self.mainPlayer = player
-                    player.play()
-
-                    self.notifyStateChange(true)
-                    self.startProgressTimer()
-                }
-            } catch {
-                AppLogger.audio.error("Failed to play audio: \(String(describing: error))")
-            }
+        do {
+            try self.player.play(url)
+            self.applyVolume()
+            self.notifyStateChange(true)
+            self.startProgressTimer()
+        } catch {
+            AppLogger.audio.error("Failed to play audio: \(error.localizedDescription)")
+            self.notifyStateChange(false)
         }
     }
 
     func pause() {
-        self.mainPlayer?.pause()
+        _ = self.player.pause()
         self.stopProgressTimer()
         self.notifyStateChange(false)
     }
 
     func resume() {
-        guard let player = self.mainPlayer else {
-            return
-        }
-
-        player.play()
+        guard self.player.resume() else { return }
         self.startProgressTimer()
         self.notifyStateChange(true)
     }
 
     func stop() {
-        self.stopMainPlayer()
+        self.player.stop()
         self.stopProgressTimer()
         self.currentTrackId = nil
+        self.shouldLoop = false
+        self.loopURL = nil
         self.notifyStateChange(false)
         self.notifyProgress(0)
     }
@@ -108,23 +87,20 @@ final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
     func toggle(trackId: String, url: URL, loop: Bool = false) {
         if self.currentTrackId != trackId {
             self.play(trackId: trackId, url: url, loop: loop)
-
             return
         }
 
-        guard let player = self.mainPlayer else {
+        if self.player.isStopped {
             self.play(trackId: trackId, url: url, loop: loop)
-
             return
         }
 
-        if self.isNearEnd(player) {
+        if self.isNearEnd {
             self.stop()
-
             return
         }
 
-        if self.stateChangeSubject.value == true {
+        if self.player.isPlaying {
             self.pause()
         } else {
             self.resume()
@@ -132,120 +108,77 @@ final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
     }
 
     func seek(by deltaSeconds: TimeInterval) {
-        guard let player = self.mainPlayer, player.duration > 0 else {
-            return
+        guard self.duration > 0 else { return }
+
+        if deltaSeconds >= 0 {
+            _ = self.player.seek(forward: deltaSeconds)
+        } else {
+            _ = player.seek(backward: abs(deltaSeconds))
         }
 
-        let newTime = max(0, min(player.duration, player.currentTime + deltaSeconds))
-        player.currentTime = newTime
-
-        self.notifyProgress(newTime / player.duration)
+        self.notifyProgress(progressValue)
     }
 
     func seek(to progress: Double) {
-        guard let player = self.mainPlayer, player.duration > 0 else {
-            return
-        }
-
+        guard self.duration > 0 else { return }
         let clamped = min(max(progress, 0), 1)
-        player.currentTime = clamped * player.duration
-
+        _ = self.player.seek(position: clamped)
         self.notifyProgress(clamped)
     }
 
     func playEffect(name: String, ext: AudioFileExtension = .mp3) {
         guard let url = Bundle.main.url(forResource: name, withExtension: ext.rawValue) else {
             AppLogger.audio.error("Effect file not found: \(name).\(ext.rawValue)")
-
             return
         }
 
-        self.effectPlayer?.stop()
-        self.effectPlayer = nil
-
         do {
-            let player = try AVAudioPlayer(contentsOf: url)
-            player.prepareToPlay()
-            player.play()
-
-            self.effectPlayer = player
+            try self.effectPlayer.play(url)
         } catch {
-            AppLogger.audio.error("Failed to play effect: \(String(describing: error))")
-        }
-    }
-
-    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        guard player === self.mainPlayer else {
-            return
-        }
-
-        self.stop()
-    }
-
-    func configureAudioSession() {
-        do {
-            let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
-            try session.setActive(true)
-        } catch {
-            AppLogger.audio.error("Failed to configure audio session: \(String(describing: error))")
+            AppLogger.audio.error("Failed to play effect: \(error.localizedDescription)")
         }
     }
 
     // MARK: - Properties. Private
 
-    private var mainPlayer: AVAudioPlayer?
-    private var effectPlayer: AVAudioPlayer?
+    private let player = AudioPlayer()
+    private let effectPlayer = AudioPlayer()
     private var progressTimer: Timer?
     private var storedVolume: Float = 1.0
+    private var shouldLoop = false
+    private var loopURL: URL?
+
     private static let progressInterval: TimeInterval = 0.1
     private static let endThreshold: TimeInterval = 0.05
 
+    private var progressValue: Double {
+        guard self.duration > 0 else { return 0 }
+        return self.currentTime / self.duration
+    }
+
+    private var isNearEnd: Bool {
+        guard self.duration > 0 else { return false }
+        return (self.duration - self.currentTime) <= Self.endThreshold
+    }
+
     // MARK: - Methods. Private
 
-    private func setupAudioSessionObservers() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(self.handleAudioInterruption),
-            name: AVAudioSession.interruptionNotification,
-            object: AVAudioSession.sharedInstance()
-        )
-
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(self.handleAudioRouteChange),
-            name: AVAudioSession.routeChangeNotification,
-            object: AVAudioSession.sharedInstance()
-        )
-    }
-
-    private func stopMainPlayer() {
-        self.mainPlayer?.stop()
-        self.mainPlayer = nil
-    }
-
-    private func isNearEnd(_ player: AVAudioPlayer) -> Bool {
-        (player.duration - player.currentTime) <= Self.endThreshold
+    private func configureAudioSession() {
+        do {
+            let session = AVAudioSession.sharedInstance()
+            try session.setCategory(.playback, mode: .default)
+            try session.setActive(true)
+        } catch {
+            AppLogger.audio.error("Failed to configure audio session: \(error.localizedDescription)")
+        }
     }
 
     private func startProgressTimer() {
         self.stopProgressTimer()
-
-        let timer = Timer(
-            timeInterval: Self.progressInterval,
-            repeats: true
-        ) { [weak self] _ in
-            guard let self = self,
-                  let player = self.mainPlayer,
-                  player.duration > 0,
-                  self.stateChangeSubject.value  == true
-            else {
-                return
-            }
-
-            self.notifyProgress(player.currentTime / player.duration)
+        let timer = Timer(timeInterval: Self.progressInterval, repeats: true) { [weak self] _ in
+            guard let self, self.player.isPlaying, self.duration > 0 else { return }
+            self.notifyProgress(self.progressValue)
         }
-
         self.progressTimer = timer
         RunLoop.main.add(timer, forMode: .common)
     }
@@ -271,38 +204,43 @@ final class AudioService: NSObject, AudioServicing, AVAudioPlayerDelegate {
         max(0, min(1, value))
     }
 
-    @objc
-    private func handleAudioInterruption(_ notification: Notification) {
-        guard
-            let typeValue = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt,
-            let type = AVAudioSession.InterruptionType(rawValue: typeValue)
-        else {
-            return
+    private func applyVolume() {
+        self.player.modifyProcessingGraph { engine in
+            engine.mainMixerNode.outputVolume = self.storedVolume
         }
+    }
+}
 
-        switch type {
-            case .began:
-                self.pause()
+// MARK: - AudioPlayer.Delegate
 
-            case .ended:
-                break
+extension AudioService: AudioPlayer.Delegate {
+
+    func audioPlayer(_ audioPlayer: AudioPlayer, playbackStateChanged playbackState: AudioPlayer.PlaybackState) {
+        switch playbackState {
+            case .playing:
+                self.notifyStateChange(true)
+                self.startProgressTimer()
+
+            case .paused, .stopped:
+                self.notifyStateChange(false)
+                self.stopProgressTimer()
 
             @unknown default:
                 break
         }
     }
 
-    @objc
-    private func handleAudioRouteChange(_ notification: Notification) {
-        guard
-            let reasonValue = notification.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt,
-            let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue)
-        else {
+    func audioPlayerEndOfAudio(_ audioPlayer: AudioPlayer) {
+        if self.shouldLoop, let loopURL, let trackId = currentTrackId {
+            self.play(trackId: trackId, url: loopURL, loop: true)
             return
         }
-
-        if reason == .oldDeviceUnavailable {
-            self.pause()
-        }
+        self.stop()
     }
+
+    func audioPlayer(_ audioPlayer: AudioPlayer, encounteredError error: any Error) {
+        AppLogger.audio.error("SFB player error: \(error.localizedDescription)")
+        self.stop()
+    }
+
 }
