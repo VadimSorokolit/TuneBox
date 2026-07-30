@@ -805,7 +805,6 @@
 			isa = PBXGroup;
 			children = (
 				5B0BC2AB300659EA00E8F2A5 /* ImportViewModel.swift */,
-				5BA5818B2FD6A33000B498D7 /* ImportViewModelV1.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -817,6 +816,15 @@
 				5BC8D9032FFE96B800742822 /* AppRoute.swift */,
 			);
 			path = Navigation;
+			sourceTree = "<group>";
+		};
+		5BCF3F94301B934C003AF4AF /* Outdated */ = {
+			isa = PBXGroup;
+			children = (
+				5BA5818B2FD6A33000B498D7 /* ImportViewModelV1.swift */,
+				5B0BC2A230051A7100E8F2A5 /* ImportTracksViewV1.swift */,
+			);
+			path = Outdated;
 			sourceTree = "<group>";
 		};
 		5BD0DAF82FBF6C4A00268A48 /* AudioService */ = {
@@ -871,6 +879,7 @@
 				5BD579A82FAB26F800503BA2 /* Services */,
 				5B8382922FC4C6A9003625CD /* Common */,
 				5BD579A72FAB26C800503BA2 /* Resources */,
+				5BCF3F94301B934C003AF4AF /* Outdated */,
 				5BD579AA2FAB275400503BA2 /* SupportingFiles */,
 			);
 			path = TuneBox;
@@ -992,7 +1001,6 @@
 				5BC8D90730011EC000742822 /* ExpandedPlayerView.swift */,
 				5BDA04C7300A5DA700C7B763 /* SourceView.swift */,
 				5BC8D9053000ED4600742822 /* CompactPlayerView.swift */,
-				5B0BC2A230051A7100E8F2A5 /* ImportTracksViewV1.swift */,
 				5B0BC2AF3006636A00E8F2A5 /* ImportsView.swift */,
 			);
 			path = Views;
