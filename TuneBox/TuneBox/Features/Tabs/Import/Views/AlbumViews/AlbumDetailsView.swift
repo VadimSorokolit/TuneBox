@@ -69,18 +69,17 @@ struct AlbumDetailsView: View {
                 }
             }
             .safeAreaInset(edge: .bottom) {
-                    if selectedTrack != nil {
+                    if let track = selectedTrack {
                         CompactPlayerView(
-                            track: selectedTrack,
-                            isPlaying: selectedTrack.map { playerViewModel.isPlaying($0) } ?? false,
+                            track: playerViewModel.track,
+                            isPlaying: playerViewModel.isPlaying,
                             progress: playerViewModel.progress,
                             onRewindTap: {
-                                AudioService.shared.seek(by: -10)
+                                playerViewModel.seek(by: -10)
                             }, onPlayPauseTap: {
-                                guard let track = selectedTrack else { return }
                                 playerViewModel.handlePlayAction(for: track)
                             }, onForwardTap: {
-                                AudioService.shared.seek(by: 10)
+                                playerViewModel.seek(by: 10)
                             },
                             onProgressTap: {
                                 isShowingExpandedPlayer = true
