@@ -89,6 +89,7 @@
 		5B88609E2FAE184C0056BE9A /* GlobalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B88609D2FAE18450056BE9A /* GlobalConstants.swift */; };
 		5B8860A52FB1CF910056BE9A /* NotificationNames+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8860A42FB1CF900056BE9A /* NotificationNames+Extension.swift */; };
 		5B899F782FCF13A8002D3232 /* RootTabsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B899F772FCF13A8002D3232 /* RootTabsView.swift */; };
+		5B970E0B301CDA88006E674C /* SFBAudioEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 5B970E0A301CDA88006E674C /* SFBAudioEngine */; };
 		5B992F5230090FE400276008 /* SegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B992F5130090FE200276008 /* SegmentedControl.swift */; };
 		5B992F54300913E800276008 /* View+segmentTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B992F53300913E700276008 /* View+segmentTransition.swift */; };
 		5B9C3DFA2FD03DA400138645 /* TrackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9C3DF92FD03DA300138645 /* TrackCell.swift */; };
@@ -111,7 +112,6 @@
 		5BC8D9042FFE96B900742822 /* AppRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D9032FFE96B800742822 /* AppRoute.swift */; };
 		5BC8D9063000ED5500742822 /* CompactPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D9053000ED4600742822 /* CompactPlayerView.swift */; };
 		5BC8D90830011ECD00742822 /* ExpandedPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D90730011EC000742822 /* ExpandedPlayerView.swift */; };
-		5BCF3F93301B80AD003AF4AF /* SFBAudioEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 5BCF3F92301B80AD003AF4AF /* SFBAudioEngine */; };
 		5BCF3F96301BBA41003AF4AF /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCF3F95301BBA40003AF4AF /* AudioService.swift */; };
 		5BCF3F98301BCC52003AF4AF /* LibraryEmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCF3F97301BCC51003AF4AF /* LibraryEmptyStateView.swift */; };
 		5BCF3F9A301BE807003AF4AF /* WaveformServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCF3F99301BE805003AF4AF /* WaveformServicing.swift */; };
@@ -330,9 +330,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				5B7E1DAD2FE2A4FA00561D67 /* SDWebImageSwiftUI in Frameworks */,
+				5B970E0B301CDA88006E674C /* SFBAudioEngine in Frameworks */,
 				5B586CBD2FAC846900BCEAD2 /* Resolver in Frameworks */,
 				5B4762872FAB5C570069E41A /* RxMoya in Frameworks */,
-				5BCF3F93301B80AD003AF4AF /* SFBAudioEngine in Frameworks */,
 				5B4762812FAB5C570069E41A /* CombineMoya in Frameworks */,
 				5B4762852FAB5C570069E41A /* ReactiveMoya in Frameworks */,
 				5B84C01C2FAB353200ACE75A /* CustomAlerts in Frameworks */,
@@ -1134,7 +1134,7 @@
 				5B4762862FAB5C570069E41A /* RxMoya */,
 				5B586CBC2FAC846900BCEAD2 /* Resolver */,
 				5B7E1DAC2FE2A4FA00561D67 /* SDWebImageSwiftUI */,
-				5BCF3F92301B80AD003AF4AF /* SFBAudioEngine */,
+				5B970E0A301CDA88006E674C /* SFBAudioEngine */,
 			);
 			productName = TuneBox;
 			productReference = 5BD579722FAB25BF00503BA2 /* TuneBox.app */;
@@ -1218,7 +1218,7 @@
 				5B47627F2FAB5C570069E41A /* XCRemoteSwiftPackageReference "moya" */,
 				5B586CBB2FAC846900BCEAD2 /* XCRemoteSwiftPackageReference "Resolver" */,
 				5B7E1DAB2FE2A4FA00561D67 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
-				5BCF3F91301B80AD003AF4AF /* XCRemoteSwiftPackageReference "SFBAudioEngine" */,
+				5B970E09301CDA88006E674C /* XCRemoteSwiftPackageReference "SFBAudioEngine" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5BD579732FAB25BF00503BA2 /* Products */;
@@ -1816,12 +1816,12 @@
 				minimumVersion = 1.10.21;
 			};
 		};
-		5BCF3F91301B80AD003AF4AF /* XCRemoteSwiftPackageReference "SFBAudioEngine" */ = {
+		5B970E09301CDA88006E674C /* XCRemoteSwiftPackageReference "SFBAudioEngine" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/sbooth/SFBAudioEngine";
+			repositoryURL = "https://github.com/martonfarago/SFBAudioEngine.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.13.0;
+				branch = main;
+				kind = branch;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -1867,9 +1867,9 @@
 			package = 5B84C01A2FAB353200ACE75A /* XCRemoteSwiftPackageReference "CustomAlerts" */;
 			productName = CustomAlerts;
 		};
-		5BCF3F92301B80AD003AF4AF /* SFBAudioEngine */ = {
+		5B970E0A301CDA88006E674C /* SFBAudioEngine */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 5BCF3F91301B80AD003AF4AF /* XCRemoteSwiftPackageReference "SFBAudioEngine" */;
+			package = 5B970E09301CDA88006E674C /* XCRemoteSwiftPackageReference "SFBAudioEngine" */;
 			productName = SFBAudioEngine;
 		};
 /* End XCSwiftPackageProductDependency section */
