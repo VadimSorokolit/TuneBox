@@ -10,159 +10,173 @@ import Combine
 import SFBAudioEngine
 
 final class AudioService: NSObject, AudioServicing {
-
+    
     // MARK: - Properties. Public
-
+    
     static let shared = AudioService()
-
+    
     private(set) var currentTrackId: String?
     private(set) var stateChangeSubject = CurrentValueSubject<Bool, Never>(false)
     private(set) var progressSubject = PassthroughSubject<Double, Never>()
-
+    
     var duration: TimeInterval {
         self.player.totalTime ?? 0
     }
-
+    
     var currentTime: TimeInterval {
         self.player.currentTime ?? 0
     }
-
+    
     var volume: Float {
         get { self.storedVolume }
         set {
             self.storedVolume = self.clampVolume(newValue)
+            guard !self.isDoPPlayback else { return }
             self.applyVolume()
         }
     }
-
     // MARK: - Initializer
-
+    
     private override init() {
         super.init()
         self.player.delegate = self
         self.configureAudioSession()
     }
-
+    
     // MARK: - Methods. Public
-
+    
     func play(trackId: String, url: URL, loop: Bool = false) {
         self.stopProgressTimer()
         self.currentTrackId = trackId
         self.shouldLoop = loop
         self.loopURL = loop ? url : nil
-
+        
         do {
-            try self.player.play(url)
+            let ext = url.pathExtension.lowercased()
+            let isDSD = ext == AudioFileExtension.dsf.rawValue
+                || ext == AudioFileExtension.dff.rawValue
+            if isDSD {
+                let decoder = try DoPDecoder(url: url)
+                try decoder.open()
+                try self.player.play(decoder)
+                self.isDoPPlayback = true
+            } else {
+                try self.player.play(url)
+                self.isDoPPlayback = false
+            }
             self.applyVolume()
             self.notifyStateChange(true)
             self.startProgressTimer()
         } catch {
             AppLogger.audio.error("Failed to play audio: \(error.localizedDescription)")
             self.notifyStateChange(false)
+            self.isDoPPlayback = false
         }
     }
-
+    
     func pause() {
         _ = self.player.pause()
         self.stopProgressTimer()
         self.notifyStateChange(false)
     }
-
+    
     func resume() {
         guard self.player.resume() else { return }
         self.startProgressTimer()
         self.notifyStateChange(true)
     }
-
+    
     func stop() {
         self.player.stop()
         self.stopProgressTimer()
         self.currentTrackId = nil
+        self.isDoPPlayback = false
         self.shouldLoop = false
         self.loopURL = nil
         self.notifyStateChange(false)
         self.notifyProgress(0)
     }
-
+    
     func toggle(trackId: String, url: URL, loop: Bool = false) {
         if self.currentTrackId != trackId {
             self.play(trackId: trackId, url: url, loop: loop)
             return
         }
-
+        
         if self.player.isStopped {
             self.play(trackId: trackId, url: url, loop: loop)
             return
         }
-
+        
         if self.isNearEnd {
             self.stop()
             return
         }
-
+        
         if self.player.isPlaying {
             self.pause()
         } else {
             self.resume()
         }
     }
-
+    
     func seek(by deltaSeconds: TimeInterval) {
         guard self.duration > 0 else { return }
-
+        
         if deltaSeconds >= 0 {
             _ = self.player.seek(forward: deltaSeconds)
         } else {
             _ = player.seek(backward: abs(deltaSeconds))
         }
-
+        
         self.notifyProgress(progressValue)
     }
-
+    
     func seek(to progress: Double) {
         guard self.duration > 0 else { return }
         let clamped = min(max(progress, 0), 1)
         _ = self.player.seek(position: clamped)
         self.notifyProgress(clamped)
     }
-
+    
     func playEffect(name: String, ext: AudioFileExtension = .mp3) {
         guard let url = Bundle.main.url(forResource: name, withExtension: ext.rawValue) else {
             AppLogger.audio.error("Effect file not found: \(name).\(ext.rawValue)")
             return
         }
-
+        
         do {
             try self.effectPlayer.play(url)
         } catch {
             AppLogger.audio.error("Failed to play effect: \(error.localizedDescription)")
         }
     }
-
+    
     // MARK: - Properties. Private
-
+    
     private let player = AudioPlayer()
     private let effectPlayer = AudioPlayer()
     private var progressTimer: Timer?
     private var storedVolume: Float = 1.0
+    private var isDoPPlayback = false
     private var shouldLoop = false
     private var loopURL: URL?
-
+    
     private static let progressInterval: TimeInterval = 0.1
     private static let endThreshold: TimeInterval = 0.05
-
+    
     private var progressValue: Double {
         guard self.duration > 0 else { return 0 }
         return self.currentTime / self.duration
     }
-
+    
     private var isNearEnd: Bool {
         guard self.duration > 0 else { return false }
         return (self.duration - self.currentTime) <= Self.endThreshold
     }
-
+    
     // MARK: - Methods. Private
-
+    
     private func configureAudioSession() {
         do {
             let session = AVAudioSession.sharedInstance()
@@ -172,7 +186,7 @@ final class AudioService: NSObject, AudioServicing {
             AppLogger.audio.error("Failed to configure audio session: \(error.localizedDescription)")
         }
     }
-
+    
     private func startProgressTimer() {
         self.stopProgressTimer()
         let timer = Timer(timeInterval: Self.progressInterval, repeats: true) { [weak self] _ in
@@ -182,31 +196,32 @@ final class AudioService: NSObject, AudioServicing {
         self.progressTimer = timer
         RunLoop.main.add(timer, forMode: .common)
     }
-
+    
     private func stopProgressTimer() {
         self.progressTimer?.invalidate()
         self.progressTimer = nil
     }
-
+    
     private func notifyStateChange(_ playing: Bool) {
         DispatchQueue.main.async {
             self.stateChangeSubject.send(playing)
         }
     }
-
+    
     private func notifyProgress(_ progress: Double) {
         DispatchQueue.main.async {
             self.progressSubject.send(progress)
         }
     }
-
+    
     private func clampVolume(_ value: Float) -> Float {
         max(0, min(1, value))
     }
-
+    
     private func applyVolume() {
+        let volume = self.isDoPPlayback ? 1.0 : self.storedVolume
         self.player.modifyProcessingGraph { engine in
-            engine.mainMixerNode.outputVolume = self.storedVolume
+            engine.mainMixerNode.outputVolume = volume
         }
     }
 }
