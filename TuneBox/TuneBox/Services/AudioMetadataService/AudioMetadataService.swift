@@ -30,8 +30,8 @@ final class AudioMetadataService: AudioMetadataServicing {
         )
 
         let artist = Self.cleanMetadataValue(
-            metadata.artist
-            ?? metadata.albumArtist
+            metadata.artist?.first
+            ?? metadata.albumArtist?.first
             ?? Self.additionalValue(
                 for: ["ARTIST", "ALBUMARTIST", "ALBUM ARTIST", "PERFORMER"],
                 in: additional
