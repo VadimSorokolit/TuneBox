@@ -41,6 +41,7 @@ struct ArtistDetailsView: View {
                 } else {
                     ChipsView(
                         viewModel: viewModel,
+                        playerViewModel: playerViewModel,
                         artist: artist
                     )
                 }
@@ -58,6 +59,7 @@ struct ArtistDetailsView: View {
     // MARK: - Properties. Private
 
     @Injected private var viewModel: ImportManaging
+    @Injected private var playerViewModel: PlayerManaging
 
     // MARK: - Private. Objects
 
@@ -66,6 +68,7 @@ struct ArtistDetailsView: View {
         // MARK: - Properties. Public
 
         let viewModel: ImportManaging
+        let playerViewModel: PlayerManaging
         let artist: MusicLibrary.Artist
 
         // MARK: - Body
@@ -101,7 +104,7 @@ struct ArtistDetailsView: View {
                     }
                     .animation(.easeInOut(duration: 0.25), value: selected)
                 }
-                .bottomContentMargin()
+                .bottomContentMargin(40, isPlayerVisible: playerViewModel.track != nil)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .padding(.top, 16)

@@ -35,7 +35,7 @@ struct SourceView: View {
                 )
             }
         }
-        .contentMargins(.bottom, 20)
+        .bottomContentMargin(isPlayerVisible: playerViewModel.track != nil)
         .navigationTitle(
             path?.components(separatedBy: "/").last
             ?? viewModel.source(for: sourceID)?.title ?? ImportSection.sources.rawValue.capitalized
@@ -50,6 +50,8 @@ struct SourceView: View {
 
     @Environment(AppCoordinator.self) private var coordinator
     @Injected private var viewModel: ImportManaging
+    @Injected private var playerViewModel: PlayerManaging
+
     @State private var items: [SourceFolderItem] = []
 
     // MARK: - Methods. Private

@@ -34,7 +34,8 @@ struct DownloadsView: View {
             )
 
             ContentView(
-                viewModel: viewModel
+                viewModel: viewModel,
+                playerViewModel: playerViewModel
             )
         }
         .frame(maxWidth: .infinity,
@@ -65,6 +66,7 @@ struct DownloadsView: View {
     // MARK: - Properties. Private
 
     @Injected private var viewModel: DownloadsPresenting
+    @Injected private var playerViewModel: PlayerManaging
     @FocusState private var isSearchFieldFocused: Bool
     @State private var searchQuery: String = ""
 
@@ -129,6 +131,7 @@ struct DownloadsView: View {
 
     private struct ContentView: View {
         let viewModel: DownloadsPresenting
+        let playerViewModel: PlayerManaging
 
         var body: some View {
             ScrollView(showsIndicators: false) {
@@ -151,7 +154,7 @@ struct DownloadsView: View {
                 }
             }
             .padding(.top, 5)
-            .contentMargins(.bottom, 20)
+            .bottomContentMargin(10, isPlayerVisible: playerViewModel.track != nil)
             .modifier(EmptyTracksStateModifier(showsEmptyState: viewModel.showsEmptyState))
         }
 

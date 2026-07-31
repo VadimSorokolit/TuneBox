@@ -13,7 +13,6 @@ struct NumberedTrackCell: View {
 
     let index: Int
     let track: TrackEntity
-    let isPlaying: Bool
     let onTapGesture: () -> Void
 
     // MARK: - Main Body
@@ -74,7 +73,6 @@ struct NumberedTrackCell: View {
             waveformData: nil,
             size: 5_242_880
         ),
-        isPlaying: false,
         onTapGesture: {}
     )
 }

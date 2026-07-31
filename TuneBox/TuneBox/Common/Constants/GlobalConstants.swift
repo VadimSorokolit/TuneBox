@@ -14,6 +14,7 @@ enum GlobalConstants {
 
     enum Screen {
         static let regularWidth: CGFloat = 393
+        static let defaultBottomPadding: CGFloat = 60
     }
 
     enum UserDefaultsKey {

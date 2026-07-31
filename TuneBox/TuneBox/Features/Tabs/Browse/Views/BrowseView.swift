@@ -29,7 +29,8 @@ struct BrowseView: View {
 
             ContentView(
                 slideDirection: $slideDirection,
-                viewModel: viewModel
+                viewModel: viewModel,
+                playerViewModel: playerViewModel
             )
         }
         .frame(maxWidth: .infinity,
@@ -55,6 +56,7 @@ struct BrowseView: View {
     // MARK: - Properties. Private
 
     @Injected private var viewModel: TransferManaging
+    @Injected private var playerViewModel: PlayerManaging
     @FocusState private var isSearchFieldFocused: Bool
     @State private var slideDirection: SlideDirection = .forward
     @State private var searchQuery: String = ""
@@ -104,6 +106,7 @@ struct BrowseView: View {
     private struct ContentView: View {
         @Binding var slideDirection: SlideDirection
         let viewModel: TransferManaging
+        let playerViewModel: PlayerManaging
 
         private let headerLeadingPadding: CGFloat = 26
 
@@ -144,7 +147,7 @@ struct BrowseView: View {
                 }
             }
             .padding(.top, 10)
-            .contentMargins(.bottom, 20)
+            .bottomContentMargin(10, isPlayerVisible: playerViewModel.track != nil)
             .refreshable {
                 await viewModel.refreshBrowse()
             }
@@ -180,7 +183,7 @@ struct BrowseView: View {
 
                             if viewModel.isPaginationSearchLoading {
                                 SpinnerView(size: .regular)
-                                    .padding(.top, 8)
+                                    .padding(.vertical, 10)
                             }
 
                             PaginationFooterView(
@@ -225,7 +228,7 @@ struct BrowseView: View {
 
                                     if viewModel.isPaginationGenreLoading {
                                         SpinnerView(size: .regular)
-                                            .padding(.leading, 8)
+                                            .padding(.vertical, 10)
                                     }
 
                                     PaginationFooterView(
@@ -280,7 +283,7 @@ struct BrowseView: View {
 
                             if viewModel.isPaginationPopularLoading {
                                 SpinnerView(size: .regular)
-                                    .padding(.top, 8)
+                                    .padding(.vertical, 10)
                             }
 
                             PaginationFooterView(

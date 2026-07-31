@@ -78,7 +78,7 @@ struct TracksView: View {
                 }
                 .listStyle(.plain)
                 .environment(\.defaultMinListRowHeight, 1)
-                .contentMargins(.bottom, 20)
+                .bottomContentMargin(isPlayerVisible: playerViewModel.track != nil)
             }
         }
         .navigationTitle(navigationTitle)
@@ -96,6 +96,7 @@ struct TracksView: View {
     // MARK: - Properties. Private
 
     @Injected private var viewModel: ImportManaging
+    @Injected private var playerViewModel: PlayerManaging
 
     private var tracks: [TrackEntity] {
         switch content {

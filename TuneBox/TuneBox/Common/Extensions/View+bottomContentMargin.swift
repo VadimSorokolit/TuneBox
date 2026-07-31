@@ -9,8 +9,16 @@ import SwiftUI
 
 extension View {
 
-    func bottomContentMargin(_ value: CGFloat = 40) -> some View {
-        contentMargins(.bottom, value)
+    func bottomContentMargin(
+        _ base: CGFloat = 20,
+        isPlayerVisible: Bool
+    ) -> some View {
+        contentMargins(
+            .bottom,
+            isPlayerVisible
+            ? GlobalConstants.Screen.defaultBottomPadding + base
+            : base
+        )
     }
 
 }

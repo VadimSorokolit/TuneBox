@@ -30,26 +30,26 @@ struct AlbumDetailsView: View {
                             NumberedTrackCell(
                                 index: index + 1,
                                 track: track,
-                                isPlaying: selectedTrack == track,
                                 onTapGesture: {
-                                    selectedTrack = track
                                     playerViewModel.handlePlayAction(for: track)
                                 }
                             )
                         }
+
+                        LibrarySummaryFooter(
+                            count: album.tracks.count,
+                            unitSingular: "track",
+                            unitPlural: "tracks",
+                            duration: viewModel.tracksDuration(album.tracks),
+                            size: viewModel.tracksSize(album.tracks),
+                            topPadding: 10
+                        )
                     }
 
-                    LibrarySummaryFooter(
-                        count: album.tracks.count,
-                        unitSingular: "track",
-                        unitPlural: "tracks",
-                        duration: viewModel.tracksDuration(album.tracks),
-                        size: viewModel.tracksSize(album.tracks),
-                    )
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .contentMargins(.bottom, 20)
+            .bottomContentMargin(isPlayerVisible: playerViewModel.track != nil)
             .contentMargins(.top, 20)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -68,30 +68,6 @@ struct AlbumDetailsView: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                 }
             }
-            .safeAreaInset(edge: .bottom) {
-                    if let track = selectedTrack {
-                        CompactPlayerView(
-                            track: playerViewModel.track,
-                            isPlaying: playerViewModel.isPlaying,
-                            progress: playerViewModel.progress,
-                            onRewindTap: {
-                                playerViewModel.seek(by: -10)
-                            }, onPlayPauseTap: {
-                                playerViewModel.handlePlayAction(for: track)
-                            }, onForwardTap: {
-                                playerViewModel.seek(by: 10)
-                            },
-                            onProgressTap: {
-                                isShowingExpandedPlayer = true
-                            }
-                        )
-                        .padding(.bottom, 20)
-                    }
-            }
-            .sheet(isPresented: $isShowingExpandedPlayer) {
-                Text("Expanded player")
-            }
-            .animation(.easeInOut(duration: 0.25), value: isShowingExpandedPlayer)
         }
     }
 
@@ -99,6 +75,4 @@ struct AlbumDetailsView: View {
 
     @Injected private var viewModel: ImportManaging
     @Injected private var playerViewModel: PlayerManaging
-    @State private var isShowingExpandedPlayer: Bool = false
-    @State private var selectedTrack: TrackEntity?
 }

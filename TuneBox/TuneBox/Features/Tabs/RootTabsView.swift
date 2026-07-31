@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Resolver
 
 enum CustomTab: String, Hashable, Identifiable, CaseIterable {
     case browse
@@ -56,18 +57,45 @@ struct RootTabsView: View {
         ZStack(alignment: .bottom) {
             content
 
+            if let track = playerViewModel.track {
+                CompactPlayerView(
+                    track: playerViewModel.track,
+                    isPlaying: playerViewModel.isPlaying,
+                    progress: playerViewModel.progress,
+                    onRewindTap: {
+                        playerViewModel.seek(by: -10)
+                    }, onPlayPauseTap: {
+                        playerViewModel.handlePlayAction(for: track)
+                    }, onForwardTap: {
+                        playerViewModel.seek(by: 10)
+                    },
+                    onProgressTap: {
+                        isShowingExpandedPlayer = true
+                    }
+                )
+                .padding(.bottom, tabBarHeight)
+            }
+
             tabBar
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
         .navigationBarBackButtonHidden(true)
+        .sheet(isPresented: $isShowingExpandedPlayer) {
+            Text("Expanded player")
+        }
+        .animation(.easeInOut(duration: 0.25), value: isShowingExpandedPlayer)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
     }
 
     // MARK: - Properties. Private
 
+    @Injected private var playerViewModel: PlayerManaging
     @Environment(\.themeManager) private var theme
     @Environment(AppCoordinator.self) private var coordinator
     @AppStorage("startTab") private var startTab = CustomTab.browse.rawValue
+    @State private var isShowingExpandedPlayer: Bool = false
+
+    private let tabBarHeight: CGFloat = 60
 
     private var content: some View {
         TabView(selection: Bindable(coordinator).selectedTab) {
@@ -122,21 +150,23 @@ struct RootTabsView: View {
     }
 
     private var tabBar: some View {
-        HStack(spacing: 10) {
-            ForEach(CustomTab.allCases) { tab in
-                TabItemView(
-                    tab: tab,
-                    isSelected: coordinator.selectedTab == tab,
-                    activeColor: theme.tokens.tabIconActive,
-                    inactiveColor: theme.tokens.tabIconInactive,
-                    onTap: {
-                        coordinator.switchToTab(tab)
-                    }
-                )
+        ZStack(alignment: .top) {
+            HStack(spacing: 10) {
+                ForEach(CustomTab.allCases) { tab in
+                    TabItemView(
+                        tab: tab,
+                        isSelected: coordinator.selectedTab == tab,
+                        activeColor: theme.tokens.tabIconActive,
+                        inactiveColor: theme.tokens.tabIconInactive,
+                        onTap: {
+                            coordinator.switchToTab(tab)
+                        }
+                    )
+                }
             }
         }
         .padding(.horizontal, 6)
-        .frame(height: 60)
+        .frame(height: tabBarHeight)
         .background(tabBarBackground)
     }
 
@@ -149,6 +179,14 @@ struct RootTabsView: View {
     // MARK: - Private. Object
 
     fileprivate struct TabItemView: View {
+
+        // MARK: - Properties. Public
+
+        fileprivate let tab: CustomTab
+        fileprivate let isSelected: Bool
+        fileprivate let activeColor: Color
+        fileprivate let inactiveColor: Color
+        fileprivate let onTap: () -> Void
 
         // MARK: - Main Body
 
@@ -180,11 +218,6 @@ struct RootTabsView: View {
 
         // MARK: - Properties. Private
 
-        fileprivate let tab: CustomTab
-        fileprivate let isSelected: Bool
-        fileprivate let activeColor: Color
-        fileprivate let inactiveColor: Color
-        fileprivate let onTap: () -> Void
         private let iconWidth: CGFloat = 54
     }
 

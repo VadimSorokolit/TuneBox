@@ -77,6 +77,7 @@ struct ImportsView: View {
     // MARK: - Properties. Private
 
     @Injected private var viewModel: ImportManaging
+    @Injected private var playerViewModel: PlayerManaging
     @State private var isFileImporterPresented: Bool = false
     @State private var isErrorPresented = false
     @State private var sourceIDToDelete: ImportSource.ID?

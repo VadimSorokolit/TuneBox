@@ -38,7 +38,7 @@ struct AlbumsView: View {
                             )
                         }
                     }
-                    .contentMargins(.bottom, 20)
+                    .bottomContentMargin(isPlayerVisible: playerViewModel.track != nil)
                 } else {
                     LibraryEmptyStateView(item: LibraryItem.albums)
                 }
@@ -51,5 +51,6 @@ struct AlbumsView: View {
     // MARK: - Properties. Private
 
     @Injected private var viewModel: ImportManaging
+    @Injected private var playerViewModel: PlayerManaging
     @Environment(AppCoordinator.self) private var coordinator
 }

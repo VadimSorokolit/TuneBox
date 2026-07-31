@@ -31,7 +31,8 @@ struct PaginationFooterView: View {
                     .font(.satoshi.medium.size(13))
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
+                    .padding(.top, 2)
+                    .padding(.bottom, 10)
 
             case .carousel:
                 VStack(spacing: 6) {
