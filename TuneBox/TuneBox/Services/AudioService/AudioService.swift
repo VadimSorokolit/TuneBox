@@ -386,6 +386,8 @@ final class AudioService: NSObject, AudioServicing {
             )
         }
     }
+    
+    // MARK: - Events
 
     @objc
     private func audioRouteChanged(_ notification: Notification) {
