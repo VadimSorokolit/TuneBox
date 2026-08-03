@@ -1,0 +1,378 @@
+//
+// SPDX-FileCopyrightText: 2010 Stephen F. Booth <contact@sbooth.dev>
+// SPDX-License-Identifier: MIT
+//
+// Part of https://github.com/sbooth/SFBAudioEngine
+//
+
+#import "SFBAudioMetadata+TagLibMP4Tag.h"
+#import "SFBAudioMetadata+TagLibTag.h"
+#import "TagLibStringUtilities.h"
+
+#import <taglib/mp4coverart.h>
+
+#import <ImageIO/ImageIO.h>
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
+
+#import <cstdio>
+#import <memory>
+
+namespace {
+
+/// A `std::unique_ptr` deleter for `CFTypeRef` objects
+struct cf_type_ref_deleter {
+    void operator()(CFTypeRef CF_RELEASES_ARGUMENT cf) noexcept { CFRelease(cf); }
+};
+
+using cg_image_source_unique_ptr = std::unique_ptr<CGImageSource, cf_type_ref_deleter>;
+
+} /* namespace */
+
+@implementation SFBAudioMetadata (TagLibMP4Tag)
+
+- (void)addMetadataFromTagLibMP4Tag:(const TagLib::MP4::Tag *)tag {
+    NSParameterAssert(tag != nil);
+
+    // Add the basic tags not specific to MP4
+    [self addMetadataFromTagLibTag:tag];
+
+    if (tag->contains("\251ART")) {
+        NSMutableArray<NSString *> *artists = [NSMutableArray array];
+        for (const TagLib::String &value : tag->item("\251ART").toStringList()) {
+            NSString *stringValue = [NSString stringWithUTF8String:value.toCString(true)];
+            if (stringValue != nil) {
+                [artists addObject:stringValue];
+            }
+        }
+        self.artist = artists;
+    }
+    if (tag->contains("\251gen")) {
+        NSMutableArray<NSString *> *genres = [NSMutableArray array];
+        for (const TagLib::String &value : tag->item("\251gen").toStringList()) {
+            NSString *stringValue = [NSString stringWithUTF8String:value.toCString(true)];
+            if (stringValue != nil) {
+                [genres addObject:stringValue];
+            }
+        }
+        self.genre = genres;
+    }
+    if (tag->contains("aART")) {
+        NSMutableArray<NSString *> *albumArtists = [NSMutableArray array];
+        for (const TagLib::String &value : tag->item("aART").toStringList()) {
+            NSString *stringValue = [NSString stringWithUTF8String:value.toCString(true)];
+            if (stringValue != nil) {
+                [albumArtists addObject:stringValue];
+            }
+        }
+        self.albumArtist = albumArtists;
+    }
+    if (tag->contains("\251wrt")) {
+        NSMutableArray<NSString *> *composers = [NSMutableArray array];
+        for (const TagLib::String &value : tag->item("\251wrt").toStringList()) {
+            NSString *stringValue = [NSString stringWithUTF8String:value.toCString(true)];
+            if (stringValue != nil) {
+                [composers addObject:stringValue];
+            }
+        }
+        self.composer = composers;
+    }
+    if (tag->contains("\251day")) {
+        self.releaseDate =
+                [NSString stringWithUTF8String:tag->item("\251day").toStringList().toString().toCString(true)];
+    }
+
+    if (tag->contains("trkn")) {
+        auto [trackNumber, trackTotal] = tag->item("trkn").toIntPair();
+        if (trackNumber != 0) {
+            self.trackNumber = @(trackNumber);
+        }
+        if (trackTotal != 0) {
+            self.trackTotal = @(trackTotal);
+        }
+    }
+    if (tag->contains("disk")) {
+        auto [discNumber, discTotal] = tag->item("disk").toIntPair();
+        if (discNumber != 0) {
+            self.discNumber = @(discNumber);
+        }
+        if (discTotal != 0) {
+            self.discTotal = @(discTotal);
+        }
+    }
+    if (tag->contains("cpil")) {
+        if (tag->item("cpil").toBool()) {
+            self.compilation = @(YES);
+        }
+    }
+    if (tag->contains("tmpo")) {
+        if (auto bpm = tag->item("tmpo").toInt(); bpm != 0) {
+            self.bpm = @(bpm);
+        }
+    }
+    if (tag->contains("\251lyr")) {
+        self.lyrics = [NSString stringWithUTF8String:tag->item("\251lyr").toStringList().toString().toCString(true)];
+    }
+
+    // Sorting
+    if (tag->contains("sonm")) {
+        self.titleSortOrder =
+                [NSString stringWithUTF8String:tag->item("sonm").toStringList().toString().toCString(true)];
+    }
+    if (tag->contains("soal")) {
+        self.albumTitleSortOrder =
+                [NSString stringWithUTF8String:tag->item("soal").toStringList().toString().toCString(true)];
+    }
+    if (tag->contains("soar")) {
+        NSMutableArray<NSString *> *artistSortOrders = [NSMutableArray array];
+        for (const TagLib::String &value : tag->item("soar").toStringList()) {
+            NSString *stringValue = [NSString stringWithUTF8String:value.toCString(true)];
+            if (stringValue != nil) {
+                [artistSortOrders addObject:stringValue];
+            }
+        }
+        self.artistSortOrder = artistSortOrders;
+    }
+    if (tag->contains("soaa")) {
+        NSMutableArray<NSString *> *albumArtistSortOrders = [NSMutableArray array];
+        for (const TagLib::String &value : tag->item("soaa").toStringList()) {
+            NSString *stringValue = [NSString stringWithUTF8String:value.toCString(true)];
+            if (stringValue != nil) {
+                [albumArtistSortOrders addObject:stringValue];
+            }
+        }
+        self.albumArtistSortOrder = albumArtistSortOrders;
+    }
+    if (tag->contains("soco")) {
+        NSMutableArray<NSString *> *composerSortOrders = [NSMutableArray array];
+        for (const TagLib::String &value : tag->item("soco").toStringList()) {
+            NSString *stringValue = [NSString stringWithUTF8String:value.toCString(true)];
+            if (stringValue != nil) {
+                [composerSortOrders addObject:stringValue];
+            }
+        }
+        self.composerSortOrder = composerSortOrders;
+    }
+
+    if (tag->contains("\251grp")) {
+        self.lyrics = [NSString stringWithUTF8String:tag->item("\251grp").toStringList().toString().toCString(true)];
+    }
+
+    // Album art
+    if (tag->contains("covr")) {
+        auto art = tag->item("covr").toCoverArtList();
+        for (auto iter : art) {
+            NSData *data = [NSData dataWithBytes:iter.data().data() length:iter.data().size()];
+            [self attachPicture:[[SFBAttachedPicture alloc] initWithImageData:data]];
+        }
+    }
+
+    // MusicBrainz
+    if (tag->contains("---:com.apple.iTunes:MusicBrainz Album Id")) {
+        self.musicBrainzReleaseID =
+                [NSString stringWithUTF8String:tag->item("---:com.apple.iTunes:MusicBrainz Album Id")
+                                                       .toStringList()
+                                                       .toString()
+                                                       .toCString(true)];
+    }
+
+    if (tag->contains("---:com.apple.iTunes:MusicBrainz Track Id")) {
+        self.musicBrainzRecordingID =
+                [NSString stringWithUTF8String:tag->item("---:com.apple.iTunes:MusicBrainz Track Id")
+                                                       .toStringList()
+                                                       .toString()
+                                                       .toCString(true)];
+    }
+
+    // ReplayGain
+    if (tag->contains("---:com.apple.iTunes:replaygain_reference_loudness")) {
+        auto s = tag->item("---:com.apple.iTunes:replaygain_reference_loudness").toStringList().toString();
+        float f;
+        if (std::sscanf(s.toCString(), "%f", &f) == 1) {
+            self.replayGainReferenceLoudness = @(f);
+        }
+    }
+
+    if (tag->contains("---:com.apple.iTunes:replaygain_track_gain")) {
+        auto s = tag->item("---:com.apple.iTunes:replaygain_track_gain").toStringList().toString();
+        float f;
+        if (std::sscanf(s.toCString(), "%f", &f) == 1) {
+            self.replayGainTrackGain = @(f);
+        }
+    }
+
+    if (tag->contains("---:com.apple.iTunes:replaygain_track_peak")) {
+        auto s = tag->item("---:com.apple.iTunes:replaygain_track_peak").toStringList().toString();
+        float f;
+        if (std::sscanf(s.toCString(), "%f", &f) == 1) {
+            self.replayGainTrackPeak = @(f);
+        }
+    }
+
+    if (tag->contains("---:com.apple.iTunes:replaygain_album_gain")) {
+        auto s = tag->item("---:com.apple.iTunes:replaygain_album_gain").toStringList().toString();
+        float f;
+        if (std::sscanf(s.toCString(), "%f", &f) == 1) {
+            self.replayGainAlbumGain = @(f);
+        }
+    }
+
+    if (tag->contains("---:com.apple.iTunes:replaygain_album_peak")) {
+        auto s = tag->item("---:com.apple.iTunes:replaygain_album_peak").toStringList().toString();
+        float f;
+        if (std::sscanf(s.toCString(), "%f", &f) == 1) {
+            self.replayGainAlbumPeak = @(f);
+        }
+    }
+}
+
+@end
+
+namespace {
+
+void SetMP4Item(TagLib::MP4::Tag *tag, const char *key, NSString *value) {
+    assert(tag != nullptr);
+    assert(key != nullptr);
+
+    // Remove the existing item with this name
+    tag->removeItem(key);
+
+    if (value != nil) {
+        tag->setItem(key, TagLib::MP4::Item(TagLib::StringFromNSString(value)));
+    }
+}
+
+void SetMP4ItemInt(TagLib::MP4::Tag *tag, const char *key, NSNumber *value) {
+    assert(tag != nullptr);
+    assert(key != nullptr);
+
+    // Remove the existing item with this name
+    tag->removeItem(key);
+
+    if (value != nil) {
+        tag->setItem(key, TagLib::MP4::Item(value.intValue));
+    }
+}
+
+void SetMP4ItemIntPair(TagLib::MP4::Tag *tag, const char *key, NSNumber *valueOne, NSNumber *valueTwo) {
+    assert(tag != nullptr);
+    assert(key != nullptr);
+
+    // Remove the existing item with this name
+    tag->removeItem(key);
+
+    if (valueOne != nil || valueTwo != nil) {
+        tag->setItem(key, TagLib::MP4::Item(valueOne.intValue, valueTwo.intValue));
+    }
+}
+
+void SetMP4ItemBoolean(TagLib::MP4::Tag *tag, const char *key, NSNumber *value) {
+    assert(tag != nullptr);
+    assert(key != nullptr);
+
+    if (value == nil) {
+        tag->removeItem(key);
+    } else {
+        tag->setItem(key, TagLib::MP4::Item(value.boolValue ? 1 : 0));
+    }
+}
+
+void SetMP4ItemDoubleWithFormat(TagLib::MP4::Tag *tag, const char *key, NSNumber *value, NSString *format = nil) {
+    assert(tag != nullptr);
+    assert(key != nullptr);
+
+    if (value == nil) {
+        SetMP4Item(tag, key, nil);
+    } else {
+        if (!format) {
+            SetMP4Item(tag, key, [NSString stringWithFormat:@"%f", value.doubleValue]);
+        } else {
+            SetMP4Item(tag, key, [NSString stringWithFormat:format, value.doubleValue]);
+        }
+    }
+}
+
+} /* namespace */
+
+void sfb::setMP4TagFromMetadata(SFBAudioMetadata *metadata, TagLib::MP4::Tag *tag, bool setAlbumArt) {
+    assert(metadata != nil);
+    assert(tag != nullptr);
+
+    SetMP4Item(tag, "\251nam", metadata.title);
+    // SetMP4Item(tag, "\251ART", metadata.artist);
+    SetMP4Item(tag, "\251ALB", metadata.albumTitle);
+    // SetMP4Item(tag, "aART", metadata.albumArtist);
+    // SetMP4Item(tag, "\251gen", metadata.genre);
+    // SetMP4Item(tag, "\251wrt", metadata.composer);
+    SetMP4Item(tag, "\251cmt", metadata.comment);
+    SetMP4Item(tag, "\251day", metadata.releaseDate);
+
+    SetMP4ItemIntPair(tag, "trkn", metadata.trackNumber, metadata.trackTotal);
+    SetMP4ItemIntPair(tag, "disk", metadata.discNumber, metadata.discTotal);
+
+    SetMP4ItemBoolean(tag, "cpil", metadata.compilation);
+
+    SetMP4ItemInt(tag, "tmpo", metadata.bpm);
+
+    SetMP4Item(tag, "\251lyr", metadata.lyrics);
+
+    // Sorting
+    SetMP4Item(tag, "sonm", metadata.titleSortOrder);
+    SetMP4Item(tag, "soal", metadata.albumTitleSortOrder);
+    // SetMP4Item(tag, "soar", metadata.artistSortOrder);
+    // SetMP4Item(tag, "soaa", metadata.albumArtistSortOrder);
+    // SetMP4Item(tag, "soco", metadata.composerSortOrder);
+
+    SetMP4Item(tag, "\251grp", metadata.grouping);
+
+    // MusicBrainz
+    SetMP4Item(tag, "---:com.apple.iTunes:MusicBrainz Album Id", metadata.musicBrainzReleaseID);
+    SetMP4Item(tag, "---:com.apple.iTunes:MusicBrainz Track Id", metadata.musicBrainzRecordingID);
+
+    // ReplayGain info
+    SetMP4ItemDoubleWithFormat(tag, "---:com.apple.iTunes:replaygain_reference_loudness",
+                               metadata.replayGainReferenceLoudness, @"%2.1f dB");
+    SetMP4ItemDoubleWithFormat(tag, "---:com.apple.iTunes:replaygain_track_gain", metadata.replayGainTrackGain,
+                               @"%2.2f dB");
+    SetMP4ItemDoubleWithFormat(tag, "---:com.apple.iTunes:replaygain_track_peak", metadata.replayGainTrackPeak,
+                               @"%1.8f");
+    SetMP4ItemDoubleWithFormat(tag, "---:com.apple.iTunes:replaygain_album_gain", metadata.replayGainAlbumGain,
+                               @"%2.2f dB");
+    SetMP4ItemDoubleWithFormat(tag, "---:com.apple.iTunes:replaygain_album_peak", metadata.replayGainAlbumPeak,
+                               @"%1.8f");
+
+    if (setAlbumArt) {
+        auto list = TagLib::MP4::CoverArtList();
+        for (SFBAttachedPicture *attachedPicture in metadata.attachedPictures) {
+            cg_image_source_unique_ptr imageSource{
+                    CGImageSourceCreateWithData((__bridge CFDataRef)attachedPicture.imageData, nullptr)};
+            if (!imageSource) {
+                continue;
+            }
+
+            auto type = TagLib::MP4::CoverArt::CoverArt::Unknown;
+
+            // Determine the image type
+            if (CFStringRef typeIdentifier = CGImageSourceGetType(imageSource.get()); typeIdentifier != nullptr) {
+                if (UTType *utType = [UTType typeWithIdentifier:(__bridge NSString *)typeIdentifier];
+                    [utType conformsToType:UTTypeBMP]) {
+                    type = TagLib::MP4::CoverArt::CoverArt::BMP;
+                } else if ([utType conformsToType:UTTypePNG]) {
+                    type = TagLib::MP4::CoverArt::CoverArt::PNG;
+                } else if ([utType conformsToType:UTTypeGIF]) {
+                    type = TagLib::MP4::CoverArt::CoverArt::GIF;
+                } else if ([utType conformsToType:UTTypeJPEG]) {
+                    type = TagLib::MP4::CoverArt::CoverArt::JPEG;
+                }
+            }
+
+            auto picture = TagLib::MP4::CoverArt(
+                    type, TagLib::ByteVector(static_cast<const char *>(attachedPicture.imageData.bytes),
+                                             static_cast<unsigned int>(attachedPicture.imageData.length)));
+            list.append(picture);
+        }
+
+        tag->setItem("covr", list);
+    } else {
+        tag->removeItem("covr");
+    }
+}

@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import AVFoundation
 import SFBAudioEngine
 import MediaPlayer
 
@@ -43,6 +44,7 @@ final class AudioService: NSObject, AudioServicing {
 
     private override init() {
         super.init()
+        self.setupObservers()
         self.player.delegate = self
         self.configureAudioSession()
         self.configureRemoteCommands()
@@ -59,16 +61,15 @@ final class AudioService: NSObject, AudioServicing {
         do {
             let ext = url.pathExtension.lowercased()
             let isDSD = ext == AudioFileExtension.dsf.rawValue
-                || ext == AudioFileExtension.dff.rawValue
+            || ext == AudioFileExtension.dff.rawValue
+
             if isDSD {
-                let decoder = try DoPDecoder(url: url)
-                try decoder.open()
-                try self.player.play(decoder)
-                self.isDoPPlayback = true
+                try self.playDSD(url: url)
             } else {
                 try self.player.play(url)
                 self.isDoPPlayback = false
             }
+
             self.applyVolume()
             self.notifyStateChange(true)
             self.startProgressTimer()
@@ -189,9 +190,10 @@ final class AudioService: NSObject, AudioServicing {
     private let effectPlayer = AudioPlayer()
     private var progressTimer: Timer?
     private var storedVolume: Float = 1.0
-    private var isDoPPlayback = false
-    private var shouldLoop = false
     private var loopURL: URL?
+    private var shouldLoop = false
+    private var isDoPPlayback = false
+    private var supportsDoP: Bool?
 
     private static let progressInterval: TimeInterval = 0.1
     private static let endThreshold: TimeInterval = 0.05
@@ -251,6 +253,52 @@ final class AudioService: NSObject, AudioServicing {
         }
     }
 
+    private func playDSD(url: URL) throws {
+        guard self.isUSBAudioDACConnected() else {
+            self.supportsDoP = nil
+            try self.playDSDAsPCM(url: url)
+            return
+        }
+
+        switch self.supportsDoP {
+            case .some(true):
+                try self.playDSDAsDoP(url: url)
+
+            case .some(false):
+                try self.playDSDAsPCM(url: url)
+
+            case .none:
+                do {
+                    try self.playDSDAsDoP(url: url)
+                    self.supportsDoP = true
+                    AppLogger.audio.info("Playing DSD via DoP")
+                } catch {
+                    self.supportsDoP = false
+                    AppLogger.audio.warning("DoP unsupported: \(error.localizedDescription)")
+                    try self.playDSDAsPCM(url: url)
+                }
+        }
+    }
+
+    private func playDSDAsDoP(url: URL) throws {
+        let decoder = try DoPDecoder(url: url)
+        try decoder.open()
+        try self.player.play(decoder)
+        self.isDoPPlayback = true
+    }
+
+    private func playDSDAsPCM(url: URL) throws {
+        let decoder = try DSDPCMDecoder(url: url)
+        try decoder.open()
+        try self.player.play(decoder)
+        self.isDoPPlayback = false
+    }
+
+    private func isUSBAudioDACConnected() -> Bool {
+        AVAudioSession.sharedInstance().currentRoute.outputs
+            .contains { $0.portType == .usbAudio }
+    }
+
     private func artworkImage(from track: TrackEntity) -> UIImage? {
         guard let path = track.imagePath, !path.isEmpty else { return nil }
 
@@ -299,6 +347,15 @@ final class AudioService: NSObject, AudioServicing {
         max(0, min(1, value))
     }
 
+    private func setupObservers() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(self.audioRouteChanged),
+            name: AVAudioSession.routeChangeNotification,
+            object: nil
+        )
+    }
+
     private func refreshNowPlayingElapsed() {
         guard var info = MPNowPlayingInfoCenter.default().nowPlayingInfo else { return }
 
@@ -316,6 +373,36 @@ final class AudioService: NSObject, AudioServicing {
         let volume = self.isDoPPlayback ? 1.0 : self.storedVolume
         self.player.modifyProcessingGraph { engine in
             engine.mainMixerNode.outputVolume = volume
+        }
+    }
+
+    private func logAudioRoute() {
+        let outputs = AVAudioSession.sharedInstance().currentRoute.outputs
+
+        for output in outputs {
+            AppLogger.audio.info(
+                "Audio output: \(output.portName), type: \(output.portType.rawValue)"
+            )
+        }
+    }
+
+    @objc
+    private func audioRouteChanged(_ notification: Notification) {
+        guard
+            let value = notification.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt,
+            let reason = AVAudioSession.RouteChangeReason(rawValue: value)
+        else {
+            return
+        }
+
+        switch reason {
+            case .newDeviceAvailable,
+                    .oldDeviceUnavailable,
+                    .routeConfigurationChange:
+                self.supportsDoP = nil
+
+            default:
+                break
         }
     }
 }

@@ -1349,7 +1349,7 @@
 				5B47627F2FAB5C570069E41A /* XCRemoteSwiftPackageReference "moya" */,
 				5B586CBB2FAC846900BCEAD2 /* XCRemoteSwiftPackageReference "Resolver" */,
 				5B7E1DAB2FE2A4FA00561D67 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
-				5B970E09301CDA88006E674C /* XCRemoteSwiftPackageReference "SFBAudioEngine" */,
+				5B970E09301CDA88006E674C /* XCLocalSwiftPackageReference "SFBAudioEngine" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5BD579732FAB25BF00503BA2 /* Products */;
@@ -2046,15 +2046,14 @@
 				minimumVersion = 1.10.21;
 			};
 		};
-		5B970E09301CDA88006E674C /* XCRemoteSwiftPackageReference "SFBAudioEngine" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/martonfarago/SFBAudioEngine.git";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		5B970E09301CDA88006E674C /* XCLocalSwiftPackageReference "SFBAudioEngine" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Vendor/SFBAudioEngine;
+		};
+/* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		5B4762762FAB37D90069E41A /* SwiftLintBuildToolPlugin */ = {
@@ -2099,7 +2098,7 @@
 		};
 		5B970E0A301CDA88006E674C /* SFBAudioEngine */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 5B970E09301CDA88006E674C /* XCRemoteSwiftPackageReference "SFBAudioEngine" */;
+			package = 5B970E09301CDA88006E674C /* XCLocalSwiftPackageReference "SFBAudioEngine" */;
 			productName = SFBAudioEngine;
 		};
 /* End XCSwiftPackageProductDependency section */
