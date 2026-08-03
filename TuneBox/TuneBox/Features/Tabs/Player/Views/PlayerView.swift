@@ -55,7 +55,7 @@ struct PlayerView: View {
 
                 Button(action: {
                     if let playlist = viewModel.playlist {
-                        viewModel.handlePlayAction(for: playlist.tracks.first!)
+                        viewModel.handlePlayAction(for: playlist.tracks.first!, in: playlist.tracks)
                     }
                 },
                     label: {

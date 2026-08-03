@@ -65,7 +65,7 @@ struct RootTabsView: View {
                     onRewindTap: {
                         playerViewModel.seek(by: -10)
                     }, onPlayPauseTap: {
-                        playerViewModel.handlePlayAction(for: track)
+                        playerViewModel.handlePlayAction(for: track, in: playerViewModel.playlist?.tracks ?? [track])
                     }, onForwardTap: {
                         playerViewModel.seek(by: 10)
                     },

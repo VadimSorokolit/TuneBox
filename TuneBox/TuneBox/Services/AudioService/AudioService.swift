@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 import SFBAudioEngine
+import MediaPlayer
 
 final class AudioService: NSObject, AudioServicing {
 
@@ -18,6 +19,9 @@ final class AudioService: NSObject, AudioServicing {
     private(set) var currentTrackId: String?
     private(set) var stateChangeSubject = CurrentValueSubject<Bool, Never>(false)
     private(set) var progressSubject = PassthroughSubject<Double, Never>()
+    var onRemotePlayNext: (() -> Void)?
+    var onRemotePlayPrevious: (() -> Void)?
+    var onTrackFinished: (() -> Void)?
 
     var duration: TimeInterval {
         self.player.totalTime ?? 0
@@ -41,6 +45,7 @@ final class AudioService: NSObject, AudioServicing {
         super.init()
         self.player.delegate = self
         self.configureAudioSession()
+        self.configureRemoteCommands()
     }
 
     // MARK: - Methods. Public
@@ -78,12 +83,14 @@ final class AudioService: NSObject, AudioServicing {
         _ = self.player.pause()
         self.stopProgressTimer()
         self.notifyStateChange(false)
+        self.refreshNowPlayingElapsed()
     }
 
     func resume() {
         guard self.player.resume() else { return }
         self.startProgressTimer()
         self.notifyStateChange(true)
+        self.refreshNowPlayingElapsed()
     }
 
     func stop() {
@@ -95,6 +102,7 @@ final class AudioService: NSObject, AudioServicing {
         self.loopURL = nil
         self.notifyStateChange(false)
         self.notifyProgress(0)
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
     }
 
     func toggle(trackId: String, url: URL, loop: Bool = false) {
@@ -130,6 +138,7 @@ final class AudioService: NSObject, AudioServicing {
         }
 
         self.notifyProgress(progressValue)
+        self.refreshNowPlayingElapsed()
     }
 
     func seek(to progress: Double) {
@@ -137,6 +146,7 @@ final class AudioService: NSObject, AudioServicing {
         let clamped = min(max(progress, 0), 1)
         _ = self.player.seek(position: clamped)
         self.notifyProgress(clamped)
+        self.refreshNowPlayingElapsed()
     }
 
     func playEffect(name: String, ext: AudioFileExtension = .mp3) {
@@ -150,6 +160,27 @@ final class AudioService: NSObject, AudioServicing {
         } catch {
             AppLogger.audio.error("Failed to play effect: \(error.localizedDescription)")
         }
+    }
+
+    func setNowPlaying(track: TrackEntity) {
+        var info: [String: Any] = [
+            MPMediaItemPropertyTitle: track.songName,
+            MPMediaItemPropertyArtist: track.artistName,
+            MPNowPlayingInfoPropertyElapsedPlaybackTime: currentTime,
+            MPNowPlayingInfoPropertyPlaybackRate: player.isPlaying ? 1.0 : 0.0
+        ]
+
+        if self.duration > 0 {
+            info[MPMediaItemPropertyPlaybackDuration] = duration
+        }
+
+        if let artwork = self.artworkImage(from: track) {
+            info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: artwork.size) { _ in
+                artwork
+            }
+        }
+
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = info
     }
 
     // MARK: - Properties. Private
@@ -177,6 +208,39 @@ final class AudioService: NSObject, AudioServicing {
 
     // MARK: - Methods. Private
 
+    private func configureRemoteCommands() {
+        let center = MPRemoteCommandCenter.shared()
+        center.playCommand.addTarget { [weak self] _ in
+            self?.resume()
+            return .success
+        }
+        center.pauseCommand.addTarget { [weak self] _ in
+            self?.pause()
+            return .success
+        }
+        center.togglePlayPauseCommand.addTarget { [weak self] _ in
+            guard let self else { return .commandFailed }
+            if self.player.isPlaying { self.pause() } else { self.resume() }
+            return .success
+        }
+        center.changePlaybackPositionCommand.addTarget { [weak self] event in
+            guard let self,
+                  let event = event as? MPChangePlaybackPositionCommandEvent,
+                  self.duration > 0 else { return .commandFailed }
+            self.seek(to: event.positionTime / self.duration)
+            self.refreshNowPlayingElapsed()
+            return .success
+        }
+        center.nextTrackCommand.addTarget { [weak self] _ in
+            self?.onRemotePlayNext?()
+            return .success
+        }
+        center.previousTrackCommand.addTarget { [weak self] _ in
+            self?.onRemotePlayPrevious?()
+            return .success
+        }
+    }
+
     private func configureAudioSession() {
         do {
             let session = AVAudioSession.sharedInstance()
@@ -185,6 +249,23 @@ final class AudioService: NSObject, AudioServicing {
         } catch {
             AppLogger.audio.error("Failed to configure audio session: \(error.localizedDescription)")
         }
+    }
+
+    private func artworkImage(from track: TrackEntity) -> UIImage? {
+        guard let path = track.imagePath, !path.isEmpty else { return nil }
+
+        if path.hasPrefix("http://") || path.hasPrefix("https://"),
+           let url = URL(string: path),
+           let data = try? Data(contentsOf: url) {
+            return UIImage(data: data)
+        }
+
+        if let url = AudioMetadataService.artworkURL(for: path),
+           let data = try? Data(contentsOf: url) {
+            return UIImage(data: data)
+        }
+
+        return nil
     }
 
     private func startProgressTimer() {
@@ -216,6 +297,19 @@ final class AudioService: NSObject, AudioServicing {
 
     private func clampVolume(_ value: Float) -> Float {
         max(0, min(1, value))
+    }
+
+    private func refreshNowPlayingElapsed() {
+        guard var info = MPNowPlayingInfoCenter.default().nowPlayingInfo else { return }
+
+        info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = currentTime
+        info[MPNowPlayingInfoPropertyPlaybackRate] = player.isPlaying ? 1.0 : 0.0
+
+        if duration > 0 {
+            info[MPMediaItemPropertyPlaybackDuration] = duration
+        }
+
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = info
     }
 
     private func applyVolume() {
@@ -250,7 +344,7 @@ extension AudioService: AudioPlayer.Delegate {
             self.play(trackId: trackId, url: loopURL, loop: true)
             return
         }
-        self.stop()
+        self.onTrackFinished?()
     }
 
     func audioPlayer(_ audioPlayer: AudioPlayer, encounteredError error: any Error) {

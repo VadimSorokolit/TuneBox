@@ -43,6 +43,22 @@ final class PlayerViewModel: PlayerManaging {
                 self?.progress = value
             }
             .store(in: &cancellables)
+
+        self.audioService.onRemotePlayNext = { [weak self] in
+            Task { @MainActor in
+                self?.playNext()
+            }
+        }
+        self.audioService.onRemotePlayPrevious = { [weak self] in
+            Task { @MainActor in
+                self?.playPrevious()
+            }
+        }
+        self.audioService.onTrackFinished = { [weak self] in
+            Task { @MainActor in
+                self?.playNext()
+            }
+        }
     }
 
     // MARK: - Methods. Public
@@ -65,14 +81,17 @@ final class PlayerViewModel: PlayerManaging {
         }
     }
 
-    func handlePlayAction(for track: TrackEntity) {
+    func handlePlayAction(for track: TrackEntity, in queue: [TrackEntity]) {
+        let tracks = queue.isEmpty ? [track] : queue
+        self.playlist = PlaylistEntity(title: "Queue", tracks: tracks)
+
         switch track.source {
             case .api:
                 do {
                     let url = try FileManagerService.makeDownloadedTrackURL(id: track.id)
-
                     self.track = track
                     self.audioService.toggle(trackId: track.id, url: url, loop: false)
+                    self.audioService.setNowPlaying(track: track)
                 } catch {
                     AppLogger.audio.error("Failed to make track URL: \(String(describing: error))")
                 }
@@ -86,6 +105,7 @@ final class PlayerViewModel: PlayerManaging {
 
                 self.track = track
                 self.audioService.toggle(trackId: track.id, url: url, loop: false)
+                self.audioService.setNowPlaying(track: track)
         }
     }
 
@@ -131,7 +151,7 @@ final class PlayerViewModel: PlayerManaging {
 
         guard let current = self.track,
               let index = tracks.firstIndex(where: { $0.id == current.id }) else {
-            self.handlePlayAction(for: firstTrack)
+            self.handlePlayAction(for: firstTrack, in: tracks)
 
             return
         }
@@ -148,7 +168,7 @@ final class PlayerViewModel: PlayerManaging {
 
         guard tracks.indices.contains(newIndex) else { return }
 
-        self.handlePlayAction(for: tracks[newIndex])
+        self.handlePlayAction(for: tracks[newIndex], in: tracks)
     }
 
     private func handleError(_ error: Error) {

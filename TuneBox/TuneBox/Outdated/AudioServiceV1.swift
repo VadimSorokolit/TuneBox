@@ -10,7 +10,7 @@ import AVFoundation
 import Combine
 import os
 
-final class AudioServiceV1: NSObject, AudioServicing, AVAudioPlayerDelegate {
+final class AudioServiceV1: NSObject, AVAudioPlayerDelegate {
 
     // MARK: - Properties. Public
 

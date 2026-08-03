@@ -13,7 +13,7 @@ protocol PlayerManaging: AnyObject, Sendable {
     var isPlaying: Bool { get }
     var progress: Double { get }
 
-    func handlePlayAction(for track: TrackEntity)
+    func handlePlayAction(for track: TrackEntity, in queue: [TrackEntity])
     func resetPlayback()
     func isPlaying(_ track: TrackEntity) -> Bool
     func seek(by deltaSeconds: TimeInterval)

@@ -657,8 +657,8 @@ struct ImportTracksViewV1: View {
                             onRewindTap: {
                                 AudioService.shared.seek(by: -10)
                             }, onPlayPauseTap: {
-                                guard let track = importViewModel.selectedTrack else { return }
-                                playerViewModel.handlePlayAction(for: track)
+//                                guard let track = importViewModel.selectedTrack else { return }
+//                                playerViewModel.handlePlayAction(for: track)
                             }, onForwardTap: {
                                 AudioService.shared.seek(by: 10)
                             },

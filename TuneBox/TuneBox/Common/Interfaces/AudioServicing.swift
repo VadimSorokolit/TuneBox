@@ -46,6 +46,7 @@ protocol AudioServicing: AnyObject {
     func resume()
     func stop()
     func toggle(trackId: String, url: URL, loop: Bool)
+    func setNowPlaying(track: TrackEntity)
     func seek(by deltaSeconds: TimeInterval)
     func seek(to progress: Double)
 }

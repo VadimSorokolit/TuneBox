@@ -15,6 +15,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         let semaphore = DispatchSemaphore(value: 0)
 
+        self.playerViewModel.resetPlayback()
+
         Task { @MainActor in
             await self.viewModel.snapshotForTerminate()
             semaphore.signal()
@@ -33,4 +35,5 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     // MARK: - Properties. Private
 
     @Injected private var viewModel: TransferManaging
+    @Injected private var playerViewModel: PlayerManaging
 }
