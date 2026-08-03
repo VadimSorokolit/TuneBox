@@ -7,7 +7,6 @@
 
 import Foundation
 import Combine
-import AVFoundation
 import SFBAudioEngine
 import MediaPlayer
 
@@ -386,7 +385,7 @@ final class AudioService: NSObject, AudioServicing {
             )
         }
     }
-    
+
     // MARK: - Events
 
     @objc
