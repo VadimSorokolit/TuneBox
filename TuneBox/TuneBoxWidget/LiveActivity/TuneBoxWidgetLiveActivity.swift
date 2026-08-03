@@ -2,7 +2,7 @@
 //  TuneBoxWidgetLiveActivity.swift
 //  TuneBoxWidget
 //
-//  Created by Nintendo on 03.08.2026.
+//  Created by Vadim Sorokolit on 03.08.2026.
 //
 
 import ActivityKit
