@@ -40,6 +40,7 @@ final class AudioService: NSObject, AudioServicing {
             self.applyVolume()
         }
     }
+
     // MARK: - Initializer
 
     private override init() {
