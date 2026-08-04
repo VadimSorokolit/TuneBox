@@ -10,7 +10,7 @@ import SwiftUI
 import WidgetKit
 
 struct TuneBoxWidgetControl: ControlWidget {
-    static let kind: String = "com.TuneBox2027.TuneBoxWidget"
+    static let kind: String = "com.TuneBox.TuneBoxWidget"
 
     var body: some ControlWidgetConfiguration {
         AppIntentControlConfiguration(
