@@ -351,10 +351,34 @@ final class ImportViewModel: ImportManaging {
         )
     }
 
+    func track(for url: URL) -> TrackEntity? {
+        let fileBase = self.normalize(url.deletingPathExtension().lastPathComponent)
+        let fileCompact = self.compact(fileBase)
+        guard fileBase.isEmpty == false else { return nil }
+
+        return self.library?.tracks.first { track in
+            let title = self.normalize(track.songName)
+            let artist = self.normalize(track.artistName)
+            let artistTitle = [artist, title].filter { !$0.isEmpty }.joined(separator: " - ")
+            guard title.isEmpty == false else { return false }
+
+            let artistTitleCompact = self.compact(artistTitle)
+
+            return fileBase == title
+                || fileBase == artistTitle
+                || fileCompact == artistTitleCompact
+                || fileBase.hasPrefix(artistTitle + " - ")
+                || fileBase.hasPrefix(title + " - ")
+                || fileBase.contains(artistTitle)
+                || fileBase.contains(title)
+                || fileCompact.contains(self.compact(title))
+        }
+    }
+
     func libraryTracks(onlyAPI: Bool) -> [TrackEntity] {
         let filtered = onlyAPI
-        ? library?.tracks.filter { $0.source == .api }
-        : library?.tracks
+        ? self.library?.tracks.filter { $0.source == .api }
+        : self.library?.tracks
 
         var seen = Set<DeduplicationKey>()
 
@@ -775,6 +799,21 @@ final class ImportViewModel: ImportManaging {
         let chosen = preferredCandidate ?? anyJPEGCandidate
 
         return chosen.flatMap { try? Data(contentsOf: $0) }
+    }
+
+    private func compact(_ string: String) -> String {
+        self.normalize(string).replacingOccurrences(of: " ", with: "")
+    }
+
+    private func normalize(_ string: String) -> String {
+        string
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: "_", with: " ")
+            .replacingOccurrences(of: "–", with: "-")
+            .replacingOccurrences(of: "—", with: "-")
+            .replacingOccurrences(of: #"['’`]"#, with: "", options: .regularExpression)
+            .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
+            .lowercased()
     }
 
     private func collectFiles(from url: URL) throws -> [URL] {

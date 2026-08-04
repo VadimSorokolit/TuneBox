@@ -36,6 +36,7 @@ struct ArtistDetailsView: View {
                 if artist.albums.isEmpty {
                     TracksContentView(
                         viewModel: viewModel,
+                        playerViewModel: playerViewModel,
                         tracks: artist.tracks
                     )
                 } else {
@@ -88,6 +89,7 @@ struct ArtistDetailsView: View {
                             case .albums:
                                 AlbumsContentView(
                                     viewModel: viewModel,
+                                    playerViewModel: playerViewModel,
                                     albums: artist.albums
                                 )
                                 .id(selected)
@@ -96,6 +98,7 @@ struct ArtistDetailsView: View {
                             case .tracks:
                                 TracksContentView(
                                     viewModel: viewModel,
+                                    playerViewModel: playerViewModel,
                                     tracks: viewModel.sortedTracksAlphabetically(artist.tracks),
                                 )
                                 .id(selected)
@@ -121,6 +124,7 @@ struct ArtistDetailsView: View {
         // MARK: - Properties. Public
 
         let viewModel: ImportManaging
+        let playerViewModel: PlayerManaging
         let albums: [MusicLibrary.Album]
 
         // MARK: - Body
@@ -157,6 +161,7 @@ struct ArtistDetailsView: View {
         // MARK: - Properties. Public
 
         let viewModel: ImportManaging
+        let playerViewModel: PlayerManaging
         let tracks: [TrackEntity]
 
         // MARK: - Body
@@ -166,8 +171,9 @@ struct ArtistDetailsView: View {
                 ForEach(tracks) { track in
                     TrackArtworkCell(
                         track: track,
-                        isPlaying: false,
-                        onTapGesture: {}
+                        onTapGesture: {
+                            playerViewModel.handlePlayAction(for: track, in: tracks)
+                        }
                     )
                 }
 

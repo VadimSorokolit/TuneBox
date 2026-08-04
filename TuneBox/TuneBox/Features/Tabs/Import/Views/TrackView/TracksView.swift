@@ -49,8 +49,9 @@ struct TracksView: View {
                             ForEach(section.tracks) { track in
                                 TrackArtworkCell(
                                     track: track,
-                                    isPlaying: false,
-                                    onTapGesture: {}
+                                    onTapGesture: {
+                                        playerViewModel.handlePlayAction(for: track, in: section.tracks)
+                                    }
                                 )
                                 .listRowInsets(EdgeInsets())
                                 .listRowBackground(Color.clear)

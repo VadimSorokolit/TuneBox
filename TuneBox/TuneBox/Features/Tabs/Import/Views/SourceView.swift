@@ -78,7 +78,13 @@ struct SourceView: View {
                 sourceRow(
                     icon: LibraryItem.tracks.systemImage,
                     title: item.url.deletingPathExtension().lastPathComponent,
-                    onTapGesture: {}
+                    onTapGesture: {
+                        guard let track = viewModel.track(for: item.url) else {
+                            return
+                        }
+                        let tracks = viewModel.tracks(for: sourceID)
+                        playerViewModel.handlePlayAction(for: track, in: tracks)
+                    }
                 )
 
             case .playlist:

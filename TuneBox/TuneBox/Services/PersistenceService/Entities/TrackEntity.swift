@@ -75,7 +75,7 @@ final class TrackEntity {
         }
 
         set {
-            localFilePath = newValue?.path
+            self.localFilePath = newValue?.path
         }
     }
 

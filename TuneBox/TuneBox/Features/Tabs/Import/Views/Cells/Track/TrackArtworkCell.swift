@@ -12,7 +12,6 @@ struct TrackArtworkCell: View {
     // MARK: - Properties. Public
 
     let track: TrackEntity
-    let isPlaying: Bool
     let defaultPadding: CGFloat = GlobalConstants.Cell.defaultPadding
     let onTapGesture: () -> Void
 
@@ -79,7 +78,6 @@ struct TrackArtworkCell: View {
             waveformData: nil,
             size: 5_242_880
         ),
-        isPlaying: false,
         onTapGesture: {}
     )
 }
