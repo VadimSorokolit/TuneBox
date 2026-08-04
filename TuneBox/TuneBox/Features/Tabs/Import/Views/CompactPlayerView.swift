@@ -14,10 +14,14 @@ struct CompactPlayerView: View {
     let track: TrackEntity?
     var isPlaying: Bool
     var progress: Double
+    let repeatMode: RepeatMode
+    let isShuffleEnabled: Bool
     let onRewindTap: () -> Void
     let onPlayPauseTap: () -> Void
     let onForwardTap: () -> Void
     let onProgressTap: () -> Void
+    let onRepeatModeChange: (RepeatMode) -> Void
+    let onShuffleToggle: () -> Void
 
     // MARK: - Main Body
 
@@ -45,11 +49,15 @@ struct CompactPlayerView: View {
                 .layoutPriority(-1)
 
                 PlaybackControls(
-                    isPlaying: isPlaying,
                     progress: progress,
+                    isPlaying: isPlaying,
+                    repeatMode: repeatMode,
+                    isShuffleEnabled: isShuffleEnabled,
                     onRewindTap: onRewindTap,
                     onPlayPauseTap: onPlayPauseTap,
-                    onForwardTap: onForwardTap
+                    onForwardTap: onForwardTap,
+                    onRepeatModeChange: onRepeatModeChange,
+                    onShuffleToggle: onShuffleToggle
                 )
                 .fixedSize()
             }
@@ -85,11 +93,15 @@ private struct PlaybackControls: View {
 
     // MARK: - Properties. Public
 
-    let isPlaying: Bool
     let progress: Double
+    let isPlaying: Bool
+    let repeatMode: RepeatMode
+    let isShuffleEnabled: Bool
     let onRewindTap: () -> Void
     let onPlayPauseTap: () -> Void
     let onForwardTap: () -> Void
+    let onRepeatModeChange: (RepeatMode) -> Void
+    let onShuffleToggle: () -> Void
 
     // MARK: - Body
 
@@ -103,12 +115,15 @@ private struct PlaybackControls: View {
             }
             .disabled(progress == 0)
 
-            Button {
-                onPlayPauseTap()
-            } label: {
-                Image(systemName: isPlaying ? "pause.fill" : "play.fill")
-                    .frame(size: imageSize)
-            }
+            PlayPauseMenuButton(
+                isPlaying: isPlaying,
+                repeatMode: repeatMode,
+                isShuffleEnabled: isShuffleEnabled,
+                onPlayPauseTap: onPlayPauseTap,
+                onRepeatModeChange: onRepeatModeChange,
+                onShuffleToggle: onShuffleToggle
+            )
+            .equatable()
 
             Button {
                 onForwardTap()
@@ -119,6 +134,100 @@ private struct PlaybackControls: View {
             .disabled(progress == 1)
         }
         .font(.title3)
+    }
+
+    // MARK: - Private. Properties
+
+    private let imageSize: CGFloat = 40
+}
+
+private struct PlayPauseMenuButton: View, Equatable {
+
+    // MARK: - Properties. Public
+
+    let isPlaying: Bool
+    let repeatMode: RepeatMode
+    let isShuffleEnabled: Bool
+    let onPlayPauseTap: () -> Void
+    let onRepeatModeChange: (RepeatMode) -> Void
+    let onShuffleToggle: () -> Void
+
+    // MARK: - Equatable
+
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.isPlaying == rhs.isPlaying
+            && lhs.repeatMode == rhs.repeatMode
+            && lhs.isShuffleEnabled == rhs.isShuffleEnabled
+    }
+
+    // MARK: - Body
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Button {
+                onPlayPauseTap()
+            } label: {
+                Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                    .frame(size: imageSize)
+            }
+            .contextMenu {
+                Button {
+                    onRepeatModeChange(.one)
+                } label: {
+                    Label {
+                        Text("Repeat One")
+                    } icon: {
+                        if repeatMode == .one {
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+
+                Button {
+                    onRepeatModeChange(.all)
+                } label: {
+                    Label {
+                        Text("Repeat All")
+                    } icon: {
+                        if repeatMode == .all {
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+
+                Button {
+                    onRepeatModeChange(.off)
+                } label: {
+                    Label {
+                        Text("No Repeat")
+                    } icon: {
+                        if repeatMode == .off {
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+
+                Divider()
+
+                Button {
+                    onShuffleToggle()
+                } label: {
+                    Label {
+                        Text("Shuffle")
+                    } icon: {
+                        if isShuffleEnabled {
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+            }
+            .overlay(alignment: .bottom) {
+                Text(repeatMode == .one ? "•" : repeatMode == .all ? "••" : "•••")
+                    .foregroundStyle(.blue)
+                    .font(.system(size: 16))
+                    .offset(y: 6)
+            }
+        }
     }
 
     // MARK: - Private. Properties
@@ -329,10 +438,14 @@ private struct MarqueeTextWidthKey: PreferenceKey {
         ),
         isPlaying: true,
         progress: 0.5,
+        repeatMode: .one,
+        isShuffleEnabled: false,
         onRewindTap: {},
         onPlayPauseTap: {},
         onForwardTap: {},
-        onProgressTap: {}
+        onProgressTap: {},
+        onRepeatModeChange: {_ in },
+        onShuffleToggle: {}
     )
     .padding()
 }

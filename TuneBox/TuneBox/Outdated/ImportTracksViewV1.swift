@@ -650,24 +650,24 @@ struct ImportTracksViewV1: View {
                             .contentMargins(.bottom, 20)
                         }
 
-                        CompactPlayerView(
-                            track: importViewModel.selectedTrack,
-                            isPlaying: importViewModel.selectedTrack.map { playerViewModel.isPlaying($0) } ?? false,
-                            progress: playerViewModel.progress,
-                            onRewindTap: {
-                                AudioService.shared.seek(by: -10)
-                            }, onPlayPauseTap: {
+//                        CompactPlayerView(
+//                            track: importViewModel.selectedTrack,
+//                            isPlaying: importViewModel.selectedTrack.map { playerViewModel.isPlaying($0) } ?? false,
+//                            progress: playerViewModel.progress,
+//                            onRewindTap: {
+//                                AudioService.shared.seek(by: -10)
+//                            }, onPlayPauseTap: {
 //                                guard let track = importViewModel.selectedTrack else { return }
 //                                playerViewModel.handlePlayAction(for: track)
-                            }, onForwardTap: {
-                                AudioService.shared.seek(by: 10)
-                            },
-                            onProgressTap: {
-                                isShowingExpandedPlayer = true
-                            }
-                        )
-                        .padding(.horizontal)
-                        .padding(.bottom, 20)
+//                            }, onForwardTap: {
+//                                AudioService.shared.seek(by: 10)
+//                            },
+//                            onProgressTap: {
+//                                isShowingExpandedPlayer = true
+//                            }
+//                        )
+//                        .padding(.horizontal)
+//                        .padding(.bottom, 20)
                     }
 
                 default:

@@ -62,6 +62,8 @@ struct RootTabsView: View {
                     track: playerViewModel.track,
                     isPlaying: playerViewModel.isPlaying,
                     progress: playerViewModel.progress,
+                    repeatMode: playerViewModel.repeatMode,
+                    isShuffleEnabled: playerViewModel.isShuffleEnabled,
                     onRewindTap: {
                         playerViewModel.seek(by: -10)
                     }, onPlayPauseTap: {
@@ -71,6 +73,12 @@ struct RootTabsView: View {
                     },
                     onProgressTap: {
                         isShowingExpandedPlayer = true
+                    },
+                    onRepeatModeChange: { mod in
+                        playerViewModel.setRepeatMode(mod)
+                    },
+                    onShuffleToggle: {
+                        playerViewModel.toggleShuffle()
                     }
                 )
                 .padding(.bottom, tabBarHeight)

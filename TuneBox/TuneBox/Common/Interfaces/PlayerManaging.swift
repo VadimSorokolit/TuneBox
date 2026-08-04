@@ -10,8 +10,10 @@ import Foundation
 protocol PlayerManaging: AnyObject, Sendable {
     var track: TrackEntity? { get }
     var playlist: PlaylistEntity? { get }
-    var isPlaying: Bool { get }
+    var repeatMode: RepeatMode { get }
     var progress: Double { get }
+    var isShuffleEnabled: Bool { get }
+    var isPlaying: Bool { get }
 
     func handlePlayAction(for track: TrackEntity, in queue: [TrackEntity])
     func resetPlayback()
@@ -20,4 +22,6 @@ protocol PlayerManaging: AnyObject, Sendable {
     func playNext()
     func playPrevious()
     func loadPlaylist()
+    func setRepeatMode(_ mode: RepeatMode)
+    func toggleShuffle()
 }

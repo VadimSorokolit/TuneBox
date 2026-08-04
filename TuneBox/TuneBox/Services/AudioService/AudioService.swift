@@ -55,8 +55,8 @@ final class AudioService: NSObject, AudioServicing {
     func play(trackId: String, url: URL, loop: Bool = false) {
         self.stopProgressTimer()
         self.currentTrackId = trackId
+        self.currentURL = url
         self.shouldLoop = loop
-        self.loopURL = loop ? url : nil
 
         do {
             let ext = url.pathExtension.lowercased()
@@ -98,12 +98,35 @@ final class AudioService: NSObject, AudioServicing {
         self.player.stop()
         self.stopProgressTimer()
         self.currentTrackId = nil
+        self.currentURL = nil
         self.isDoPPlayback = false
         self.shouldLoop = false
-        self.loopURL = nil
         self.notifyStateChange(false)
         self.notifyProgress(0)
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+    }
+
+    /// Restarts the current item from the beginning without changing track identity.
+    func restartCurrentTrack() {
+        guard let url = self.currentURL, let trackId = self.currentTrackId else { return }
+
+        if self.player.seek(position: 0) {
+            self.notifyProgress(0)
+
+            if self.player.isPlaying {
+                self.refreshNowPlayingElapsed()
+                return
+            }
+
+            if self.player.resume() {
+                self.notifyStateChange(true)
+                self.startProgressTimer()
+                self.refreshNowPlayingElapsed()
+                return
+            }
+        }
+
+        self.play(trackId: trackId, url: url, loop: self.shouldLoop)
     }
 
     func toggle(trackId: String, url: URL, loop: Bool = false) {
@@ -190,7 +213,7 @@ final class AudioService: NSObject, AudioServicing {
     private let effectPlayer = AudioPlayer()
     private var progressTimer: Timer?
     private var storedVolume: Float = 1.0
-    private var loopURL: URL?
+    private var currentURL: URL?
     private var shouldLoop = false
     private var isDoPPlayback = false
     private var supportsDoP: Bool?
@@ -429,10 +452,8 @@ extension AudioService: AudioPlayer.Delegate {
     }
 
     func audioPlayerEndOfAudio(_ audioPlayer: AudioPlayer) {
-        if self.shouldLoop, let loopURL, let trackId = currentTrackId {
-            self.play(trackId: trackId, url: loopURL, loop: true)
-            return
-        }
+        // Always defer to PlayerViewModel so repeat/shuffle stay consistent.
+        // (Engine-level re-play causes an audible stop and can race with queue advance.)
         self.onTrackFinished?()
     }
 
