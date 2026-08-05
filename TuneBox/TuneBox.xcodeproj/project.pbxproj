@@ -106,15 +106,6 @@
 		5BA581922FD7055C00B498D7 /* EmptyTrackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA581912FD7055B00B498D7 /* EmptyTrackCell.swift */; };
 		5BA581942FD70BC300B498D7 /* EmptyGenreCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA581932FD70BC200B498D7 /* EmptyGenreCell.swift */; };
 		5BA581962FD8603500B498D7 /* HighlightedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA581952FD8603400B498D7 /* HighlightedText.swift */; };
-		5BBC59333020772D003442D2 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5BBC59323020772D003442D2 /* WidgetKit.framework */; };
-		5BBC59353020772D003442D2 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5BBC59343020772D003442D2 /* SwiftUI.framework */; };
-		5BBC59463020772E003442D2 /* TuneBoxWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5BBC59303020772D003442D2 /* TuneBoxWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		5BBC595430207736003442D2 /* AppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC594C30207736003442D2 /* AppIntent.swift */; };
-		5BBC595530207736003442D2 /* TuneBoxWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC594F30207736003442D2 /* TuneBoxWidget.swift */; };
-		5BBC595630207736003442D2 /* TuneBoxWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC595030207736003442D2 /* TuneBoxWidgetBundle.swift */; };
-		5BBC595730207736003442D2 /* TuneBoxWidgetControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC595130207736003442D2 /* TuneBoxWidgetControl.swift */; };
-		5BBC595830207736003442D2 /* TuneBoxWidgetLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC595230207736003442D2 /* TuneBoxWidgetLiveActivity.swift */; };
-		5BBC595930207736003442D2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5BBC594D30207736003442D2 /* Assets.xcassets */; };
 		5BC0DEAD2FDD000100503BA2 /* DownloadStateMergeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC0DEAC2FDD000100503BA2 /* DownloadStateMergeTests.swift */; };
 		5BC8D8F62FFD769300742822 /* ImportedPlaylistCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D8F52FFD769200742822 /* ImportedPlaylistCell.swift */; };
 		5BC8D9022FFE966B00742822 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D9012FFE966A00742822 /* AppCoordinator.swift */; };
@@ -168,13 +159,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		5BBC59443020772E003442D2 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 5BD5796A2FAB25BF00503BA2 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 5BBC592F3020772D003442D2;
-			remoteInfo = TuneBoxWidgetExtension;
-		};
 		5BD579802FAB25C000503BA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 5BD5796A2FAB25BF00503BA2 /* Project object */;
@@ -198,7 +182,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				5BBC59463020772E003442D2 /* TuneBoxWidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -298,16 +281,8 @@
 		5BA581932FD70BC200B498D7 /* EmptyGenreCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyGenreCell.swift; sourceTree = "<group>"; };
 		5BA581952FD8603400B498D7 /* HighlightedText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightedText.swift; sourceTree = "<group>"; };
 		5BB9A56D2FC8AF45000B8127 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
-		5BBC59303020772D003442D2 /* TuneBoxWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TuneBoxWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		5BBC59323020772D003442D2 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		5BBC59343020772D003442D2 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
-		5BBC594C30207736003442D2 /* AppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntent.swift; sourceTree = "<group>"; };
-		5BBC594D30207736003442D2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		5BBC594E30207736003442D2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		5BBC594F30207736003442D2 /* TuneBoxWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneBoxWidget.swift; sourceTree = "<group>"; };
-		5BBC595030207736003442D2 /* TuneBoxWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneBoxWidgetBundle.swift; sourceTree = "<group>"; };
-		5BBC595130207736003442D2 /* TuneBoxWidgetControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneBoxWidgetControl.swift; sourceTree = "<group>"; };
-		5BBC595230207736003442D2 /* TuneBoxWidgetLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneBoxWidgetLiveActivity.swift; sourceTree = "<group>"; };
 		5BC0DEAC2FDD000100503BA2 /* DownloadStateMergeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadStateMergeTests.swift; sourceTree = "<group>"; };
 		5BC8D8F52FFD769200742822 /* ImportedPlaylistCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportedPlaylistCell.swift; sourceTree = "<group>"; };
 		5BC8D9012FFE966A00742822 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
@@ -365,15 +340,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		5BBC592D3020772D003442D2 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				5BBC59353020772D003442D2 /* SwiftUI.framework in Frameworks */,
-				5BBC59333020772D003442D2 /* WidgetKit.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		5BD5796F2FAB25BF00503BA2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -877,52 +843,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		5BBC595330207736003442D2 /* TuneBoxWidget */ = {
-			isa = PBXGroup;
-			children = (
-				5BBC595C30207D02003442D2 /* Intent */,
-				5BBC595D30207D59003442D2 /* LiveActivity */,
-				5BBC595E30207D75003442D2 /* Widgets */,
-				5BBC595B30207952003442D2 /* Resources */,
-			);
-			path = TuneBoxWidget;
-			sourceTree = "<group>";
-		};
-		5BBC595B30207952003442D2 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				5BBC594D30207736003442D2 /* Assets.xcassets */,
-				5BBC594E30207736003442D2 /* Info.plist */,
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
-		5BBC595C30207D02003442D2 /* Intent */ = {
-			isa = PBXGroup;
-			children = (
-				5BBC594C30207736003442D2 /* AppIntent.swift */,
-			);
-			path = Intent;
-			sourceTree = "<group>";
-		};
-		5BBC595D30207D59003442D2 /* LiveActivity */ = {
-			isa = PBXGroup;
-			children = (
-				5BBC595230207736003442D2 /* TuneBoxWidgetLiveActivity.swift */,
-			);
-			path = LiveActivity;
-			sourceTree = "<group>";
-		};
-		5BBC595E30207D75003442D2 /* Widgets */ = {
-			isa = PBXGroup;
-			children = (
-				5BBC594F30207736003442D2 /* TuneBoxWidget.swift */,
-				5BBC595030207736003442D2 /* TuneBoxWidgetBundle.swift */,
-				5BBC595130207736003442D2 /* TuneBoxWidgetControl.swift */,
-			);
-			path = Widgets;
-			sourceTree = "<group>";
-		};
 		5BC8D9002FFE965600742822 /* Navigation */ = {
 			isa = PBXGroup;
 			children = (
@@ -977,7 +897,6 @@
 				5B0BC2A8300539BC00E8F2A5 /* Settings.bundle */,
 				5B84C0242FAB367B00ACE75A /* .swiftlint.yml */,
 				5BD5799F2FAB25E300503BA2 /* TuneBox */,
-				5BBC595330207736003442D2 /* TuneBoxWidget */,
 				5BD579A42FAB25EE00503BA2 /* TuneBoxTests */,
 				5BBC59313020772D003442D2 /* Frameworks */,
 				5BD579732FAB25BF00503BA2 /* Products */,
@@ -990,7 +909,6 @@
 				5BD579722FAB25BF00503BA2 /* TuneBox.app */,
 				5BD5797F2FAB25C000503BA2 /* TuneBoxTests.xctest */,
 				5BD579892FAB25C000503BA2 /* TuneBoxUITests.xctest */,
-				5BBC59303020772D003442D2 /* TuneBoxWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1219,25 +1137,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		5BBC592F3020772D003442D2 /* TuneBoxWidgetExtension */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 5BBC594B3020772E003442D2 /* Build configuration list for PBXNativeTarget "TuneBoxWidgetExtension" */;
-			buildPhases = (
-				5BBC592C3020772D003442D2 /* Sources */,
-				5BBC592D3020772D003442D2 /* Frameworks */,
-				5BBC592E3020772D003442D2 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = TuneBoxWidgetExtension;
-			packageProductDependencies = (
-			);
-			productName = TuneBoxWidgetExtension;
-			productReference = 5BBC59303020772D003442D2 /* TuneBoxWidgetExtension.appex */;
-			productType = "com.apple.product-type.app-extension";
-		};
 		5BD579712FAB25BF00503BA2 /* TuneBox */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5BD579932FAB25C000503BA2 /* Build configuration list for PBXNativeTarget "TuneBox" */;
@@ -1251,7 +1150,6 @@
 			);
 			dependencies = (
 				5B4762772FAB37D90069E41A /* PBXTargetDependency */,
-				5BBC59453020772E003442D2 /* PBXTargetDependency */,
 			);
 			name = TuneBox;
 			packageProductDependencies = (
@@ -1318,9 +1216,6 @@
 				LastSwiftUpdateCheck = 2660;
 				LastUpgradeCheck = 2660;
 				TargetAttributes = {
-					5BBC592F3020772D003442D2 = {
-						CreatedOnToolsVersion = 26.6;
-					};
 					5BD579712FAB25BF00503BA2 = {
 						CreatedOnToolsVersion = 26.4.1;
 					};
@@ -1357,7 +1252,6 @@
 			projectRoot = "";
 			targets = (
 				5BD579712FAB25BF00503BA2 /* TuneBox */,
-				5BBC592F3020772D003442D2 /* TuneBoxWidgetExtension */,
 				5BD5797E2FAB25C000503BA2 /* TuneBoxTests */,
 				5BD579882FAB25C000503BA2 /* TuneBoxUITests */,
 			);
@@ -1365,14 +1259,6 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		5BBC592E3020772D003442D2 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				5BBC595930207736003442D2 /* Assets.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		5BD579702FAB25BF00503BA2 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1418,18 +1304,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		5BBC592C3020772D003442D2 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				5BBC595430207736003442D2 /* AppIntent.swift in Sources */,
-				5BBC595530207736003442D2 /* TuneBoxWidget.swift in Sources */,
-				5BBC595630207736003442D2 /* TuneBoxWidgetBundle.swift in Sources */,
-				5BBC595730207736003442D2 /* TuneBoxWidgetControl.swift in Sources */,
-				5BBC595830207736003442D2 /* TuneBoxWidgetLiveActivity.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		5BD5796E2FAB25BF00503BA2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1578,11 +1452,6 @@
 			isa = PBXTargetDependency;
 			productRef = 5B4762762FAB37D90069E41A /* SwiftLintBuildToolPlugin */;
 		};
-		5BBC59453020772E003442D2 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 5BBC592F3020772D003442D2 /* TuneBoxWidgetExtension */;
-			targetProxy = 5BBC59443020772E003442D2 /* PBXContainerItemProxy */;
-		};
 		5BD579812FAB25C000503BA2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 5BD579712FAB25BF00503BA2 /* TuneBox */;
@@ -1596,70 +1465,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		5BBC59483020772E003442D2 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = D28SS25G7Y;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = TuneBoxWidget/Resources/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = TuneBoxWidget;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.TuneBox.TuneBoxWidget;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		5BBC59493020772E003442D2 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = D28SS25G7Y;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = TuneBoxWidget/Resources/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = TuneBoxWidget;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.TuneBox.TuneBoxWidget;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
 		5BD579912FAB25C000503BA2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5BB9A56D2FC8AF45000B8127 /* Config.xcconfig */;
@@ -1958,15 +1763,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		5BBC594B3020772E003442D2 /* Build configuration list for PBXNativeTarget "TuneBoxWidgetExtension" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				5BBC59483020772E003442D2 /* Debug */,
-				5BBC59493020772E003442D2 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		5BD5796D2FAB25BF00503BA2 /* Build configuration list for PBXProject "TuneBox" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
