@@ -37,10 +37,10 @@ struct TracksView: View {
                         Section {
                             sectionTracksTitle(
                                 section.letter,
-                                font: .system(size: 16, weight: .regular),
+                                font: .system(size: 15, weight: .medium),
                                 foregroundStyle: .gray,
-                                topPadding: 10,
-                                bottomPadding: 5,
+                                topPadding: 20,
+                                bottomPadding: 8,
                                 horizontalPadding: GlobalConstants.Cell.defaultPadding,
                                 hasSeparator: false
                             )
