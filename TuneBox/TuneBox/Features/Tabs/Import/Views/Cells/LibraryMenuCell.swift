@@ -153,6 +153,7 @@ struct LibraryMenuCell: View {
                 VStack(spacing: 0) {
                     Text(title)
                         .font(.system(size: 16, weight: .regular))
+                        .lineLimit(4)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
                     if let sourceStorageSize {
@@ -177,7 +178,6 @@ struct LibraryMenuCell: View {
                 }
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 22)
             .padding(.horizontal, 26)
 
             Rectangle()

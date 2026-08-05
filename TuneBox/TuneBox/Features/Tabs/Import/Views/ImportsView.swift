@@ -204,9 +204,7 @@ struct ImportsView: View {
                                 Section {
                                     VStack(spacing: 0) {
                                         ForEach(section.items, id: \.self) { item in
-                                            menuCell(for: item,
-                                                     in: section
-                                            )
+                                            menuCell(for: item, in: section)
                                         }
                                     }
                                     .animation(
