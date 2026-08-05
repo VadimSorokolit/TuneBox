@@ -31,7 +31,11 @@ struct AlbumDetailsView: View {
                                 index: index + 1,
                                 track: track,
                                 onTapGesture: {
-                                    playerViewModel.handlePlayAction(for: track, in: album.tracks)
+                                    playerViewModel.handlePlayAction(
+                                        for: track,
+                                        in: album.tracks,
+                                        origin: .album(album)
+                                    )
                                 }
                             )
                         }

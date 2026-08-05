@@ -83,7 +83,11 @@ struct SourceView: View {
                             return
                         }
                         let tracks = viewModel.tracks(for: sourceID)
-                        playerViewModel.handlePlayAction(for: track, in: tracks)
+                        playerViewModel.handlePlayAction(
+                            for: track,
+                            in: tracks,
+                            origin: nil
+                        )
                     }
                 )
 

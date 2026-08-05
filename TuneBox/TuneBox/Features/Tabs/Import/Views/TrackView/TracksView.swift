@@ -50,7 +50,11 @@ struct TracksView: View {
                                 TrackArtworkCell(
                                     track: track,
                                     onTapGesture: {
-                                        playerViewModel.handlePlayAction(for: track, in: section.tracks)
+                                        playerViewModel.handlePlayAction(
+                                            for: track,
+                                            in: section.tracks,
+                                            origin: nil
+                                        )
                                     }
                                 )
                                 .listRowInsets(EdgeInsets())

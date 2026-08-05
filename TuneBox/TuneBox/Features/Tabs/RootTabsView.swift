@@ -64,10 +64,17 @@ struct RootTabsView: View {
                     progress: playerViewModel.progress,
                     repeatMode: playerViewModel.repeatMode,
                     isShuffleEnabled: playerViewModel.isShuffleEnabled,
+                    onTrackInfoTap: {
+                        openTrackSource()
+                    },
                     onRewindTap: {
                         playerViewModel.seek(by: -10)
                     }, onPlayPauseTap: {
-                        playerViewModel.handlePlayAction(for: track, in: playerViewModel.playlist?.tracks ?? [track])
+                        playerViewModel.handlePlayAction(
+                            for: track,
+                            in: playerViewModel.playlist?.tracks ?? [track],
+                            origin: nil
+                        )
                     }, onForwardTap: {
                         playerViewModel.seek(by: 10)
                     },
@@ -182,6 +189,41 @@ struct RootTabsView: View {
         Rectangle()
             .foregroundStyle(theme.tokens.tabBarBackground)
             .ignoresSafeArea(edges: .bottom)
+    }
+
+    // MARK: - Private. Methods
+
+    private func openTrackSource() {
+        guard let origin = playerViewModel.playbackOrigin else { return }
+
+        switch origin {
+            case .downloads:
+                self.coordinator.switchToTab(.downloads)
+
+            case .album(let album):
+                coordinator.switchToTab(.importFiles)
+                coordinator.popToRoot(animated: false)
+                coordinator.push(.album(album))
+
+            case .artist(let artist):
+                coordinator.switchToTab(.importFiles)
+                coordinator.popToRoot(animated: false)
+                coordinator.push(.artist(artist))
+
+            case .sourceFolder(let sourceID, let path):
+                coordinator.switchToTab(.importFiles)
+                coordinator.popToRoot(animated: false)
+                coordinator.push(.sourceFolder(sourceID: sourceID, path: path))
+
+            case .tracks(let title, let content):
+                coordinator.switchToTab(.importFiles)
+                coordinator.popToRoot(animated: false)
+                coordinator.push(.tracks(title, content))
+
+            case .playlist(let id, let title):
+                coordinator.switchToTab(.importFiles)
+                coordinator.popToRoot(animated: false)
+        }
     }
 
     // MARK: - Private. Object

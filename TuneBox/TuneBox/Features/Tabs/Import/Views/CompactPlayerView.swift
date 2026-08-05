@@ -16,6 +16,7 @@ struct CompactPlayerView: View {
     var progress: Double
     let repeatMode: RepeatMode
     let isShuffleEnabled: Bool
+    let onTrackInfoTap: () -> Void
     let onRewindTap: () -> Void
     let onPlayPauseTap: () -> Void
     let onForwardTap: () -> Void
@@ -34,19 +35,28 @@ struct CompactPlayerView: View {
                     cornerRadius: 8
                 )
 
-                VStack(
-                    alignment: .leading,
-                    spacing: track?.artistName.isEmpty == true ? 0 : 2
-                ) {
-                    MarqueeText(text: track?.songName ?? "")
+                Button(action: {
+                    onTrackInfoTap()
+                }, label: {
+                    VStack(
+                        alignment: .leading,
+                        spacing: track?.artistName.isEmpty == true
+                        ? 0
+                        : 2
+                    ) {
+                        MarqueeText(text: track?.songName ?? "")
 
-                    Text(track?.artistName ?? "")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .layoutPriority(-1)
+                        Text(track?.artistName ?? "")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .contentShape(Capsule())
+                })
+                .buttonStyle(PressGlassButtonStyle())
 
                 PlaybackControls(
                     progress: progress,
@@ -88,6 +98,23 @@ struct CompactPlayerView: View {
 }
 
 // MARK: - Private. Objects
+
+private struct PressGlassButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .background {
+                Capsule()
+                    .fill(.white.opacity(configuration.isPressed ? 0.22 : 0))
+            }
+            .glassEffect(
+                configuration.isPressed
+                    ? .regular.interactive()
+                    : .identity,
+                in: .capsule
+            )
+            .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
+    }
+}
 
 private struct PlaybackControls: View {
 
@@ -440,6 +467,7 @@ private struct MarqueeTextWidthKey: PreferenceKey {
         progress: 0.5,
         repeatMode: .one,
         isShuffleEnabled: false,
+        onTrackInfoTap: {},
         onRewindTap: {},
         onPlayPauseTap: {},
         onForwardTap: {},

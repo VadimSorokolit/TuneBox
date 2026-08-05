@@ -172,7 +172,11 @@ struct ArtistDetailsView: View {
                     TrackArtworkCell(
                         track: track,
                         onTapGesture: {
-                            playerViewModel.handlePlayAction(for: track, in: tracks)
+                            playerViewModel.handlePlayAction(
+                                for: track,
+                                in: tracks,
+                                origin: nil
+                            )
                         }
                     )
                 }

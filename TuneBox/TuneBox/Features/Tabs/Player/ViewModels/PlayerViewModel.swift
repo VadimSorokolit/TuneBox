@@ -21,6 +21,15 @@ enum RepeatMode: String, CaseIterable {
     case all
 }
 
+enum PlaybackOrigin: Hashable {
+    case album(MusicLibrary.Album)
+    case artist(MusicLibrary.Artist)
+    case sourceFolder(sourceID: UUID, path: String?)
+    case tracks(title: String?, TracksContent)
+    case playlist(id: String, title: String)
+    case downloads
+}
+
 @MainActor
 @Observable
 final class PlayerViewModel: PlayerManaging {
@@ -34,6 +43,7 @@ final class PlayerViewModel: PlayerManaging {
     private(set) var isShuffleEnabled = false
     private(set) var isPlaying = false
     private(set) var error: String?
+    private(set) var playbackOrigin: PlaybackOrigin?
 
     // MARK: - Initializer
 
@@ -97,7 +107,11 @@ final class PlayerViewModel: PlayerManaging {
         }
     }
 
-    func handlePlayAction(for track: TrackEntity, in queue: [TrackEntity]) {
+    func handlePlayAction(for track: TrackEntity, in queue: [TrackEntity], origin: PlaybackOrigin? = nil) {
+        if let origin {
+            self.playbackOrigin = origin
+        }
+
         let tracks = queue.isEmpty ? [track] : queue
         let queueChanged = self.playlist?.tracks.map(\.id) != tracks.map(\.id)
         self.playlist = PlaylistEntity(title: "Queue", tracks: tracks)
@@ -122,6 +136,7 @@ final class PlayerViewModel: PlayerManaging {
         self.track = nil
         self.progress = 0
         self.isPlaying = false
+        self.playbackOrigin = nil
     }
 
     func isPlaying(_ track: TrackEntity) -> Bool {

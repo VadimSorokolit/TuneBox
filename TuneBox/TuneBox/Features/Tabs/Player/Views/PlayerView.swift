@@ -55,7 +55,13 @@ struct PlayerView: View {
 
                 Button(action: {
                     if let playlist = viewModel.playlist {
-                        viewModel.handlePlayAction(for: playlist.tracks.first!, in: playlist.tracks)
+                        if let firstTrack = playlist.tracks.first {
+                            viewModel.handlePlayAction(
+                                for: firstTrack,
+                                in: playlist.tracks,
+                                origin: viewModel.playbackOrigin
+                            )
+                        }
                     }
                 },
                     label: {
