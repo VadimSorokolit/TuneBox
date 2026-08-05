@@ -86,7 +86,7 @@ struct SourceView: View {
                         playerViewModel.handlePlayAction(
                             for: track,
                             in: tracks,
-                            origin: nil
+                            navigationPath: coordinator.path
                         )
                     }
                 )

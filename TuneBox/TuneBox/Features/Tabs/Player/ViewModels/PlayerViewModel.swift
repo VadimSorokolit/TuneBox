@@ -43,7 +43,7 @@ final class PlayerViewModel: PlayerManaging {
     private(set) var isShuffleEnabled = false
     private(set) var isPlaying = false
     private(set) var error: String?
-    private(set) var playbackOrigin: PlaybackOrigin?
+    private(set) var playbackNavigationPath: [AppRoute] = []
 
     // MARK: - Initializer
 
@@ -107,9 +107,9 @@ final class PlayerViewModel: PlayerManaging {
         }
     }
 
-    func handlePlayAction(for track: TrackEntity, in queue: [TrackEntity], origin: PlaybackOrigin? = nil) {
-        if let origin {
-            self.playbackOrigin = origin
+    func handlePlayAction(for track: TrackEntity, in queue: [TrackEntity], navigationPath: [AppRoute]? = nil) {
+        if let navigationPath {
+            self.playbackNavigationPath = navigationPath
         }
 
         let tracks = queue.isEmpty ? [track] : queue
@@ -136,7 +136,7 @@ final class PlayerViewModel: PlayerManaging {
         self.track = nil
         self.progress = 0
         self.isPlaying = false
-        self.playbackOrigin = nil
+        self.playbackNavigationPath = []
     }
 
     func isPlaying(_ track: TrackEntity) -> Bool {

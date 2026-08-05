@@ -53,7 +53,7 @@ struct TracksView: View {
                                         playerViewModel.handlePlayAction(
                                             for: track,
                                             in: section.tracks,
-                                            origin: nil
+                                            navigationPath: coordinator.path
                                         )
                                     }
                                 )
@@ -100,6 +100,7 @@ struct TracksView: View {
 
     // MARK: - Properties. Private
 
+    @Environment(AppCoordinator.self) private var coordinator
     @Injected private var viewModel: ImportManaging
     @Injected private var playerViewModel: PlayerManaging
 

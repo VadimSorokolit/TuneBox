@@ -59,7 +59,7 @@ struct PlayerView: View {
                             viewModel.handlePlayAction(
                                 for: firstTrack,
                                 in: playlist.tracks,
-                                origin: viewModel.playbackOrigin
+                                navigationPath: nil
                             )
                         }
                     }

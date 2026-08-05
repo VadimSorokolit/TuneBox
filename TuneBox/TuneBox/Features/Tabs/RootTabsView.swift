@@ -73,7 +73,7 @@ struct RootTabsView: View {
                         playerViewModel.handlePlayAction(
                             for: track,
                             in: playerViewModel.playlist?.tracks ?? [track],
-                            origin: nil
+                            navigationPath: nil
                         )
                     }, onForwardTap: {
                         playerViewModel.seek(by: 10)
@@ -194,36 +194,11 @@ struct RootTabsView: View {
     // MARK: - Private. Methods
 
     private func openTrackSource() {
-        guard let origin = playerViewModel.playbackOrigin else { return }
+        let path = playerViewModel.playbackNavigationPath
+        guard path.isNotEmpty else { return }
 
-        switch origin {
-            case .downloads:
-                self.coordinator.switchToTab(.downloads)
-
-            case .album(let album):
-                coordinator.switchToTab(.importFiles)
-                coordinator.popToRoot(animated: false)
-                coordinator.push(.album(album))
-
-            case .artist(let artist):
-                coordinator.switchToTab(.importFiles)
-                coordinator.popToRoot(animated: false)
-                coordinator.push(.artist(artist))
-
-            case .sourceFolder(let sourceID, let path):
-                coordinator.switchToTab(.importFiles)
-                coordinator.popToRoot(animated: false)
-                coordinator.push(.sourceFolder(sourceID: sourceID, path: path))
-
-            case .tracks(let title, let content):
-                coordinator.switchToTab(.importFiles)
-                coordinator.popToRoot(animated: false)
-                coordinator.push(.tracks(title, content))
-
-            case .playlist(let id, let title):
-                coordinator.switchToTab(.importFiles)
-                coordinator.popToRoot(animated: false)
-        }
+        coordinator.switchToTab(.importFiles)
+        coordinator.syncPath(path)
     }
 
     // MARK: - Private. Object

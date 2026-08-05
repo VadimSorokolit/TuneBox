@@ -36,11 +36,13 @@ struct ArtistDetailsView: View {
                 if artist.albums.isEmpty {
                     TracksContentView(
                         viewModel: viewModel,
+                        coordinator: coordinator,
                         playerViewModel: playerViewModel,
                         tracks: artist.tracks
                     )
                 } else {
                     ChipsView(
+                        coordinator: coordinator,
                         viewModel: viewModel,
                         playerViewModel: playerViewModel,
                         artist: artist
@@ -59,6 +61,7 @@ struct ArtistDetailsView: View {
 
     // MARK: - Properties. Private
 
+    @Environment(AppCoordinator.self) private var coordinator
     @Injected private var viewModel: ImportManaging
     @Injected private var playerViewModel: PlayerManaging
 
@@ -68,6 +71,7 @@ struct ArtistDetailsView: View {
 
         // MARK: - Properties. Public
 
+        let coordinator: AppCoordinator
         let viewModel: ImportManaging
         let playerViewModel: PlayerManaging
         let artist: MusicLibrary.Artist
@@ -88,6 +92,7 @@ struct ArtistDetailsView: View {
                         switch selected {
                             case .albums:
                                 AlbumsContentView(
+                                    coorditaor: coordinator,
                                     viewModel: viewModel,
                                     playerViewModel: playerViewModel,
                                     albums: artist.albums
@@ -98,6 +103,7 @@ struct ArtistDetailsView: View {
                             case .tracks:
                                 TracksContentView(
                                     viewModel: viewModel,
+                                    coordinator: coordinator,
                                     playerViewModel: playerViewModel,
                                     tracks: viewModel.sortedTracksAlphabetically(artist.tracks),
                                 )
@@ -123,6 +129,7 @@ struct ArtistDetailsView: View {
 
         // MARK: - Properties. Public
 
+        let coorditaor: AppCoordinator
         let viewModel: ImportManaging
         let playerViewModel: PlayerManaging
         let albums: [MusicLibrary.Album]
@@ -150,10 +157,6 @@ struct ArtistDetailsView: View {
                 )
             }
         }
-
-        // MARK: - Properties. Private
-
-        @Environment(AppCoordinator.self) private var coorditaor
     }
 
     private struct TracksContentView: View {
@@ -161,6 +164,7 @@ struct ArtistDetailsView: View {
         // MARK: - Properties. Public
 
         let viewModel: ImportManaging
+        let coordinator: AppCoordinator
         let playerViewModel: PlayerManaging
         let tracks: [TrackEntity]
 
@@ -175,7 +179,7 @@ struct ArtistDetailsView: View {
                             playerViewModel.handlePlayAction(
                                 for: track,
                                 in: tracks,
-                                origin: nil
+                                navigationPath: coordinator.path
                             )
                         }
                     )

@@ -34,7 +34,7 @@ struct AlbumDetailsView: View {
                                     playerViewModel.handlePlayAction(
                                         for: track,
                                         in: album.tracks,
-                                        origin: .album(album)
+                                        navigationPath: coordinator.path
                                     )
                                 }
                             )
@@ -77,6 +77,7 @@ struct AlbumDetailsView: View {
 
     // MARK: - Properties. Private
 
+    @Environment(AppCoordinator.self) private var coordinator
     @Injected private var viewModel: ImportManaging
     @Injected private var playerViewModel: PlayerManaging
 }
