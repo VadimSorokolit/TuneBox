@@ -376,9 +376,9 @@ private struct MarqueeText: View {
     @State private var textWidth: CGFloat = 0
     @State private var cycleStartedAt: Date = Date()
 
-    private let speed: CGFloat = 100
+    private let speed: CGFloat = 60
     private let textSpacing: CGFloat = 100
-    private let pauseDuration: TimeInterval = 1.5
+    private let pauseDuration: TimeInterval = 2
     private let fadeWidth: CGFloat = 0
 
     private var textView: some View {
