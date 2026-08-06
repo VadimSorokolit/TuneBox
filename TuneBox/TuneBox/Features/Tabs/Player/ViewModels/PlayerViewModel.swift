@@ -131,6 +131,10 @@ final class PlayerViewModel: PlayerManaging {
         self.audioService.seek(by: deltaSeconds)
     }
 
+    func setSeekScrubbing(_ isScrubbing: Bool) {
+        self.audioService.setSeekScrubbing(isScrubbing)
+    }
+
     func resetPlayback() {
         self.audioService.stop()
         self.track = nil

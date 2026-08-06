@@ -67,16 +67,18 @@ struct RootTabsView: View {
                     onTrackInfoTap: {
                         openTrackSource()
                     },
-                    onRewindTap: {
-                        playerViewModel.seek(by: -10)
-                    }, onPlayPauseTap: {
+                    onSeek: { delta in
+                        playerViewModel.seek(by: delta)
+                    },
+                    onSeekHoldChanged: { isHolding in
+                        playerViewModel.setSeekScrubbing(isHolding)
+                    },
+                    onPlayPauseTap: {
                         playerViewModel.handlePlayAction(
                             for: track,
                             in: playerViewModel.playlist?.tracks ?? [track],
                             navigationPath: nil
                         )
-                    }, onForwardTap: {
-                        playerViewModel.seek(by: 10)
                     },
                     onProgressTap: {
                         isShowingExpandedPlayer = true

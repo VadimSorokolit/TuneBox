@@ -101,6 +101,7 @@ final class AudioService: NSObject, AudioServicing {
         self.currentURL = nil
         self.isDoPPlayback = false
         self.shouldLoop = false
+        self.isSeekScrubbing = false
         self.notifyStateChange(false)
         self.notifyProgress(0)
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
@@ -165,6 +166,12 @@ final class AudioService: NSObject, AudioServicing {
         self.refreshNowPlayingElapsed()
     }
 
+    func setSeekScrubbing(_ isScrubbing: Bool) {
+        guard self.isSeekScrubbing != isScrubbing else { return }
+        self.isSeekScrubbing = isScrubbing
+        self.applyVolume()
+    }
+
     func seek(to progress: Double) {
         guard self.duration > 0 else { return }
         let clamped = min(max(progress, 0), 1)
@@ -217,6 +224,7 @@ final class AudioService: NSObject, AudioServicing {
     private var shouldLoop = false
     private var isDoPPlayback = false
     private var supportsDoP: Bool?
+    private var isSeekScrubbing = false
 
     private static let progressInterval: TimeInterval = 0.1
     private static let endThreshold: TimeInterval = 0.05
@@ -393,7 +401,16 @@ final class AudioService: NSObject, AudioServicing {
     }
 
     private func applyVolume() {
-        let volume = self.isDoPPlayback ? 1.0 : self.storedVolume
+        let volume: Float
+
+        if self.isSeekScrubbing {
+            volume = 0
+        } else if self.isDoPPlayback {
+            volume = 1.0
+        } else {
+            volume = self.storedVolume
+        }
+
         self.player.modifyProcessingGraph { engine in
             engine.mainMixerNode.outputVolume = volume
         }

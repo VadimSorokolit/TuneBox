@@ -17,9 +17,9 @@ struct CompactPlayerView: View {
     let repeatMode: RepeatMode
     let isShuffleEnabled: Bool
     let onTrackInfoTap: () -> Void
-    let onRewindTap: () -> Void
+    let onSeek: (TimeInterval) -> Void
+    let onSeekHoldChanged: (Bool) -> Void
     let onPlayPauseTap: () -> Void
-    let onForwardTap: () -> Void
     let onProgressTap: () -> Void
     let onRepeatModeChange: (RepeatMode) -> Void
     let onShuffleToggle: () -> Void
@@ -63,9 +63,9 @@ struct CompactPlayerView: View {
                     isPlaying: isPlaying,
                     repeatMode: repeatMode,
                     isShuffleEnabled: isShuffleEnabled,
-                    onRewindTap: onRewindTap,
+                    onSeek: onSeek,
+                    onSeekHoldChanged: onSeekHoldChanged,
                     onPlayPauseTap: onPlayPauseTap,
-                    onForwardTap: onForwardTap,
                     onRepeatModeChange: onRepeatModeChange,
                     onShuffleToggle: onShuffleToggle
                 )
@@ -116,6 +116,23 @@ private struct PressGlassButtonStyle: ButtonStyle {
     }
 }
 
+private struct PressCircleGlassButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .background {
+                Circle()
+                    .fill(.white.opacity(configuration.isPressed ? 0.22 : 0))
+            }
+            .glassEffect(
+                configuration.isPressed
+                    ? .regular.interactive()
+                    : .identity,
+                in: .circle
+            )
+            .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
+    }
+}
+
 private struct PlaybackControls: View {
 
     // MARK: - Properties. Public
@@ -124,9 +141,9 @@ private struct PlaybackControls: View {
     let isPlaying: Bool
     let repeatMode: RepeatMode
     let isShuffleEnabled: Bool
-    let onRewindTap: () -> Void
+    let onSeek: (TimeInterval) -> Void
+    let onSeekHoldChanged: (Bool) -> Void
     let onPlayPauseTap: () -> Void
-    let onForwardTap: () -> Void
     let onRepeatModeChange: (RepeatMode) -> Void
     let onShuffleToggle: () -> Void
 
@@ -134,13 +151,13 @@ private struct PlaybackControls: View {
 
     var body: some View {
         HStack(spacing: 16) {
-            Button {
-                onRewindTap()
-            } label: {
-                Image(systemName: "gobackward.10")
-                    .frame(size: imageSize)
-            }
-            .disabled(progress == 0)
+            SeekHoldButton(
+                systemImage: "backward",
+                direction: -1,
+                isDisabled: progress == 0,
+                onSeek: onSeek,
+                onSeekHoldChanged: onSeekHoldChanged
+            )
 
             PlayPauseMenuButton(
                 isPlaying: isPlaying,
@@ -152,20 +169,124 @@ private struct PlaybackControls: View {
             )
             .equatable()
 
-            Button {
-                onForwardTap()
-            } label: {
-                Image(systemName: "goforward.10")
-                    .frame(size: imageSize)
-            }
-            .disabled(progress == 1)
+            SeekHoldButton(
+                systemImage: "forward",
+                direction: 1,
+                isDisabled: progress == 1,
+                onSeek: onSeek,
+                onSeekHoldChanged: onSeekHoldChanged
+            )
         }
         .font(.title3)
+    }
+}
+
+private struct SeekHoldButton: View {
+
+    // MARK: - Properties. Public
+
+    let systemImage: String
+    let direction: Double
+    let isDisabled: Bool
+    let onSeek: (TimeInterval) -> Void
+    let onSeekHoldChanged: (Bool) -> Void
+
+    // MARK: - Body
+
+    var body: some View {
+        Image(systemName: systemImage)
+            .foregroundStyle(.tint)
+            .frame(size: imageSize)
+            .contentShape(Circle())
+            .background {
+                Circle()
+                    .fill(.white.opacity(isPressed ? 0.22 : 0))
+            }
+            .glassEffect(
+                isPressed
+                    ? .regular.interactive()
+                    : .identity,
+                in: .circle
+            )
+            .animation(.easeOut(duration: 0.15), value: isPressed)
+            .opacity(isDisabled ? 0.35 : 1)
+            .gesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { _ in
+                        guard isDisabled.isFalse else { return }
+                        beginPress()
+                    }
+                    .onEnded { _ in
+                        endPress()
+                    }
+            )
+            .allowsHitTesting(isDisabled.isFalse)
+            .onDisappear {
+                endPress()
+            }
     }
 
     // MARK: - Private. Properties
 
+    @State private var holdTask: Task<Void, Never>?
+    @State private var didEnterHold = false
+    @State private var isPressed = false
+
     private let imageSize: CGFloat = 40
+    private let tapSeekSeconds: TimeInterval = 10
+    private let holdStepSeconds: TimeInterval = 1
+    private let holdDelayNanoseconds: UInt64 = 300_000_000
+    private let holdTickNanoseconds: UInt64 = 120_000_000
+
+    // MARK: - Private. Methods
+
+    private func beginPress() {
+        guard holdTask == nil else { return }
+
+        isPressed = true
+        didEnterHold = false
+        holdTask = Task { @MainActor in
+            do {
+                try await Task.sleep(nanoseconds: holdDelayNanoseconds)
+            } catch {
+                return
+            }
+
+            guard !Task.isCancelled else { return }
+            didEnterHold = true
+            onSeekHoldChanged(true)
+
+            while !Task.isCancelled {
+                onSeek(direction * holdStepSeconds)
+                do {
+                    try await Task.sleep(nanoseconds: holdTickNanoseconds)
+                } catch {
+                    return
+                }
+            }
+        }
+    }
+
+    private func endPress() {
+        let wasHolding = didEnterHold
+        let wasPressed = isPressed
+        cancelHold()
+        isPressed = false
+
+        guard wasPressed else { return }
+
+        if wasHolding {
+            onSeekHoldChanged(false)
+        } else if isDisabled.isFalse {
+            onSeek(direction * tapSeekSeconds)
+        }
+    }
+
+    private func cancelHold() {
+        holdTask?.cancel()
+        holdTask = nil
+        didEnterHold = false
+    }
 }
 
 private struct PlayPauseMenuButton: View, Equatable {
@@ -194,9 +315,12 @@ private struct PlayPauseMenuButton: View, Equatable {
             Button {
                 onPlayPauseTap()
             } label: {
-                Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                Image(systemName: isPlaying ? "pause" : "play")
+                    .foregroundStyle(.tint)
                     .frame(size: imageSize)
+                    .contentShape(Circle())
             }
+            .buttonStyle(PressCircleGlassButtonStyle())
             .contextMenu {
                 Button {
                     onRepeatModeChange(.one)
@@ -468,9 +592,9 @@ private struct MarqueeTextWidthKey: PreferenceKey {
         repeatMode: .one,
         isShuffleEnabled: false,
         onTrackInfoTap: {},
-        onRewindTap: {},
+        onSeek: { _ in },
+        onSeekHoldChanged: { _ in },
         onPlayPauseTap: {},
-        onForwardTap: {},
         onProgressTap: {},
         onRepeatModeChange: {_ in },
         onShuffleToggle: {}

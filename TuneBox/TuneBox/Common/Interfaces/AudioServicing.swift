@@ -49,4 +49,5 @@ protocol AudioServicing: AnyObject {
     func setNowPlaying(track: TrackEntity)
     func seek(by deltaSeconds: TimeInterval)
     func seek(to progress: Double)
+    func setSeekScrubbing(_ isScrubbing: Bool)
 }

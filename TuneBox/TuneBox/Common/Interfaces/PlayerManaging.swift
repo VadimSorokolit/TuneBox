@@ -20,6 +20,7 @@ protocol PlayerManaging: AnyObject, Sendable {
     func resetPlayback()
     func isPlaying(_ track: TrackEntity) -> Bool
     func seek(by deltaSeconds: TimeInterval)
+    func setSeekScrubbing(_ isScrubbing: Bool)
     func playNext()
     func playPrevious()
     func loadPlaylist()
