@@ -18,6 +18,7 @@ final class TrackEntity {
     @Attribute(.unique)
     var id: String
 
+    var trackNumber: Int?
     var imagePath: String?
     var songName: String
     var artistName: String
@@ -148,6 +149,7 @@ final class TrackEntity {
         importSourceID: String? = nil,
         genreRawValue: String? = nil,
         localFilePath: String? = nil,
+        trackNumber: Int? = nil,
         sourceRawValue: String = TrackSource.api.rawValue,
         downloadStateRawValue: String = DownloadState.idle.rawValue,
         fileStateRawValue: String = FileStorageState.none.rawValue,
@@ -168,6 +170,7 @@ final class TrackEntity {
         self.importSourceID = importSourceID
         self.genreRawValue = genreRawValue
         self.localFilePath = localFilePath
+        self.trackNumber = trackNumber
         self.sourceRawValue = sourceRawValue
         self.downloadStateRawValue = downloadStateRawValue
         self.fileStateRawValue = fileStateRawValue
@@ -204,6 +207,7 @@ extension TrackEntity {
         self.download = entity.download
         self.waveformData = entity.waveformData
         self.size = entity.size
+        self.trackNumber = entity.trackNumber
 
         if let isPopular = entity.isPopular {
             self.isPopular = isPopular

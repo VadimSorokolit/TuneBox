@@ -9,6 +9,7 @@ import AVFoundation
 import SFBAudioEngine
 
 struct TrackMetadata {
+    let trackNumber: Int?
     let title: String?
     let artist: String?
     let album: String?
@@ -23,6 +24,8 @@ final class AudioMetadataService: AudioMetadataServicing {
         let file = try AudioFile(readingPropertiesAndMetadataFrom: url)
         let metadata = file.metadata
         let additional = metadata.additionalMetadata
+
+        let trackNumber = metadata.trackNumber
 
         let title = Self.cleanMetadataValue(
             metadata.title
@@ -52,6 +55,7 @@ final class AudioMetadataService: AudioMetadataServicing {
         )
 
         return TrackMetadata(
+            trackNumber: trackNumber,
             title: title,
             artist: artist,
             album: album,

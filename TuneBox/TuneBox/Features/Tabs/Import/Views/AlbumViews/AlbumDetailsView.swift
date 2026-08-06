@@ -28,7 +28,7 @@ struct AlbumDetailsView: View {
                     LazyVStack(spacing: 0) {
                         ForEach(Array(album.tracks.enumerated()), id: \.element.id) { index, track in
                             NumberedTrackCell(
-                                index: index + 1,
+                                index: track.trackNumber ?? index + 1,
                                 track: track,
                                 onTapGesture: {
                                     playerViewModel.handlePlayAction(

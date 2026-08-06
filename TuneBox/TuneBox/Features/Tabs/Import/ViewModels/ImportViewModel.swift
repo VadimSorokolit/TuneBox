@@ -711,6 +711,7 @@ final class ImportViewModel: ImportManaging {
                 size: fileSize,
                 importSourceID: importSourceID,
                 localFilePath: localURL.path,
+                trackNumber: metadata?.trackNumber,
                 sourceRawValue: TrackSource.imported.rawValue,
                 downloadStateRawValue: DownloadState.completed.rawValue,
                 fileStateRawValue: FileStorageState.exists.rawValue
@@ -840,24 +841,33 @@ final class ImportViewModel: ImportManaging {
     }
 
     private func parseLibrary(from tracks: [TrackEntity], playlists: [PlaylistEntity]) -> MusicLibrary {
-        let albums = Dictionary(grouping: tracks.filter { $0.albumName.isNotEmpty }) {
+        let albums: [MusicLibrary.Album] = Dictionary(
+            grouping: tracks.filter { $0.albumName.isNotEmpty }
+        ) {
             $0.albumName
         }
-            .map { name, tracks in
-                MusicLibrary.Album(
-                    id: name,
-                    name: name,
-                    artist: tracks.first?.artistName ?? "",
-                    date: tracks
-                        .compactMap(\.releaseDate)
-                        .first { !$0.isEmpty },
-                    tracks: tracks,
-                    cover: tracks.first?.imagePath
-                )
+        .map { name, albumTracks -> MusicLibrary.Album in
+            let orderedTracks = albumTracks.sorted { lhs, rhs in
+                let left = (lhs.trackNumber ?? Int.max, lhs.songName.localizedLowercase)
+                let right = (rhs.trackNumber ?? Int.max, rhs.songName.localizedLowercase)
+                return left < right
             }
-            .sorted {
-                $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
-            }
+
+            return MusicLibrary.Album(
+                id: name,
+                name: name,
+                artist: orderedTracks.first?.artistName ?? "",
+                date: orderedTracks
+                    .compactMap(\.releaseDate)
+                    .first { !$0.isEmpty },
+                tracks: orderedTracks,
+                cover: orderedTracks.first?.imagePath
+            )
+        }
+        .sorted {
+            $0.name.localizedStandardCompare($1.name) == .orderedAscending
+
+        }
 
         let artists = Dictionary(grouping: tracks.filter { $0.artistName.isNotEmpty }) {
             $0.artistName
