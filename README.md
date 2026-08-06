@@ -23,7 +23,8 @@ The app allows users to browse, search, and download tracks using the [Jamendo A
 * Persistence - **SwiftData**
 * Dependency Injection - **Resolver**
 * Resources – **SDWebImage**
-* Audio Playback — **AVFoundation**
+* Audio Playback - **SFBAudioEngine**
+* Media Controls - **MediaPlayer / MPRemoteCommandCenter**
 * Dependency Management - **Swift Package Manager**
 * Linting - **SwiftLint**
 * Unit Testing - **Swift Testing**
