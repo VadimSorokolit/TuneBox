@@ -12,13 +12,14 @@ struct TrackArtworkCell: View {
     // MARK: - Properties. Public
 
     let track: TrackEntity
+    let verticalPadding: CGFloat = 8
     let defaultPadding: CGFloat = GlobalConstants.Cell.defaultPadding
     let onTapGesture: () -> Void
 
     // MARK: - Main Body
 
     var body: some View {
-        VStack(spacing: 5) {
+        VStack(spacing: verticalPadding) {
             HStack {
                 HStack(spacing: 10) {
                     ArtworkView(
@@ -55,7 +56,7 @@ struct TrackArtworkCell: View {
                 .padding(.leading, 82)
                 .padding(.trailing, defaultPadding)
         }
-        .padding(.top, 5)
+        .padding(.top, verticalPadding)
         .frame(maxWidth: .infinity)
         .contentShape(Rectangle())
         .onTapGesture {
