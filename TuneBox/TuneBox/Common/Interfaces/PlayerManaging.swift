@@ -15,10 +15,16 @@ protocol PlayerManaging: AnyObject, Sendable {
     var progress: Double { get }
     var isShuffleEnabled: Bool { get }
     var isPlaying: Bool { get }
+    var isPlayerVisible: Bool { get }
 
     func handlePlayAction(for track: TrackEntity, in queue: [TrackEntity], navigationPath: [AppRoute]?)
     func togglePlayPause()
+    func restoreLastPlaybackSession()
+    func persistPlaybackSession()
+    func refreshPlaybackNavigationPath(library: MusicLibrary?)
     func resetPlayback()
+    func stopAudioPreservingSession()
+    func clearPlaybackIfAffected(byRemovedSourceID sourceID: UUID, isAPISource: Bool)
     func isPlaying(_ track: TrackEntity) -> Bool
     func seek(by deltaSeconds: TimeInterval)
     func setSeekScrubbing(_ isScrubbing: Bool)

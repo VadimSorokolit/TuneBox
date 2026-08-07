@@ -147,7 +147,7 @@ struct BrowseView: View {
                 }
             }
             .padding(.top, 10)
-            .bottomContentMargin(10, isPlayerVisible: playerViewModel.track != nil)
+            .bottomContentMargin(10, isPlayerVisible: playerViewModel.isPlayerVisible)
             .refreshable {
                 await viewModel.refreshBrowse()
             }

@@ -154,7 +154,7 @@ struct DownloadsView: View {
                 }
             }
             .padding(.top, 5)
-            .bottomContentMargin(10, isPlayerVisible: playerViewModel.track != nil)
+            .bottomContentMargin(10, isPlayerVisible: playerViewModel.isPlayerVisible)
             .modifier(EmptyTracksStateModifier(showsEmptyState: viewModel.showsEmptyState))
         }
 

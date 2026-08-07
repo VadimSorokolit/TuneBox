@@ -15,7 +15,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         let semaphore = DispatchSemaphore(value: 0)
 
-        self.playerViewModel.resetPlayback()
+        self.playerViewModel.stopAudioPreservingSession()
 
         Task { @MainActor in
             await self.viewModel.snapshotForTerminate()

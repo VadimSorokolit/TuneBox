@@ -106,6 +106,7 @@
 		5BA581922FD7055C00B498D7 /* EmptyTrackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA581912FD7055B00B498D7 /* EmptyTrackCell.swift */; };
 		5BA581942FD70BC300B498D7 /* EmptyGenreCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA581932FD70BC200B498D7 /* EmptyGenreCell.swift */; };
 		5BA581962FD8603500B498D7 /* HighlightedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA581952FD8603400B498D7 /* HighlightedText.swift */; };
+		5BB3012A3026020200A2AA47 /* PlaybackSessionSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB301293026020100A2AA47 /* PlaybackSessionSnapshot.swift */; };
 		5BC0DEAD2FDD000100503BA2 /* DownloadStateMergeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC0DEAC2FDD000100503BA2 /* DownloadStateMergeTests.swift */; };
 		5BC8D8F62FFD769300742822 /* ImportedPlaylistCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D8F52FFD769200742822 /* ImportedPlaylistCell.swift */; };
 		5BC8D9022FFE966B00742822 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D9012FFE966A00742822 /* AppCoordinator.swift */; };
@@ -280,6 +281,7 @@
 		5BA581912FD7055B00B498D7 /* EmptyTrackCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyTrackCell.swift; sourceTree = "<group>"; };
 		5BA581932FD70BC200B498D7 /* EmptyGenreCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyGenreCell.swift; sourceTree = "<group>"; };
 		5BA581952FD8603400B498D7 /* HighlightedText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightedText.swift; sourceTree = "<group>"; };
+		5BB301293026020100A2AA47 /* PlaybackSessionSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackSessionSnapshot.swift; sourceTree = "<group>"; };
 		5BB9A56D2FC8AF45000B8127 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		5BBC59323020772D003442D2 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		5BBC59343020772D003442D2 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -377,6 +379,7 @@
 			children = (
 				5BCF3F97301BCC51003AF4AF /* LibraryEmptyStateView.swift */,
 				5B0BC2B63006AF7E00E8F2A5 /* MusicLibrary.swift */,
+				5BB301293026020100A2AA47 /* PlaybackSessionSnapshot.swift */,
 				5BDA04C9300A677F00C7B763 /* SourceFolderItem.swift */,
 				5B1214273017505800987F16 /* TrackAlphabetSection.swift */,
 			);
@@ -542,7 +545,6 @@
 			isa = PBXGroup;
 			children = (
 				5B3FEB482FB454A300DC1562 /* Views */,
-				5B83828F2FC495EA003625CD /* ViewModels */,
 			);
 			path = Player;
 			sourceTree = "<group>";
@@ -676,14 +678,6 @@
 				5B74DF9C2FF444BD007EB36D /* AudioMetadataService.swift */,
 			);
 			path = AudioMetadataService;
-			sourceTree = "<group>";
-		};
-		5B83828F2FC495EA003625CD /* ViewModels */ = {
-			isa = PBXGroup;
-			children = (
-				5B8382902FC495F8003625CD /* PlayerViewModel.swift */,
-			);
-			path = ViewModels;
 			sourceTree = "<group>";
 		};
 		5B8382922FC4C6A9003625CD /* Common */ = {
@@ -830,6 +824,7 @@
 			isa = PBXGroup;
 			children = (
 				5B0BC2AB300659EA00E8F2A5 /* ImportViewModel.swift */,
+				5B8382902FC495F8003625CD /* PlayerViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -1338,6 +1333,7 @@
 				5B9D45DC2FDF0B1C00F86C1B /* TracksSection.swift in Sources */,
 				5B9CE54B2FB32589001BE37F /* AppDelegate.swift in Sources */,
 				5B0BC2B93007699100E8F2A5 /* LibraryMenuCell.swift in Sources */,
+				5BB3012A3026020200A2AA47 /* PlaybackSessionSnapshot.swift in Sources */,
 				5B586CBA2FAC842200BCEAD2 /* Resolver+Injection.swift in Sources */,
 				5B2CF4612FBC7C6B00C5BA4C /* TransferDownloadObserverTokens.swift in Sources */,
 				5B0BC2B03006638700E8F2A5 /* ImportsView.swift in Sources */,

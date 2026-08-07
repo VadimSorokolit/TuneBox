@@ -35,7 +35,7 @@ struct SourceView: View {
                 )
             }
         }
-        .bottomContentMargin(isPlayerVisible: playerViewModel.track != nil)
+        .bottomContentMargin(isPlayerVisible: playerViewModel.isPlayerVisible)
         .navigationTitle(
             path?.components(separatedBy: "/").last
             ?? viewModel.source(for: sourceID)?.title ?? ImportSection.sources.rawValue.capitalized

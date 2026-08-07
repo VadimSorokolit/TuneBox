@@ -15,6 +15,7 @@ struct TuneBoxApp: App {
     @State private var themeManager = ThemeManager()
     @State private var coordinator = AppCoordinator(root: .main)
     @Injected private var viewModel: TransferManaging
+    @Injected private var playerViewModel: PlayerManaging
 
     var body: some Scene {
         WindowGroup {
@@ -32,10 +33,12 @@ struct TuneBoxApp: App {
 
                         case .inactive:
                             viewModel.saveTransferState()
+                            playerViewModel.persistPlaybackSession()
                             AppLogger.app.info("App is inactive")
 
                         case .background:
                             viewModel.saveTransferState()
+                            playerViewModel.persistPlaybackSession()
                             AppLogger.app.info("App moved to background")
 
                         @unknown default:

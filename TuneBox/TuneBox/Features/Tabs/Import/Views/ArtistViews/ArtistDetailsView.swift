@@ -113,7 +113,7 @@ struct ArtistDetailsView: View {
                     }
                     .animation(.easeInOut(duration: 0.25), value: selected)
                 }
-                .bottomContentMargin(20, isPlayerVisible: playerViewModel.track != nil)
+                .bottomContentMargin(20, isPlayerVisible: playerViewModel.isPlayerVisible)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .padding(.top, 16)

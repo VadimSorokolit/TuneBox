@@ -32,10 +32,12 @@ struct ImportsView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(.gray.opacity(0.025))
+        .bottomContentMargin(isPlayerVisible: playerViewModel.isPlayerVisible)
         .onAppear {
             Task {
                 viewModel.startObservingTracksChanges()
                 await viewModel.refreshLibrary()
+                playerViewModel.refreshPlaybackNavigationPath(library: viewModel.library)
             }
         }
         .onDisappear {
@@ -45,6 +47,14 @@ struct ImportsView: View {
             if viewModel.hasLibrary.isFalse {
                 await viewModel.refreshLibrary()
             }
+            playerViewModel.refreshPlaybackNavigationPath(library: viewModel.library)
+        }
+        .onChange(of: viewModel.hasLibrary) { _, hasLibrary in
+            guard hasLibrary else { return }
+            playerViewModel.refreshPlaybackNavigationPath(library: viewModel.library)
+        }
+        .onChange(of: viewModel.error) { _, newValue in
+            isErrorPresented = newValue != nil
         }
         .fileImporter(
             isPresented: $isFileImporterPresented,
@@ -61,9 +71,6 @@ struct ImportsView: View {
                 }
             }
         )
-        .onChange(of: viewModel.error) { _, newValue in
-            isErrorPresented = newValue != nil
-        }
         .alert("Error", isPresented: $isErrorPresented) {
             Button("OK", role: .cancel) {
                 viewModel.dismissError()

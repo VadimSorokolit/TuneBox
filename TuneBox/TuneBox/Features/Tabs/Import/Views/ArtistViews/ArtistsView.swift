@@ -36,7 +36,7 @@ struct ArtistsView: View {
                 }
             }
             .navigationTitle(LibraryItem.artists.rawValue.capitalized)
-            .bottomContentMargin(isPlayerVisible: playerViewModel.track != nil)
+            .bottomContentMargin(isPlayerVisible: playerViewModel.isPlayerVisible)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         } else {
             LibraryEmptyStateView(item: LibraryItem.artists)

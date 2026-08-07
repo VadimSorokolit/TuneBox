@@ -83,7 +83,7 @@ struct TracksView: View {
                 }
                 .listStyle(.plain)
                 .environment(\.defaultMinListRowHeight, 1)
-                .bottomContentMargin(isPlayerVisible: playerViewModel.track != nil)
+                .bottomContentMargin(isPlayerVisible: playerViewModel.isPlayerVisible)
             }
         }
         .navigationTitle(navigationTitle)

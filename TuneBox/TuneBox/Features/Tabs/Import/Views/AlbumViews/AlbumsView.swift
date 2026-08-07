@@ -38,7 +38,7 @@ struct AlbumsView: View {
                             )
                         }
                     }
-                    .bottomContentMargin(isPlayerVisible: playerViewModel.track != nil)
+                    .bottomContentMargin(isPlayerVisible: playerViewModel.isPlayerVisible)
                 } else {
                     LibraryEmptyStateView(item: LibraryItem.albums)
                 }

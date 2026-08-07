@@ -36,7 +36,7 @@ struct PlaylistsView: View {
                 }
             }
             .navigationTitle(LibraryItem.playlists.rawValue.capitalized)
-            .bottomContentMargin(isPlayerVisible: playerViewModel.track != nil)
+            .bottomContentMargin(isPlayerVisible: playerViewModel.isPlayerVisible)
         } else {
             LibraryEmptyStateView(
                 item: LibraryItem.playlists,

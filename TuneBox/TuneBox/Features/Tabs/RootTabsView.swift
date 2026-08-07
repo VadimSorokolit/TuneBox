@@ -57,35 +57,37 @@ struct RootTabsView: View {
         ZStack(alignment: .bottom) {
             content
 
-            CompactPlayerView(
-                track: playerViewModel.track,
-                isPlaying: playerViewModel.isPlaying,
-                progress: playerViewModel.progress,
-                repeatMode: playerViewModel.repeatMode,
-                isShuffleEnabled: playerViewModel.isShuffleEnabled,
-                onTrackInfoTap: {
-                    openTrackSource()
-                },
-                onSeek: { delta in
-                    playerViewModel.seek(by: delta)
-                },
-                onSeekHoldChanged: { isHolding in
-                    playerViewModel.setSeekScrubbing(isHolding)
-                },
-                onPlayPauseTap: {
-                    playerViewModel.togglePlayPause()
-                },
-                onProgressTap: {
-                    isShowingExpandedPlayer = true
-                },
-                onRepeatModeChange: { mod in
-                    playerViewModel.setRepeatMode(mod)
-                },
-                onShuffleToggle: {
-                    playerViewModel.toggleShuffle()
-                }
-            )
-            .padding(.bottom, tabBarHeight)
+            if playerViewModel.track != nil {
+                CompactPlayerView(
+                    track: playerViewModel.track,
+                    isPlaying: playerViewModel.isPlaying,
+                    progress: playerViewModel.progress,
+                    repeatMode: playerViewModel.repeatMode,
+                    isShuffleEnabled: playerViewModel.isShuffleEnabled,
+                    onTrackInfoTap: {
+                        openTrackSource()
+                    },
+                    onSeek: { delta in
+                        playerViewModel.seek(by: delta)
+                    },
+                    onSeekHoldChanged: { isHolding in
+                        playerViewModel.setSeekScrubbing(isHolding)
+                    },
+                    onPlayPauseTap: {
+                        playerViewModel.togglePlayPause()
+                    },
+                    onProgressTap: {
+                        isShowingExpandedPlayer = true
+                    },
+                    onRepeatModeChange: { mod in
+                        playerViewModel.setRepeatMode(mod)
+                    },
+                    onShuffleToggle: {
+                        playerViewModel.toggleShuffle()
+                    }
+                )
+                .padding(.bottom, tabBarHeight)
+            }
 
             tabBar
         }
@@ -96,6 +98,12 @@ struct RootTabsView: View {
         }
         .animation(.easeInOut(duration: 0.25), value: isShowingExpandedPlayer)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+        .onAppear {
+            playerViewModel.restoreLastPlaybackSession()
+        }
+        .task {
+            playerViewModel.restoreLastPlaybackSession()
+        }
     }
 
     // MARK: - Properties. Private
@@ -190,6 +198,10 @@ struct RootTabsView: View {
     // MARK: - Private. Methods
 
     private func openTrackSource() {
+        if playerViewModel.playbackNavigationPath.isEmpty {
+            playerViewModel.refreshPlaybackNavigationPath(library: nil)
+        }
+
         let path = playerViewModel.playbackNavigationPath
         guard path.isNotEmpty else { return }
 

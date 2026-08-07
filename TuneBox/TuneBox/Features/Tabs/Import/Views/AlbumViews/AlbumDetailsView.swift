@@ -53,7 +53,7 @@ struct AlbumDetailsView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .bottomContentMargin(isPlayerVisible: playerViewModel.track != nil)
+            .bottomContentMargin(isPlayerVisible: playerViewModel.isPlayerVisible)
             .contentMargins(.top, 20)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

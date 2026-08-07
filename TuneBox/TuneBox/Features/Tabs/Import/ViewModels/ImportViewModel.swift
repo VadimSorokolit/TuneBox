@@ -535,7 +535,9 @@ final class ImportViewModel: ImportManaging {
         guard let source = self.sources.first(where: { $0.id == id }) else { return }
 
         do {
-            if source.kind == .api {
+            let isAPISource = source.kind == .api
+
+            if isAPISource {
                 let tracks = try self.persistenceService.getRecentDownloadedTracks(limit: nil)
 
                 for track in tracks {
@@ -544,6 +546,11 @@ final class ImportViewModel: ImportManaging {
             } else {
                 try self.persistenceService.deleteAllData(forSourceID: id.uuidString)
             }
+
+            self.playerViewModel.clearPlaybackIfAffected(
+                byRemovedSourceID: id,
+                isAPISource: isAPISource
+            )
 
             self.sources.removeAll { $0.id == id }
             self.selectedSourceIDs.remove(id)
@@ -582,6 +589,9 @@ final class ImportViewModel: ImportManaging {
     @Injected
     @ObservationIgnored
     private var persistenceService: PersistenceServicing
+    @Injected
+    @ObservationIgnored
+    private var playerViewModel: PlayerManaging
     private var tracksObservationTask: Task<Void, Never>?
     private let supportedPlaylistExtensions: Set<PlaylistExtension> = [.m3u, .m3u8]
     private let supportedTrackExtensions: Set<AudioFileExtension> = [
