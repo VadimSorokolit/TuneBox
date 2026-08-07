@@ -53,6 +53,8 @@ final class AudioService: NSObject, AudioServicing {
     // MARK: - Methods. Public
 
     func play(trackId: String, url: URL, loop: Bool = false) {
+        AppLogger.audio.info("AudioService PLAY: \(trackId)")
+
         self.stopProgressTimer()
         self.currentTrackId = trackId
         self.currentURL = url
@@ -131,6 +133,8 @@ final class AudioService: NSObject, AudioServicing {
     }
 
     func toggle(trackId: String, url: URL, loop: Bool = false) {
+        AppLogger.audio.info("AudioService TOGGLE: \(trackId), current: \(self.currentTrackId ?? "nil")")
+
         if self.currentTrackId != trackId {
             self.play(trackId: trackId, url: url, loop: loop)
             return
@@ -471,6 +475,8 @@ extension AudioService: AudioPlayer.Delegate {
     func audioPlayerEndOfAudio(_ audioPlayer: AudioPlayer) {
         // Always defer to PlayerViewModel so repeat/shuffle stay consistent.
         // (Engine-level re-play causes an audible stop and can race with queue advance.)
+        AppLogger.audio.info("AudioService END: \(self.currentTrackId ?? "nil")")
+
         self.onTrackFinished?()
     }
 

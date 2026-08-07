@@ -108,6 +108,8 @@ final class PlayerViewModel: PlayerManaging {
     }
 
     func handlePlayAction(for track: TrackEntity, in queue: [TrackEntity], navigationPath: [AppRoute]? = nil) {
+        AppLogger.audio.info("handlePlayAction: \(track.songName), current: \(self.track?.songName ?? "nil")")
+
         if let navigationPath {
             self.playbackNavigationPath = navigationPath
         }
@@ -125,6 +127,11 @@ final class PlayerViewModel: PlayerManaging {
         } else {
             self.play(track)
         }
+    }
+
+    func togglePlayPause() {
+        guard let track = self.track else { return }
+        self.toggle(track)
     }
 
     func seek(by deltaSeconds: TimeInterval) {
@@ -272,12 +279,16 @@ final class PlayerViewModel: PlayerManaging {
     }
 
     private func play(_ track: TrackEntity) {
+        AppLogger.audio.info("PlayerViewModel PLAY: \(track.songName)")
+
         self.start(track, using: { trackId, url, _ in
             self.audioService.play(trackId: trackId, url: url, loop: false)
         })
     }
 
     private func toggle(_ track: TrackEntity) {
+        AppLogger.audio.info("PlayerViewModel TOGGLE: \(track.songName)")
+
         self.start(track, using: { trackId, url, _ in
             self.audioService.toggle(trackId: trackId, url: url, loop: false)
         })

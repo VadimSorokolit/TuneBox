@@ -17,6 +17,7 @@ protocol PlayerManaging: AnyObject, Sendable {
     var isPlaying: Bool { get }
 
     func handlePlayAction(for track: TrackEntity, in queue: [TrackEntity], navigationPath: [AppRoute]?)
+    func togglePlayPause()
     func resetPlayback()
     func isPlaying(_ track: TrackEntity) -> Bool
     func seek(by deltaSeconds: TimeInterval)

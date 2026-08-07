@@ -63,6 +63,7 @@ struct CompactPlayerView: View {
                     isPlaying: isPlaying,
                     repeatMode: repeatMode,
                     isShuffleEnabled: isShuffleEnabled,
+                    trackID: track?.id,
                     onSeek: onSeek,
                     onSeekHoldChanged: onSeekHoldChanged,
                     onPlayPauseTap: onPlayPauseTap,
@@ -141,6 +142,7 @@ private struct PlaybackControls: View {
     let isPlaying: Bool
     let repeatMode: RepeatMode
     let isShuffleEnabled: Bool
+    let trackID: String?
     let onSeek: (TimeInterval) -> Void
     let onSeekHoldChanged: (Bool) -> Void
     let onPlayPauseTap: () -> Void
@@ -163,6 +165,7 @@ private struct PlaybackControls: View {
                 isPlaying: isPlaying,
                 repeatMode: repeatMode,
                 isShuffleEnabled: isShuffleEnabled,
+                trackID: trackID,
                 onPlayPauseTap: onPlayPauseTap,
                 onRepeatModeChange: onRepeatModeChange,
                 onShuffleToggle: onShuffleToggle
@@ -296,6 +299,7 @@ private struct PlayPauseMenuButton: View, Equatable {
     let isPlaying: Bool
     let repeatMode: RepeatMode
     let isShuffleEnabled: Bool
+    let trackID: String?
     let onPlayPauseTap: () -> Void
     let onRepeatModeChange: (RepeatMode) -> Void
     let onShuffleToggle: () -> Void
@@ -306,6 +310,7 @@ private struct PlayPauseMenuButton: View, Equatable {
         lhs.isPlaying == rhs.isPlaying
             && lhs.repeatMode == rhs.repeatMode
             && lhs.isShuffleEnabled == rhs.isShuffleEnabled
+            && lhs.trackID == rhs.trackID
     }
 
     // MARK: - Body
