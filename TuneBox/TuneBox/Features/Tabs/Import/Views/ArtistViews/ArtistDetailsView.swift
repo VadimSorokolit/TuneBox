@@ -113,7 +113,7 @@ struct ArtistDetailsView: View {
                     }
                     .animation(.easeInOut(duration: 0.25), value: selected)
                 }
-                .bottomContentMargin(40, isPlayerVisible: playerViewModel.track != nil)
+                .bottomContentMargin(20, isPlayerVisible: playerViewModel.track != nil)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .padding(.top, 16)
@@ -153,7 +153,8 @@ struct ArtistDetailsView: View {
                     unitSingular: "album",
                     unitPlural: "albums",
                     duration: viewModel.tracksDuration(albums.flatMap(\.tracks)),
-                    size: viewModel.tracksSize(albums.flatMap(\.tracks))
+                    size: viewModel.tracksSize(albums.flatMap(\.tracks)),
+                    topPadding: 10
                 )
             }
         }
@@ -190,7 +191,8 @@ struct ArtistDetailsView: View {
                     unitSingular: "track",
                     unitPlural: "tracks",
                     duration: viewModel.tracksDuration(tracks),
-                    size: viewModel.tracksSize(tracks)
+                    size: viewModel.tracksSize(tracks),
+                    topPadding: 10
                 )
             }
         }
