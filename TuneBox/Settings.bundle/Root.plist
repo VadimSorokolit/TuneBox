@@ -22,12 +22,12 @@
 			<key>Titles</key>
 			<array>
 				<string>All Tabs</string>
-				<string>Imports</string>
+				<string>Import</string>
 			</array>
 			<key>Values</key>
 			<array>
 				<string>allTabs</string>
-				<string>imports</string>
+				<string>import</string>
 			</array>
 		</dict>
 	</array>

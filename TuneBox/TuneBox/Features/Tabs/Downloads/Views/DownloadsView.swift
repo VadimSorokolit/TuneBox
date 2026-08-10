@@ -20,7 +20,7 @@ struct DownloadsView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HeaderView(viewModel: viewModel)
+            HeaderView(viewModel: transferManagingVM)
 
             SearchBarView(
                 searchQuery: $searchQuery,
@@ -29,13 +29,14 @@ struct DownloadsView: View {
                     isSearchFieldFocused = false
                 },
                 onClear: {
-                    viewModel.clearSearchState()
+                    transferManagingVM.clearSearchState()
                 }
             )
 
             ContentView(
-                viewModel: viewModel,
-                playerViewModel: playerViewModel
+                rootTabsVM: rootTabsVM,
+                transferManagingVM: transferManagingVM,
+                playerVM: playerVM
             )
         }
         .frame(maxWidth: .infinity,
@@ -43,13 +44,13 @@ struct DownloadsView: View {
                alignment: .top
         )
         .onAppear {
-            viewModel.startObservingTracksChanges()
+            transferManagingVM.startObservingTracksChanges()
         }
         .onDisappear {
-            viewModel.stopObservingTracksChanges()
+            transferManagingVM.stopObservingTracksChanges()
         }
-        .task(id: viewModel.selectedTracksType) {
-            await viewModel.fetchTracksSectionBy(viewModel.selectedTracksType)
+        .task(id: transferManagingVM.selectedTracksType) {
+            await transferManagingVM.fetchTracksSectionBy(transferManagingVM.selectedTracksType)
         }
         .task(id: searchQuery) {
             try? await Task.sleep(for: .milliseconds(300))
@@ -58,15 +59,16 @@ struct DownloadsView: View {
                 return
             }
 
-            await viewModel.handleSearchQuery(searchQuery)
+            await transferManagingVM.handleSearchQuery(searchQuery)
         }
         .dismissKeyboardOnTap(focused: $isSearchFieldFocused)
     }
 
     // MARK: - Properties. Private
 
-    @Injected private var viewModel: DownloadsPresenting
-    @Injected private var playerViewModel: PlayerManaging
+    @Injected private var rootTabsVM: RootTabsManaging
+    @Injected private var transferManagingVM: DownloadsPresenting
+    @Injected private var playerVM: PlayerManaging
     @FocusState private var isSearchFieldFocused: Bool
     @State private var searchQuery: String = ""
 
@@ -130,13 +132,19 @@ struct DownloadsView: View {
     }
 
     private struct ContentView: View {
-        let viewModel: DownloadsPresenting
-        let playerViewModel: PlayerManaging
+
+        // MARK: - Properties. Public
+
+        let rootTabsVM: RootTabsManaging
+        let transferManagingVM: DownloadsPresenting
+        let playerVM: PlayerManaging
+
+        // MARK: - Body
 
         var body: some View {
             ScrollView(showsIndicators: false) {
                 LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
-                    ForEach(viewModel.sections) { section in
+                    ForEach(transferManagingVM.sections) { section in
                         switch section.type {
                             case .search:
                                 searchSectionView(section)
@@ -154,8 +162,13 @@ struct DownloadsView: View {
                 }
             }
             .padding(.top, 5)
-            .bottomContentMargin(10, isPlayerVisible: playerViewModel.isPlayerVisible)
-            .modifier(EmptyTracksStateModifier(showsEmptyState: viewModel.showsEmptyState))
+            .bottomContentMargin(
+                10,
+                0,
+                isPlayerVisible: playerVM.isPlayerVisible,
+                isTabBarVisible: rootTabsVM.isTabBarVisible
+            )
+            .modifier(EmptyTracksStateModifier(showsEmptyState: transferManagingVM.showsEmptyState))
         }
 
         // MARK: - Private. Methods
@@ -163,16 +176,16 @@ struct DownloadsView: View {
         @ViewBuilder
         private func searchSectionView(_ section: TracksSection) -> some View {
             if section.tracks.isNotEmpty,
-               viewModel.isSearchMode {
+               transferManagingVM.isSearchMode {
                 Section {
                     LazyVStack(spacing: 4) {
                         ForEach(section.tracks, id: \.id) { track in
                             TrackCell(
                                 track: track,
-                                searchQuery: viewModel.completedSearchQuery,
+                                searchQuery: transferManagingVM.completedSearchQuery,
                                 onButtonTap: {
                                     Task {
-                                        await viewModel.handleDownloadAction(for: track)
+                                        await transferManagingVM.handleDownloadAction(for: track)
                                     }
                                 })
                         }
@@ -186,7 +199,7 @@ struct DownloadsView: View {
         @ViewBuilder
         private func recentsSectionView(_ section: TracksSection) -> some View {
             if section.tracks.isNotEmpty,
-               viewModel.isSearchMode.isFalse {
+               transferManagingVM.isSearchMode.isFalse {
                 Section {
                     ScrollView(.horizontal, showsIndicators: false) {
                         LazyHStack(spacing: 4) {
@@ -195,7 +208,7 @@ struct DownloadsView: View {
                                     track: track,
                                     onButtonTap: {
                                         Task {
-                                            await viewModel.handleDownloadAction(for: track)
+                                            await transferManagingVM.handleDownloadAction(for: track)
                                         }
                                     }
                                 )
@@ -212,7 +225,7 @@ struct DownloadsView: View {
         @ViewBuilder
         private func filteredSectionView(_ section: TracksSection) -> some View {
             if section.tracks.isNotEmpty,
-               viewModel.isSearchMode.isFalse {
+               transferManagingVM.isSearchMode.isFalse {
 
                 Section(
                     content: {
@@ -222,7 +235,7 @@ struct DownloadsView: View {
                                     track: track,
                                     onButtonTap: {
                                         Task {
-                                            await viewModel.handleDownloadAction(for: track)
+                                            await transferManagingVM.handleDownloadAction(for: track)
                                         }
                                     }
                                 )
@@ -231,7 +244,7 @@ struct DownloadsView: View {
                         .scrollTargetLayout()
                     },
                     header: {
-                        sectionTracksTitle(section.title, suffix: viewModel.sectionTitleSuffix)
+                        sectionTracksTitle(section.title, suffix: transferManagingVM.sectionTitleSuffix)
                     }
                 )
             }

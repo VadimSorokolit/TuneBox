@@ -13,7 +13,7 @@ struct AlbumsView: View {
     // MARK: - Main Body
 
     var body: some View {
-        if let library = viewModel.library {
+        if let library = importManagingVM.library {
             Group {
                 if library.albums.isNotEmpty {
                     ScrollView(showsIndicators: false) {
@@ -32,13 +32,18 @@ struct AlbumsView: View {
                                 count: library.albums.count,
                                 unitSingular: String(LibraryItem.albums.rawValue.dropLast()),
                                 unitPlural: LibraryItem.albums.rawValue,
-                                duration: viewModel.tracksDuration(library.albums.flatMap(\.tracks)),
-                                size: viewModel.tracksSize(library.albums.flatMap(\.tracks)),
+                                duration: importManagingVM.tracksDuration(library.albums.flatMap(\.tracks)),
+                                size: importManagingVM.tracksSize(library.albums.flatMap(\.tracks)),
                                 topPadding: 10
                             )
                         }
                     }
-                    .bottomContentMargin(isPlayerVisible: playerViewModel.isPlayerVisible)
+                    .bottomContentMargin(
+                        10,
+                        0,
+                        isPlayerVisible: playerVM.isPlayerVisible,
+                        isTabBarVisible: rootTabsVM.isTabBarVisible
+                    )
                 } else {
                     LibraryEmptyStateView(item: LibraryItem.albums)
                 }
@@ -50,7 +55,8 @@ struct AlbumsView: View {
 
     // MARK: - Properties. Private
 
-    @Injected private var viewModel: ImportManaging
-    @Injected private var playerViewModel: PlayerManaging
     @Environment(AppCoordinator.self) private var coordinator
+    @Injected private var rootTabsVM: RootTabsManaging
+    @Injected private var importManagingVM: ImportManaging
+    @Injected private var playerVM: PlayerManaging
 }

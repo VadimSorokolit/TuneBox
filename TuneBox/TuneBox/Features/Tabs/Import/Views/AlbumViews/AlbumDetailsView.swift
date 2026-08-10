@@ -31,7 +31,7 @@ struct AlbumDetailsView: View {
                                 index: track.trackNumber ?? index + 1,
                                 track: track,
                                 onTapGesture: {
-                                    playerViewModel.handlePlayAction(
+                                    playerVM.handlePlayAction(
                                         for: track,
                                         in: album.tracks,
                                         navigationPath: coordinator.path
@@ -44,8 +44,8 @@ struct AlbumDetailsView: View {
                             count: album.tracks.count,
                             unitSingular: "track",
                             unitPlural: "tracks",
-                            duration: viewModel.tracksDuration(album.tracks),
-                            size: viewModel.tracksSize(album.tracks),
+                            duration: importManagingVM.tracksDuration(album.tracks),
+                            size: importManagingVM.tracksSize(album.tracks),
                             topPadding: 10
                         )
                     }
@@ -53,7 +53,12 @@ struct AlbumDetailsView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .bottomContentMargin(isPlayerVisible: playerViewModel.isPlayerVisible)
+            .bottomContentMargin(
+                10,
+                0,
+                isPlayerVisible: playerVM.isPlayerVisible,
+                isTabBarVisible: rootTabsVM.isTabBarVisible
+            )
             .contentMargins(.top, 20)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -78,6 +83,7 @@ struct AlbumDetailsView: View {
     // MARK: - Properties. Private
 
     @Environment(AppCoordinator.self) private var coordinator
-    @Injected private var viewModel: ImportManaging
-    @Injected private var playerViewModel: PlayerManaging
+    @Injected private var rootTabsVM: RootTabsManaging
+    @Injected private var importManagingVM: ImportManaging
+    @Injected private var playerVM: PlayerManaging
 }

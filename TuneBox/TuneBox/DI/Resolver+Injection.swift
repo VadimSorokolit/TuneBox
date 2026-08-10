@@ -93,6 +93,14 @@ extension Resolver: @retroactive ResolverRegistering {
             }
         }
         .scope(.application)
+
+        self.register {
+            MainActor.assumeIsolated {
+                RootTabsViewModel()
+                as RootTabsManaging
+            }
+        }
+        .scope(.application)
     }
 
 }

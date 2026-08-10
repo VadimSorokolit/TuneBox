@@ -16,13 +16,13 @@ struct ImportsView: View {
         VStack(spacing: 20) {
             HeaderView(
                 isFileImporterPresented: $isFileImporterPresented,
-                viewModel: viewModel
+                importManagingVM: importManagingVM
             )
 
-            if viewModel.hasLibrary {
+            if importManagingVM.hasLibrary {
                 ContentView(
                     sourceIDToDelete: $sourceIDToDelete,
-                    viewModel: viewModel
+                    importManagingVM: importManagingVM
                 )
             } else {
                 EmptyContentView(
@@ -32,28 +32,28 @@ struct ImportsView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(.gray.opacity(0.025))
-        .bottomContentMargin(isPlayerVisible: playerViewModel.isPlayerVisible)
+        .bottomContentMargin(isPlayerVisible: playerVM.isPlayerVisible, isTabBarVisible: rootTabsVM.isTabBarVisible)
         .onAppear {
             Task {
-                viewModel.startObservingTracksChanges()
-                await viewModel.refreshLibrary()
-                playerViewModel.refreshPlaybackNavigationPath(library: viewModel.library)
+                importManagingVM.startObservingTracksChanges()
+                await importManagingVM.refreshLibrary()
+                playerVM.refreshPlaybackNavigationPath(library: importManagingVM.library)
             }
         }
         .onDisappear {
-            viewModel.stopObservingTracksChanges()
+            importManagingVM.stopObservingTracksChanges()
         }
         .task {
-            if viewModel.hasLibrary.isFalse {
-                await viewModel.refreshLibrary()
+            if importManagingVM.hasLibrary.isFalse {
+                await importManagingVM.refreshLibrary()
             }
-            playerViewModel.refreshPlaybackNavigationPath(library: viewModel.library)
+            playerVM.refreshPlaybackNavigationPath(library: importManagingVM.library)
         }
-        .onChange(of: viewModel.hasLibrary) { _, hasLibrary in
+        .onChange(of: importManagingVM.hasLibrary) { _, hasLibrary in
             guard hasLibrary else { return }
-            playerViewModel.refreshPlaybackNavigationPath(library: viewModel.library)
+            playerVM.refreshPlaybackNavigationPath(library: importManagingVM.library)
         }
-        .onChange(of: viewModel.error) { _, newValue in
+        .onChange(of: importManagingVM.error) { _, newValue in
             isErrorPresented = newValue != nil
         }
         .fileImporter(
@@ -63,7 +63,7 @@ struct ImportsView: View {
                 switch result {
                     case .success(let url):
                         Task {
-                            await viewModel.importFolder(url)
+                            await importManagingVM.importFolder(url)
                         }
 
                     case .failure(let error):
@@ -73,21 +73,22 @@ struct ImportsView: View {
         )
         .alert("Error", isPresented: $isErrorPresented) {
             Button("OK", role: .cancel) {
-                viewModel.dismissError()
+                importManagingVM.dismissError()
             }
         } message: {
-            Text(viewModel.error ?? "")
+            Text(importManagingVM.error ?? "")
         }
-        .modifier(CentralSpinnerModifier(isVisible: viewModel.isLoading))
+        .modifier(CentralSpinnerModifier(isVisible: importManagingVM.isLoading))
     }
 
     // MARK: - Properties. Private
 
-    @Injected private var viewModel: ImportManaging
-    @Injected private var playerViewModel: PlayerManaging
+    @Injected private var rootTabsVM: RootTabsManaging
+    @Injected private var importManagingVM: ImportManaging
+    @Injected private var playerVM: PlayerManaging
+    @State private var sourceIDToDelete: ImportSource.ID?
     @State private var isFileImporterPresented: Bool = false
     @State private var isErrorPresented = false
-    @State private var sourceIDToDelete: ImportSource.ID?
 
     // MARK: - Objects. Private
 
@@ -96,7 +97,7 @@ struct ImportsView: View {
         // MARK: - Properties. Public
 
         @Binding var isFileImporterPresented: Bool
-        let viewModel: ImportManaging
+        let importManagingVM: ImportManaging
 
         // MARK: - Body
 
@@ -104,9 +105,9 @@ struct ImportsView: View {
             HStack {
                 Spacer()
 
-                if viewModel.isEditSectionModeEnabled {
+                if importManagingVM.isEditSectionModeEnabled {
                     Button(action: {
-                            viewModel.finishEditSections()
+                        importManagingVM.finishEditSections()
                         }, label: {
                             Image(systemName: "checkmark")
                                 .font(.system(size: imageFontSize, weight: .medium))
@@ -125,7 +126,7 @@ struct ImportsView: View {
                         )
 
                         Button(action: {
-                                viewModel.beginEditSections()
+                            importManagingVM.beginEditSections()
                             }, label: {
                                 Label("Edit Sections", systemImage: "slider.horizontal.3")
                             }
@@ -152,7 +153,7 @@ struct ImportsView: View {
         private let foregroundOpacity: Double = 0.6
 
         private var isMenuButtonDisabled: Bool {
-            viewModel.hasLibrary.isFalse
+            importManagingVM.hasLibrary.isFalse
         }
     }
 
@@ -198,15 +199,16 @@ struct ImportsView: View {
 
         @Environment(AppCoordinator.self) private var coordinator
         @Binding var sourceIDToDelete: ImportSource.ID?
-        let viewModel: ImportManaging
+
+        let importManagingVM: ImportManaging
 
         // MARK: - Body
 
         var body: some View {
-            if viewModel.hasVisibleItems || viewModel.isEditSectionModeEnabled {
+            if importManagingVM.hasVisibleItems || importManagingVM.isEditSectionModeEnabled {
                 ScrollView {
                     LazyVStack(spacing: 10, pinnedViews: [.sectionHeaders]) {
-                        ForEach(viewModel.sections) { section in
+                        ForEach(importManagingVM.sections) { section in
                             if section.items.isNotEmpty {
                                 Section {
                                     VStack(spacing: 0) {
@@ -239,7 +241,7 @@ struct ImportsView: View {
                         .padding(.top, 10)
                 } actions: {
                     Button(action: {
-                            viewModel.beginEditSections()
+                            importManagingVM.beginEditSections()
                         }, label: {
                             Text("Edit Sections")
                                 .foregroundStyle(.black.opacity(0.6))
@@ -268,15 +270,15 @@ struct ImportsView: View {
             LibraryMenuCell(
                 title: title(for: item),
                 icon: icon(for: item),
-                isEditMode: viewModel.isEditSectionModeEnabled,
-                isSelected: viewModel.isItemSelected(item),
+                isEditMode: importManagingVM.isEditSectionModeEnabled,
+                isSelected: importManagingVM.isItemSelected(item),
                 showsChevron: showsChevron(for: item),
-                sourceStorageSize: viewModel.sourceStorageSize(for: item),
+                sourceStorageSize: importManagingVM.sourceStorageSize(for: item),
                 onTapGesture: {
                     handleTap(for: item)
                 },
                 onDragStarted: {
-                    viewModel.draggingItem = item
+                    importManagingVM.draggingItem = item
                     dragSectionKind = section.kind
                     dragStartIndex = currentItems(for: section.kind).firstIndex(of: item)
                 },
@@ -293,13 +295,13 @@ struct ImportsView: View {
                     return clampedHeight
                 },
                 onDragEnded: {
-                    viewModel.draggingItem = nil
+                    importManagingVM.draggingItem = nil
                     dragStartIndex = nil
                     dragSectionKind = nil
                 }
             )
             .contextMenu {
-                if case .source(let id) = item, viewModel.isEditSectionModeEnabled.isFalse {
+                if case .source(let id) = item, importManagingVM.isEditSectionModeEnabled.isFalse {
                     Button(role: .destructive) {
                         sourceIDToDelete = id
                     } label: {
@@ -323,7 +325,7 @@ struct ImportsView: View {
                 Button("Delete", role: .destructive) {
                     if let id = sourceIDToDelete {
                         Task {
-                            await viewModel.removeSource(id)
+                            await importManagingVM.removeSource(id)
                         }
                     }
                     sourceIDToDelete = nil
@@ -361,7 +363,7 @@ struct ImportsView: View {
             translationHeight: CGFloat,
             rowHeight: CGFloat
         ) {
-            guard viewModel.draggingItem == dragging else { return }
+            guard importManagingVM.draggingItem == dragging else { return }
             guard
                 let sectionKind = dragSectionKind,
                 let startIndex = dragStartIndex
@@ -384,18 +386,18 @@ struct ImportsView: View {
             guard targetIndex != currentIndex else { return }
 
             withAnimation(.easeInOut(duration: 0.45)) {
-                viewModel.moveItem(to: items[targetIndex])
+                importManagingVM.moveItem(to: items[targetIndex])
             }
             UISelectionFeedbackGenerator().selectionChanged()
         }
 
         private func currentItems(for kind: ImportSection) -> [ImportItem] {
-            viewModel.sections.first { $0.kind == kind }?.items ?? []
+            importManagingVM.sections.first { $0.kind == kind }?.items ?? []
         }
 
         private func handleTap(for item: ImportItem) {
-            if viewModel.isEditSectionModeEnabled {
-                viewModel.toggleItem(item)
+            if importManagingVM.isEditSectionModeEnabled {
+                importManagingVM.toggleItem(item)
                 return
             }
 
@@ -414,14 +416,14 @@ struct ImportsView: View {
 
                 case .source(let id):
                     Task {
-                        guard let source = viewModel.source(for: id) else { return }
+                        guard let source = importManagingVM.source(for: id) else { return }
 
                         switch source.kind {
                             case .api:
                                 coordinator.push(.tracks("Downloaded", .downloads))
 
                             case .local, .sync:
-                                if await viewModel.fetchfolderItems(
+                                if await importManagingVM.fetchfolderItems(
                                     sourceID: id,
                                     path: nil
                                 ) != nil {
@@ -433,7 +435,7 @@ struct ImportsView: View {
         }
 
         private func showsChevron(for item: ImportItem) -> Bool {
-            if case .source = item, viewModel.isEditSectionModeEnabled.isFalse {
+            if case .source = item, importManagingVM.isEditSectionModeEnabled.isFalse {
                 return true
             }
             return false
@@ -445,7 +447,7 @@ struct ImportsView: View {
                     return libraryItem.rawValue.capitalized
 
                 case .source(let id):
-                    return viewModel.source(for: id)?.title ?? ""
+                    return importManagingVM.source(for: id)?.title ?? ""
             }
         }
 
@@ -455,7 +457,7 @@ struct ImportsView: View {
                     return libraryItem.systemImage
 
                 case .source(let id):
-                    return viewModel.source(for: id)?.kind.systemImage ?? "folder"
+                    return importManagingVM.source(for: id)?.kind.systemImage ?? "folder"
             }
         }
     }

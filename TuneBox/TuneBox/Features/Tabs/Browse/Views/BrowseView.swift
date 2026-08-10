@@ -14,7 +14,7 @@ struct BrowseView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HeaderView(viewModel: viewModel)
+            HeaderView(transferManagingVM: transferManagingVM)
 
             SearchBarView(
                 searchQuery: $searchQuery,
@@ -23,14 +23,15 @@ struct BrowseView: View {
                     isSearchFieldFocused = false
                 },
                 onClear: {
-                    viewModel.clearSearchState()
+                    transferManagingVM.clearSearchState()
                 }
             )
 
             ContentView(
                 slideDirection: $slideDirection,
-                viewModel: viewModel,
-                playerViewModel: playerViewModel
+                rootTabsVM: rootTabsVM,
+                transferManagingVM: transferManagingVM,
+                playerVM: playerVM,
             )
         }
         .frame(maxWidth: .infinity,
@@ -38,7 +39,7 @@ struct BrowseView: View {
                alignment: .top
         )
         .task {
-            await viewModel.loadInitialData()
+            await transferManagingVM.loadInitialData()
         }
         .task(id: searchQuery) {
             try? await Task.sleep(for: .milliseconds(300))
@@ -50,13 +51,14 @@ struct BrowseView: View {
             handleSearchStateBy(query: searchQuery)
         }
         .dismissKeyboardOnTap(focused: $isSearchFieldFocused)
-        .modifier(CentralSpinnerModifier(isVisible: viewModel.shouldShowCentralSpinner))
+        .modifier(CentralSpinnerModifier(isVisible: transferManagingVM.shouldShowCentralSpinner))
     }
 
     // MARK: - Properties. Private
 
-    @Injected private var viewModel: TransferManaging
-    @Injected private var playerViewModel: PlayerManaging
+    @Injected private var rootTabsVM: RootTabsManaging
+    @Injected private var transferManagingVM: TransferManaging
+    @Injected private var playerVM: PlayerManaging
     @FocusState private var isSearchFieldFocused: Bool
     @State private var slideDirection: SlideDirection = .forward
     @State private var searchQuery: String = ""
@@ -64,10 +66,14 @@ struct BrowseView: View {
     // MARK: - Subviews. Private
 
     private struct HeaderView: View {
-        @Environment(\.themeManager) private var theme
-        let viewModel: TransferManaging
 
-        private let horizontalPadding: CGFloat = 26
+        // MARK: - Properties. Public
+
+        @Environment(\.themeManager) private var theme
+
+        let transferManagingVM: TransferManaging
+
+        // MARK: - Body
 
         var body: some View {
             HStack {
@@ -79,36 +85,53 @@ struct BrowseView: View {
 
                 Menu {
                     Button(action: {
-                        viewModel.cancelAllActiveDownloads()
+                        transferManagingVM.cancelAllActiveDownloads()
                     }, label: {
                         Label("Remove all active tracks", systemImage: "")
                     })
-                    .disabled(viewModel.inProgressActiveTracksCount == .zero)
+                    .disabled(transferManagingVM.inProgressActiveTracksCount == .zero)
 
                     Button(action: {
-                        viewModel.cancelAllPausedDownloads()
+                        transferManagingVM.cancelAllPausedDownloads()
                     }, label: {
                         Label("Remove all paused tracks", systemImage: "")
                     })
-                    .disabled(viewModel.inProgressPausedTracksCount == .zero)
+                    .disabled(transferManagingVM.inProgressPausedTracksCount == .zero)
                 } label: {
                     Image(systemName: "xmark.circle")
                         .symbolRenderingMode(.hierarchical)
                         .font(.system(size: 30, weight: .ultraLight))
                 }
-                .disabled(viewModel.inProgressActiveTracksCount == .zero && viewModel.inProgressPausedTracksCount == .zero)
-                .opacity(viewModel.inProgressActiveTracksCount == .zero && viewModel.inProgressPausedTracksCount == .zero ? 0.5 : 1)
+                .disabled(
+                    transferManagingVM.inProgressActiveTracksCount == .zero
+                    && transferManagingVM.inProgressPausedTracksCount == .zero
+                )
+                .opacity(
+                    transferManagingVM.inProgressActiveTracksCount == .zero
+                    && transferManagingVM.inProgressPausedTracksCount == .zero
+                    ? 0.5
+                    : 1
+                )
             }
             .padding(.horizontal, horizontalPadding)
         }
+
+        // MARK: - Properties. Private
+
+        private let horizontalPadding: CGFloat = 26
     }
 
     private struct ContentView: View {
-        @Binding var slideDirection: SlideDirection
-        let viewModel: TransferManaging
-        let playerViewModel: PlayerManaging
 
-        private let headerLeadingPadding: CGFloat = 26
+        // MARK: - Properties. Public
+
+        @Binding var slideDirection: SlideDirection
+
+        let rootTabsVM: RootTabsManaging
+        let transferManagingVM: TransferManaging
+        let playerVM: PlayerManaging
+
+        // MARK: - Body
 
         var body: some View {
             ScrollView(showsIndicators: true) {
@@ -116,10 +139,10 @@ struct BrowseView: View {
                     SegmentedChipControl(
                         selected: Binding(
                             get: {
-                                viewModel.selectedGenre
+                                transferManagingVM.selectedGenre
                             },
                             set: {
-                                viewModel.selectGenre($0)
+                                transferManagingVM.selectGenre($0)
                             }
                         ),
                         direction: $slideDirection,
@@ -127,7 +150,7 @@ struct BrowseView: View {
                     )
 
                     Group {
-                        ForEach(viewModel.sections) { section in
+                        ForEach(transferManagingVM.sections) { section in
                             switch section.type {
                                 case .search:
                                     searchSectionView(section)
@@ -143,23 +166,27 @@ struct BrowseView: View {
                             }
                         }
                     }
-                    .modifier(EmptyTracksStateModifier(showsEmptyState: viewModel.showsEmptyState))
+                    .modifier(EmptyTracksStateModifier(showsEmptyState: transferManagingVM.showsEmptyState))
                 }
             }
             .padding(.top, 10)
-            .bottomContentMargin(10, isPlayerVisible: playerViewModel.isPlayerVisible)
+            .bottomContentMargin(0, 0, isPlayerVisible: playerVM.isPlayerVisible, isTabBarVisible: rootTabsVM.isTabBarVisible)
             .refreshable {
-                await viewModel.refreshBrowse()
+                await transferManagingVM.refreshBrowse()
             }
         }
+
+        // MARK: - Properties. Private
+
+        private let headerLeadingPadding: CGFloat = 26
 
         // MARK: - Methods. Private
 
         @ViewBuilder
         private func searchSectionView(_ section: TracksSection) -> some View {
             if section.tracks.isNotEmpty,
-               viewModel.completedSearchQuery.isNotEmpty,
-               viewModel.shouldShowCentralSpinner.isFalse {
+               transferManagingVM.completedSearchQuery.isNotEmpty,
+               transferManagingVM.shouldShowCentralSpinner.isFalse {
 
                 Section(
                     content: {
@@ -167,27 +194,27 @@ struct BrowseView: View {
                             ForEach(section.tracks, id: \.id) { track in
                                 TrackCell(
                                     track: track,
-                                    searchQuery: viewModel.completedSearchQuery,
+                                    searchQuery: transferManagingVM.completedSearchQuery,
                                     onButtonTap: {
                                         Task {
-                                            await viewModel.handleDownloadAction(for: track)
+                                            await transferManagingVM.handleDownloadAction(for: track)
                                         }
                                     }
                                 )
                                 .onAppear {
                                     if track === section.tracks.last {
-                                        viewModel.loadNextSearch()
+                                        transferManagingVM.loadNextSearch()
                                     }
                                 }
                             }
 
-                            if viewModel.isPaginationSearchLoading {
+                            if transferManagingVM.isPaginationSearchLoading {
                                 SpinnerView(size: .regular)
                                     .padding(.vertical, 10)
                             }
 
                             PaginationFooterView(
-                                hasReachedEnd: viewModel.reachedSearchTracksEnd,
+                                hasReachedEnd: transferManagingVM.reachedSearchTracksEnd,
                                 hasItems: section.tracks.isNotEmpty
                             )
                         }
@@ -202,8 +229,8 @@ struct BrowseView: View {
         @ViewBuilder
         private func genreSectionView(_ section: TracksSection) -> some View {
             if section.tracks.isNotEmpty,
-               viewModel.completedSearchQuery.isEmpty,
-               viewModel.shouldShowCentralSpinner.isFalse {
+               transferManagingVM.completedSearchQuery.isEmpty,
+               transferManagingVM.shouldShowCentralSpinner.isFalse {
 
                 Section(
                     content: {
@@ -215,24 +242,24 @@ struct BrowseView: View {
                                             track: track,
                                             onButtonTap: {
                                                 Task {
-                                                    await viewModel.handleDownloadAction(for: track)
+                                                    await transferManagingVM.handleDownloadAction(for: track)
                                                 }
                                             }
                                         )
                                         .onAppear {
                                             if track === section.tracks.last {
-                                                viewModel.loadNextBy(genre: viewModel.selectedGenre)
+                                                transferManagingVM.loadNextBy(genre: transferManagingVM.selectedGenre)
                                             }
                                         }
                                     }
 
-                                    if viewModel.isPaginationGenreLoading {
+                                    if transferManagingVM.isPaginationGenreLoading {
                                         SpinnerView(size: .regular)
                                             .padding(.vertical, 10)
                                     }
 
                                     PaginationFooterView(
-                                        hasReachedEnd: viewModel.reachedGenreTracksEnd,
+                                        hasReachedEnd: transferManagingVM.reachedGenreTracksEnd,
                                         hasItems: section.tracks.isNotEmpty,
                                         style: .carousel
                                     )
@@ -241,12 +268,12 @@ struct BrowseView: View {
                                 .padding(.horizontal)
                                 .id("featuredLeft")
                             }
-                            .onChange(of: viewModel.isRefreshing) { _, isRefreshing in
+                            .onChange(of: transferManagingVM.isRefreshing) { _, isRefreshing in
                                 guard isRefreshing.isFalse else { return }
 
                                 horizontalProxy.scrollTo("featuredLeft", anchor: .leading)
                             }
-                            .id(viewModel.selectedGenre)
+                            .id(transferManagingVM.selectedGenre)
                         }
                     },
                     header: {
@@ -259,8 +286,8 @@ struct BrowseView: View {
         @ViewBuilder
         private func popularSectionView(_ section: TracksSection) -> some View {
             if section.tracks.isNotEmpty,
-               viewModel.completedSearchQuery.isEmpty,
-               viewModel.shouldShowCentralSpinner.isFalse {
+               transferManagingVM.completedSearchQuery.isEmpty,
+               transferManagingVM.shouldShowCentralSpinner.isFalse {
 
                 Section(
                     content: {
@@ -270,24 +297,24 @@ struct BrowseView: View {
                                     track: track,
                                     onButtonTap: {
                                         Task {
-                                            await viewModel.handleDownloadAction(for: track)
+                                            await transferManagingVM.handleDownloadAction(for: track)
                                         }
                                     }
                                 )
                                 .onAppear {
                                     if track === section.tracks.last {
-                                        viewModel.loadNextPopular()
+                                        transferManagingVM.loadNextPopular()
                                     }
                                 }
                             }
 
-                            if viewModel.isPaginationPopularLoading {
+                            if transferManagingVM.isPaginationPopularLoading {
                                 SpinnerView(size: .regular)
                                     .padding(.vertical, 10)
                             }
 
                             PaginationFooterView(
-                                hasReachedEnd: viewModel.reachedPopularTracksEnd,
+                                hasReachedEnd: transferManagingVM.reachedPopularTracksEnd,
                                 hasItems: section.tracks.isNotEmpty
                             )
                         }
@@ -303,11 +330,11 @@ struct BrowseView: View {
 
     private func handleSearchStateBy(query: String) {
         if query.isEmpty {
-            viewModel.clearSearchState()
+            transferManagingVM.clearSearchState()
         }
 
-        if viewModel.completedSearchQuery != query {
-            viewModel.loadSearchBy(query: query)
+        if transferManagingVM.completedSearchQuery != query {
+            transferManagingVM.loadSearchBy(query: query)
         }
     }
 }

@@ -13,7 +13,7 @@ struct ArtistsView: View {
     // MARK: - Main Body
 
     var body: some View {
-        if let library = viewModel.library, library.artists.isNotEmpty {
+        if let library = importManagingVM.library, library.artists.isNotEmpty {
             ScrollView(showsIndicators: false) {
                 LazyVStack(spacing: 0) {
                     ForEach(library.artists) { artist in
@@ -29,14 +29,19 @@ struct ArtistsView: View {
                         count: library.artists.count,
                         unitSingular: String(LibraryItem.artists.rawValue.dropLast()),
                         unitPlural: LibraryItem.artists.rawValue,
-                        duration: viewModel.tracksDuration(library.artists.flatMap(\.tracks)),
-                        size: viewModel.tracksSize(library.artists.flatMap(\.tracks)),
+                        duration: importManagingVM.tracksDuration(library.artists.flatMap(\.tracks)),
+                        size: importManagingVM.tracksSize(library.artists.flatMap(\.tracks)),
                         topPadding: 10
                     )
                 }
             }
             .navigationTitle(LibraryItem.artists.rawValue.capitalized)
-            .bottomContentMargin(isPlayerVisible: playerViewModel.isPlayerVisible)
+            .bottomContentMargin(
+                10,
+                0,
+                isPlayerVisible: playerVM.isPlayerVisible,
+                isTabBarVisible: rootTabsVM.isTabBarVisible
+            )
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         } else {
             LibraryEmptyStateView(item: LibraryItem.artists)
@@ -46,6 +51,7 @@ struct ArtistsView: View {
     // MARK: - Properties. Private
 
     @Environment(AppCoordinator.self) private var coordinator
-    @Injected var viewModel: ImportManaging
-    @Injected private var playerViewModel: PlayerManaging
+    @Injected private var rootTabsVM: RootTabsManaging
+    @Injected var importManagingVM: ImportManaging
+    @Injected private var playerVM: PlayerManaging
 }

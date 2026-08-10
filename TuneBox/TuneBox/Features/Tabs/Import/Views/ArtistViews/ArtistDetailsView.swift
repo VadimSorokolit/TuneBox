@@ -35,16 +35,22 @@ struct ArtistDetailsView: View {
             Group {
                 if artist.albums.isEmpty {
                     TracksContentView(
-                        viewModel: viewModel,
                         coordinator: coordinator,
-                        playerViewModel: playerViewModel,
+                        importManagingVM: importManagingVM,
+                        playerVM: playerVM,
                         tracks: artist.tracks
+                    )
+                    .bottomContentMargin(
+                        20,
+                        isPlayerVisible: playerVM.isPlayerVisible,
+                        isTabBarVisible: rootTabsVM.isTabBarVisible
                     )
                 } else {
                     ChipsView(
                         coordinator: coordinator,
-                        viewModel: viewModel,
-                        playerViewModel: playerViewModel,
+                        rootTabsVM: rootTabsVM,
+                        importManagingVM: importManagingVM,
+                        playerVM: playerVM,
                         artist: artist
                     )
                 }
@@ -62,8 +68,9 @@ struct ArtistDetailsView: View {
     // MARK: - Properties. Private
 
     @Environment(AppCoordinator.self) private var coordinator
-    @Injected private var viewModel: ImportManaging
-    @Injected private var playerViewModel: PlayerManaging
+    @Injected private var rootTabsVM: RootTabsManaging
+    @Injected private var importManagingVM: ImportManaging
+    @Injected private var playerVM: PlayerManaging
 
     // MARK: - Private. Objects
 
@@ -72,8 +79,9 @@ struct ArtistDetailsView: View {
         // MARK: - Properties. Public
 
         let coordinator: AppCoordinator
-        let viewModel: ImportManaging
-        let playerViewModel: PlayerManaging
+        let rootTabsVM: RootTabsManaging
+        let importManagingVM: ImportManaging
+        let playerVM: PlayerManaging
         let artist: MusicLibrary.Artist
 
         // MARK: - Body
@@ -93,8 +101,8 @@ struct ArtistDetailsView: View {
                             case .albums:
                                 AlbumsContentView(
                                     coorditaor: coordinator,
-                                    viewModel: viewModel,
-                                    playerViewModel: playerViewModel,
+                                    importManagingVM: importManagingVM,
+                                    playerVM: playerVM,
                                     albums: artist.albums
                                 )
                                 .id(selected)
@@ -102,10 +110,10 @@ struct ArtistDetailsView: View {
 
                             case .tracks:
                                 TracksContentView(
-                                    viewModel: viewModel,
                                     coordinator: coordinator,
-                                    playerViewModel: playerViewModel,
-                                    tracks: viewModel.sortedTracksAlphabetically(artist.tracks),
+                                    importManagingVM: importManagingVM,
+                                    playerVM: playerVM,
+                                    tracks: importManagingVM.sortedTracksAlphabetically(artist.tracks),
                                 )
                                 .id(selected)
                                 .segmentTransition(direction)
@@ -113,7 +121,12 @@ struct ArtistDetailsView: View {
                     }
                     .animation(.easeInOut(duration: 0.25), value: selected)
                 }
-                .bottomContentMargin(20, isPlayerVisible: playerViewModel.isPlayerVisible)
+                .bottomContentMargin(
+                    10,
+                    0,
+                    isPlayerVisible: playerVM.isPlayerVisible,
+                    isTabBarVisible: rootTabsVM.isTabBarVisible
+                )
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .padding(.top, 16)
@@ -130,8 +143,8 @@ struct ArtistDetailsView: View {
         // MARK: - Properties. Public
 
         let coorditaor: AppCoordinator
-        let viewModel: ImportManaging
-        let playerViewModel: PlayerManaging
+        let importManagingVM: ImportManaging
+        let playerVM: PlayerManaging
         let albums: [MusicLibrary.Album]
 
         // MARK: - Body
@@ -152,8 +165,8 @@ struct ArtistDetailsView: View {
                     count: albums.count,
                     unitSingular: "album",
                     unitPlural: "albums",
-                    duration: viewModel.tracksDuration(albums.flatMap(\.tracks)),
-                    size: viewModel.tracksSize(albums.flatMap(\.tracks)),
+                    duration: importManagingVM.tracksDuration(albums.flatMap(\.tracks)),
+                    size: importManagingVM.tracksSize(albums.flatMap(\.tracks)),
                     topPadding: 10
                 )
             }
@@ -164,9 +177,9 @@ struct ArtistDetailsView: View {
 
         // MARK: - Properties. Public
 
-        let viewModel: ImportManaging
         let coordinator: AppCoordinator
-        let playerViewModel: PlayerManaging
+        let importManagingVM: ImportManaging
+        let playerVM: PlayerManaging
         let tracks: [TrackEntity]
 
         // MARK: - Body
@@ -177,7 +190,7 @@ struct ArtistDetailsView: View {
                     TrackArtworkCell(
                         track: track,
                         onTapGesture: {
-                            playerViewModel.handlePlayAction(
+                            playerVM.handlePlayAction(
                                 for: track,
                                 in: tracks,
                                 navigationPath: coordinator.path
@@ -190,8 +203,8 @@ struct ArtistDetailsView: View {
                     count: tracks.count,
                     unitSingular: "track",
                     unitPlural: "tracks",
-                    duration: viewModel.tracksDuration(tracks),
-                    size: viewModel.tracksSize(tracks),
+                    duration: importManagingVM.tracksDuration(tracks),
+                    size: importManagingVM.tracksSize(tracks),
                     topPadding: 10
                 )
             }

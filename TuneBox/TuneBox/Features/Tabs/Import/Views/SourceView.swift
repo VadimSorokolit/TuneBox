@@ -24,24 +24,29 @@ struct SourceView: View {
                     row(for: item)
                 }
 
-                let tracks = viewModel.tracks(for: sourceID)
+                let tracks = importManagingVM.tracks(for: sourceID)
                 LibrarySummaryFooter(
                     count: tracks.count,
                     unitSingular: String(LibraryItem.tracks.rawValue.dropLast()),
                     unitPlural: LibraryItem.tracks.rawValue,
-                    duration: viewModel.tracksDuration(tracks),
-                    size: viewModel.tracksSize(tracks),
+                    duration: importManagingVM.tracksDuration(tracks),
+                    size: importManagingVM.tracksSize(tracks),
                     topPadding: 10
                 )
             }
         }
-        .bottomContentMargin(isPlayerVisible: playerViewModel.isPlayerVisible)
+        .bottomContentMargin(
+            10,
+            0,
+            isPlayerVisible: playerVM.isPlayerVisible,
+            isTabBarVisible: rootTabsVM.isTabBarVisible
+        )
         .navigationTitle(
             path?.components(separatedBy: "/").last
-            ?? viewModel.source(for: sourceID)?.title ?? ImportSection.sources.rawValue.capitalized
+            ?? importManagingVM.source(for: sourceID)?.title ?? ImportSection.sources.rawValue.capitalized
         )
         .task(id: path) {
-            guard let items = await viewModel.fetchfolderItems(sourceID: sourceID, path: path) else { return }
+            guard let items = await importManagingVM.fetchfolderItems(sourceID: sourceID, path: path) else { return }
             self.items = items
         }
     }
@@ -49,8 +54,9 @@ struct SourceView: View {
     // MARK: - Properties. Private
 
     @Environment(AppCoordinator.self) private var coordinator
-    @Injected private var viewModel: ImportManaging
-    @Injected private var playerViewModel: PlayerManaging
+    @Injected private var rootTabsVM: RootTabsManaging
+    @Injected private var importManagingVM: ImportManaging
+    @Injected private var playerVM: PlayerManaging
 
     @State private var items: [SourceFolderItem] = []
 
@@ -79,11 +85,11 @@ struct SourceView: View {
                     icon: LibraryItem.tracks.systemImage,
                     title: item.url.deletingPathExtension().lastPathComponent,
                     onTapGesture: {
-                        guard let track = viewModel.track(for: item.url) else {
+                        guard let track = importManagingVM.track(for: item.url) else {
                             return
                         }
-                        let tracks = viewModel.tracks(for: sourceID)
-                        playerViewModel.handlePlayAction(
+                        let tracks = importManagingVM.tracks(for: sourceID)
+                        playerVM.handlePlayAction(
                             for: track,
                             in: tracks,
                             navigationPath: coordinator.path
@@ -92,7 +98,7 @@ struct SourceView: View {
                 )
 
             case .playlist:
-                if let playlist = viewModel.playlist(for: item.url) {
+                if let playlist = importManagingVM.playlist(for: item.url) {
                     PlaylistCell(
                         playlist: playlist,
                         onTapGesture: {
@@ -114,7 +120,7 @@ struct SourceView: View {
     private func openPlaylist(_ url: URL) {
         let title = url.deletingPathExtension().lastPathComponent
 
-        guard let playlist = viewModel.library?.playlists.first(
+        guard let playlist = importManagingVM.library?.playlists.first(
             where: { $0.title == title }
         ) else {
             return

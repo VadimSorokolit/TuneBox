@@ -1,5 +1,5 @@
 //
-//  GenreCell.swift
+//  RootTabsView.swift
 //  TuneBox
 //
 //  Created by Vadim Sorokolit on 05.06.2026.
@@ -7,6 +7,39 @@
 
 import SwiftUI
 import Resolver
+
+private enum Constants {
+    enum Title {
+        static let defaultNavigationTitle = "Tracks"
+    }
+
+    enum Icons {
+        enum Browse {
+            static let inactive = "magnifyingglass.circle"
+            static let active = "magnifyingglass.circle.fill"
+        }
+
+        enum Downloads {
+            static let inactive = "arrow.down.circle"
+            static let active = "arrow.down.circle.fill"
+        }
+
+        enum ImportFiles {
+            static let inactive = "folder.circle"
+            static let active = "folder.circle.fill"
+        }
+
+        enum Settings {
+            static let inactive = "gear.circle"
+            static let active = "gear.circle.fill"
+        }
+    }
+}
+
+enum TabsMode: String {
+    case allTabs
+    case `import`
+}
 
 enum CustomTab: String, Hashable, Identifiable, CaseIterable {
     case browse
@@ -19,32 +52,32 @@ enum CustomTab: String, Hashable, Identifiable, CaseIterable {
     var iconInactive: String {
         switch self {
             case .browse:
-                "magnifyingglass.circle"
+                Constants.Icons.Browse.inactive
 
             case .downloads:
-                "arrow.down.circle"
+                Constants.Icons.Downloads.inactive
 
             case .importFiles:
-                "folder.circle"
+                Constants.Icons.ImportFiles.inactive
 
             case .settings:
-                "gear.circle"
+                Constants.Icons.Settings.inactive
         }
     }
 
     var iconActive: String {
         switch self {
             case .browse:
-                "magnifyingglass.circle.fill"
+                Constants.Icons.Browse.active
 
             case .downloads:
-                "arrow.down.circle.fill"
+                Constants.Icons.Downloads.active
 
             case .importFiles:
-                "folder.circle.fill"
+                Constants.Icons.ImportFiles.active
 
             case .settings:
-                "gear.circle.fill"
+                Constants.Icons.Settings.active
         }
     }
 }
@@ -57,7 +90,7 @@ struct RootTabsView: View {
         ZStack(alignment: .bottom) {
             content
 
-            if playerViewModel.track != nil {
+            if playerViewModel.isPlayerVisible {
                 CompactPlayerView(
                     track: playerViewModel.track,
                     isPlaying: playerViewModel.isPlaying,
@@ -79,17 +112,17 @@ struct RootTabsView: View {
                     onProgressTap: {
                         isShowingExpandedPlayer = true
                     },
-                    onRepeatModeChange: { mod in
-                        playerViewModel.setRepeatMode(mod)
+                    onRepeatModeChange: { mode in
+                        playerViewModel.setRepeatMode(mode)
                     },
                     onShuffleToggle: {
                         playerViewModel.toggleShuffle()
                     }
                 )
-                .padding(.bottom, tabBarHeight)
+                .padding(.bottom, rootTabsViewModel.isTabBarVisible ? rootTabsViewModel.tabBarHeight : 0)
             }
 
-            if visibleTabs.count > 1 {
+            if rootTabsViewModel.isTabBarVisible {
                 tabBar
             }
         }
@@ -101,47 +134,27 @@ struct RootTabsView: View {
         .animation(.easeInOut(duration: 0.25), value: isShowingExpandedPlayer)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
         .onAppear {
+            restoreSelectedTab()
             playerViewModel.restoreLastPlaybackSession()
         }
         .task {
             playerViewModel.restoreLastPlaybackSession()
         }
+        .onChange(of: rootTabsViewModel.tabsMode) { _, _ in
+            restoreSelectedTab()
+        }
+        .onChange(of: coordinator.selectedTab) { _, newTab in
+            rootTabsViewModel.rememberSelectedTab(newTab)
+        }
     }
 
     // MARK: - Properties. Private
 
-    private enum Constants {
-        enum Title {
-            static let defaultNavigationTitle = "Tracks"
-        }
-
-        enum Keys {
-            static let tabsMode = "tabsMode"
-            static let lastSelectedTab = "lastSelectedTab"
-        }
-
-        enum TabsMode {
-            static let allTabs = "allTabs"
-            static let imports = "imports"
-        }
-    }
-
+    @Injected private var rootTabsViewModel: RootTabsManaging
     @Injected private var playerViewModel: PlayerManaging
     @Environment(\.themeManager) private var theme
     @Environment(AppCoordinator.self) private var coordinator
-    @AppStorage(Constants.Keys.tabsMode) private var tabsMode = Constants.TabsMode.allTabs
-    @AppStorage(Constants.Keys.lastSelectedTab) private var lastSelectedTab = CustomTab.browse.rawValue
     @State private var isShowingExpandedPlayer: Bool = false
-
-    private let tabBarHeight: CGFloat = 60
-
-    private var showAllTabs: Bool {
-        tabsMode == Constants.TabsMode.allTabs
-    }
-
-    private var visibleTabs: [CustomTab] {
-        showAllTabs ? CustomTab.allCases : [.importFiles]
-    }
 
     private var content: some View {
         Group {
@@ -190,21 +203,12 @@ struct RootTabsView: View {
                     SettingsView()
             }
         }
-        .onAppear {
-            restoreSelectedTab()
-        }
-        .onChange(of: tabsMode) { _, _ in
-            restoreSelectedTab()
-        }
-        .onChange(of: coordinator.selectedTab) { _, newTab in
-            lastSelectedTab = newTab.rawValue
-        }
     }
 
     private var tabBar: some View {
         ZStack(alignment: .top) {
             HStack(spacing: 10) {
-                ForEach(visibleTabs) { tab in
+                ForEach(rootTabsViewModel.visibleTabs) { tab in
                     TabItemView(
                         tab: tab,
                         isSelected: coordinator.selectedTab == tab,
@@ -218,7 +222,7 @@ struct RootTabsView: View {
             }
         }
         .padding(.horizontal, 6)
-        .frame(height: tabBarHeight)
+        .frame(height: rootTabsViewModel.tabBarHeight)
         .background(tabBarBackground)
     }
 
@@ -231,13 +235,7 @@ struct RootTabsView: View {
     // MARK: - Private. Methods
 
     private func restoreSelectedTab() {
-        if showAllTabs {
-            let restored = CustomTab(rawValue: lastSelectedTab) ?? .browse
-            coordinator.selectedTab = visibleTabs.contains(restored) ? restored : .browse
-            return
-        }
-
-        coordinator.selectedTab = .importFiles
+        coordinator.selectedTab = rootTabsViewModel.restoreSelectedTab()
     }
 
     private func openTrackSource() {
@@ -267,7 +265,8 @@ struct RootTabsView: View {
         // MARK: - Main Body
 
         var body: some View {
-            Button(action: {
+            Button(
+                action: {
                     withAnimation(.spring(response: 0.28, dampingFraction: 0.78)) {
                         onTap()
                     }
@@ -277,12 +276,9 @@ struct RootTabsView: View {
                         .font(.system(size: 30, weight: .ultraLight))
                         .symbolRenderingMode(.hierarchical)
                         .foregroundStyle(isSelected ? activeColor : inactiveColor)
-                        .frame(width: isSelected
-                               ? iconWidth + 5
-                               : iconWidth,
-                               height: isSelected
-                               ? iconWidth + 5
-                               : iconWidth
+                        .frame(
+                            width: isSelected ? iconWidth + 5 : iconWidth,
+                            height: isSelected ? iconWidth + 5 : iconWidth
                         )
                         .animation(.spring(response: 0.28, dampingFraction: 0.78), value: isSelected)
                         .frame(maxWidth: .infinity)
@@ -296,7 +292,6 @@ struct RootTabsView: View {
 
         private let iconWidth: CGFloat = 54
     }
-
 }
 
 #Preview("Tab Bar Only") {

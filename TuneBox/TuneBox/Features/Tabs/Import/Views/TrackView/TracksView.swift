@@ -33,7 +33,7 @@ struct TracksView: View {
                 }
             } else {
                 List {
-                    ForEach(viewModel.sectionedTracks(from: tracks)) { section in
+                    ForEach(importManagingVM.sectionedTracks(from: tracks)) { section in
                         Section {
                             sectionTracksTitle(
                                 section.letter,
@@ -50,7 +50,7 @@ struct TracksView: View {
                                 TrackArtworkCell(
                                     track: track,
                                     onTapGesture: {
-                                        playerViewModel.handlePlayAction(
+                                        playerVM.handlePlayAction(
                                             for: track,
                                             in: section.tracks,
                                             navigationPath: coordinator.path
@@ -71,8 +71,8 @@ struct TracksView: View {
                             count: tracks.count,
                             unitSingular: "track",
                             unitPlural: "tracks",
-                            duration: viewModel.tracksDuration(tracks),
-                            size: viewModel.tracksSize(tracks),
+                            duration: importManagingVM.tracksDuration(tracks),
+                            size: importManagingVM.tracksSize(tracks),
                             topPadding: 10
                         )
                         .frame(maxWidth: .infinity)
@@ -80,37 +80,51 @@ struct TracksView: View {
                         .listRowBackground(Color.clear)
                     }
                     .listSectionSeparator(.hidden)
+
+                    Section {
+                        Color.clear
+                            .frame(
+                                height: BottomLayout.inset(
+                                    isPlayerVisible: playerVM.isPlayerVisible,
+                                    isTabBarVisible: rootTabsVM.isTabBarVisible
+                                )
+                            )
+                            .listRowInsets(EdgeInsets())
+                            .listRowBackground(Color.clear)
+                            .listRowSeparator(.hidden)
+                    }
+                    .listSectionSeparator(.hidden)
                 }
                 .listStyle(.plain)
                 .environment(\.defaultMinListRowHeight, 1)
-                .bottomContentMargin(isPlayerVisible: playerViewModel.isPlayerVisible)
             }
         }
         .navigationTitle(navigationTitle)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .onAppear {
             Task {
-                viewModel.startObservingTracksChanges()
+                importManagingVM.startObservingTracksChanges()
             }
         }
         .onDisappear {
-            viewModel.stopObservingTracksChanges()
+            importManagingVM.stopObservingTracksChanges()
         }
     }
 
     // MARK: - Properties. Private
 
     @Environment(AppCoordinator.self) private var coordinator
-    @Injected private var viewModel: ImportManaging
-    @Injected private var playerViewModel: PlayerManaging
+    @Injected private var rootTabsVM: RootTabsManaging
+    @Injected private var importManagingVM: ImportManaging
+    @Injected private var playerVM: PlayerManaging
 
     private var tracks: [TrackEntity] {
         switch content {
             case .library:
-                viewModel.libraryTracks()
+                importManagingVM.libraryTracks()
 
             case .downloads:
-                viewModel.libraryTracks(onlyAPI: true)
+                importManagingVM.libraryTracks(onlyAPI: true)
 
             case .fixed(let tracks):
                 tracks

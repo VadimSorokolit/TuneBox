@@ -7,17 +7,36 @@
 
 import SwiftUI
 
+enum BottomLayout {
+    static func inset(
+        base: CGFloat = 10,
+        adjustment: CGFloat = 0,
+        isPlayerVisible: Bool,
+        isTabBarVisible: Bool
+    ) -> CGFloat {
+        base
+            - adjustment
+            + (isPlayerVisible ? GlobalConstants.Screen.defaultBottomPadding : 0)
+            + (isTabBarVisible ? GlobalConstants.Screen.defaultBottomPadding : 0)
+    }
+}
+
 extension View {
 
     func bottomContentMargin(
-        _ base: CGFloat = 20,
-        isPlayerVisible: Bool
+        _ base: CGFloat = 0,
+        _ adjustment: CGFloat = 10,
+        isPlayerVisible: Bool,
+        isTabBarVisible: Bool
     ) -> some View {
         contentMargins(
             .bottom,
-            isPlayerVisible
-            ? GlobalConstants.Screen.defaultBottomPadding + base
-            : base
+            BottomLayout.inset(
+                base: base,
+                adjustment: adjustment,
+                isPlayerVisible: isPlayerVisible,
+                isTabBarVisible: isTabBarVisible
+            )
         )
     }
 
