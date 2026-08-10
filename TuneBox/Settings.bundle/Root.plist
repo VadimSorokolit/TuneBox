@@ -8,28 +8,26 @@
 	<array>
 		<dict>
 			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>Type</key>
 			<string>PSMultiValueSpecifier</string>
 			<key>Title</key>
-			<string>Start Tab</string>
+			<string>Tabs Mode</string>
 			<key>Key</key>
-			<string>startTab</string>
+			<string>tabsMode</string>
 			<key>DefaultValue</key>
-			<string>browse</string>
+			<string>allTabs</string>
 			<key>Titles</key>
 			<array>
-				<string>Browse</string>
-				<string>Downloads</string>
-				<string>Player</string>
-				<string>Import</string>
-				<string>Settings</string>
+				<string>All Tabs</string>
+				<string>Imports</string>
 			</array>
 			<key>Values</key>
 			<array>
-				<string>browse</string>
-				<string>downloads</string>
-				<string>player</string>
-				<string>importFiles</string>
-				<string>settings</string>
+				<string>allTabs</string>
+				<string>imports</string>
 			</array>
 		</dict>
 	</array>

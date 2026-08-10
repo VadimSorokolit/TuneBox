@@ -20,6 +20,8 @@ struct TrackMetadata {
 
 final class AudioMetadataService: AudioMetadataServicing {
 
+    // MARK: - Methods. Public
+
     static func extractMetadata(from url: URL) async throws -> TrackMetadata {
         let file = try AudioFile(readingPropertiesAndMetadataFrom: url)
         let metadata = file.metadata
@@ -83,10 +85,10 @@ final class AudioMetadataService: AudioMetadataServicing {
                 return url
             }
 
-            return try? artworkDirectory().appendingPathComponent(url.lastPathComponent)
+            return try? self.artworkDirectory().appendingPathComponent(url.lastPathComponent)
         }
 
-        return try? artworkDirectory().appendingPathComponent(storedPath)
+        return try? self.artworkDirectory().appendingPathComponent(storedPath)
     }
 
     func bitrate(for url: URL) async throws -> Int {
@@ -116,10 +118,10 @@ final class AudioMetadataService: AudioMetadataServicing {
         return fileURL
     }
 
+    // MARK: - Methods. Private
+
     private static func cleanMetadataValue(_ value: String?) -> String? {
-        guard let value else {
-            return nil
-        }
+        guard let value else { return nil }
 
         let cleaned = value
             .replacingOccurrences(of: "\0", with: " ")
@@ -130,7 +132,36 @@ final class AudioMetadataService: AudioMetadataServicing {
                 options: .regularExpression
             )
 
-        return cleaned.isEmpty ? nil : cleaned
+        guard !cleaned.isEmpty else { return nil }
+
+        let fixed = self.repairedCyrillicMetadata(cleaned)
+
+        return fixed
+    }
+
+    private static func repairedCyrillicMetadata(_ value: String) -> String {
+        let minLatinValue: UInt32 = 0x80
+        let maxLatinValue: UInt32 = 0xFF
+        let minCyrillicValue: UInt32 = 0x0400
+        let maxCyrillicValue: UInt32 = 0x04FF
+
+        guard let data = value.data(using: .isoLatin1) else {
+            return value
+        }
+
+        guard let fixed = String(data: data, encoding: .windowsCP1251) else {
+            return value
+        }
+
+        let looksBroken = value.unicodeScalars.contains {
+            $0.value >= minLatinValue && $0.value <= maxLatinValue
+        }
+
+        let looksCyrillic = fixed.unicodeScalars.contains {
+            $0.value >= minCyrillicValue && $0.value <= maxCyrillicValue
+        }
+
+        return (looksBroken && looksCyrillic) ? fixed : value
     }
 
     private static func additionalValue(

@@ -89,7 +89,9 @@ struct RootTabsView: View {
                 .padding(.bottom, tabBarHeight)
             }
 
-            tabBar
+            if visibleTabs.count > 1 {
+                tabBar
+            }
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
         .navigationBarBackButtonHidden(true)
@@ -108,70 +110,101 @@ struct RootTabsView: View {
 
     // MARK: - Properties. Private
 
+    private enum Constants {
+        enum Title {
+            static let defaultNavigationTitle = "Tracks"
+        }
+
+        enum Keys {
+            static let tabsMode = "tabsMode"
+            static let lastSelectedTab = "lastSelectedTab"
+        }
+
+        enum TabsMode {
+            static let allTabs = "allTabs"
+            static let imports = "imports"
+        }
+    }
+
     @Injected private var playerViewModel: PlayerManaging
     @Environment(\.themeManager) private var theme
     @Environment(AppCoordinator.self) private var coordinator
-    @AppStorage("startTab") private var startTab = CustomTab.browse.rawValue
+    @AppStorage(Constants.Keys.tabsMode) private var tabsMode = Constants.TabsMode.allTabs
+    @AppStorage(Constants.Keys.lastSelectedTab) private var lastSelectedTab = CustomTab.browse.rawValue
     @State private var isShowingExpandedPlayer: Bool = false
 
     private let tabBarHeight: CGFloat = 60
 
+    private var showAllTabs: Bool {
+        tabsMode == Constants.TabsMode.allTabs
+    }
+
+    private var visibleTabs: [CustomTab] {
+        showAllTabs ? CustomTab.allCases : [.importFiles]
+    }
+
     private var content: some View {
-        TabView(selection: Bindable(coordinator).selectedTab) {
-            BrowseView()
-                .tag(CustomTab.browse)
+        Group {
+            switch coordinator.selectedTab {
+                case .browse:
+                    BrowseView()
 
-            DownloadsView()
-                .tag(CustomTab.downloads)
+                case .downloads:
+                    DownloadsView()
 
-            NavigationStack(path: coordinator.pathBinding) {
-                ImportsView()
-                    .navigationDestination(for: AppRoute.self) { route in
-                        switch route {
-                            case .albums:
-                                AlbumsView()
+                case .importFiles:
+                    NavigationStack(path: coordinator.pathBinding) {
+                        ImportsView()
+                            .navigationDestination(for: AppRoute.self) { route in
+                                switch route {
+                                    case .albums:
+                                        AlbumsView()
 
-                            case .album(let album):
-                                AlbumDetailsView(album: album)
+                                    case .album(let album):
+                                        AlbumDetailsView(album: album)
 
-                            case .artists:
-                                ArtistsView()
+                                    case .artists:
+                                        ArtistsView()
 
-                            case .artist(artist: let artist):
-                                ArtistDetailsView(artist: artist)
+                                    case .artist(artist: let artist):
+                                        ArtistDetailsView(artist: artist)
 
-                            case .tracks(let title, let content):
-                                TracksView(
-                                    navigationTitle: title ?? "Tracks",
-                                    content: content
-                                )
+                                    case .tracks(let title, let content):
+                                        TracksView(
+                                            navigationTitle: title ?? Constants.Title.defaultNavigationTitle,
+                                            content: content
+                                        )
 
-                            case .playlists:
-                                PlaylistsView()
+                                    case .playlists:
+                                        PlaylistsView()
 
-                            case .sourceFolder(let sourceID, let path):
-                                SourceView(sourceID: sourceID, path: path)
+                                    case .sourceFolder(let sourceID, let path):
+                                        SourceView(sourceID: sourceID, path: path)
 
-                            default: EmptyView()
-                        }
+                                    default: EmptyView()
+                                }
+                            }
                     }
+
+                case .settings:
+                    SettingsView()
             }
-            .tag(CustomTab.importFiles)
-
-            SettingsView()
-                .tag(CustomTab.settings)
         }
-        .toolbar(.hidden, for: .tabBar)
         .onAppear {
-            coordinator.selectedTab = CustomTab(rawValue: startTab) ?? .browse
-
+            restoreSelectedTab()
+        }
+        .onChange(of: tabsMode) { _, _ in
+            restoreSelectedTab()
+        }
+        .onChange(of: coordinator.selectedTab) { _, newTab in
+            lastSelectedTab = newTab.rawValue
         }
     }
 
     private var tabBar: some View {
         ZStack(alignment: .top) {
             HStack(spacing: 10) {
-                ForEach(CustomTab.allCases) { tab in
+                ForEach(visibleTabs) { tab in
                     TabItemView(
                         tab: tab,
                         isSelected: coordinator.selectedTab == tab,
@@ -196,6 +229,16 @@ struct RootTabsView: View {
     }
 
     // MARK: - Private. Methods
+
+    private func restoreSelectedTab() {
+        if showAllTabs {
+            let restored = CustomTab(rawValue: lastSelectedTab) ?? .browse
+            coordinator.selectedTab = visibleTabs.contains(restored) ? restored : .browse
+            return
+        }
+
+        coordinator.selectedTab = .importFiles
+    }
 
     private func openTrackSource() {
         if playerViewModel.playbackNavigationPath.isEmpty {
