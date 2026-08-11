@@ -182,7 +182,7 @@ struct RootTabsView: View {
                                     case .artists:
                                         ArtistsView()
 
-                                    case .covers(paths: let paths):
+                                    case .covers(let paths):
                                         AlbumСoversView(coverPaths: paths)
 
                                     case .tracks(let title, let content):

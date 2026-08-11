@@ -34,13 +34,17 @@ struct CoverView: View {
     // MARK: - Main Body
 
     var body: some View {
-        content
+        let shape = RoundedRectangle(cornerRadius: cornerRadius)
+        let cover = content
             .frame(size: size)
-            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
-            .contentShape(RoundedRectangle(cornerRadius: cornerRadius))
-            .onTapGesture {
-                onTap?()
-            }
+            .clipShape(shape)
+            .contentShape(shape)
+
+        if let onTap {
+            cover.onTapGesture(perform: onTap)
+        } else {
+            cover
+        }
     }
 
     // MARK: - Properties. Private
