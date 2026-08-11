@@ -29,8 +29,8 @@ struct CompactPlayerView: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             HStack(spacing: 12) {
-                ArtworkView(
-                    artworkPath: track?.imagePath,
+                CoverView(
+                    coverPath: track?.imagePath,
                     size: 44,
                     cornerRadius: 8
                 )

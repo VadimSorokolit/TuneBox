@@ -24,6 +24,7 @@ protocol ImportManaging: LoadStateManaging {
     func playlist(for url: URL) -> PlaylistEntity?
     func fetchfolderItems(sourceID: ImportSource.ID, path: String?) async -> [SourceFolderItem]?
     func importFolder(_ url: URL) async
+    func artistCoverPaths(for album: MusicLibrary.Album) -> [String]
     func track(for url: URL) -> TrackEntity?
     func tracks(for sourceID: ImportSource.ID) -> [TrackEntity]
     func tracksSize(_ tracks: [TrackEntity]) -> Int

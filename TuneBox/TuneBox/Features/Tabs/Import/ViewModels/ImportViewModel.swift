@@ -9,6 +9,14 @@ import Foundation
 import Observation
 import Resolver
 
+enum ImageFileExtension: String {
+    case jpg
+    case jpeg
+    case png
+    case webp
+    case heic
+}
+
 enum ImportSection: String, Hashable {
     case library
     case sources
@@ -309,7 +317,11 @@ final class ImportViewModel: ImportManaging {
             let sourceID = source.id.uuidString
 
             for file in trackFiles {
-                await self.importTrack(from: file, importSourceID: sourceID)
+                await self.importTrack(
+                    from: file,
+                    importSourceID: sourceID,
+                    sourceRootURL: url
+                )
             }
 
             for playlistFile in playlistFiles {
@@ -339,6 +351,81 @@ final class ImportViewModel: ImportManaging {
             case .api:
                 return self.libraryTracks(onlyAPI: true)
         }
+    }
+
+    func artistCoverPaths(for album: MusicLibrary.Album) -> [String] {
+        guard
+            let track = album.tracks.first(where: {
+                $0.importSourceID != nil && $0.originalRelativePath != nil
+            }) ?? album.tracks.first,
+            let sourceIDString = track.importSourceID,
+            let sourceID = UUID(uuidString: sourceIDString),
+            let relativePath = track.originalRelativePath
+        else {
+            return album.cover.map { [$0] } ?? []
+        }
+
+        guard
+            let source = self.source(for: sourceID),
+            let bookmarkData = source.bookmarkData
+        else {
+            return album.cover.map { [$0] } ?? []
+        }
+
+        var isStale = false
+        guard let rootURL = try? URL(
+            resolvingBookmarkData: bookmarkData,
+            options: .withoutUI,
+            relativeTo: nil,
+            bookmarkDataIsStale: &isStale
+        ) else {
+            return album.cover.map { [$0] } ?? []
+        }
+
+        guard rootURL.startAccessingSecurityScopedResource() else {
+            return album.cover.map { [$0] } ?? []
+        }
+        defer { rootURL.stopAccessingSecurityScopedResource() }
+
+        let components = relativePath.split(separator: "/").map(String.init)
+
+        let folderToScan: URL
+        if components.count >= 3 {
+            folderToScan = rootURL.appendingPathComponent(components[0])
+        } else {
+            folderToScan = rootURL
+        }
+
+        guard let enumerator = FileManager.default.enumerator(
+            at: folderToScan,
+            includingPropertiesForKeys: [.isDirectoryKey],
+            options: [.skipsHiddenFiles]
+        ) else {
+            return album.cover.map { [$0] } ?? []
+        }
+
+        var seen = Set<String>()
+        var result: [String] = []
+
+        for case let fileURL as URL in enumerator {
+            let isDirectory = (try? fileURL.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true
+            if isDirectory { continue }
+
+            guard let fileExtension = ImageFileExtension(
+                rawValue: fileURL.pathExtension.lowercased()
+            ),
+
+            self.supportedImageExtensions.contains(fileExtension) else {
+                continue
+            }
+
+            let path = fileURL.path
+            if seen.insert(path).inserted {
+                result.append(path)
+            }
+        }
+
+        return result.isEmpty ? (album.cover.map { [$0] } ?? []) : result
     }
 
     func sourceTracksSummary(for sourceID: ImportSource.ID) -> (count: Int, duration: Int, size: Int) {
@@ -594,6 +681,7 @@ final class ImportViewModel: ImportManaging {
     private var playerViewModel: PlayerManaging
     private var tracksObservationTask: Task<Void, Never>?
     private let supportedPlaylistExtensions: Set<PlaylistExtension> = [.m3u, .m3u8]
+    private let supportedImageExtensions: Set<ImageFileExtension> = [.jpg, .jpeg, .png, .webp, .heic]
     private let supportedTrackExtensions: Set<AudioFileExtension> = [
         .mp3, .wav, .flac, .wv, .dsf, .dff,
         .m4a, .aac, .aiff, .aif, .caf, .ape,
@@ -667,7 +755,26 @@ final class ImportViewModel: ImportManaging {
         }
     }
 
-    private func importTrack(from url: URL, importSourceID: String?, into playlist: PlaylistEntity? = nil) async {
+    private func importTrack(
+        from url: URL,
+        importSourceID: String?,
+        sourceRootURL: URL? = nil,
+        into playlist: PlaylistEntity? = nil
+    ) async {
+        let relativePath: String?
+
+        if let root = sourceRootURL {
+            let rootPath = root.standardizedFileURL.path
+            let filePath = url.standardizedFileURL.path
+            if filePath.hasPrefix(rootPath + "/") {
+                relativePath = String(filePath.dropFirst(rootPath.count + 1))
+            } else {
+                relativePath = nil
+            }
+        } else {
+            relativePath = nil
+        }
+
         let ext = url.pathExtension.lowercased()
 
         guard
@@ -722,6 +829,7 @@ final class ImportViewModel: ImportManaging {
                 importSourceID: importSourceID,
                 localFilePath: localURL.path,
                 trackNumber: metadata?.trackNumber,
+                originalRelativePath: relativePath,
                 sourceRawValue: TrackSource.imported.rawValue,
                 downloadStateRawValue: DownloadState.completed.rawValue,
                 fileStateRawValue: FileStorageState.exists.rawValue

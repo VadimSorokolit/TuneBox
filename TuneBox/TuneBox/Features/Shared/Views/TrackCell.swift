@@ -214,8 +214,8 @@ struct TrackCell: View {
     private var trackImage: some View {
         if track.source == .imported,
            let storedPath = track.imagePath,
-           let artworkURL = AudioMetadataService.artworkURL(for: storedPath),
-           let data = try? Data(contentsOf: artworkURL),
+           let coverURL = AudioMetadataService.coverURL(for: storedPath),
+           let data = try? Data(contentsOf: coverURL),
            let image = UIImage(data: data) {
 
             Image(uiImage: image)

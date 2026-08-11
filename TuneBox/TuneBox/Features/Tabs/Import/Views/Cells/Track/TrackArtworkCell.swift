@@ -22,8 +22,8 @@ struct TrackArtworkCell: View {
         VStack(spacing: verticalPadding) {
             HStack {
                 HStack(spacing: 10) {
-                    ArtworkView(
-                        artworkPath: track.imagePath,
+                    CoverView(
+                        coverPath: track.imagePath,
                         size: GlobalConstants.Cell.imageSize,
                         cornerRadius: GlobalConstants.Cell.imageCornerRadius
                     )

@@ -77,7 +77,7 @@ final class AudioMetadataService: AudioMetadataServicing {
         return directory
     }
 
-    static func artworkURL(for storedPath: String) -> URL? {
+    static func coverURL(for storedPath: String) -> URL? {
         if storedPath.hasPrefix("/") {
             let url = URL(fileURLWithPath: storedPath)
 

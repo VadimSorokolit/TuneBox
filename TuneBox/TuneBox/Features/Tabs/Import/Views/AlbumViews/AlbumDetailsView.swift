@@ -20,9 +20,13 @@ struct AlbumDetailsView: View {
         if let album {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 20) {
-                    ArtworkView(artworkPath: album.cover,
-                                size: 300,
-                                cornerRadius: 5
+                    CoverView(
+                        coverPath: album.cover,
+                        size: 300,
+                        cornerRadius: 5,
+                        onTap: {
+                            coordinator.push(.covers(importManagingVM.artistCoverPaths(for: album)))
+                        }
                     )
 
                     LazyVStack(spacing: 0) {

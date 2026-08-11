@@ -170,17 +170,20 @@ struct RootTabsView: View {
                         ImportsView()
                             .navigationDestination(for: AppRoute.self) { route in
                                 switch route {
+                                    case .album(let album):
+                                        AlbumDetailsView(album: album)
+
                                     case .albums:
                                         AlbumsView()
 
-                                    case .album(let album):
-                                        AlbumDetailsView(album: album)
+                                    case .artist(artist: let artist):
+                                        ArtistDetailsView(artist: artist)
 
                                     case .artists:
                                         ArtistsView()
 
-                                    case .artist(artist: let artist):
-                                        ArtistDetailsView(artist: artist)
+                                    case .covers(paths: let paths):
+                                        AlbumСoversView(coverPaths: paths)
 
                                     case .tracks(let title, let content):
                                         TracksView(

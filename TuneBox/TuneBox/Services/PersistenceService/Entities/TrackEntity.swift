@@ -19,6 +19,7 @@ final class TrackEntity {
     var id: String
 
     var trackNumber: Int?
+    var originalRelativePath: String?
     var imagePath: String?
     var songName: String
     var artistName: String
@@ -150,6 +151,7 @@ final class TrackEntity {
         genreRawValue: String? = nil,
         localFilePath: String? = nil,
         trackNumber: Int? = nil,
+        originalRelativePath: String? = nil,
         sourceRawValue: String = TrackSource.api.rawValue,
         downloadStateRawValue: String = DownloadState.idle.rawValue,
         fileStateRawValue: String = FileStorageState.none.rawValue,
@@ -171,6 +173,7 @@ final class TrackEntity {
         self.genreRawValue = genreRawValue
         self.localFilePath = localFilePath
         self.trackNumber = trackNumber
+        self.originalRelativePath = originalRelativePath
         self.sourceRawValue = sourceRawValue
         self.downloadStateRawValue = downloadStateRawValue
         self.fileStateRawValue = fileStateRawValue

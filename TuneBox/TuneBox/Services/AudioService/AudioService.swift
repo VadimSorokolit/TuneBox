@@ -343,7 +343,7 @@ final class AudioService: NSObject, AudioServicing {
             return UIImage(data: data)
         }
 
-        if let url = AudioMetadataService.artworkURL(for: path),
+        if let url = AudioMetadataService.coverURL(for: path),
            let data = try? Data(contentsOf: url) {
             return UIImage(data: data)
         }

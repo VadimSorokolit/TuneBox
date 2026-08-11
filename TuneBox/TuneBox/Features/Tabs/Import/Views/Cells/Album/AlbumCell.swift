@@ -26,8 +26,8 @@ struct AlbumCell: View {
     var body: some View {
         VStack(spacing: 5) {
             HStack(spacing: 10) {
-                ArtworkView(
-                    artworkPath: album.cover,
+                CoverView(
+                    coverPath: album.cover,
                     size: GlobalConstants.Cell.imageSize,
                     cornerRadius: GlobalConstants.Cell.imageCornerRadius
                 )
