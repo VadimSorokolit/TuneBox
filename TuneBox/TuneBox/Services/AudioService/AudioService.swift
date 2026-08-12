@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import AVFoundation
 import SFBAudioEngine
 import MediaPlayer
 
@@ -17,8 +18,11 @@ final class AudioService: NSObject, AudioServicing {
     static let shared = AudioService()
 
     private(set) var currentTrackId: String?
+    private(set) var sourceFormatText: String = ""
+    private(set) var outputRouteText: String = ""
     private(set) var stateChangeSubject = CurrentValueSubject<Bool, Never>(false)
     private(set) var progressSubject = PassthroughSubject<Double, Never>()
+    private(set) var formatInfoSubject = CurrentValueSubject<(source: String, output: String), Never>(("", ""))
     var onRemotePlayNext: (() -> Void)?
     var onRemotePlayPrevious: (() -> Void)?
     var onTrackFinished: (() -> Void)?
@@ -75,6 +79,7 @@ final class AudioService: NSObject, AudioServicing {
             self.applyVolume()
             self.notifyStateChange(true)
             self.startProgressTimer()
+            self.refreshFormatInfo(for: url)
         } catch {
             AppLogger.audio.error("Failed to play audio: \(error.localizedDescription)")
             self.notifyStateChange(false)
@@ -174,6 +179,11 @@ final class AudioService: NSObject, AudioServicing {
         guard self.isSeekScrubbing != isScrubbing else { return }
         self.isSeekScrubbing = isScrubbing
         self.applyVolume()
+    }
+
+    func refreshFormatInfo(for url: URL) {
+        self.updateSourceFormat(for: url)
+        self.updateOutputRoute()
     }
 
     func seek(to progress: Double) {
@@ -430,6 +440,41 @@ final class AudioService: NSObject, AudioServicing {
         }
     }
 
+    private func updateSourceFormat(for url: URL) {
+        let format = url.pathExtension.uppercased()
+        var parts: [String] = []
+
+        if let file = try? AudioFile(readingPropertiesAndMetadataFrom: url) {
+            let props = file.properties
+
+            if let bits = props.bitDepth {
+                parts.append("\(bits) bit")
+            } else if let bitrate = props.bitrate, bitrate > 0 {
+                parts.append("\(Int(bitrate.rounded())) kbps")
+            }
+
+            if let rate = props.sampleRate {
+                parts.append("\(Int((rate / 1000).rounded())) kHz")
+            }
+        }
+
+        parts.append(format.isEmpty ? "AUDIO" : format)
+        self.sourceFormatText = parts.joined(separator: " • ")
+        self.publishFormatInfo()
+    }
+
+    private func updateOutputRoute() {
+        let session = AVAudioSession.sharedInstance()
+        let name = session.currentRoute.outputs.first?.portName ?? "Speaker"
+        let kHz = Int((session.sampleRate / 1000).rounded())
+        self.outputRouteText = "\(name) • \(kHz) kHz"
+        self.publishFormatInfo()
+    }
+
+    private func publishFormatInfo() {
+        self.formatInfoSubject.send((self.sourceFormatText, self.outputRouteText))
+    }
+
     // MARK: - Events
 
     @objc
@@ -446,6 +491,7 @@ final class AudioService: NSObject, AudioServicing {
                     .oldDeviceUnavailable,
                     .routeConfigurationChange:
                 self.supportsDoP = nil
+                self.updateOutputRoute()
 
             default:
                 break

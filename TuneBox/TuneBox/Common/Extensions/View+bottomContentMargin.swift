@@ -16,8 +16,8 @@ enum BottomLayout {
     ) -> CGFloat {
         base
             - adjustment
-            + (isPlayerVisible ? GlobalConstants.Screen.defaultBottomPadding : 0)
-            + (isTabBarVisible ? GlobalConstants.Screen.defaultBottomPadding : 0)
+            + (isPlayerVisible ? GlobalConstants.CompactPlayer.defaultHeight : 0)
+            + (isTabBarVisible ? GlobalConstants.Screen.defaultHeight : 0)
     }
 }
 

@@ -30,8 +30,8 @@ final class RootTabsViewModel: RootTabsManaging {
         self.visibleTabs.count > 1
     }
 
-    let tabBarHeight: CGFloat = 60
-    let playerHeight: CGFloat = GlobalConstants.Screen.defaultBottomPadding
+    let tabBarHeight: CGFloat = GlobalConstants.Screen.defaultHeight
+    let playerHeight: CGFloat = GlobalConstants.CompactPlayer.defaultHeight
 
     // MARK: - Initializer
 

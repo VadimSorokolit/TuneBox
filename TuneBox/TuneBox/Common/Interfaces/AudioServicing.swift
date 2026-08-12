@@ -38,8 +38,11 @@ protocol AudioServicing: AnyObject {
     var duration: TimeInterval { get }
     var currentTime: TimeInterval { get }
     var volume: Float { get set }
+    var sourceFormatText: String { get }
+    var outputRouteText: String { get }
     var stateChangeSubject: CurrentValueSubject<Bool, Never> { get }
     var progressSubject: PassthroughSubject<Double, Never> { get }
+    var formatInfoSubject: CurrentValueSubject<(source: String, output: String), Never> { get }
 
     func play(trackId: String, url: URL, loop: Bool)
     func pause()
@@ -50,4 +53,5 @@ protocol AudioServicing: AnyObject {
     func seek(by deltaSeconds: TimeInterval)
     func seek(to progress: Double)
     func setSeekScrubbing(_ isScrubbing: Bool)
+    func refreshFormatInfo(for url: URL)
 }

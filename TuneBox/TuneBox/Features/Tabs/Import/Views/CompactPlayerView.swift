@@ -16,6 +16,8 @@ struct CompactPlayerView: View {
     var progress: Double
     let repeatMode: RepeatMode
     let isShuffleEnabled: Bool
+    let sourceFormatText: String
+    let outputRouteText: String
     let onTrackInfoTap: () -> Void
     let onSeek: (TimeInterval) -> Void
     let onSeekHoldChanged: (Bool) -> Void
@@ -27,74 +29,109 @@ struct CompactPlayerView: View {
     // MARK: - Main Body
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            HStack(spacing: 12) {
-                CoverView(
-                    coverPath: track?.imagePath,
-                    size: 44,
-                    cornerRadius: 8
-                )
+        if let track {
+            VStack(spacing: 10) {
+                ZStack(alignment: .bottom) {
+                    HStack(spacing: 12) {
+                        CoverView(
+                            coverPath: track.imagePath,
+                            size: 44,
+                            cornerRadius: 8
+                        )
 
-                Button(action: {
-                    onTrackInfoTap()
-                }, label: {
-                    VStack(
-                        alignment: .leading,
-                        spacing: track?.artistName.isEmpty == true
-                        ? 0
-                        : 2
-                    ) {
-                        MarqueeText(text: track?.songName ?? "")
+                        Button(action: {
+                            onTrackInfoTap()
+                        }, label: {
+                            VStack(
+                                alignment: .leading,
+                                spacing: track.artistName.isEmpty == true
+                                ? 0
+                                : 2
+                            ) {
+                                MarqueeText(text: track.songName)
 
-                        Text(track?.artistName ?? "")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
+                                Text(track.artistName)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .contentShape(Capsule())
+                        })
+                        .buttonStyle(PressGlassButtonStyle())
+
+                        PlaybackControls(
+                            progress: progress,
+                            isPlaying: isPlaying,
+                            repeatMode: repeatMode,
+                            isShuffleEnabled: isShuffleEnabled,
+                            trackID: track.id,
+                            onSeek: onSeek,
+                            onSeekHoldChanged: onSeekHoldChanged,
+                            onPlayPauseTap: onPlayPauseTap,
+                            onRepeatModeChange: onRepeatModeChange,
+                            onShuffleToggle: onShuffleToggle
+                        )
+                        .fixedSize()
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .contentShape(Capsule())
-                })
-                .buttonStyle(PressGlassButtonStyle())
+                    .padding(.horizontal, 16)
+                    .frame(height: GlobalConstants.Screen.defaultHeight)
+                    .frame(maxWidth: .infinity)
 
-                PlaybackControls(
-                    progress: progress,
-                    isPlaying: isPlaying,
-                    repeatMode: repeatMode,
-                    isShuffleEnabled: isShuffleEnabled,
-                    trackID: track?.id,
-                    onSeek: onSeek,
-                    onSeekHoldChanged: onSeekHoldChanged,
-                    onPlayPauseTap: onPlayPauseTap,
-                    onRepeatModeChange: onRepeatModeChange,
-                    onShuffleToggle: onShuffleToggle
+                    if progress > 0 {
+                        ProgressBar(
+                            progress: progress,
+                            onProgressTap: onProgressTap
+                        )
+                    }
+                }
+                .frame(height: GlobalConstants.Screen.defaultHeight)
+                .frame(maxWidth: .infinity)
+                .glassEffect(
+                    in: RoundedRectangle(
+                        cornerRadius: 30,
+                        style: .continuous
+                    )
                 )
-                .fixedSize()
-            }
-            .padding(.horizontal, 16)
-            .frame(height: 60)
-            .frame(maxWidth: .infinity)
+                .clipShape(
+                    RoundedRectangle(
+                        cornerRadius: 30,
+                        style: .continuous
+                    )
+                )
 
-            ProgressBar(
-                progress: progress,
-                onProgressTap: onProgressTap
-            )
+                HStack {
+                    sourceFormatLabel
+
+                    Spacer()
+
+                    outputRouteLabel
+                }
+                .frame(height: 10)
+                .padding(.horizontal, 24)
+            }
+            .padding(.bottom, 10)
+            .frame(height: GlobalConstants.CompactPlayer.defaultHeight)
         }
-        .frame(height: 60)
-        .frame(maxWidth: .infinity)
-        .glassEffect(
-            in: RoundedRectangle(
-                cornerRadius: 30,
-                style: .continuous
-            )
-        )
-        .clipShape(
-            RoundedRectangle(
-                cornerRadius: 30,
-                style: .continuous
-            )
-        )
+    }
+
+    // MARK: - Properties. Private
+
+    private var sourceFormatLabel: some View {
+        Text(sourceFormatText)
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+    }
+
+    private var outputRouteLabel: some View {
+        Text(outputRouteText)
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+            .multilineTextAlignment(.trailing)
+            .frame(maxWidth: .infinity, alignment: .trailing)
     }
 }
 
@@ -596,6 +633,8 @@ private struct MarqueeTextWidthKey: PreferenceKey {
         progress: 0.5,
         repeatMode: .one,
         isShuffleEnabled: false,
+        sourceFormatText: "24 bit • 192 kHz • FLAC",
+        outputRouteText: "Speaker • 48 kHz",
         onTrackInfoTap: {},
         onSeek: { _ in },
         onSeekHoldChanged: { _ in },

@@ -97,6 +97,8 @@ struct RootTabsView: View {
                     progress: playerViewModel.progress,
                     repeatMode: playerViewModel.repeatMode,
                     isShuffleEnabled: playerViewModel.isShuffleEnabled,
+                    sourceFormatText: playerViewModel.sourceFormatText,
+                    outputRouteText: playerViewModel.outputRouteText,
                     onTrackInfoTap: {
                         openTrackSource()
                     },

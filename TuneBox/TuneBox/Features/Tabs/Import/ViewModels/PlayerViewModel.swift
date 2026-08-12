@@ -35,6 +35,8 @@ final class PlayerViewModel: PlayerManaging {
     private(set) var isPlaying = false
     private(set) var error: String?
     private(set) var playbackNavigationPath: [AppRoute] = []
+    private(set) var sourceFormatText: String = ""
+    private(set) var outputRouteText: String = ""
 
     var isPlayerVisible: Bool {
         self.track != nil
@@ -59,6 +61,14 @@ final class PlayerViewModel: PlayerManaging {
             }
             .store(in: &cancellables)
 
+        self.audioService.formatInfoSubject
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] info in
+                self?.sourceFormatText = info.source
+                self?.outputRouteText = info.output
+            }
+            .store(in: &self.cancellables)
+
         self.audioService.onRemotePlayNext = { [weak self] in
             Task { @MainActor in
                 self?.playNext()
@@ -82,6 +92,9 @@ final class PlayerViewModel: PlayerManaging {
         self.isShuffleEnabled = UserDefaults.standard.bool(
             forKey: Keys.shuffleEnabled
         )
+
+        self.sourceFormatText = self.audioService.sourceFormatText
+        self.outputRouteText = self.audioService.outputRouteText
     }
 
     // MARK: - Methods. Public
@@ -181,6 +194,8 @@ final class PlayerViewModel: PlayerManaging {
         if self.isShuffleEnabled {
             self.rebuildShuffleOrder(startingWith: track)
         }
+
+        self.refreshFormatInfo(for: track)
     }
 
     func persistPlaybackSession() {
@@ -397,7 +412,8 @@ final class PlayerViewModel: PlayerManaging {
                 if userInitiated {
                     return
                 }
-                self.resetPlayback()
+                self.stopAudioPreservingSession()
+                self.progress = 0
 
             case .one:
                 self.audioService.restartCurrentTrack()
@@ -456,6 +472,20 @@ final class PlayerViewModel: PlayerManaging {
         DispatchQueue.main.async { [weak self] in
             self?.audioService.seek(to: pending)
         }
+    }
+
+    private func refreshFormatInfo(for track: TrackEntity) {
+        let url: URL?
+        switch track.source {
+            case .imported:
+                url = self.resolveImportedURL(for: track)
+
+            case .api:
+                url = try? FileManagerService.makeDownloadedTrackURL(id: track.id)
+        }
+
+        guard let url else { return }
+        self.audioService.refreshFormatInfo(for: url)
     }
 
     private func persistPlaybackSessionIfNeeded() {
