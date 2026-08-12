@@ -50,7 +50,7 @@
 		5B3FEB4A2FB454AE00DC1562 /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB492FB454AB00DC1562 /* PlayerView.swift */; };
 		5B3FEB4D2FB454C900DC1562 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB4C2FB454C400DC1562 /* SettingsView.swift */; };
 		5B40F3FB302D0D2D0025693E /* CoverRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B40F3FA302D0D100025693E /* CoverRouter.swift */; };
-		5B47627A2FAB3DC30069E41A /* TuneBoxRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4762792FAB3DB80069E41A /* TuneBoxRouter.swift */; };
+		5B47627A2FAB3DC30069E41A /* JamendoRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4762792FAB3DB80069E41A /* JamendoRouter.swift */; };
 		5B47627E2FAB49B00069E41A /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B47627D2FAB49AF0069E41A /* AppLogger.swift */; };
 		5B4762812FAB5C570069E41A /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5B4762802FAB5C570069E41A /* CombineMoya */; };
 		5B4762832FAB5C570069E41A /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 5B4762822FAB5C570069E41A /* Moya */; };
@@ -240,7 +240,7 @@
 		5B3FEB492FB454AB00DC1562 /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
 		5B3FEB4C2FB454C400DC1562 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		5B40F3FA302D0D100025693E /* CoverRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoverRouter.swift; sourceTree = "<group>"; };
-		5B4762792FAB3DB80069E41A /* TuneBoxRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneBoxRouter.swift; sourceTree = "<group>"; };
+		5B4762792FAB3DB80069E41A /* JamendoRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JamendoRouter.swift; sourceTree = "<group>"; };
 		5B47627D2FAB49AF0069E41A /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
 		5B586CB02FAB98EE00BCEAD2 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
 		5B586CB42FAC618400BCEAD2 /* FileManagerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerService.swift; sourceTree = "<group>"; };
@@ -592,6 +592,15 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		5B40F3FC302D11D90025693E /* Jamendo */ = {
+			isa = PBXGroup;
+			children = (
+				5B586CB62FAC678600BCEAD2 /* TrackDTO.swift */,
+				5B586CCB2FACB61400BCEAD2 /* TracksResponse.swift */,
+			);
+			path = Jamendo;
+			sourceTree = "<group>";
+		};
 		5B4762782FAB3DA30069E41A /* APIs */ = {
 			isa = PBXGroup;
 			children = (
@@ -628,8 +637,7 @@
 		5B586CBE2FAC87A100BCEAD2 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				5B586CCB2FACB61400BCEAD2 /* TracksResponse.swift */,
-				5B586CB62FAC678600BCEAD2 /* TrackDTO.swift */,
+				5B40F3FC302D11D90025693E /* Jamendo */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -638,7 +646,7 @@
 			isa = PBXGroup;
 			children = (
 				5B40F3FA302D0D100025693E /* CoverRouter.swift */,
-				5B4762792FAB3DB80069E41A /* TuneBoxRouter.swift */,
+				5B4762792FAB3DB80069E41A /* JamendoRouter.swift */,
 			);
 			path = Routers;
 			sourceTree = "<group>";
@@ -1423,7 +1431,7 @@
 				5B0BC2DD3008D91C00E8F2A5 /* ArtistDetailsView.swift in Sources */,
 				5B0BC2C53007940A00E8F2A5 /* AlbumCell.swift in Sources */,
 				5B9D8D733029F78700E5E9E5 /* RootTabsViewModel.swift in Sources */,
-				5B47627A2FAB3DC30069E41A /* TuneBoxRouter.swift in Sources */,
+				5B47627A2FAB3DC30069E41A /* JamendoRouter.swift in Sources */,
 				5BECD77C3010E0750028FC67 /* LibrarySummaryFooter.swift in Sources */,
 				5B8382BC2FC5D97F003625CD /* PlayerManaging.swift in Sources */,
 				5BD3BF312FF56EDC006FED4B /* PlaylistEntity.swift in Sources */,

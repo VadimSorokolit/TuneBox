@@ -1,5 +1,5 @@
 //
-//  TuneBoxRouter.swift
+//  JamendoRouter.swift
 //  TuneBox
 //
 //  Created by Vadim Sorokolit on 06.05.2026.
@@ -52,7 +52,7 @@ private struct Constants {
     }
 }
 
-enum TuneBoxRouter {
+enum JamendoRouter {
     case getTracksByGenre(genre: String?, limit: Int, offset: Int)
     case getPopularTracks(limit: Int, offset: Int)
     case getTrackSize(id: Int)
@@ -61,7 +61,7 @@ enum TuneBoxRouter {
 
 // MARK: - TargetType Protocol
 
-extension TuneBoxRouter: TargetType {
+extension JamendoRouter: TargetType {
 
     private typealias API = Constants.API
     private typealias Params = Constants.Params

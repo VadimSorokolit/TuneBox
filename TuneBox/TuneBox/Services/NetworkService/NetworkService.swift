@@ -265,14 +265,14 @@ final class NetworkService: NSObject, NetworkServicing {
 
     // MARK: - Initializer
 
-    init(provider: MoyaProvider<TuneBoxRouter>) {
+    init(provider: MoyaProvider<JamendoRouter>) {
         self.requestHandler = { target in
             try await provider.request(target)
         }
         super.init()
     }
 
-    init(requestHandler: @escaping (TuneBoxRouter) async throws -> Response) {
+    init(requestHandler: @escaping (JamendoRouter) async throws -> Response) {
         self.requestHandler = requestHandler
         super.init()
     }
@@ -286,7 +286,7 @@ final class NetworkService: NSObject, NetworkServicing {
     }
 
     private var backgroundCompletionHandler: (() -> Void)?
-    private var requestHandler: (TuneBoxRouter) async throws -> Response
+    private var requestHandler: (JamendoRouter) async throws -> Response
 
     private lazy var urlSession: URLSession = {
         let configuration = URLSessionConfiguration.background(

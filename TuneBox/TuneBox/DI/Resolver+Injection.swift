@@ -20,11 +20,11 @@ extension Resolver: @retroactive ResolverRegistering {
 
     private static func registerNetworkService() {
         self.register {
-            MoyaProvider<TuneBoxRouter>()
+            MoyaProvider<JamendoRouter>()
         }
 
         self.register {
-            let provider = self.resolve(MoyaProvider<TuneBoxRouter>.self)
+            let provider = self.resolve(MoyaProvider<JamendoRouter>.self)
 
             return NetworkService(provider: provider) as NetworkServicing
         }

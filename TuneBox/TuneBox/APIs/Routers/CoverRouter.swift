@@ -25,25 +25,25 @@ enum CoverRouter {
 // MARK: - TargetType Protocol
 
 extension CoverRouter: TargetType {
-    
+
     var baseURL: URL {
         URL(string: "https://example.com")!
     }
-    
+
     var path: String {
         ""
     }
-    
+
     var method: Moya.Method {
         .get
     }
-    
+
     var task: Moya.Task {
         .requestPlain
     }
-    
+
     var headers: [String: String]? {
         nil
     }
-    
+
 }
