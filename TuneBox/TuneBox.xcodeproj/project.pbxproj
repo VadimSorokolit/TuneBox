@@ -49,6 +49,7 @@
 		5B3FEB472FB4548600DC1562 /* DownloadsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB462FB4547E00DC1562 /* DownloadsView.swift */; };
 		5B3FEB4A2FB454AE00DC1562 /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB492FB454AB00DC1562 /* PlayerView.swift */; };
 		5B3FEB4D2FB454C900DC1562 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB4C2FB454C400DC1562 /* SettingsView.swift */; };
+		5B40F3FB302D0D2D0025693E /* CoverRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B40F3FA302D0D100025693E /* CoverRouter.swift */; };
 		5B47627A2FAB3DC30069E41A /* TuneBoxRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4762792FAB3DB80069E41A /* TuneBoxRouter.swift */; };
 		5B47627E2FAB49B00069E41A /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B47627D2FAB49AF0069E41A /* AppLogger.swift */; };
 		5B4762812FAB5C570069E41A /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5B4762802FAB5C570069E41A /* CombineMoya */; };
@@ -238,6 +239,7 @@
 		5B3FEB462FB4547E00DC1562 /* DownloadsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsView.swift; sourceTree = "<group>"; };
 		5B3FEB492FB454AB00DC1562 /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
 		5B3FEB4C2FB454C400DC1562 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		5B40F3FA302D0D100025693E /* CoverRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoverRouter.swift; sourceTree = "<group>"; };
 		5B4762792FAB3DB80069E41A /* TuneBoxRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneBoxRouter.swift; sourceTree = "<group>"; };
 		5B47627D2FAB49AF0069E41A /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
 		5B586CB02FAB98EE00BCEAD2 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
@@ -590,13 +592,13 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
-		5B4762782FAB3DA30069E41A /* API */ = {
+		5B4762782FAB3DA30069E41A /* APIs */ = {
 			isa = PBXGroup;
 			children = (
 				5B586CBE2FAC87A100BCEAD2 /* Models */,
-				5B586CBF2FAC87AF00BCEAD2 /* Router */,
+				5B586CBF2FAC87AF00BCEAD2 /* Routers */,
 			);
-			path = API;
+			path = APIs;
 			sourceTree = "<group>";
 		};
 		5B586CB22FAC610400BCEAD2 /* NetworkService */ = {
@@ -632,12 +634,13 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
-		5B586CBF2FAC87AF00BCEAD2 /* Router */ = {
+		5B586CBF2FAC87AF00BCEAD2 /* Routers */ = {
 			isa = PBXGroup;
 			children = (
+				5B40F3FA302D0D100025693E /* CoverRouter.swift */,
 				5B4762792FAB3DB80069E41A /* TuneBoxRouter.swift */,
 			);
-			path = Router;
+			path = Routers;
 			sourceTree = "<group>";
 		};
 		5B586CC12FAC880500BCEAD2 /* Extensions */ = {
@@ -946,7 +949,7 @@
 			isa = PBXGroup;
 			children = (
 				5BD579A62FAB262A00503BA2 /* App */,
-				5B4762782FAB3DA30069E41A /* API */,
+				5B4762782FAB3DA30069E41A /* APIs */,
 				5B586CB82FAC841100BCEAD2 /* DI */,
 				5BD579A92FAB272E00503BA2 /* Features */,
 				5BC8D9002FFE965600742822 /* Navigation */,
@@ -1453,6 +1456,7 @@
 				5B7D62B32FEE8B7A0084738C /* EmptyTracksStateModifier.swift in Sources */,
 				5BA581962FD8603500B498D7 /* HighlightedText.swift in Sources */,
 				5B6B8CD32FED1D9400C23D3E /* DismissKeyboardOnTapModifier.swift in Sources */,
+				5B40F3FB302D0D2D0025693E /* CoverRouter.swift in Sources */,
 				5B88609E2FAE184C0056BE9A /* GlobalConstants.swift in Sources */,
 				5BC8D9063000ED5500742822 /* CompactPlayerView.swift in Sources */,
 				5B1875C62FD06EBD00D8A042 /* SearchBarView.swift in Sources */,
