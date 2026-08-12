@@ -17,7 +17,7 @@ struct AlbumDetailsView: View {
     // MARK: - Main Body
 
     var body: some View {
-        if let album {
+        if let album = currentAlbum {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 20) {
                     CoverView(
@@ -25,7 +25,7 @@ struct AlbumDetailsView: View {
                         size: 300,
                         cornerRadius: 5,
                         onTap: {
-                            coordinator.push(.covers(importManagingVM.artistCoverPaths(for: album)))
+                            coordinator.push(.covers(album))
                         }
                     )
 
@@ -90,4 +90,9 @@ struct AlbumDetailsView: View {
     @Injected private var rootTabsVM: RootTabsManaging
     @Injected private var importManagingVM: ImportManaging
     @Injected private var playerVM: PlayerManaging
+
+    private var currentAlbum: MusicLibrary.Album? {
+        guard let album else { return nil }
+        return importManagingVM.library?.albums.first { $0.id == album.id } ?? album
+    }
 }

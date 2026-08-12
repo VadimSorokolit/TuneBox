@@ -6,12 +6,13 @@
 //
 
 import SwiftUI
+import Resolver
 
 struct AlbumСoversView: View {
 
     // MARK: - Properties. Public
 
-    let coverPaths: [String]
+    let album: MusicLibrary.Album
 
     // MARK: - Main Body
 
@@ -26,12 +27,20 @@ struct AlbumСoversView: View {
             .fullScreenCover(isPresented: $isPagerPresented) {
                 pagerView
             }
+            .task {
+                guard coverPaths.isEmpty else { return }
+                coverPaths = importManagingVM.artistCoverPaths(for: album)
+            }
     }
 
     // MARK: - Properties. Private
 
+    @Environment(AppCoordinator.self) private var coordinator
+    @Injected private var importManagingVM: ImportManaging
+    @State private var coverPaths: [String] = []
     @State private var selectedIndex: Int?
     @State private var isPagerPresented = false
+    @State private var isApplying = false
 
     private var navigationTitle: String {
         if let selectedIndex {
@@ -66,10 +75,15 @@ struct AlbumСoversView: View {
                 Button(action: {
                     applySelectedCover()
                 }, label: {
-                    Text("Apply")
-                        .foregroundStyle(Color(.label))
-                        .font(.body.weight(.semibold))
+                    if isApplying {
+                        ProgressView()
+                    } else {
+                        Text("Apply")
+                            .foregroundStyle(Color(.label))
+                            .font(.body.weight(.semibold))
+                    }
                 })
+                .disabled(isApplying)
             }
         }
     }
@@ -77,8 +91,8 @@ struct AlbumСoversView: View {
     private var pagerView: some View {
         CoverPagerView(
             coverPaths: coverPaths,
-            initialIndex: selectedIndex ?? 0,
-            onAppleBtn: handlePagerImage
+            coverIndex: selectedIndex ?? 0,
+            onApplyBtnTap: handlePagerImage
         )
     }
 
@@ -133,13 +147,24 @@ struct AlbumСoversView: View {
 
     private func handlePagerImage(_ index: Int) {
         selectedIndex = index
-        isPagerPresented = false
+        applyCover(at: index)
     }
 
     private func applySelectedCover() {
-        guard let selectedIndex, coverPaths.indices.contains(selectedIndex) else { return }
-        let path = coverPaths[selectedIndex]
-        isPagerPresented = false
-        _ = path
+        guard let selectedIndex else { return }
+        applyCover(at: selectedIndex)
+    }
+
+    private func applyCover(at index: Int) {
+        guard coverPaths.indices.contains(index), !isApplying else { return }
+        let path = coverPaths[index]
+        isApplying = true
+
+        Task {
+            await importManagingVM.applyCover(path, to: album)
+            isApplying = false
+            isPagerPresented = false
+            _ = coordinator.pop(animated: false)
+        }
     }
 }

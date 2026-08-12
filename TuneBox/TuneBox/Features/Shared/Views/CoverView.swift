@@ -57,7 +57,7 @@ struct CoverView: View {
             WebImage(url: url) { image in
                 image
                     .resizable()
-                    .scaledToFit()
+                    .scaledToFill()
             } placeholder: {
                 placeholder
             }
@@ -67,7 +67,7 @@ struct CoverView: View {
                   let image = UIImage(data: data) {
             Image(uiImage: image)
                 .resizable()
-                .scaledToFit()
+                .scaledToFill()
         } else {
             Image(systemName: "square.stack")
                 .font(.system(size: size * 0.4))

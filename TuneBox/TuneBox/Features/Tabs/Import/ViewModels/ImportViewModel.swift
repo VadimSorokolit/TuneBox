@@ -428,6 +428,24 @@ final class ImportViewModel: ImportManaging {
         return result.isEmpty ? (album.cover.map { [$0] } ?? []) : result
     }
 
+    func applyCover(_ sourcePath: String, to album: MusicLibrary.Album) async {
+        guard let data = self.loadCoverData(sourcePath: sourcePath, album: album) else {
+            return
+        }
+
+        do {
+            for track in album.tracks {
+                let coverID = "\(track.id)-\(UUID().uuidString)"
+                let url = try AudioMetadataService.save(data, trackID: coverID)
+                track.imagePath = url.lastPathComponent
+            }
+            try self.persistenceService.save()
+            await self.refreshLibrary()
+        } catch {
+            self.handleError(error)
+        }
+    }
+
     func sourceTracksSummary(for sourceID: ImportSource.ID) -> (count: Int, duration: Int, size: Int) {
         let tracks = self.tracks(for: sourceID)
 
@@ -696,6 +714,33 @@ final class ImportViewModel: ImportManaging {
     }
 
     // MARK: - Methods. Private
+
+    private func loadCoverData(sourcePath: String, album: MusicLibrary.Album) -> Data? {
+        guard
+            let track = album.tracks.first(where: { $0.importSourceID != nil }),
+            let sourceIDString = track.importSourceID,
+            let sourceID = UUID(uuidString: sourceIDString),
+            let source = self.source(for: sourceID),
+            let bookmarkData = source.bookmarkData
+        else {
+            return nil
+        }
+
+        var isStale = false
+        guard let rootURL = try? URL(
+            resolvingBookmarkData: bookmarkData,
+            options: .withoutUI,
+            relativeTo: nil,
+            bookmarkDataIsStale: &isStale
+        ),
+        rootURL.startAccessingSecurityScopedResource()
+        else {
+            return nil
+        }
+        defer { rootURL.stopAccessingSecurityScopedResource() }
+
+        return try? Data(contentsOf: URL(fileURLWithPath: sourcePath))
+    }
 
     private func ensureSections() {
         self.sections = [
