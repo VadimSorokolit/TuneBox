@@ -66,6 +66,7 @@
 		5B601ECD302B0D05005D7548 /* AlbumСoversView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B601ECC302B0CF2005D7548 /* AlbumСoversView.swift */; };
 		5B601ED0302B1688005D7548 /* CoverCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B601ECF302B1687005D7548 /* CoverCell.swift */; };
 		5B601ED2302B2001005D7548 /* CoverPagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B601ED1302B2001005D7548 /* CoverPagerView.swift */; };
+		5B601ED2302C56A6005D7548 /* ZoomableCoverPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B601ED1302C56A4005D7548 /* ZoomableCoverPageView.swift */; };
 		5B6B8CD32FED1D9400C23D3E /* DismissKeyboardOnTapModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6B8CD22FED1D9200C23D3E /* DismissKeyboardOnTapModifier.swift */; };
 		5B6B8CD52FED1DED00C23D3E /* View+dismissKeyboardOnTap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6B8CD42FED1DEC00C23D3E /* View+dismissKeyboardOnTap.swift */; };
 		5B6B8CD72FED326800C23D3E /* View+sectionTracksTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6B8CD62FED326700C23D3E /* View+sectionTracksTitle.swift */; };
@@ -132,7 +133,7 @@
 		5BDA04C8300A5DA900C7B763 /* SourceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDA04C7300A5DA700C7B763 /* SourceView.swift */; };
 		5BDA04CA300A677F00C7B763 /* SourceFolderItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDA04C9300A677F00C7B763 /* SourceFolderItem.swift */; };
 		5BECD77C3010E0750028FC67 /* LibrarySummaryFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BECD77B3010E0740028FC67 /* LibrarySummaryFooter.swift */; };
-		5BECD77E301380E10028FC67 /* TrackArtworkCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BECD77D301380DF0028FC67 /* TrackArtworkCell.swift */; };
+		5BECD77E301380E10028FC67 /* TrackCoverCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BECD77D301380DF0028FC67 /* TrackCoverCell.swift */; };
 		5BFCA7D22FCE0DDE009C6AD9 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA7D12FCE0DDD009C6AD9 /* AppTheme.swift */; };
 		5BFCA7D42FCE1148009C6AD9 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA7D32FCE1130009C6AD9 /* ThemeManager.swift */; };
 		5BFCA7D62FCE118B009C6AD9 /* Theme+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA7D52FCE118A009C6AD9 /* Theme+Extensions.swift */; };
@@ -249,6 +250,7 @@
 		5B601ECC302B0CF2005D7548 /* AlbumСoversView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AlbumСoversView.swift"; sourceTree = "<group>"; };
 		5B601ECF302B1687005D7548 /* CoverCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoverCell.swift; sourceTree = "<group>"; };
 		5B601ED1302B2001005D7548 /* CoverPagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoverPagerView.swift; sourceTree = "<group>"; };
+		5B601ED1302C56A4005D7548 /* ZoomableCoverPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomableCoverPageView.swift; sourceTree = "<group>"; };
 		5B6B8CD22FED1D9200C23D3E /* DismissKeyboardOnTapModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DismissKeyboardOnTapModifier.swift; sourceTree = "<group>"; };
 		5B6B8CD42FED1DEC00C23D3E /* View+dismissKeyboardOnTap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+dismissKeyboardOnTap.swift"; sourceTree = "<group>"; };
 		5B6B8CD62FED326700C23D3E /* View+sectionTracksTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+sectionTracksTitle.swift"; sourceTree = "<group>"; };
@@ -319,7 +321,7 @@
 		5BDA04C7300A5DA700C7B763 /* SourceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceView.swift; sourceTree = "<group>"; };
 		5BDA04C9300A677F00C7B763 /* SourceFolderItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceFolderItem.swift; sourceTree = "<group>"; };
 		5BECD77B3010E0740028FC67 /* LibrarySummaryFooter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibrarySummaryFooter.swift; sourceTree = "<group>"; };
-		5BECD77D301380DF0028FC67 /* TrackArtworkCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackArtworkCell.swift; sourceTree = "<group>"; };
+		5BECD77D301380DF0028FC67 /* TrackCoverCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackCoverCell.swift; sourceTree = "<group>"; };
 		5BFCA7D12FCE0DDD009C6AD9 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		5BFCA7D32FCE1130009C6AD9 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
 		5BFCA7D52FCE118A009C6AD9 /* Theme+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Theme+Extensions.swift"; sourceTree = "<group>"; };
@@ -402,6 +404,8 @@
 				5B0BC2C63007A3A800E8F2A5 /* AlbumDetailsView.swift */,
 				5B0BC2BA3007828C00E8F2A5 /* AlbumsView.swift */,
 				5B601ECC302B0CF2005D7548 /* AlbumСoversView.swift */,
+				5B601ED1302B2001005D7548 /* CoverPagerView.swift */,
+				5B601ED1302C56A4005D7548 /* ZoomableCoverPageView.swift */,
 			);
 			path = AlbumViews;
 			sourceTree = "<group>";
@@ -662,7 +666,6 @@
 			isa = PBXGroup;
 			children = (
 				5B601ECF302B1687005D7548 /* CoverCell.swift */,
-				5B601ED1302B2001005D7548 /* CoverPagerView.swift */,
 			);
 			path = Cover;
 			sourceTree = "<group>";
@@ -1037,7 +1040,7 @@
 			isa = PBXGroup;
 			children = (
 				5B0BC2D23007E81000E8F2A5 /* NumberedTrackCell.swift */,
-				5BECD77D301380DF0028FC67 /* TrackArtworkCell.swift */,
+				5BECD77D301380DF0028FC67 /* TrackCoverCell.swift */,
 			);
 			path = Track;
 			sourceTree = "<group>";
@@ -1337,7 +1340,7 @@
 				5B8382B12FC4D05E003625CD /* DownloadStateProviding.swift in Sources */,
 				5B586CB52FAC618500BCEAD2 /* FileManagerService.swift in Sources */,
 				5B1214283017505A00987F16 /* TrackAlphabetSection.swift in Sources */,
-				5BECD77E301380E10028FC67 /* TrackArtworkCell.swift in Sources */,
+				5BECD77E301380E10028FC67 /* TrackCoverCell.swift in Sources */,
 				5B0FD0C62FD2FD0600753D3A /* Collection+isNotEmpty.swift in Sources */,
 				5B1875C92FD084CB00D8A042 /* SegmentedChipControl.swift in Sources */,
 				5B899F782FCF13A8002D3232 /* RootTabsView.swift in Sources */,
@@ -1380,6 +1383,7 @@
 				5B8382B32FC4D0D8003625CD /* StorageManaging.swift in Sources */,
 				5BFCA8412FCED9F6009C6AD9 /* FontStyle.swift in Sources */,
 				5BC8D9042FFE96B900742822 /* AppRoute.swift in Sources */,
+				5B601ED2302C56A6005D7548 /* ZoomableCoverPageView.swift in Sources */,
 				5B0BC2AE30065A5000E8F2A5 /* ImportManaging.swift in Sources */,
 				5B8382A32FC4CB4D003625CD /* AudioServicing.swift in Sources */,
 				5B8382AD2FC4CFF1003625CD /* DownloadManaging.swift in Sources */,

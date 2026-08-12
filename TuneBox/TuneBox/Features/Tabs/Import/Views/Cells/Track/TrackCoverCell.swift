@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct TrackArtworkCell: View {
+struct TrackCoverCell: View {
 
     // MARK: - Properties. Public
 
@@ -66,7 +66,7 @@ struct TrackArtworkCell: View {
 }
 
 #Preview {
-    TrackArtworkCell(
+    TrackCoverCell(
         track: TrackEntity(
             id: "1",
             image: nil,

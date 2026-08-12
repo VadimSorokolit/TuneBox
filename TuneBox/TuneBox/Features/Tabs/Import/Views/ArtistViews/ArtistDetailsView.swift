@@ -187,7 +187,7 @@ struct ArtistDetailsView: View {
         var body: some View {
             LazyVStack(spacing: 0) {
                 ForEach(tracks) { track in
-                    TrackArtworkCell(
+                    TrackCoverCell(
                         track: track,
                         onTapGesture: {
                             playerVM.handlePlayAction(
