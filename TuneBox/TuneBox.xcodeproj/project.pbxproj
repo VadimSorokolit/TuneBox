@@ -480,12 +480,12 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
-		5B2AEF3C300A2A9A00436CD3 /* TrackView */ = {
+		5B2AEF3C300A2A9A00436CD3 /* TrackViews */ = {
 			isa = PBXGroup;
 			children = (
 				5B0BC2BE3007829500E8F2A5 /* TracksView.swift */,
 			);
-			path = TrackView;
+			path = TrackViews;
 			sourceTree = "<group>";
 		};
 		5B2AEF3D300A2AC500436CD3 /* PlaylistViews */ = {
@@ -599,6 +599,23 @@
 				5B586CCB2FACB61400BCEAD2 /* TracksResponse.swift */,
 			);
 			path = Jamendo;
+			sourceTree = "<group>";
+		};
+		5B40F3FD302D13C40025693E /* Library */ = {
+			isa = PBXGroup;
+			children = (
+				5B0BC2B83007699000E8F2A5 /* LibraryMenuCell.swift */,
+			);
+			path = Library;
+			sourceTree = "<group>";
+		};
+		5B40F3FE302D140C0025693E /* PlayerView */ = {
+			isa = PBXGroup;
+			children = (
+				5BC8D90730011EC000742822 /* ExpandedPlayerView.swift */,
+				5BC8D9053000ED4600742822 /* CompactPlayerView.swift */,
+			);
+			path = PlayerView;
 			sourceTree = "<group>";
 		};
 		5B4762782FAB3DA30069E41A /* APIs */ = {
@@ -924,9 +941,9 @@
 				5BECD77F301381530028FC67 /* Album */,
 				5BECD7803013815B0028FC67 /* Artist */,
 				5B601ECE302B166D005D7548 /* Cover */,
+				5B40F3FD302D13C40025693E /* Library */,
 				5BECD7823013818B0028FC67 /* Playlist */,
 				5BECD781301381730028FC67 /* Track */,
-				5B0BC2B83007699000E8F2A5 /* LibraryMenuCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -1081,11 +1098,10 @@
 				5BD3BF342FF586A8006FED4B /* Cells */,
 				5B0BC2DA3008D8C400E8F2A5 /* AlbumViews */,
 				5B0BC2DB3008D8EA00E8F2A5 /* ArtistViews */,
+				5B40F3FE302D140C0025693E /* PlayerView */,
 				5B2AEF3D300A2AC500436CD3 /* PlaylistViews */,
-				5B2AEF3C300A2A9A00436CD3 /* TrackView */,
-				5BC8D90730011EC000742822 /* ExpandedPlayerView.swift */,
+				5B2AEF3C300A2A9A00436CD3 /* TrackViews */,
 				5BDA04C7300A5DA700C7B763 /* SourceView.swift */,
-				5BC8D9053000ED4600742822 /* CompactPlayerView.swift */,
 				5B0BC2AF3006636A00E8F2A5 /* ImportsView.swift */,
 			);
 			path = Views;
