@@ -15,7 +15,7 @@ The app allows users to browse, search, and download tracks using the [Jamendo A
 
 ## Tech Stack
 
-* API - https://developer.jamendo.com/v3.0
+* APIs - https://developer.jamendo.com/v3.0, https://musicbrainz.org
 * UI Framework - **SwiftUI**
 * Architecture - **MVVM**
 * Networking - **Moya**
