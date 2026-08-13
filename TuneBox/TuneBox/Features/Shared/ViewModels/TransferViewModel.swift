@@ -333,7 +333,7 @@ final class TransferViewModel: TransferManaging {
             }
 
             do {
-                let dtos = try await self.networkService.searchTracks(
+                let dtos = try await self.jamendoService.searchTracks(
                     query: query,
                     limit: self.limit,
                     offset: .zero
@@ -378,7 +378,7 @@ final class TransferViewModel: TransferManaging {
             }
 
             do {
-                let dtos = try await self.networkService.searchTracks(
+                let dtos = try await self.jamendoService.searchTracks(
                     query: self.completedSearchQuery,
                     limit: self.limit,
                     offset: self.offsetSearch
@@ -496,7 +496,7 @@ final class TransferViewModel: TransferManaging {
     func stopDownload(track: TrackEntity) async {
         let track = self.ensureCanonical(track)
 
-        await self.networkService.stopDownload(trackId: track.id)
+        await self.jamendoService.stopDownload(trackId: track.id)
         await self.finishActiveDownload(trackId: track.id)
 
         self.setTransferState(
@@ -551,12 +551,12 @@ final class TransferViewModel: TransferManaging {
 
     func snapshotForTerminate() async {
         self.saveTransferState()
-        await self.networkService.snapshotResumeDataForRelaunch()
+        await self.jamendoService.snapshotResumeDataForRelaunch()
     }
 
     func cancelAllActiveDownloads() {
         Task {
-            await self.networkService.cancelAllDownloads()
+            await self.jamendoService.cancelAllDownloads()
         }
         self.inProgressTrackIDs.removeAll()
         self.queuedDownloadTrackIDs.removeAll()
@@ -586,7 +586,7 @@ final class TransferViewModel: TransferManaging {
         }
 
         for track in pausedTracks {
-            self.networkService.clearPersistedResumeData(trackId: track.id)
+            self.jamendoService.clearPersistedResumeData(trackId: track.id)
             self.resetTrackState(
                 track,
                 to: .idle,
@@ -598,8 +598,8 @@ final class TransferViewModel: TransferManaging {
     }
 
     func restoreDownloadsOnForeground() async {
-        await self.networkService.restoreDownloadSession()
-        let runningTrackIDs = await self.networkService.runningDownloadTrackIDs()
+        await self.jamendoService.restoreDownloadSession()
+        let runningTrackIDs = await self.jamendoService.runningDownloadTrackIDs()
 
         for trackID in runningTrackIDs {
             self.inProgressTrackIDs.insert(trackID)
@@ -618,7 +618,7 @@ final class TransferViewModel: TransferManaging {
     func deleteDownloadedTrack(track: TrackEntity) {
         let track = self.ensureCanonical(track)
 
-        self.networkService.clearPersistedResumeData(trackId: track.id)
+        self.jamendoService.clearPersistedResumeData(trackId: track.id)
 
         if AudioService.shared.currentTrackId == track.id {
             AudioService.shared.stop()
@@ -650,7 +650,7 @@ final class TransferViewModel: TransferManaging {
     }
 
     func handleBackgroundCompletion(_ handler: @escaping () -> Void) {
-        self.networkService.setBackgroundCompletionHandler { [weak self] in
+        self.jamendoService.setBackgroundCompletionHandler { [weak self] in
             Task { @MainActor in
                 self?.persistDownloadSession(force: true)
                 handler()
@@ -690,7 +690,7 @@ final class TransferViewModel: TransferManaging {
         self.cancelGenreLoadTask()
         self.cancelSearchLoadTask()
 
-        await self.networkService.cancelAllDownloads()
+        await self.jamendoService.cancelAllDownloads()
 
         self.queuedDownloadTrackIDs.removeAll()
         self.inProgressTrackIDs.removeAll()
@@ -716,10 +716,10 @@ final class TransferViewModel: TransferManaging {
     // MARK: - Initializer
 
     init(
-        networkService: NetworkServicing,
+        jamendoService: JamendoServicing,
         storageService: FileManagerServicing
     ) {
-        self.networkService = networkService
+        self.jamendoService = jamendoService
         self.storageService = storageService
 
         self.setupNotificationObservers()
@@ -738,7 +738,7 @@ final class TransferViewModel: TransferManaging {
     @ObservationIgnored
     private var persistenceService: PersistenceServicing
     private let limit: Int = 30
-    private let networkService: NetworkServicing
+    private let jamendoService: JamendoServicing
     private let storageService: FileManagerServicing
     private let downloadObserverTokens = TransferDownloadObserverTokens()
     private let minimumSearchLength: Int = 2
@@ -852,15 +852,15 @@ final class TransferViewModel: TransferManaging {
     private func restoreFromPersistedState(_ tracks: [TrackEntity]) async {
         self.seedPersistedProgressBaseline(tracks)
 
-        await self.networkService.restoreDownloadSession()
-        await self.networkService.waitForPendingCancellations(timeout: 2.5)
+        await self.jamendoService.restoreDownloadSession()
+        await self.jamendoService.waitForPendingCancellations(timeout: 2.5)
         await self.restoreInterruptedDownloads(tracks)
         await self.processDownloadQueue()
     }
 
     private func loadPopularTracks(offset: Int) async -> [TrackEntity] {
         do {
-            let dtos = try await self.networkService.getPopularTracks(
+            let dtos = try await self.jamendoService.getPopularTracks(
                 limit: self.limit,
                 offset: offset
             )
@@ -885,7 +885,7 @@ final class TransferViewModel: TransferManaging {
         appendToGenreTracks: Bool
     ) async -> [TrackEntity] {
         do {
-            let dtos = try await self.networkService.getTracksByGenre(
+            let dtos = try await self.jamendoService.getTracksByGenre(
                 genre: genre?.displayName,
                 limit: self.limit,
                 offset: offset
@@ -1074,7 +1074,7 @@ final class TransferViewModel: TransferManaging {
         self.persistDownloadSession()
 
         do {
-            try await self.networkService.startDownload(track)
+            try await self.jamendoService.startDownload(track)
         } catch {
             await self.handleDownloadActivationFailure(track, error: error)
         }
@@ -1094,7 +1094,7 @@ final class TransferViewModel: TransferManaging {
         self.persistDownloadSession()
 
         do {
-            try await self.networkService.resumeDownload(trackId: track.id)
+            try await self.jamendoService.resumeDownload(trackId: track.id)
         } catch {
             await self.handleResumeFailure(track, error: error)
         }
@@ -1108,10 +1108,10 @@ final class TransferViewModel: TransferManaging {
 
     private func handleResumeFailure(_ track: TrackEntity, error: Error) async {
         self.logTransferWarning("Resume failed for \(track.id), restarting from scratch: \(error.localizedDescription)")
-        self.networkService.clearPersistedResumeData(trackId: track.id)
+        self.jamendoService.clearPersistedResumeData(trackId: track.id)
 
         do {
-            try await self.networkService.startDownload(track)
+            try await self.jamendoService.startDownload(track)
         } catch {
             await self.handleDownloadActivationFailure(track, error: error)
         }
@@ -1138,7 +1138,7 @@ final class TransferViewModel: TransferManaging {
         repeat {
             self.pendingDownloadQueuePass = false
 
-            let runningTrackIDs = await self.networkService.runningDownloadTrackIDs()
+            let runningTrackIDs = await self.jamendoService.runningDownloadTrackIDs()
 
             while self.hasFreeDownloadSlot, self.queuedDownloadTrackIDs.isNotEmpty {
                 let trackID = self.queuedDownloadTrackIDs.removeFirst()
@@ -1155,7 +1155,7 @@ final class TransferViewModel: TransferManaging {
                     continue
                 }
 
-                let hasResumeData = await self.networkService.hasPersistedResumeData(trackId: trackID)
+                let hasResumeData = await self.jamendoService.hasPersistedResumeData(trackId: trackID)
 
                 if hasResumeData {
                     await self.activateResumeDownload(track: track)
@@ -1169,7 +1169,7 @@ final class TransferViewModel: TransferManaging {
     }
 
     private func restoreInterruptedDownloads(_ tracks: [TrackEntity]) async {
-        let liveActive = await self.networkService.runningDownloadTrackIDs()
+        let liveActive = await self.jamendoService.runningDownloadTrackIDs()
 
         for track in self.uniqueTracksByID(tracks)
         where self.storageService.downloadedTrackExists(id: track.id) {

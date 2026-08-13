@@ -40,11 +40,11 @@ private struct Constants {
         static let front = "front-\(CoverSize.medium.rawValue)"
         static let userAgent = "TuneBox/1.0 (macintosh@ukr.net)"
     }
-    
+
     struct SearchOperator {
         static let and = "AND"
     }
-    
+
     struct SearchField {
         static let artist = "artist"
         static let release = "release"
@@ -103,16 +103,16 @@ extension CoverRouter: TargetType {
                 let query = """
                 \(SearchField.artist):"\(artist)" \(SearchOperator.and) \(SearchField.release):"\(album)"
                 """
-                
+
                 return .requestParameters(
                     parameters: [
                         Params.query: query,
                         Params.format: Values.json
                     ],
-                    
+
                     encoding: URLEncoding.queryString
                 )
-                
+
             case .getFrontCover:
                 return .requestPlain
         }

@@ -12,13 +12,14 @@ import Resolver
 extension Resolver: @retroactive ResolverRegistering {
 
     public static func registerAllServices() {
-        self.registerNetworkService()
+        self.registerJamendoService()
+        self.registerCoverService()
         self.registerStorageService()
         self.registerPersistenceService()
         self.registerViewModels()
     }
 
-    private static func registerNetworkService() {
+    private static func registerJamendoService() {
         self.register {
             MoyaProvider<JamendoRouter>()
         }
@@ -26,7 +27,20 @@ extension Resolver: @retroactive ResolverRegistering {
         self.register {
             let provider = self.resolve(MoyaProvider<JamendoRouter>.self)
 
-            return NetworkService(provider: provider) as NetworkServicing
+            return JamendoService(provider: provider) as JamendoServicing
+        }
+        .scope(.application)
+    }
+
+    private static func registerCoverService() {
+        self.register {
+            MoyaProvider<CoverRouter>()
+        }
+
+        self.register {
+            let provider = self.resolve(MoyaProvider<CoverRouter>.self)
+
+            return CoverService(provider: provider) as CoverServicing
         }
         .scope(.application)
     }
@@ -55,7 +69,7 @@ extension Resolver: @retroactive ResolverRegistering {
         self.register {
             MainActor.assumeIsolated {
                 TransferViewModel(
-                    networkService: self.resolve(NetworkServicing.self),
+                    jamendoService: self.resolve(JamendoServicing.self),
                     storageService: self.resolve(FileManagerServicing.self)
                 ) as TransferManaging
             }

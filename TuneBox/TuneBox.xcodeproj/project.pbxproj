@@ -50,13 +50,15 @@
 		5B3FEB4A2FB454AE00DC1562 /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB492FB454AB00DC1562 /* PlayerView.swift */; };
 		5B3FEB4D2FB454C900DC1562 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB4C2FB454C400DC1562 /* SettingsView.swift */; };
 		5B40F3FB302D0D2D0025693E /* CoverRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B40F3FA302D0D100025693E /* CoverRouter.swift */; };
+		5B40F400302DE35A0025693E /* CoverServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B40F3FF302DE3540025693E /* CoverServicing.swift */; };
+		5B40F403302DE4DD0025693E /* CoverService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B40F402302DE4DA0025693E /* CoverService.swift */; };
 		5B47627A2FAB3DC30069E41A /* JamendoRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4762792FAB3DB80069E41A /* JamendoRouter.swift */; };
 		5B47627E2FAB49B00069E41A /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B47627D2FAB49AF0069E41A /* AppLogger.swift */; };
 		5B4762812FAB5C570069E41A /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5B4762802FAB5C570069E41A /* CombineMoya */; };
 		5B4762832FAB5C570069E41A /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 5B4762822FAB5C570069E41A /* Moya */; };
 		5B4762852FAB5C570069E41A /* ReactiveMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5B4762842FAB5C570069E41A /* ReactiveMoya */; };
 		5B4762872FAB5C570069E41A /* RxMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5B4762862FAB5C570069E41A /* RxMoya */; };
-		5B586CB12FAB98EE00BCEAD2 /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB02FAB98EE00BCEAD2 /* NetworkService.swift */; };
+		5B586CB12FAB98EE00BCEAD2 /* JamendoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB02FAB98EE00BCEAD2 /* JamendoService.swift */; };
 		5B586CB52FAC618500BCEAD2 /* FileManagerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB42FAC618400BCEAD2 /* FileManagerService.swift */; };
 		5B586CB72FAC678700BCEAD2 /* TrackDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB62FAC678600BCEAD2 /* TrackDTO.swift */; };
 		5B586CBA2FAC842200BCEAD2 /* Resolver+Injection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB92FAC842100BCEAD2 /* Resolver+Injection.swift */; };
@@ -80,7 +82,7 @@
 		5B8382992FC4C9EE003625CD /* SpinnerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382982FC4C9ED003625CD /* SpinnerView.swift */; };
 		5B8382A32FC4CB4D003625CD /* AudioServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382A22FC4CB4C003625CD /* AudioServicing.swift */; };
 		5B8382A72FC4CEF8003625CD /* FileManagerServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382A62FC4CEF6003625CD /* FileManagerServicing.swift */; };
-		5B8382A92FC4CF43003625CD /* NetworkServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382A82FC4CF41003625CD /* NetworkServicing.swift */; };
+		5B8382A92FC4CF43003625CD /* JamendoServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382A82FC4CF41003625CD /* JamendoServicing.swift */; };
 		5B8382AB2FC4CF88003625CD /* PersistenceTrackServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382AA2FC4CF84003625CD /* PersistenceTrackServicing.swift */; };
 		5B8382AD2FC4CFF1003625CD /* DownloadManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382AC2FC4CFEF003625CD /* DownloadManaging.swift */; };
 		5B8382AF2FC4D01C003625CD /* PersistenceManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382AE2FC4D01B003625CD /* PersistenceManaging.swift */; };
@@ -240,9 +242,11 @@
 		5B3FEB492FB454AB00DC1562 /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
 		5B3FEB4C2FB454C400DC1562 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		5B40F3FA302D0D100025693E /* CoverRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoverRouter.swift; sourceTree = "<group>"; };
+		5B40F3FF302DE3540025693E /* CoverServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoverServicing.swift; sourceTree = "<group>"; };
+		5B40F402302DE4DA0025693E /* CoverService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoverService.swift; sourceTree = "<group>"; };
 		5B4762792FAB3DB80069E41A /* JamendoRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JamendoRouter.swift; sourceTree = "<group>"; };
 		5B47627D2FAB49AF0069E41A /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
-		5B586CB02FAB98EE00BCEAD2 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
+		5B586CB02FAB98EE00BCEAD2 /* JamendoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JamendoService.swift; sourceTree = "<group>"; };
 		5B586CB42FAC618400BCEAD2 /* FileManagerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerService.swift; sourceTree = "<group>"; };
 		5B586CB62FAC678600BCEAD2 /* TrackDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackDTO.swift; sourceTree = "<group>"; };
 		5B586CB92FAC842100BCEAD2 /* Resolver+Injection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Resolver+Injection.swift"; sourceTree = "<group>"; };
@@ -264,7 +268,7 @@
 		5B8382982FC4C9ED003625CD /* SpinnerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerView.swift; sourceTree = "<group>"; };
 		5B8382A22FC4CB4C003625CD /* AudioServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioServicing.swift; sourceTree = "<group>"; };
 		5B8382A62FC4CEF6003625CD /* FileManagerServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerServicing.swift; sourceTree = "<group>"; };
-		5B8382A82FC4CF41003625CD /* NetworkServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkServicing.swift; sourceTree = "<group>"; };
+		5B8382A82FC4CF41003625CD /* JamendoServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JamendoServicing.swift; sourceTree = "<group>"; };
 		5B8382AA2FC4CF84003625CD /* PersistenceTrackServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceTrackServicing.swift; sourceTree = "<group>"; };
 		5B8382AC2FC4CFEF003625CD /* DownloadManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadManaging.swift; sourceTree = "<group>"; };
 		5B8382AE2FC4D01B003625CD /* PersistenceManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceManaging.swift; sourceTree = "<group>"; };
@@ -618,6 +622,14 @@
 			path = PlayerView;
 			sourceTree = "<group>";
 		};
+		5B40F401302DE4D00025693E /* CoverService */ = {
+			isa = PBXGroup;
+			children = (
+				5B40F402302DE4DA0025693E /* CoverService.swift */,
+			);
+			path = CoverService;
+			sourceTree = "<group>";
+		};
 		5B4762782FAB3DA30069E41A /* APIs */ = {
 			isa = PBXGroup;
 			children = (
@@ -627,12 +639,12 @@
 			path = APIs;
 			sourceTree = "<group>";
 		};
-		5B586CB22FAC610400BCEAD2 /* NetworkService */ = {
+		5B586CB22FAC610400BCEAD2 /* JamendoService */ = {
 			isa = PBXGroup;
 			children = (
-				5B586CB02FAB98EE00BCEAD2 /* NetworkService.swift */,
+				5B586CB02FAB98EE00BCEAD2 /* JamendoService.swift */,
 			);
-			path = NetworkService;
+			path = JamendoService;
 			sourceTree = "<group>";
 		};
 		5B586CB32FAC611E00BCEAD2 /* FileManagerService */ = {
@@ -752,6 +764,7 @@
 			children = (
 				5B74DF9E2FF4452A007EB36D /* AudioMetadataServicing.swift */,
 				5B8382A22FC4CB4C003625CD /* AudioServicing.swift */,
+				5B40F3FF302DE3540025693E /* CoverServicing.swift */,
 				5B8382AC2FC4CFEF003625CD /* DownloadManaging.swift */,
 				5B9D45DE2FDF122F00F86C1B /* DownloadsPresenting.swift */,
 				5B8382B02FC4D05C003625CD /* DownloadStateProviding.swift */,
@@ -760,7 +773,7 @@
 				5B0BC2AD30065A4E00E8F2A5 /* ImportManaging.swift */,
 				5BA5818F2FD6A52000B498D7 /* ImportManagingV1.swift */,
 				5B0BC2B330068B6700E8F2A5 /* LoadStateManaging.swift */,
-				5B8382A82FC4CF41003625CD /* NetworkServicing.swift */,
+				5B8382A82FC4CF41003625CD /* JamendoServicing.swift */,
 				5B8382AE2FC4D01B003625CD /* PersistenceManaging.swift */,
 				5BD3BF322FF5711C006FED4B /* PersistencePlaylistServicing.swift */,
 				5B8382AA2FC4CF84003625CD /* PersistenceTrackServicing.swift */,
@@ -1020,8 +1033,9 @@
 			children = (
 				5B74DF9B2FF444BA007EB36D /* AudioMetadataService */,
 				5BD0DAF82FBF6C4A00268A48 /* AudioService */,
+				5B40F401302DE4D00025693E /* CoverService */,
 				5B586CB32FAC611E00BCEAD2 /* FileManagerService */,
-				5B586CB22FAC610400BCEAD2 /* NetworkService */,
+				5B586CB22FAC610400BCEAD2 /* JamendoService */,
 				5B11C3382FB716590089BAD2 /* PersistenceService */,
 				5BCF3F9B301BE84A003AF4AF /* WaveformService */,
 			);
@@ -1374,6 +1388,7 @@
 				5B9D45DF2FDF123200F86C1B /* DownloadsPresenting.swift in Sources */,
 				5B0BC2D33007E81100E8F2A5 /* NumberedTrackCell.swift in Sources */,
 				5B74DF9F2FF4452B007EB36D /* AudioMetadataServicing.swift in Sources */,
+				5B40F403302DE4DD0025693E /* CoverService.swift in Sources */,
 				5B2AEF41300A35BC00436CD3 /* PlaylistCell.swift in Sources */,
 				5B0FD0C22FD2B18600753D3A /* GenreCell.swift in Sources */,
 				5BD0DAF72FBF6BA000268A48 /* AudioServiceV1.swift in Sources */,
@@ -1418,7 +1433,7 @@
 				5B3FEB3D2FB4539C00DC1562 /* TransferViewModel.swift in Sources */,
 				5BC8D90830011ECD00742822 /* ExpandedPlayerView.swift in Sources */,
 				5B0BC2BD3007829200E8F2A5 /* ArtistsView.swift in Sources */,
-				5B8382A92FC4CF43003625CD /* NetworkServicing.swift in Sources */,
+				5B8382A92FC4CF43003625CD /* JamendoServicing.swift in Sources */,
 				5BA5818C2FD6A33200B498D7 /* ImportViewModelV1.swift in Sources */,
 				5BD3BF332FF5711D006FED4B /* PersistencePlaylistServicing.swift in Sources */,
 				5B8382A72FC4CEF8003625CD /* FileManagerServicing.swift in Sources */,
@@ -1430,7 +1445,7 @@
 				5B3FEB4A2FB454AE00DC1562 /* PlayerView.swift in Sources */,
 				5B9D45DA2FDF099D00F86C1B /* DownloadsViewModel.swift in Sources */,
 				5BCF3F9A301BE807003AF4AF /* WaveformServicing.swift in Sources */,
-				5B586CB12FAB98EE00BCEAD2 /* NetworkService.swift in Sources */,
+				5B586CB12FAB98EE00BCEAD2 /* JamendoService.swift in Sources */,
 				5B0BC2C13007829A00E8F2A5 /* PlaylistsView.swift in Sources */,
 				5B9D8D753029F80B00E5E9E5 /* RootTabsManaging.swift in Sources */,
 				5B992F54300913E800276008 /* View+segmentTransition.swift in Sources */,
@@ -1458,6 +1473,7 @@
 				5BA581892FD6A2B800B498D7 /* SettingsViewModel.swift in Sources */,
 				5B0BC2B73006AF7F00E8F2A5 /* MusicLibrary.swift in Sources */,
 				5BFCA83C2FCED7BF009C6AD9 /* Font+Family.swift in Sources */,
+				5B40F400302DE35A0025693E /* CoverServicing.swift in Sources */,
 				5BDA04C8300A5DA900C7B763 /* SourceView.swift in Sources */,
 				5B2CF45E2FBC7AA400C5BA4C /* TransferDownloadSlotLimiter.swift in Sources */,
 				5B0BC2B430068B6900E8F2A5 /* LoadStateManaging.swift in Sources */,

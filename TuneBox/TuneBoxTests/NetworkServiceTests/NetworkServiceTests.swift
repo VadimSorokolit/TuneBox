@@ -151,8 +151,8 @@ struct NetworkServiceTests {
 //        }
 //    }
     
-    private func makeService(requestHandler: @escaping (JamendoRouter) async throws -> Response) -> NetworkService {
-        NetworkService(requestHandler: requestHandler)
+    private func makeService(requestHandler: @escaping (JamendoRouter) async throws -> Response) -> JamendoService {
+        JamendoService(requestHandler: requestHandler)
     }
     
     private func makeJSONResponse(statusCode: Int, body: String) -> Response {

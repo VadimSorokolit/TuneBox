@@ -1,5 +1,5 @@
 //
-//  NetworkService.swift
+//  JamendoService.swift
 //  TuneBox
 //
 //  Created by Vadim Sorokolit on 06.05.2026.
@@ -16,7 +16,7 @@ enum TrackDownloadNotificationUserInfoKey {
     static let error = "error"
 }
 
-final class NetworkService: NSObject, NetworkServicing {
+final class JamendoService: NSObject, JamendoServicing {
 
     // MARK: - Methods. Public
 
@@ -398,7 +398,7 @@ final class NetworkService: NSObject, NetworkServicing {
     }
 }
 
-extension NetworkService: URLSessionDownloadDelegate {
+extension JamendoService: URLSessionDownloadDelegate {
 
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
         _Concurrency.Task { @MainActor in

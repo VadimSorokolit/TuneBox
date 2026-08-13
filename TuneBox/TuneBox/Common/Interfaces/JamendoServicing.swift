@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol NetworkServicing: AnyObject {
+protocol JamendoServicing: AnyObject {
     func getTracksByGenre(genre: String?, limit: Int, offset: Int) async throws -> [TrackDTO]
     func getPopularTracks(limit: Int, offset: Int) async throws -> [TrackDTO]
     func searchTracks(query: String, limit: Int, offset: Int) async throws -> [TrackDTO]
