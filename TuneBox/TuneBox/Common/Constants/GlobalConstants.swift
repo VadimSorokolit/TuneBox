@@ -12,6 +12,11 @@ enum GlobalConstants {
     static let bytesInGigabyte: Double = 1e9
     static let downloadedFilePrefix = "track"
 
+    enum API {
+        static let fallbackBaseURL = "google.com"
+        static let invalidURLMessage = "Invalid baseURL:"
+    }
+
     enum Screen {
         static let regularWidth: CGFloat = 393
         static let defaultHeight: CGFloat = 60

@@ -35,9 +35,7 @@ private struct Constants {
     }
 
     static let mockAPIKey = "88888888"
-    static let fallbackBaseURL = "google.com"
     static let сlientIDKey = "JAMENDO_CLIENT_ID"
-    static let invalidURLMessage = "Invalid baseURL:"
     static let warningMessage = "Using mock API key"
 
     static var apiKey: String {
@@ -113,8 +111,8 @@ extension JamendoRouter: TargetType {
                 urlString = API.baseURL
         }
 
-        guard let url = URL(string: urlString) ?? URL(string: Constants.fallbackBaseURL) else {
-            fatalError("\(Constants.invalidURLMessage) \(urlString)")
+        guard let url = URL(string: urlString) ?? URL(string: GlobalConstants.API.fallbackBaseURL) else {
+            fatalError("\(GlobalConstants.API.invalidURLMessage) \(urlString)")
         }
 
         return url
