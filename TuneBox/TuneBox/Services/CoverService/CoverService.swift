@@ -13,7 +13,23 @@ final class CoverService: CoverServicing {
     // MARK: - Methods. Public
 
     func fetchFrontCover(artist: String, album: String) async throws -> Data {
-        return Data()
+        do {
+            let releaseResponse = try await self.requestHandler(
+                .getReleaseBy(artist: artist, album: album)
+            )
+
+            let decoded = try JSONDecoder().decode(ReleaseResponse.self, from: releaseResponse.data)
+
+            guard let mbid = decoded.releases.first?.id else {
+                throw AppError.API.notFound
+            }
+
+            let coverResponse = try await self.requestHandler(.getFrontCover(mbid: mbid))
+
+            return coverResponse.data
+        } catch {
+            throw AppError.API.from(error)
+        }
     }
 
     // MARK: - Initializer

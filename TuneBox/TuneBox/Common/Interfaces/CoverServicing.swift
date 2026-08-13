@@ -7,6 +7,6 @@
 
 import Foundation
 
-protocol CoverServicing {
+protocol CoverServicing: AnyObject {
     func fetchFrontCover(artist: String, album: String) async throws -> Data
 }
