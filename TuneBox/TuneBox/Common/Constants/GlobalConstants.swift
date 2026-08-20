@@ -31,7 +31,7 @@ enum GlobalConstants {
     }
 
     enum AppColor {
-        static let defaultBackground = SwiftUI.Color(hex: 0xFCFCFC)
+        static let defaultBackground = Color(hex: 0xFCFCFC)
     }
 
     enum Cell {

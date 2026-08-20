@@ -18,6 +18,7 @@ struct AlbumCell: View {
 
     let album: MusicLibrary.Album
     let displayContext: AlbumDisplayContext
+    let shouldLoadCover: Bool
     let defaultPadding: CGFloat = GlobalConstants.Cell.defaultPadding
     let onTapGesture: () -> Void
 
@@ -26,11 +27,21 @@ struct AlbumCell: View {
     var body: some View {
         VStack(spacing: 5) {
             HStack(spacing: 10) {
-                CoverView(
-                    coverPath: album.cover,
-                    size: GlobalConstants.Cell.imageSize,
-                    cornerRadius: GlobalConstants.Cell.imageCornerRadius
-                )
+                ZStack(alignment: .topTrailing) {
+                    CoverView(
+                        coverPath: album.cover,
+                        size: GlobalConstants.Cell.imageSize,
+                        cornerRadius: GlobalConstants.Cell.imageCornerRadius
+                    )
+
+                    if shouldLoadCover {
+                        SpinnerView(
+                            size: .mini,
+                            color: .black
+                        )
+                        .offset(x: -3, y: 3)
+                    }
+                }
 
                 VStack(spacing: subtitle?.isNotEmpty == true ? 4 : 0) {
                     if title.isNotEmpty {
@@ -98,6 +109,7 @@ struct AlbumCell: View {
             cover: nil
         ),
         displayContext: .album,
+        shouldLoadCover: true,
         onTapGesture: {}
     )
 }

@@ -626,7 +626,10 @@ final class TransferViewModel: TransferManaging {
 
         do {
             try self.storageService.deleteDownloadedTrack(id: track.id)
+
             self.resetTrackState(track, to: .idle, fileState: .removed)
+
+            try self.persistenceService.save()
         } catch {
             self.handleError(error)
         }

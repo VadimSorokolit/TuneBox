@@ -13,11 +13,12 @@ protocol PlayerManaging: AnyObject, Sendable {
     var playbackNavigationPath: [AppRoute] { get }
     var repeatMode: RepeatMode { get }
     var progress: Double { get }
-    var isShuffleEnabled: Bool { get }
-    var isPlaying: Bool { get }
-    var isPlayerVisible: Bool { get }
     var sourceFormatText: String { get }
     var outputRouteText: String { get }
+    var isPlaying: Bool { get }
+    var isShuffleEnabled: Bool { get }
+    var isPlayerVisible: Bool { get }
+    var shouldLoadCover: Bool { get }
 
     func handlePlayAction(for track: TrackEntity, in queue: [TrackEntity], navigationPath: [AppRoute]?)
     func togglePlayPause()

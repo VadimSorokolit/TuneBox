@@ -8,14 +8,21 @@
 import SwiftUI
 
 struct SpinnerView: View {
+    var backgroundColor: Color = .clear
+    var style: CircularProgressViewStyle = .circular
     var size: ControlSize = .large
+    var color: Color = .gray
 
     var body: some View {
         ProgressView()
-            .progressViewStyle(.circular)
-            .tint(.gray)
+            .progressViewStyle(style)
+            .tint(color)
             .controlSize(size)
-            .background(Color.clear)
+            .background(backgroundColor)
     }
 
+}
+
+#Preview {
+    SpinnerView()
 }

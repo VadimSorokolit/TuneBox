@@ -20,14 +20,24 @@ struct AlbumDetailsView: View {
         if let album = currentAlbum {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 20) {
-                    CoverView(
-                        coverPath: album.cover,
-                        size: 300,
-                        cornerRadius: 5,
-                        onTap: {
-                            coordinator.push(.covers(album))
+                    ZStack(alignment: .topTrailing) {
+                        CoverView(
+                            coverPath: album.cover,
+                            size: 300,
+                            cornerRadius: 5,
+                            onTap: {
+                                coordinator.push(.covers(album))
+                            }
+                        )
+
+                        if playerVM.shouldLoadCover {
+                            SpinnerView(
+                                size: .large,
+                                color: .black
+                            )
+                            .offset(x: -16, y: 16)
                         }
-                    )
+                    }
 
                     LazyVStack(spacing: 0) {
                         ForEach(Array(album.tracks.enumerated()), id: \.element.id) { index, track in
@@ -94,5 +104,48 @@ struct AlbumDetailsView: View {
     private var currentAlbum: MusicLibrary.Album? {
         guard let album else { return nil }
         return importManagingVM.library?.albums.first { $0.id == album.id } ?? album
+    }
+}
+
+#Preview {
+    NavigationStack {
+        AlbumDetailsView(
+            album: MusicLibrary.Album(
+                id: "1",
+                name: "Random Access Memories",
+                artist: "Daft Punk",
+                date: "2013",
+                tracks: [
+                    TrackEntity(
+                        id: "1",
+                        image: nil,
+                        songName: "Give Life Back to Music",
+                        duration: 274,
+                        artistName: "Daft Punk",
+                        albumName: "Random Access Memories",
+                        releaseDate: "2013",
+                        download: nil,
+                        waveformData: nil,
+                        size: 5_242_880,
+                        trackNumber: 1
+                    ),
+                    TrackEntity(
+                        id: "2",
+                        image: nil,
+                        songName: "Get Lucky",
+                        duration: 369,
+                        artistName: "Daft Punk",
+                        albumName: "Random Access Memories",
+                        releaseDate: "2013",
+                        download: nil,
+                        waveformData: nil,
+                        size: 5_242_880,
+                        trackNumber: 3
+                    )
+                ],
+                cover: nil
+            )
+        )
+        .environment(AppCoordinator(root: .main))
     }
 }

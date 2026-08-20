@@ -22,6 +22,7 @@ struct AlbumsView: View {
                                 AlbumCell(
                                     album: album,
                                     displayContext: .album,
+                                    shouldLoadCover: playerVM.shouldLoadCover,
                                     onTapGesture: {
                                         coordinator.push(.album(album))
                                     }

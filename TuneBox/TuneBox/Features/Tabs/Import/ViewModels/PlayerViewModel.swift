@@ -31,12 +31,13 @@ final class PlayerViewModel: PlayerManaging {
     private(set) var playlist: PlaylistEntity?
     private(set) var repeatMode: RepeatMode = .off
     private(set) var progress: Double = 0
-    private(set) var isShuffleEnabled = false
     private(set) var isPlaying = false
     private(set) var error: String?
     private(set) var playbackNavigationPath: [AppRoute] = []
     private(set) var sourceFormatText: String = ""
     private(set) var outputRouteText: String = ""
+    private(set) var isShuffleEnabled = false
+    private(set) var shouldLoadCover = false
 
     var isPlayerVisible: Bool {
         self.track != nil
@@ -217,7 +218,6 @@ final class PlayerViewModel: PlayerManaging {
     }
 
     func refreshPlaybackNavigationPath(library: MusicLibrary?) {
-        // Keep a live path from play; only fill/repair after restore or when empty.
         guard self.needsNavigationPathRebuild || self.playbackNavigationPath.isEmpty else { return }
         guard self.playbackOrigin != nil else { return }
 
@@ -338,7 +338,6 @@ final class PlayerViewModel: PlayerManaging {
     private var playbackOrigin: PlaybackOriginSnapshot?
     private var pendingRestoreProgress: Double?
     private var lastPersistedProgressAt: Date?
-    /// After cold restore, album/artist routes may need library data before path is ready.
     private var needsNavigationPathRebuild = false
 
     private static let restartThreshold: TimeInterval = 3

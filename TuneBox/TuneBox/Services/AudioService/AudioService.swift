@@ -219,9 +219,9 @@ final class AudioService: NSObject, AudioServicing {
             info[MPMediaItemPropertyPlaybackDuration] = duration
         }
 
-        if let artwork = self.artworkImage(from: track) {
-            info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: artwork.size) { _ in
-                artwork
+        if let coverImage = self.coverImage(from: track) {
+            info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: coverImage.size) { _ in
+                coverImage
             }
         }
 
@@ -344,7 +344,7 @@ final class AudioService: NSObject, AudioServicing {
             .contains { $0.portType == .usbAudio }
     }
 
-    private func artworkImage(from track: TrackEntity) -> UIImage? {
+    private func coverImage(from track: TrackEntity) -> UIImage? {
         guard let path = track.imagePath, !path.isEmpty else { return nil }
 
         if path.hasPrefix("http://") || path.hasPrefix("https://"),

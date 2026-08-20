@@ -155,6 +155,7 @@ struct ArtistDetailsView: View {
                     AlbumCell(
                         album: album,
                         displayContext: .artist,
+                        shouldLoadCover: playerVM.shouldLoadCover,
                         onTapGesture: {
                             coorditaor.push(.album(album))
                         }
