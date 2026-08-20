@@ -37,7 +37,6 @@ final class PlayerViewModel: PlayerManaging {
     private(set) var sourceFormatText: String = ""
     private(set) var outputRouteText: String = ""
     private(set) var isShuffleEnabled = false
-    private(set) var shouldLoadCover = false
 
     var isPlayerVisible: Bool {
         self.track != nil

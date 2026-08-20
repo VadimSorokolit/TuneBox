@@ -22,7 +22,7 @@ struct AlbumsView: View {
                                 AlbumCell(
                                     album: album,
                                     displayContext: .album,
-                                    shouldLoadCover: playerVM.shouldLoadCover,
+                                    shouldLoadCover: coverVM.isLoading,
                                     onTapGesture: {
                                         coordinator.push(.album(album))
                                     }
@@ -60,4 +60,5 @@ struct AlbumsView: View {
     @Injected private var rootTabsVM: RootTabsManaging
     @Injected private var importManagingVM: ImportManaging
     @Injected private var playerVM: PlayerManaging
+    @Injected private var coverVM: CoverManaging
 }

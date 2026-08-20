@@ -30,7 +30,7 @@ struct AlbumDetailsView: View {
                             }
                         )
 
-                        if playerVM.shouldLoadCover {
+                        if coverVM.isLoading {
                             SpinnerView(
                                 size: .large,
                                 color: .black
@@ -100,6 +100,7 @@ struct AlbumDetailsView: View {
     @Injected private var rootTabsVM: RootTabsManaging
     @Injected private var importManagingVM: ImportManaging
     @Injected private var playerVM: PlayerManaging
+    @Injected private var coverVM: CoverManaging
 
     private var currentAlbum: MusicLibrary.Album? {
         guard let album else { return nil }

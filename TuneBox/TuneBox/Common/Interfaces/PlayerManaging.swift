@@ -18,7 +18,6 @@ protocol PlayerManaging: AnyObject, Sendable {
     var isPlaying: Bool { get }
     var isShuffleEnabled: Bool { get }
     var isPlayerVisible: Bool { get }
-    var shouldLoadCover: Bool { get }
 
     func handlePlayAction(for track: TrackEntity, in queue: [TrackEntity], navigationPath: [AppRoute]?)
     func togglePlayPause()
