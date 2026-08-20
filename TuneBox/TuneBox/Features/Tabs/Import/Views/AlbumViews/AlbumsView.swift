@@ -27,6 +27,18 @@ struct AlbumsView: View {
                                         coordinator.push(.album(album))
                                     }
                                 )
+                                .onAppear {
+                                    guard album.cover == nil else { return }
+
+                                    Task {
+                                        guard let data = await coverVM.fetchFrontCover(
+                                            artist: album.artist,
+                                            album: album.name
+                                        ) else { return }
+
+                                        await importManagingVM.applyCover(data, to: album)
+                                    }
+                                }
                             }
 
                             LibrarySummaryFooter(

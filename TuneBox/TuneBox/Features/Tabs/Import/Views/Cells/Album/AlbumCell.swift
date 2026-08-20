@@ -27,7 +27,7 @@ struct AlbumCell: View {
     var body: some View {
         VStack(spacing: 5) {
             HStack(spacing: 10) {
-                ZStack(alignment: .topTrailing) {
+                ZStack {
                     CoverView(
                         coverPath: album.cover,
                         size: GlobalConstants.Cell.imageSize,
@@ -36,10 +36,9 @@ struct AlbumCell: View {
 
                     if shouldLoadCover {
                         SpinnerView(
-                            size: .mini,
-                            color: .black
+                            size: .large,
+                            color: .gray
                         )
-                        .offset(x: -3, y: 3)
                     }
                 }
 

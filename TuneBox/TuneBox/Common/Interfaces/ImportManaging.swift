@@ -26,6 +26,7 @@ protocol ImportManaging: LoadStateManaging {
     func importFolder(_ url: URL) async
     func artistCoverPaths(for album: MusicLibrary.Album) -> [String]
     func applyCover(_ sourcePath: String, to album: MusicLibrary.Album) async
+    func applyCover(_ data: Data, to album: MusicLibrary.Album) async
     func track(for url: URL) -> TrackEntity?
     func tracks(for sourceID: ImportSource.ID) -> [TrackEntity]
     func tracksSize(_ tracks: [TrackEntity]) -> Int

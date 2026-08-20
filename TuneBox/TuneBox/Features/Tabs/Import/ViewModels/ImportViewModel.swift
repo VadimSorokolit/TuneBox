@@ -433,6 +433,10 @@ final class ImportViewModel: ImportManaging {
             return
         }
 
+        await self.applyCover(data, to: album)
+    }
+
+    func applyCover(_ data: Data, to album: MusicLibrary.Album) async {
         do {
             for track in album.tracks {
                 let coverID = "\(track.id)-\(UUID().uuidString)"
