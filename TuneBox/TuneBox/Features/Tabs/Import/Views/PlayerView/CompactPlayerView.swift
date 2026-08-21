@@ -12,6 +12,7 @@ struct CompactPlayerView: View {
     // MARK: - Properties. Public
 
     let track: TrackEntity?
+    var shouldLoadCoverIfNeeded: Bool
     var isPlaying: Bool
     var progress: Double
     let repeatMode: RepeatMode
@@ -33,11 +34,20 @@ struct CompactPlayerView: View {
             VStack(spacing: 10) {
                 ZStack(alignment: .bottom) {
                     HStack(spacing: 12) {
-                        CoverView(
-                            coverPath: track.imagePath,
-                            size: 44,
-                            cornerRadius: 8
-                        )
+                        ZStack {
+                            CoverView(
+                                coverPath: track.imagePath,
+                                size: 44,
+                                cornerRadius: 8
+                            )
+
+                            if shouldLoadCoverIfNeeded {
+                                SpinnerView(
+                                    size: .regular,
+                                    color: .gray
+                                )
+                            }
+                        }
 
                         Button(action: {
                             onTrackInfoTap()
@@ -629,6 +639,7 @@ private struct MarqueeTextWidthKey: PreferenceKey {
             waveformData: nil,
             size: 5_242_880
         ),
+        shouldLoadCoverIfNeeded: true,
         isPlaying: true,
         progress: 0.5,
         repeatMode: .one,

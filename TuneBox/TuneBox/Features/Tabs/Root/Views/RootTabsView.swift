@@ -90,41 +90,42 @@ struct RootTabsView: View {
         ZStack(alignment: .bottom) {
             content
 
-            if playerViewModel.isPlayerVisible {
+            if playerVM.isPlayerVisible {
                 CompactPlayerView(
-                    track: playerViewModel.track,
-                    isPlaying: playerViewModel.isPlaying,
-                    progress: playerViewModel.progress,
-                    repeatMode: playerViewModel.repeatMode,
-                    isShuffleEnabled: playerViewModel.isShuffleEnabled,
-                    sourceFormatText: playerViewModel.sourceFormatText,
-                    outputRouteText: playerViewModel.outputRouteText,
+                    track: playerVM.track,
+                    shouldLoadCoverIfNeeded: coverVM.isLoading,
+                    isPlaying: playerVM.isPlaying,
+                    progress: playerVM.progress,
+                    repeatMode: playerVM.repeatMode,
+                    isShuffleEnabled: playerVM.isShuffleEnabled,
+                    sourceFormatText: playerVM.sourceFormatText,
+                    outputRouteText: playerVM.outputRouteText,
                     onTrackInfoTap: {
                         openTrackSource()
                     },
                     onSeek: { delta in
-                        playerViewModel.seek(by: delta)
+                        playerVM.seek(by: delta)
                     },
                     onSeekHoldChanged: { isHolding in
-                        playerViewModel.setSeekScrubbing(isHolding)
+                        playerVM.setSeekScrubbing(isHolding)
                     },
                     onPlayPauseTap: {
-                        playerViewModel.togglePlayPause()
+                        playerVM.togglePlayPause()
                     },
                     onProgressTap: {
                         isShowingExpandedPlayer = true
                     },
                     onRepeatModeChange: { mode in
-                        playerViewModel.setRepeatMode(mode)
+                        playerVM.setRepeatMode(mode)
                     },
                     onShuffleToggle: {
-                        playerViewModel.toggleShuffle()
+                        playerVM.toggleShuffle()
                     }
                 )
-                .padding(.bottom, rootTabsViewModel.isTabBarVisible ? rootTabsViewModel.tabBarHeight : 0)
+                .padding(.bottom, rootTabsVM.isTabBarVisible ? rootTabsVM.tabBarHeight : 0)
             }
 
-            if rootTabsViewModel.isTabBarVisible {
+            if rootTabsVM.isTabBarVisible {
                 tabBar
             }
         }
@@ -137,23 +138,24 @@ struct RootTabsView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
         .onAppear {
             restoreSelectedTab()
-            playerViewModel.restoreLastPlaybackSession()
+            playerVM.restoreLastPlaybackSession()
         }
         .task {
-            playerViewModel.restoreLastPlaybackSession()
+            playerVM.restoreLastPlaybackSession()
         }
-        .onChange(of: rootTabsViewModel.tabsMode) { _, _ in
+        .onChange(of: rootTabsVM.tabsMode) { _, _ in
             restoreSelectedTab()
         }
         .onChange(of: coordinator.selectedTab) { _, newTab in
-            rootTabsViewModel.rememberSelectedTab(newTab)
+            rootTabsVM.rememberSelectedTab(newTab)
         }
     }
 
     // MARK: - Properties. Private
 
-    @Injected private var rootTabsViewModel: RootTabsManaging
-    @Injected private var playerViewModel: PlayerManaging
+    @Injected private var rootTabsVM: RootTabsManaging
+    @Injected private var playerVM: PlayerManaging
+    @Injected private var coverVM: CoverManaging
     @Environment(\.themeManager) private var theme
     @Environment(AppCoordinator.self) private var coordinator
     @State private var isShowingExpandedPlayer: Bool = false
@@ -213,7 +215,7 @@ struct RootTabsView: View {
     private var tabBar: some View {
         ZStack(alignment: .top) {
             HStack(spacing: 10) {
-                ForEach(rootTabsViewModel.visibleTabs) { tab in
+                ForEach(rootTabsVM.visibleTabs) { tab in
                     TabItemView(
                         tab: tab,
                         isSelected: coordinator.selectedTab == tab,
@@ -227,7 +229,7 @@ struct RootTabsView: View {
             }
         }
         .padding(.horizontal, 6)
-        .frame(height: rootTabsViewModel.tabBarHeight)
+        .frame(height: rootTabsVM.tabBarHeight)
         .background(tabBarBackground)
     }
 
@@ -240,15 +242,15 @@ struct RootTabsView: View {
     // MARK: - Private. Methods
 
     private func restoreSelectedTab() {
-        coordinator.selectedTab = rootTabsViewModel.restoreSelectedTab()
+        coordinator.selectedTab = rootTabsVM.restoreSelectedTab()
     }
 
     private func openTrackSource() {
-        if playerViewModel.playbackNavigationPath.isEmpty {
-            playerViewModel.refreshPlaybackNavigationPath(library: nil)
+        if playerVM.playbackNavigationPath.isEmpty {
+            playerVM.refreshPlaybackNavigationPath(library: nil)
         }
 
-        let path = playerViewModel.playbackNavigationPath
+        let path = playerVM.playbackNavigationPath
         guard path.isNotEmpty else { return }
 
         coordinator.switchToTab(.importFiles)
