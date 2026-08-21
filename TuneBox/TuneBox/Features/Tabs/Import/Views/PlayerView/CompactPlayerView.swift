@@ -6,13 +6,13 @@
 //
 
 import SwiftUI
+import Resolver
 
 struct CompactPlayerView: View {
 
     // MARK: - Properties. Public
 
     let track: TrackEntity?
-    var shouldLoadCoverIfNeeded: Bool
     var isPlaying: Bool
     var progress: Double
     let repeatMode: RepeatMode
@@ -41,7 +41,7 @@ struct CompactPlayerView: View {
                                 cornerRadius: 8
                             )
 
-                            if shouldLoadCoverIfNeeded {
+                            if coverVM.isLoading {
                                 SpinnerView(
                                     size: .regular,
                                     color: .gray
@@ -124,6 +124,21 @@ struct CompactPlayerView: View {
             }
             .padding(.bottom, 10)
             .frame(height: GlobalConstants.CompactPlayer.defaultHeight)
+            .task(id: "\(track.id)-\(NetworkMonitorService.shared.isConnected)") {
+                guard NetworkMonitorService.shared.isConnected else { return }
+                guard track.imagePath == nil else { return }
+                guard track.artistName.isNotEmpty, track.albumName.isNotEmpty else { return }
+                guard let data = await coverVM.fetchFrontCover(
+                    artist: track.artistName,
+                    album: track.albumName
+                ) else { return }
+
+                guard let album = importManagingVM.library?.albums.first(where: { album in
+                    album.tracks.contains(where: { $0.id == track.id })
+                }) else { return }
+
+                await importManagingVM.applyCover(data, to: album)
+            }
         }
     }
 
@@ -143,6 +158,9 @@ struct CompactPlayerView: View {
             .multilineTextAlignment(.trailing)
             .frame(maxWidth: .infinity, alignment: .trailing)
     }
+
+    @Injected private var importManagingVM: ImportManaging
+    @Injected private var coverVM: CoverManaging
 }
 
 // MARK: - Private. Objects
@@ -639,7 +657,6 @@ private struct MarqueeTextWidthKey: PreferenceKey {
             waveformData: nil,
             size: 5_242_880
         ),
-        shouldLoadCoverIfNeeded: true,
         isPlaying: true,
         progress: 0.5,
         repeatMode: .one,

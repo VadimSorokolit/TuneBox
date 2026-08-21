@@ -93,7 +93,6 @@ struct RootTabsView: View {
             if playerVM.isPlayerVisible {
                 CompactPlayerView(
                     track: playerVM.track,
-                    shouldLoadCoverIfNeeded: coverVM.isLoading,
                     isPlaying: playerVM.isPlaying,
                     progress: playerVM.progress,
                     repeatMode: playerVM.repeatMode,
