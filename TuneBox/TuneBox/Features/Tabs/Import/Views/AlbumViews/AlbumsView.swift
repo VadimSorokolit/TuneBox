@@ -22,23 +22,10 @@ struct AlbumsView: View {
                                 AlbumCell(
                                     album: album,
                                     displayContext: .album,
-                                    shouldLoadCover: coverVM.isLoading,
                                     onTapGesture: {
                                         coordinator.push(.album(album))
                                     }
                                 )
-                                .onAppear {
-                                    guard album.cover == nil else { return }
-
-                                    Task {
-                                        guard let data = await coverVM.fetchFrontCover(
-                                            artist: album.artist,
-                                            album: album.name
-                                        ) else { return }
-
-                                        await importManagingVM.applyCover(data, to: album)
-                                    }
-                                }
                             }
 
                             LibrarySummaryFooter(
@@ -72,5 +59,4 @@ struct AlbumsView: View {
     @Injected private var rootTabsVM: RootTabsManaging
     @Injected private var importManagingVM: ImportManaging
     @Injected private var playerVM: PlayerManaging
-    @Injected private var coverVM: CoverManaging
 }

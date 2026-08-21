@@ -29,14 +29,6 @@ struct AlbumDetailsView: View {
                                 coordinator.push(.covers(album))
                             }
                         )
-
-                        if coverVM.isLoading {
-                            SpinnerView(
-                                size: .large,
-                                color: .black
-                            )
-                            .offset(x: -16, y: 16)
-                        }
                     }
 
                     LazyVStack(spacing: 0) {
@@ -100,7 +92,6 @@ struct AlbumDetailsView: View {
     @Injected private var rootTabsVM: RootTabsManaging
     @Injected private var importManagingVM: ImportManaging
     @Injected private var playerVM: PlayerManaging
-    @Injected private var coverVM: CoverManaging
 
     private var currentAlbum: MusicLibrary.Album? {
         guard let album else { return nil }

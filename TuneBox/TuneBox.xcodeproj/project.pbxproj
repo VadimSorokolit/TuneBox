@@ -120,6 +120,8 @@
 		5BA581962FD8603500B498D7 /* HighlightedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA581952FD8603400B498D7 /* HighlightedText.swift */; };
 		5BB3012A3026020200A2AA47 /* PlaybackSessionSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB301293026020100A2AA47 /* PlaybackSessionSnapshot.swift */; };
 		5BC0DEAD2FDD000100503BA2 /* DownloadStateMergeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC0DEAC2FDD000100503BA2 /* DownloadStateMergeTests.swift */; };
+		5BC5EED1303846DB001A16A9 /* NetworkMonitorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC5EED0303846DA001A16A9 /* NetworkMonitorService.swift */; };
+		5BC5EED33038470B001A16A9 /* NetworkMonitoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC5EED230384709001A16A9 /* NetworkMonitoring.swift */; };
 		5BC8D8F62FFD769300742822 /* ImportedPlaylistCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D8F52FFD769200742822 /* ImportedPlaylistCell.swift */; };
 		5BC8D9022FFE966B00742822 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D9012FFE966A00742822 /* AppCoordinator.swift */; };
 		5BC8D9042FFE96B900742822 /* AppRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D9032FFE96B800742822 /* AppRoute.swift */; };
@@ -310,6 +312,8 @@
 		5BBC59323020772D003442D2 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		5BBC59343020772D003442D2 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		5BC0DEAC2FDD000100503BA2 /* DownloadStateMergeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadStateMergeTests.swift; sourceTree = "<group>"; };
+		5BC5EED0303846DA001A16A9 /* NetworkMonitorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitorService.swift; sourceTree = "<group>"; };
+		5BC5EED230384709001A16A9 /* NetworkMonitoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitoring.swift; sourceTree = "<group>"; };
 		5BC8D8F52FFD769200742822 /* ImportedPlaylistCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportedPlaylistCell.swift; sourceTree = "<group>"; };
 		5BC8D9012FFE966A00742822 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		5BC8D9032FFE96B800742822 /* AppRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRoute.swift; sourceTree = "<group>"; };
@@ -790,6 +794,7 @@
 				5BA5818F2FD6A52000B498D7 /* ImportManagingV1.swift */,
 				5B8382A82FC4CF41003625CD /* JamendoServicing.swift */,
 				5B0BC2B330068B6700E8F2A5 /* LoadStateManaging.swift */,
+				5BC5EED230384709001A16A9 /* NetworkMonitoring.swift */,
 				5B8382AE2FC4D01B003625CD /* PersistenceManaging.swift */,
 				5BD3BF322FF5711C006FED4B /* PersistencePlaylistServicing.swift */,
 				5B8382AA2FC4CF84003625CD /* PersistenceTrackServicing.swift */,
@@ -929,6 +934,14 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		5BC5EECF303846BC001A16A9 /* NetworkMonitorService */ = {
+			isa = PBXGroup;
+			children = (
+				5BC5EED0303846DA001A16A9 /* NetworkMonitorService.swift */,
+			);
+			path = NetworkMonitorService;
+			sourceTree = "<group>";
+		};
 		5BC8D9002FFE965600742822 /* Navigation */ = {
 			isa = PBXGroup;
 			children = (
@@ -1053,6 +1066,7 @@
 				5B40F401302DE4D00025693E /* CoverService */,
 				5B586CB32FAC611E00BCEAD2 /* FileManagerService */,
 				5B586CB22FAC610400BCEAD2 /* JamendoService */,
+				5BC5EECF303846BC001A16A9 /* NetworkMonitorService */,
 				5B11C3382FB716590089BAD2 /* PersistenceService */,
 				5BCF3F9B301BE84A003AF4AF /* WaveformService */,
 			);
@@ -1400,6 +1414,7 @@
 				5B1214283017505A00987F16 /* TrackAlphabetSection.swift in Sources */,
 				5BECD77E301380E10028FC67 /* TrackCoverCell.swift in Sources */,
 				5B0FD0C62FD2FD0600753D3A /* Collection+isNotEmpty.swift in Sources */,
+				5BC5EED1303846DB001A16A9 /* NetworkMonitorService.swift in Sources */,
 				5B1875C92FD084CB00D8A042 /* SegmentedChipControl.swift in Sources */,
 				5B899F782FCF13A8002D3232 /* RootTabsView.swift in Sources */,
 				5B9D45DF2FDF123200F86C1B /* DownloadsPresenting.swift in Sources */,
@@ -1412,6 +1427,7 @@
 				5B3FEB472FB4548600DC1562 /* DownloadsView.swift in Sources */,
 				5B3FEB432FB4545200DC1562 /* BrowseView.swift in Sources */,
 				5BFCA8452FCEE252009C6AD9 /* TransferPrioritizable+mergePriority.swift in Sources */,
+				5BC5EED33038470B001A16A9 /* NetworkMonitoring.swift in Sources */,
 				5BA581942FD70BC300B498D7 /* EmptyGenreCell.swift in Sources */,
 				5BFCA83A2FCED71E009C6AD9 /* Color+hex.swift in Sources */,
 				5B0BC2B230068A4A00E8F2A5 /* CentralSpinnerModifier.swift in Sources */,
