@@ -2,7 +2,7 @@
 //  NumberedTrackCell.swift
 //  TuneBox
 //
-//  Created by Vadiy Sorokolit on 15.07.2026.
+//  Created by Vadim Sorokolit on 15.07.2026.
 //
 
 import SwiftUI
