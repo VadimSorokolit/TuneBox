@@ -47,13 +47,16 @@ struct CompactPlayerView: View {
 
                                 let elapsed = context.date.timeIntervalSince(spinStartedAt)
 
-                                return elapsed / Self.vinylRevolutionDuration * 360
+                                return elapsed / vinylRevolutionDuration * 360
                             }()
 
                             ZStack {
                                 VinylPlateView(
                                     track: track,
                                     isLoading: coverVM.isLoading,
+                                    vinylImageSize: 44,
+                                    coverImageSize: 15,
+                                    centerHoleSize: 1,
                                     rotation: 0
                                 )
                                 .opacity(0.15)
@@ -61,8 +64,15 @@ struct CompactPlayerView: View {
                                 VinylPlateView(
                                     track: track,
                                     isLoading: coverVM.isLoading,
+                                    vinylImageSize: 44,
+                                    coverImageSize: 15,
+                                    centerHoleSize: 1,
                                     rotation: baseRotation + spinDegrees
                                 )
+                                .mask {
+                                    Circle()
+                                        .frame(size: visibleSize)
+                                }
                             }
                         }
                         .onAppear {
@@ -173,7 +183,15 @@ struct CompactPlayerView: View {
     @State private var baseRotation: Double = 0
     @State private var spinStartedAt: Date?
 
-    private static let vinylRevolutionDuration: TimeInterval = 4
+    private let vinylRevolutionDuration: TimeInterval = 4
+    private let minimumSize: CGFloat = 15
+    private let maximumSize: CGFloat = 44
+
+    var visibleSize: CGFloat {
+        maximumSize
+        - (maximumSize - minimumSize)
+        * progress
+    }
 
     private var sourceFormatLabel: some View {
         Text(sourceFormatText)
@@ -201,47 +219,12 @@ struct CompactPlayerView: View {
             spinStartedAt = Date()
         } else if let spinStartedAt {
             let elapsed = Date().timeIntervalSince(spinStartedAt)
-            baseRotation += elapsed / Self.vinylRevolutionDuration * 360
+            baseRotation += elapsed / vinylRevolutionDuration * 360
             self.spinStartedAt = nil
         }
     }
 
     // MARK: - Private. Objects
-
-    struct VinylPlateView: View {
-
-        let track: TrackEntity
-        let isLoading: Bool
-        let rotation: Double
-
-        var body: some View {
-            ZStack {
-                Image(.vinylPlate)
-                    .resizable()
-                    .scaledToFit()
-                    .clipShape(Circle())
-
-                CoverView(
-                    coverPath: track.imagePath,
-                    size: 15,
-                    cornerRadius: 7.5
-                )
-
-                Circle()
-                    .frame(size: 1)
-                    .foregroundColor(.black)
-
-                if isLoading {
-                    SpinnerView(
-                        size: .regular,
-                        color: .gray
-                    )
-                }
-            }
-            .frame(size: 44)
-            .rotationEffect(.degrees(rotation))
-        }
-    }
 
     private struct PressGlassButtonStyle: ButtonStyle {
         func makeBody(configuration: Configuration) -> some View {
