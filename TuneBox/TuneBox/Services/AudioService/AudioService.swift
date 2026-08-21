@@ -114,7 +114,6 @@ final class AudioService: NSObject, AudioServicing {
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
     }
 
-    /// Restarts the current item from the beginning without changing track identity.
     func restartCurrentTrack() {
         guard let url = self.currentURL, let trackId = self.currentTrackId else { return }
 
@@ -519,8 +518,6 @@ extension AudioService: AudioPlayer.Delegate {
     }
 
     func audioPlayerEndOfAudio(_ audioPlayer: AudioPlayer) {
-        // Always defer to PlayerViewModel so repeat/shuffle stay consistent.
-        // (Engine-level re-play causes an audible stop and can race with queue advance.)
         AppLogger.audio.info("AudioService END: \(self.currentTrackId ?? "nil")")
 
         self.onTrackFinished?()

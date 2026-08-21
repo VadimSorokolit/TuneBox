@@ -196,6 +196,13 @@ final class PlayerViewModel: PlayerManaging {
         }
 
         self.refreshFormatInfo(for: track)
+
+        if self.pendingRestoreProgress != nil {
+            self.audioService.setSeekScrubbing(true)
+            self.play(track)
+            self.audioService.pause()
+            self.audioService.setSeekScrubbing(false)
+        }
     }
 
     func persistPlaybackSession() {
