@@ -157,8 +157,8 @@ struct CompactPlayerView: View {
             }
             .padding(.bottom, 10)
             .frame(height: GlobalConstants.CompactPlayer.defaultHeight)
-            .task(id: "\(track.id)-\(NetworkMonitorService.shared.isConnected)") {
-                guard NetworkMonitorService.shared.isConnected else { return }
+            .task(id: "\(track.id)-\(coverVM.isConnected)") {
+                guard coverVM.isConnected else { return }
                 guard track.imagePath == nil else { return }
                 guard track.artistName.isNotEmpty, track.albumName.isNotEmpty else { return }
                 guard let data = await coverVM.fetchFrontCover(

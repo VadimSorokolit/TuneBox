@@ -16,6 +16,7 @@ class CoverViewModel: CoverManaging {
     // MARK: - Properties. Public
 
     private(set) var isLoading = false
+    private(set) var isConnected = false
     private(set) var error: String?
 
     // MARK: - Methods. Public
@@ -36,9 +37,16 @@ class CoverViewModel: CoverManaging {
         }
     }
 
+    // MARK: - Initializer
+
+    init() {
+        self.isConnected = self.networkMonitorService.isConnected
+    }
+
     // MARK: - Properties. Private
 
     @ObservationIgnored
     @Injected
     private var coverService: CoverServicing
+    private let networkMonitorService = NetworkMonitorService.shared
 }

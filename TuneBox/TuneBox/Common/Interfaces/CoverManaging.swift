@@ -7,6 +7,6 @@
 
 import Foundation
 
-protocol CoverManaging: LoadStateManaging {
+protocol CoverManaging: LoadStateManaging, NetworkMonitoring {
     func fetchFrontCover(artist: String, album: String) async -> Data?
 }
