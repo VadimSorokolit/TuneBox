@@ -20,10 +20,22 @@ struct AlbumDetailsView: View {
         if let album = currentAlbum {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 20) {
-                    ZStack(alignment: .topTrailing) {
+                    if playerVM.isPlaying, let track = playerVM.track {
+                        VinylPlateView(
+                            track: track,
+                            isLoading: coverVM.isLoading,
+                            vinylImageSize: coverImageSize,
+                            coverImageSize: 106,
+                            centerHoleSize: 10,
+                            rotation: 0,
+                            onTap: {
+                                coordinator.push(.covers(album))
+                            }
+                        )
+                    } else {
                         CoverView(
                             coverPath: album.cover,
-                            size: 300,
+                            size: coverImageSize,
                             cornerRadius: 5,
                             onTap: {
                                 coordinator.push(.covers(album))
@@ -92,11 +104,14 @@ struct AlbumDetailsView: View {
     @Injected private var rootTabsVM: RootTabsManaging
     @Injected private var importManagingVM: ImportManaging
     @Injected private var playerVM: PlayerManaging
+    @Injected private var coverVM: CoverManaging
 
     private var currentAlbum: MusicLibrary.Album? {
         guard let album else { return nil }
         return importManagingVM.library?.albums.first { $0.id == album.id } ?? album
     }
+
+    private let coverImageSize: CGFloat = 300
 }
 
 #Preview {

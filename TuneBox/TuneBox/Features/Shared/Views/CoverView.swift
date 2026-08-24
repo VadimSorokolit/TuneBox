@@ -15,6 +15,7 @@ struct CoverView: View {
     let coverPath: String?
     let size: CGFloat
     let cornerRadius: CGFloat
+    let placeholderOpacity: Double
     var onTap: (() -> Void)?
 
     // MARK: - Initializer
@@ -23,11 +24,13 @@ struct CoverView: View {
         coverPath: String?,
         size: CGFloat,
         cornerRadius: CGFloat,
+        placeholderOpacity: Double = 0.2,
         onTap: (() -> Void)? = nil
     ) {
         self.coverPath = coverPath
         self.size = size
         self.cornerRadius = cornerRadius
+        self.placeholderOpacity = placeholderOpacity
         self.onTap = onTap
     }
 
@@ -39,12 +42,11 @@ struct CoverView: View {
             .frame(size: size)
             .clipShape(shape)
             .contentShape(shape)
-
-        if let onTap {
-            cover.onTapGesture(perform: onTap)
-        } else {
-            cover
-        }
+        
+        cover
+            .onTapGesture {
+                onTap?()
+            }
     }
 
     // MARK: - Properties. Private
@@ -74,7 +76,7 @@ struct CoverView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background {
                     RoundedRectangle(cornerRadius: cornerRadius)
-                        .fill(.gray.opacity(0.2))
+                        .fill(.gray.opacity(placeholderOpacity))
                 }
         }
     }
