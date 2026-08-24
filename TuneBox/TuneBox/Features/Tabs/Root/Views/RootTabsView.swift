@@ -105,8 +105,8 @@ struct RootTabsView: View {
                     onSeek: { delta in
                         playerVM.seek(by: delta)
                     },
-                    onSeekHoldChanged: { isHolding in
-                        playerVM.setSeekScrubbing(isHolding)
+                    onSeekHoldChanged: { isHolding, direction in
+                        playerVM.setSeekScrubbing(isHolding, direction: direction)
                     },
                     onPlayPauseTap: {
                         playerVM.togglePlayPause()

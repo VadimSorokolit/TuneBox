@@ -37,6 +37,10 @@ final class PlayerViewModel: PlayerManaging {
     private(set) var sourceFormatText: String = ""
     private(set) var outputRouteText: String = ""
     let vinylRevolutionDuration: TimeInterval = 8
+    private(set) var vinylSpinDirection: Double = 1
+    private(set) var vinylSpinSpeed: Double = 1
+    private(set) var isSeekScrubbing = false
+    private(set) var isVinylTapSpinning = false
     private(set) var isShuffleEnabled = false
 
     var isPlayerVisible: Bool {
@@ -241,10 +245,27 @@ final class PlayerViewModel: PlayerManaging {
 
     func seek(by deltaSeconds: TimeInterval) {
         self.audioService.seek(by: deltaSeconds)
+
+        guard self.isSeekScrubbing.isFalse else {
+            return
+        }
+
+        let direction = deltaSeconds >= 0 ? 1.0 : -1.0
+        self.startVinylTapSpin(direction: direction)
     }
 
-    func setSeekScrubbing(_ isScrubbing: Bool) {
+    func setSeekScrubbing(_ isScrubbing: Bool, direction: Double = 0) {
         self.audioService.setSeekScrubbing(isScrubbing)
+        self.isSeekScrubbing = isScrubbing
+        self.cancelVinylTapSpin()
+
+        if isScrubbing {
+            self.vinylSpinDirection = direction >= 0 ? 1 : -1
+            self.vinylSpinSpeed = Self.vinylScrubSpinSpeed
+        } else {
+            self.vinylSpinDirection = 1
+            self.vinylSpinSpeed = 1
+        }
     }
 
     func resetPlayback() {
@@ -252,6 +273,12 @@ final class PlayerViewModel: PlayerManaging {
         self.track = nil
         self.progress = 0
         self.isPlaying = false
+        self.isSeekScrubbing = false
+        self.isVinylTapSpinning = false
+        self.vinylSpinDirection = 1
+        self.vinylSpinSpeed = 1
+        self.vinylTapSpinTask?.cancel()
+        self.vinylTapSpinTask = nil
         self.playbackNavigationPath = []
         self.playbackOrigin = nil
         self.pendingRestoreProgress = nil
@@ -346,9 +373,13 @@ final class PlayerViewModel: PlayerManaging {
     private var pendingRestoreProgress: Double?
     private var lastPersistedProgressAt: Date?
     private var needsNavigationPathRebuild = false
+    private var vinylTapSpinTask: Task<Void, Never>?
 
     private static let restartThreshold: TimeInterval = 3
     private static let persistProgressInterval: TimeInterval = 5
+    private static let vinylScrubSpinSpeed: Double = 2.5
+    private static let vinylTapSpinSpeed: Double = 3.0
+    private static let vinylTapSpinDurationNanoseconds: UInt64 = 400_000_000
 
     private enum Keys {
         static let playbackSession = "UserDefaultsPlaybackSessionKey"
@@ -367,6 +398,41 @@ final class PlayerViewModel: PlayerManaging {
 
         let byId = Dictionary(uniqueKeysWithValues: tracks.map { ($0.id, $0) })
         return shuffleOrder.compactMap { byId[$0] }
+    }
+
+    private func startVinylTapSpin(direction: Double) {
+        self.cancelVinylTapSpin()
+
+        self.vinylSpinDirection = direction
+        self.vinylSpinSpeed = Self.vinylTapSpinSpeed
+        self.isVinylTapSpinning = true
+
+        self.vinylTapSpinTask = Task { @MainActor in
+            do {
+                try await Task.sleep(nanoseconds: Self.vinylTapSpinDurationNanoseconds)
+            } catch {
+                return
+            }
+
+            guard !Task.isCancelled else {
+                return
+            }
+
+            guard self.isSeekScrubbing.isFalse else {
+                return
+            }
+
+            self.isVinylTapSpinning = false
+            self.vinylSpinDirection = 1
+            self.vinylSpinSpeed = 1
+            self.vinylTapSpinTask = nil
+        }
+    }
+
+    private func cancelVinylTapSpin() {
+        self.vinylTapSpinTask?.cancel()
+        self.vinylTapSpinTask = nil
+        self.isVinylTapSpinning = false
     }
 
     private func handleTrackFinished() {

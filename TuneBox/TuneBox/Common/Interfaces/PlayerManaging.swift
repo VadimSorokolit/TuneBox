@@ -16,6 +16,10 @@ protocol PlayerManaging: AnyObject, Sendable {
     var sourceFormatText: String { get }
     var outputRouteText: String { get }
     var vinylRevolutionDuration: TimeInterval { get }
+    var vinylSpinDirection: Double { get }
+    var vinylSpinSpeed: Double { get }
+    var isSeekScrubbing: Bool { get }
+    var isVinylTapSpinning: Bool { get }
     var isPlaying: Bool { get }
     var isShuffleEnabled: Bool { get }
     var isPlayerVisible: Bool { get }
@@ -30,7 +34,7 @@ protocol PlayerManaging: AnyObject, Sendable {
     func clearPlaybackIfAffected(byRemovedSourceID sourceID: UUID, isAPISource: Bool)
     func isPlaying(_ track: TrackEntity) -> Bool
     func seek(by deltaSeconds: TimeInterval)
-    func setSeekScrubbing(_ isScrubbing: Bool)
+    func setSeekScrubbing(_ isScrubbing: Bool, direction: Double)
     func playNext()
     func playPrevious()
     func loadPlaylist()

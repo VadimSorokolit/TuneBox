@@ -21,7 +21,7 @@ struct CompactPlayerView: View {
     let outputRouteText: String
     let onTrackInfoTap: () -> Void
     let onSeek: (TimeInterval) -> Void
-    let onSeekHoldChanged: (Bool) -> Void
+    let onSeekHoldChanged: (Bool, Double) -> Void
     let onPlayPauseTap: () -> Void
     let onProgressTap: () -> Void
     let onRepeatModeChange: (RepeatMode) -> Void
@@ -38,8 +38,12 @@ struct CompactPlayerView: View {
                             track: track,
                             isPlaying: isPlaying,
                             isLoading: coverVM.isLoading,
+                            isSeekScrubbing: playerVM.isSeekScrubbing,
+                            isTapSpinning: playerVM.isVinylTapSpinning,
                             progress: progress,
                             revolutionDuration: playerVM.vinylRevolutionDuration,
+                            spinDirection: playerVM.vinylSpinDirection,
+                            spinSpeed: playerVM.vinylSpinSpeed,
                             vinylSize: 44,
                             coverSize: 15,
                             holeSize: 1
@@ -211,7 +215,7 @@ struct CompactPlayerView: View {
         let isShuffleEnabled: Bool
         let trackID: String?
         let onSeek: (TimeInterval) -> Void
-        let onSeekHoldChanged: (Bool) -> Void
+        let onSeekHoldChanged: (Bool, Double) -> Void
         let onPlayPauseTap: () -> Void
         let onRepeatModeChange: (RepeatMode) -> Void
         let onShuffleToggle: () -> Void
@@ -259,7 +263,7 @@ struct CompactPlayerView: View {
         let direction: Double
         let isDisabled: Bool
         let onSeek: (TimeInterval) -> Void
-        let onSeekHoldChanged: (Bool) -> Void
+        let onSeekHoldChanged: (Bool, Double) -> Void
 
         // MARK: - Body
 
@@ -324,7 +328,7 @@ struct CompactPlayerView: View {
 
                 guard !Task.isCancelled else { return }
                 didEnterHold = true
-                onSeekHoldChanged(true)
+                onSeekHoldChanged(true, direction)
 
                 while !Task.isCancelled {
                     onSeek(direction * holdStepSeconds)
@@ -346,7 +350,7 @@ struct CompactPlayerView: View {
             guard wasPressed else { return }
 
             if wasHolding {
-                onSeekHoldChanged(false)
+                onSeekHoldChanged(false, direction)
             } else if isDisabled.isFalse {
                 onSeek(direction * tapSeekSeconds)
             }
@@ -669,7 +673,7 @@ struct CompactPlayerView: View {
         outputRouteText: "Speaker • 48 kHz",
         onTrackInfoTap: {},
         onSeek: { _ in },
-        onSeekHoldChanged: { _ in },
+        onSeekHoldChanged: { _, _ in },
         onPlayPauseTap: {},
         onProgressTap: {},
         onRepeatModeChange: {_ in },
