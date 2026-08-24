@@ -123,6 +123,7 @@
 		5BC5EED1303846DB001A16A9 /* NetworkMonitorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC5EED0303846DA001A16A9 /* NetworkMonitorService.swift */; };
 		5BC5EED33038470B001A16A9 /* NetworkMonitoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC5EED230384709001A16A9 /* NetworkMonitoring.swift */; };
 		5BC5EED530388ABA001A16A9 /* VinylPlateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC5EED430388AB8001A16A9 /* VinylPlateView.swift */; };
+		C403EB9385FB43DFBFD3CD50 /* SpinningVinylView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96095791DA314523A802F6CC /* SpinningVinylView.swift */; };
 		5BC8D8F62FFD769300742822 /* ImportedPlaylistCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D8F52FFD769200742822 /* ImportedPlaylistCell.swift */; };
 		5BC8D9022FFE966B00742822 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D9012FFE966A00742822 /* AppCoordinator.swift */; };
 		5BC8D9042FFE96B900742822 /* AppRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D9032FFE96B800742822 /* AppRoute.swift */; };
@@ -316,6 +317,7 @@
 		5BC5EED0303846DA001A16A9 /* NetworkMonitorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitorService.swift; sourceTree = "<group>"; };
 		5BC5EED230384709001A16A9 /* NetworkMonitoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitoring.swift; sourceTree = "<group>"; };
 		5BC5EED430388AB8001A16A9 /* VinylPlateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VinylPlateView.swift; sourceTree = "<group>"; };
+		96095791DA314523A802F6CC /* SpinningVinylView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinningVinylView.swift; sourceTree = "<group>"; };
 		5BC8D8F52FFD769200742822 /* ImportedPlaylistCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportedPlaylistCell.swift; sourceTree = "<group>"; };
 		5BC8D9012FFE966A00742822 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		5BC8D9032FFE96B800742822 /* AppRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRoute.swift; sourceTree = "<group>"; };
@@ -484,6 +486,7 @@
 			isa = PBXGroup;
 			children = (
 				5BC5EED430388AB8001A16A9 /* VinylPlateView.swift */,
+				96095791DA314523A802F6CC /* SpinningVinylView.swift */,
 				5B0BC2CE3007DF7100E8F2A5 /* CoverView.swift */,
 				5BA581912FD7055B00B498D7 /* EmptyTrackCell.swift */,
 				5BA581952FD8603400B498D7 /* HighlightedText.swift */,
@@ -1534,6 +1537,7 @@
 				5B7D62B32FEE8B7A0084738C /* EmptyTracksStateModifier.swift in Sources */,
 				5BA581962FD8603500B498D7 /* HighlightedText.swift in Sources */,
 				5BC5EED530388ABA001A16A9 /* VinylPlateView.swift in Sources */,
+				C403EB9385FB43DFBFD3CD50 /* SpinningVinylView.swift in Sources */,
 				5B6B8CD32FED1D9400C23D3E /* DismissKeyboardOnTapModifier.swift in Sources */,
 				5B40F3FB302D0D2D0025693E /* CoverRouter.swift in Sources */,
 				5B88609E2FAE184C0056BE9A /* GlobalConstants.swift in Sources */,

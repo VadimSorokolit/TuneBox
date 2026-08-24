@@ -34,53 +34,16 @@ struct CompactPlayerView: View {
             VStack(spacing: 10) {
                 ZStack(alignment: .bottom) {
                     HStack(spacing: 12) {
-                        TimelineView(
-                            .animation(
-                                minimumInterval: 1.0 / 30.0,
-                                paused: isPlaying.isFalse
-                            )
-                        ) { context in
-                            let spinDegrees: Double = {
-                                guard let spinStartedAt else {
-                                    return 0
-                                }
-
-                                let elapsed = context.date.timeIntervalSince(spinStartedAt)
-
-                                return elapsed / playerVM.vinylRevolutionDuration * 360
-                            }()
-
-                            ZStack {
-                                VinylPlateView(
-                                    track: track,
-                                    isLoading: coverVM.isLoading,
-                                    vinylImageSize: 44,
-                                    coverImageSize: 15,
-                                    centerHoleSize: 1,
-                                    rotation: 0
-                                )
-                                .opacity(0.15)
-
-                                VinylPlateView(
-                                    track: track,
-                                    isLoading: coverVM.isLoading,
-                                    vinylImageSize: 44,
-                                    coverImageSize: 15,
-                                    centerHoleSize: 1,
-                                    rotation: baseRotation + spinDegrees
-                                )
-                                .mask {
-                                    Circle()
-                                        .frame(size: visibleSize)
-                                }
-                            }
-                        }
-                        .onAppear {
-                            updateVinylSpin(isPlaying: isPlaying)
-                        }
-                        .onChange(of: isPlaying) { _, playing in
-                            updateVinylSpin(isPlaying: playing)
-                        }
+                        SpinningVinylView(
+                            track: track,
+                            isPlaying: isPlaying,
+                            isLoading: coverVM.isLoading,
+                            progress: progress,
+                            revolutionDuration: playerVM.vinylRevolutionDuration,
+                            vinylSize: 44,
+                            coverSize: 15,
+                            holeSize: 1
+                        )
 
                         Button(action: {
                             onTrackInfoTap()
@@ -187,18 +150,6 @@ struct CompactPlayerView: View {
     @Injected private var playerVM: PlayerManaging
     @Injected private var coverVM: CoverManaging
 
-    @State private var baseRotation: Double = 0
-    @State private var spinStartedAt: Date?
-
-    private let minimumSize: CGFloat = 15
-    private let maximumSize: CGFloat = 44
-
-    var visibleSize: CGFloat {
-        maximumSize
-        - (maximumSize - minimumSize)
-        * progress
-    }
-
     private var sourceFormatLabel: some View {
         Text(sourceFormatText)
             .font(.caption2)
@@ -212,22 +163,6 @@ struct CompactPlayerView: View {
             .foregroundStyle(.secondary)
             .multilineTextAlignment(.trailing)
             .frame(maxWidth: .infinity, alignment: .trailing)
-    }
-
-    // MARK: - Methods. Private
-
-    private func updateVinylSpin(isPlaying: Bool) {
-        if isPlaying {
-            guard spinStartedAt == nil else {
-                return
-            }
-
-            spinStartedAt = Date()
-        } else if let spinStartedAt {
-            let elapsed = Date().timeIntervalSince(spinStartedAt)
-            baseRotation += elapsed / playerVM.vinylRevolutionDuration * 360
-            self.spinStartedAt = nil
-        }
     }
 
     // MARK: - Private. Objects

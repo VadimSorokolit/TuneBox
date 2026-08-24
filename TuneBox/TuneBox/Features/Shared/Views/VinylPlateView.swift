@@ -1,5 +1,5 @@
 //
-//  Untitled.swift
+//  VinylPlateView.swift
 //  TuneBox
 //
 //  Created by Vadim Sorokolit on 21.08.2026.
