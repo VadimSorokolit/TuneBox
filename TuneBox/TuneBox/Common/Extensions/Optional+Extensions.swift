@@ -10,7 +10,7 @@ extension Optional {
     var isNotNil: Bool {
         self != nil
     }
-    
+
     var isNil: Bool {
         self == nil
     }

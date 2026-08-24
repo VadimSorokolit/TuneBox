@@ -43,11 +43,11 @@ struct CoverView: View {
             .clipShape(shape)
             .contentShape(shape)
 
-        cover
-            .onTapGesture {
-                onTap?()
-            }
-            .allowsHitTesting(onTap.isNotNil)
+        if let onTap {
+            cover.onTapGesture(perform: onTap)
+        } else {
+            cover
+        }
     }
 
     // MARK: - Properties. Private
