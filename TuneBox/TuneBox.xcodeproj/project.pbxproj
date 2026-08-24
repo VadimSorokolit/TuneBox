@@ -123,7 +123,7 @@
 		5BC5EED1303846DB001A16A9 /* NetworkMonitorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC5EED0303846DA001A16A9 /* NetworkMonitorService.swift */; };
 		5BC5EED33038470B001A16A9 /* NetworkMonitoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC5EED230384709001A16A9 /* NetworkMonitoring.swift */; };
 		5BC5EED530388ABA001A16A9 /* VinylPlateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC5EED430388AB8001A16A9 /* VinylPlateView.swift */; };
-		C403EB9385FB43DFBFD3CD50 /* SpinningVinylView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96095791DA314523A802F6CC /* SpinningVinylView.swift */; };
+		5BC5EED9303C86DC001A16A9 /* Optional+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC5EED8303C86DB001A16A9 /* Optional+Extensions.swift */; };
 		5BC8D8F62FFD769300742822 /* ImportedPlaylistCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D8F52FFD769200742822 /* ImportedPlaylistCell.swift */; };
 		5BC8D9022FFE966B00742822 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D9012FFE966A00742822 /* AppCoordinator.swift */; };
 		5BC8D9042FFE96B900742822 /* AppRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8D9032FFE96B800742822 /* AppRoute.swift */; };
@@ -173,6 +173,7 @@
 		5BFCA8452FCEE252009C6AD9 /* TransferPrioritizable+mergePriority.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA8442FCEE251009C6AD9 /* TransferPrioritizable+mergePriority.swift */; };
 		5BFCA8492FCEE470009C6AD9 /* Launch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA8482FCEE46F009C6AD9 /* Launch.swift */; };
 		5BFCA84D2FCEE5D4009C6AD9 /* Onboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA84C2FCEE5D3009C6AD9 /* Onboarding.swift */; };
+		C403EB9385FB43DFBFD3CD50 /* SpinningVinylView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96095791DA314523A802F6CC /* SpinningVinylView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -317,7 +318,7 @@
 		5BC5EED0303846DA001A16A9 /* NetworkMonitorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitorService.swift; sourceTree = "<group>"; };
 		5BC5EED230384709001A16A9 /* NetworkMonitoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitoring.swift; sourceTree = "<group>"; };
 		5BC5EED430388AB8001A16A9 /* VinylPlateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VinylPlateView.swift; sourceTree = "<group>"; };
-		96095791DA314523A802F6CC /* SpinningVinylView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinningVinylView.swift; sourceTree = "<group>"; };
+		5BC5EED8303C86DB001A16A9 /* Optional+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Optional+Extensions.swift"; sourceTree = "<group>"; };
 		5BC8D8F52FFD769200742822 /* ImportedPlaylistCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportedPlaylistCell.swift; sourceTree = "<group>"; };
 		5BC8D9012FFE966A00742822 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		5BC8D9032FFE96B800742822 /* AppRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRoute.swift; sourceTree = "<group>"; };
@@ -371,6 +372,7 @@
 		5BFCA8442FCEE251009C6AD9 /* TransferPrioritizable+mergePriority.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransferPrioritizable+mergePriority.swift"; sourceTree = "<group>"; };
 		5BFCA8482FCEE46F009C6AD9 /* Launch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Launch.swift; sourceTree = "<group>"; };
 		5BFCA84C2FCEE5D3009C6AD9 /* Onboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding.swift; sourceTree = "<group>"; };
+		96095791DA314523A802F6CC /* SpinningVinylView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinningVinylView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -716,6 +718,7 @@
 				5B0BC2D43007FFA700E8F2A5 /* Int+formattedFileSize.swift */,
 				5B586CC22FAC912400BCEAD2 /* MoyaProvider+Async.swift */,
 				5B8382B62FC5AE9F003625CD /* Notifications */,
+				5BC5EED8303C86DB001A16A9 /* Optional+Extensions.swift */,
 				5BFCA8442FCEE251009C6AD9 /* TransferPrioritizable+mergePriority.swift */,
 				5BA48CFD3018BDB900192BAF /* View+bottomContentMargin.swift */,
 				5BFCA83D2FCED841009C6AD9 /* View+cornerRadius.swift */,
@@ -1526,6 +1529,7 @@
 				5BC8D8F62FFD769300742822 /* ImportedPlaylistCell.swift in Sources */,
 				5B601ED0302B1688005D7548 /* CoverCell.swift in Sources */,
 				5B601ED2302B2001005D7548 /* CoverPagerView.swift in Sources */,
+				5BC5EED9303C86DC001A16A9 /* Optional+Extensions.swift in Sources */,
 				5B8860A52FB1CF910056BE9A /* NotificationNames+Extension.swift in Sources */,
 				5BFCA8432FCEE237009C6AD9 /* TransferPrioritizable.swift in Sources */,
 				5B0BC2CF3007DF7200E8F2A5 /* CoverView.swift in Sources */,

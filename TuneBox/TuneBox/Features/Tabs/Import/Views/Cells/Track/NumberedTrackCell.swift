@@ -13,6 +13,7 @@ struct NumberedTrackCell: View {
 
     let index: Int
     let track: TrackEntity
+    let isPlaying: Bool
     let onTapGesture: () -> Void
 
     // MARK: - Main Body
@@ -22,12 +23,13 @@ struct NumberedTrackCell: View {
             HStack {
                 HStack(spacing: 12) {
                     Circle()
+                        .fill(isPlaying ? .black : .clear)
                         .stroke(.gray.opacity(0.8), lineWidth: 1.5)
-                        .frame(size: 20)
+                        .frame(size: isPlaying ? 23 : 20)
                         .overlay {
                             Text("\(index)")
                                 .font(.system(size: 13, weight: .medium))
-                                .foregroundStyle(.gray)
+                                .foregroundStyle(isPlaying ? .white : .gray)
                         }
 
                     Text("\(track.songName)")
@@ -73,6 +75,7 @@ struct NumberedTrackCell: View {
             waveformData: nil,
             size: 5_242_880
         ),
+        isPlaying: true,
         onTapGesture: {}
     )
 }

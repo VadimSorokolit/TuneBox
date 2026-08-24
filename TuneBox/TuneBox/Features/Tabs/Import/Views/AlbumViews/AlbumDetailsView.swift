@@ -20,9 +20,10 @@ struct AlbumDetailsView: View {
         if let album = currentAlbum {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 20) {
-                    if let track = playerVM.track {
+                    if let track = playerVM.track,
+                       let albumTrack = album.tracks.first(where: { $0.id == track.id }) {
                         SpinningVinylView(
-                            track: track,
+                            track: albumTrack,
                             isPlaying: playerVM.isPlaying,
                             isLoading: coverVM.isLoading,
                             isSeekScrubbing: playerVM.isSeekScrubbing,
@@ -54,6 +55,7 @@ struct AlbumDetailsView: View {
                             NumberedTrackCell(
                                 index: track.trackNumber ?? index + 1,
                                 track: track,
+                                isPlaying: track === playerVM.track,
                                 onTapGesture: {
                                     playerVM.handlePlayAction(
                                         for: track,

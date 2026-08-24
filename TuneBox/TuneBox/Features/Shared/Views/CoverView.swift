@@ -47,6 +47,7 @@ struct CoverView: View {
             .onTapGesture {
                 onTap?()
             }
+            .allowsHitTesting(onTap.isNotNil)
     }
 
     // MARK: - Properties. Private

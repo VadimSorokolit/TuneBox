@@ -36,7 +36,7 @@ final class PlayerViewModel: PlayerManaging {
     private(set) var playbackNavigationPath: [AppRoute] = []
     private(set) var sourceFormatText: String = ""
     private(set) var outputRouteText: String = ""
-    let vinylRevolutionDuration: TimeInterval = 8
+    let vinylRevolutionDuration: TimeInterval = 12
     private(set) var vinylSpinDirection: Double = 1
     private(set) var vinylSpinSpeed: Double = 1
     private(set) var isSeekScrubbing = false
