@@ -95,7 +95,6 @@ struct CompactPlayerView: View {
                             progress: progress,
                             onProgressTap: onProgressTap
                         )
-                        .opacity(0.0)
                     }
                 }
                 .frame(height: GlobalConstants.Screen.defaultHeight)
@@ -475,7 +474,7 @@ struct CompactPlayerView: View {
             ZStack {
                 GeometryReader { geo in
                     Capsule()
-                        .fill(.orange)
+                        .fill(.orange).opacity(0)
                         .frame(
                             width: geo.size.width * min(max(progress, 0), 1),
                             height: 3
