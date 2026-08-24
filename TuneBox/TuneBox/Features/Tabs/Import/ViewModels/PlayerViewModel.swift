@@ -36,6 +36,7 @@ final class PlayerViewModel: PlayerManaging {
     private(set) var playbackNavigationPath: [AppRoute] = []
     private(set) var sourceFormatText: String = ""
     private(set) var outputRouteText: String = ""
+    let vinylRevolutionDuration: TimeInterval = 8
     private(set) var isShuffleEnabled = false
 
     var isPlayerVisible: Bool {

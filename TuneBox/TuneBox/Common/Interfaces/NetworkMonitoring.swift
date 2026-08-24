@@ -8,6 +8,6 @@
 import Foundation
 
 @MainActor
-protocol NetworkMonitoring: AnyObject, Observable {
+protocol NetworkMonitoring: AnyObject {
     var isConnected: Bool { get }
 }

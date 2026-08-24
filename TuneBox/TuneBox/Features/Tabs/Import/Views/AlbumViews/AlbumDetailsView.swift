@@ -20,22 +20,64 @@ struct AlbumDetailsView: View {
         if let album = currentAlbum {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 20) {
-                    if playerVM.isPlaying, let track = playerVM.track {
-                        VinylPlateView(
-                            track: track,
-                            isLoading: coverVM.isLoading,
-                            vinylImageSize: coverImageSize,
-                            coverImageSize: 106,
-                            centerHoleSize: 10,
-                            rotation: 0,
-                            onTap: {
+                    if let track = playerVM.track {
+                        TimelineView(
+                            .animation(
+                                minimumInterval: 1.0 / 30.0,
+                                paused: playerVM.isPlaying.isFalse
+                            )
+                        ) { context in
+                            let spinDegrees: Double = {
+                                guard let spinStartedAt else {
+                                    return 0
+                                }
+
+                                let elapsed = context.date.timeIntervalSince(spinStartedAt)
+
+                                return elapsed / playerVM.vinylRevolutionDuration * 360
+                            }()
+
+                            ZStack {
+                                VinylPlateView(
+                                    track: track,
+                                    isLoading: coverVM.isLoading,
+                                    vinylImageSize: maximumSize,
+                                    coverImageSize: minimumSize,
+                                    centerHoleSize: centerHoleSize,
+                                    rotation: .zero,
+                                )
+                                .allowsHitTesting(false)
+                                .opacity(0.15)
+
+                                VinylPlateView(
+                                    track: track,
+                                    isLoading: coverVM.isLoading,
+                                    vinylImageSize: maximumSize,
+                                    coverImageSize: minimumSize,
+                                    centerHoleSize: centerHoleSize,
+                                    rotation: baseRotation + spinDegrees
+                                )
+                                .allowsHitTesting(false)
+                                .mask {
+                                    Circle()
+                                        .frame(size: visibleSize)
+                                }
+                            }
+                            .contentShape(Circle())
+                            .onTapGesture {
                                 coordinator.push(.covers(album))
                             }
-                        )
+                        }
+                        .onAppear {
+                            updateVinylSpin(isPlaying: playerVM.isPlaying)
+                        }
+                        .onChange(of: playerVM.isPlaying) { _, playing in
+                            updateVinylSpin(isPlaying: playing)
+                        }
                     } else {
                         CoverView(
                             coverPath: album.cover,
-                            size: coverImageSize,
+                            size: maximumSize,
                             cornerRadius: 5,
                             onTap: {
                                 coordinator.push(.covers(album))
@@ -106,12 +148,36 @@ struct AlbumDetailsView: View {
     @Injected private var playerVM: PlayerManaging
     @Injected private var coverVM: CoverManaging
 
+    @State private var spinStartedAt: Date?
+    @State private var baseRotation: Double = 0
+
+    private let minimumSize: CGFloat = 106
+    private let maximumSize: CGFloat = 300
+    private let centerHoleSize: CGFloat = 10
+
+    var visibleSize: CGFloat {
+        maximumSize
+        - (maximumSize - minimumSize)
+        * playerVM.progress
+    }
+
     private var currentAlbum: MusicLibrary.Album? {
         guard let album else { return nil }
         return importManagingVM.library?.albums.first { $0.id == album.id } ?? album
     }
 
-    private let coverImageSize: CGFloat = 300
+    // MARK: - Methods. Private
+
+    private func updateVinylSpin(isPlaying: Bool) {
+        if isPlaying {
+            guard spinStartedAt == nil else { return }
+            spinStartedAt = Date()
+        } else if let spinStartedAt {
+            let elapsed = Date().timeIntervalSince(spinStartedAt)
+            baseRotation += elapsed / playerVM.vinylRevolutionDuration * 360
+            self.spinStartedAt = nil
+        }
+    }
 }
 
 #Preview {

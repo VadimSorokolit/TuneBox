@@ -54,6 +54,7 @@ struct VinylPlateView: View {
                 cornerRadius: coverImageSize / 2,
                 placeholderOpacity: 1.0
             )
+            .allowsHitTesting(false)
 
             Circle()
                 .frame(size: centerHoleSize)
@@ -68,6 +69,7 @@ struct VinylPlateView: View {
         }
         .frame(size: vinylImageSize)
         .rotationEffect(.degrees(rotation))
+        .contentShape(Circle())
         .onTapGesture {
             onTap?()
         }

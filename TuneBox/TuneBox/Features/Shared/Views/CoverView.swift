@@ -42,7 +42,7 @@ struct CoverView: View {
             .frame(size: size)
             .clipShape(shape)
             .contentShape(shape)
-        
+
         cover
             .onTapGesture {
                 onTap?()

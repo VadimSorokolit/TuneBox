@@ -50,7 +50,7 @@ final class WaveformService: WaveformServicing {
 
             guard let samples = buffer.floatChannelData?[0] else { break }
 
-            for index in 0..<decoded {
+            for index in 0 ..< decoded {
                 maxAmp = max(maxAmp, abs(samples[index]))
                 framesInCurrentPeak += 1
 

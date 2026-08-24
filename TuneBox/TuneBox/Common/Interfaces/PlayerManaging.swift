@@ -15,6 +15,7 @@ protocol PlayerManaging: AnyObject, Sendable {
     var progress: Double { get }
     var sourceFormatText: String { get }
     var outputRouteText: String { get }
+    var vinylRevolutionDuration: TimeInterval { get }
     var isPlaying: Bool { get }
     var isShuffleEnabled: Bool { get }
     var isPlayerVisible: Bool { get }

@@ -47,7 +47,7 @@ struct CompactPlayerView: View {
 
                                 let elapsed = context.date.timeIntervalSince(spinStartedAt)
 
-                                return elapsed / vinylRevolutionDuration * 360
+                                return elapsed / playerVM.vinylRevolutionDuration * 360
                             }()
 
                             ZStack {
@@ -128,6 +128,7 @@ struct CompactPlayerView: View {
                             progress: progress,
                             onProgressTap: onProgressTap
                         )
+                        .opacity(0.0)
                     }
                 }
                 .frame(height: GlobalConstants.Screen.defaultHeight)
@@ -143,6 +144,11 @@ struct CompactPlayerView: View {
                         cornerRadius: 30,
                         style: .continuous
                     )
+                )
+                .shadow(
+                    color: .black.opacity(0.18),
+                    radius: 12,
+                    y: 4
                 )
 
                 HStack {
@@ -178,12 +184,12 @@ struct CompactPlayerView: View {
     // MARK: - Properties. Private
 
     @Injected private var importManagingVM: ImportManaging
+    @Injected private var playerVM: PlayerManaging
     @Injected private var coverVM: CoverManaging
 
     @State private var baseRotation: Double = 0
     @State private var spinStartedAt: Date?
 
-    private let vinylRevolutionDuration: TimeInterval = 4
     private let minimumSize: CGFloat = 15
     private let maximumSize: CGFloat = 44
 
@@ -219,7 +225,7 @@ struct CompactPlayerView: View {
             spinStartedAt = Date()
         } else if let spinStartedAt {
             let elapsed = Date().timeIntervalSince(spinStartedAt)
-            baseRotation += elapsed / vinylRevolutionDuration * 360
+            baseRotation += elapsed / playerVM.vinylRevolutionDuration * 360
             self.spinStartedAt = nil
         }
     }
@@ -504,7 +510,7 @@ struct CompactPlayerView: View {
                     }
                 }
                 .overlay(alignment: .bottom) {
-                    Text(repeatMode == .one ? "•" : repeatMode == .all ? "••" : "•••")
+                    Text(repeatMode == .one ? "•" : repeatMode == .all ? "••" : "")
                         .foregroundStyle(.blue)
                         .font(.system(size: 16))
                         .offset(y: 6)
