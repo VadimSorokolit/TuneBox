@@ -31,7 +31,10 @@ struct CompactPlayerView: View {
 
     var body: some View {
         if let track {
-            VStack(spacing: 10) {
+            VStack(spacing: 5) {
+                MarqueeText(text: track.songName)
+                    .padding(.leading, 20)
+
                 ZStack(alignment: .bottom) {
                     HStack(spacing: 12) {
                         SpinningVinylView(
@@ -52,23 +55,14 @@ struct CompactPlayerView: View {
                         Button(action: {
                             onTrackInfoTap()
                         }, label: {
-                            VStack(
-                                alignment: .leading,
-                                spacing: track.artistName.isEmpty == true
-                                ? 0
-                                : 2
-                            ) {
-                                MarqueeText(text: track.songName)
-
-                                Text(track.artistName)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(1)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .contentShape(Capsule())
+                            Text(track.artistName)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 14)
+                                .contentShape(Capsule())
                         })
                         .buttonStyle(PressGlassButtonStyle())
 
@@ -87,7 +81,6 @@ struct CompactPlayerView: View {
                         .fixedSize()
                     }
                     .padding(.horizontal, 16)
-                    .frame(height: GlobalConstants.Screen.defaultHeight)
                     .frame(maxWidth: .infinity)
 
                     if progress > 0 {
@@ -97,25 +90,7 @@ struct CompactPlayerView: View {
                         )
                     }
                 }
-                .frame(height: GlobalConstants.Screen.defaultHeight)
                 .frame(maxWidth: .infinity)
-                .glassEffect(
-                    in: RoundedRectangle(
-                        cornerRadius: 30,
-                        style: .continuous
-                    )
-                )
-                .clipShape(
-                    RoundedRectangle(
-                        cornerRadius: 30,
-                        style: .continuous
-                    )
-                )
-                .shadow(
-                    color: .black.opacity(0.18),
-                    radius: 12,
-                    y: 4
-                )
 
                 HStack {
                     sourceFormatLabel
@@ -127,8 +102,25 @@ struct CompactPlayerView: View {
                 .frame(height: 10)
                 .padding(.horizontal, 24)
             }
+            .padding(.top, 5)
             .padding(.bottom, 10)
-            .frame(height: GlobalConstants.CompactPlayer.defaultHeight)
+            .glassEffect(
+                in: RoundedRectangle(
+                    cornerRadius: 30,
+                    style: .continuous
+                )
+            )
+            .clipShape(
+                RoundedRectangle(
+                    cornerRadius: 30,
+                    style: .continuous
+                )
+            )
+            .shadow(
+                color: .black.opacity(0.18),
+                radius: 12,
+                y: 4
+            )
             .task(id: "\(track.id)-\(coverVM.isConnected)") {
                 guard coverVM.isConnected else { return }
                 guard track.imagePath == nil else { return }
@@ -516,6 +508,7 @@ struct CompactPlayerView: View {
                         let containerWidth = geometry.size.width
                         let canScroll = textWidth > 0
                             && containerWidth > 0
+                            && textWidth > containerWidth
                             && !text.isEmpty
 
                         Group {

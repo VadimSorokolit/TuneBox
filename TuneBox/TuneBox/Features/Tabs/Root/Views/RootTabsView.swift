@@ -121,7 +121,12 @@ struct RootTabsView: View {
                         playerVM.toggleShuffle()
                     }
                 )
-                .padding(.bottom, rootTabsVM.isTabBarVisible ? rootTabsVM.tabBarHeight : 0)
+                .padding(
+                    .bottom,
+                    rootTabsVM.isTabBarVisible
+                    ? rootTabsVM.tabBarHeight
+                    : GlobalConstants.CompactPlayer.bottomPadding
+                )
             }
 
             if rootTabsVM.isTabBarVisible {

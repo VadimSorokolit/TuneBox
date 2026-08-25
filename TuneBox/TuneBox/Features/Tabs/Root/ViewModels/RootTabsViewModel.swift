@@ -31,7 +31,7 @@ final class RootTabsViewModel: RootTabsManaging {
     }
 
     let tabBarHeight: CGFloat = GlobalConstants.Screen.defaultHeight
-    let playerHeight: CGFloat = GlobalConstants.CompactPlayer.defaultHeight
+    let playerHeight: CGFloat = GlobalConstants.CompactPlayer.height
 
     // MARK: - Initializer
 

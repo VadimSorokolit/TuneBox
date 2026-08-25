@@ -23,7 +23,8 @@ enum GlobalConstants {
     }
 
     enum CompactPlayer {
-        static let defaultHeight: CGFloat = 90
+        static let height: CGFloat = 101
+        static let bottomPadding: CGFloat = 20
     }
 
     enum UserDefaultsKey {
