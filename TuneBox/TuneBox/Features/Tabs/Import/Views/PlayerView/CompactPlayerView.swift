@@ -37,20 +37,26 @@ struct CompactPlayerView: View {
 
                 ZStack(alignment: .bottom) {
                     HStack(spacing: 12) {
-                        SpinningVinylView(
-                            track: track,
-                            isPlaying: isPlaying,
-                            isLoading: coverVM.isLoading,
-                            isSeekScrubbing: playerVM.isSeekScrubbing,
-                            isTapSpinning: playerVM.isVinylTapSpinning,
-                            progress: progress,
-                            revolutionDuration: playerVM.vinylRevolutionDuration,
-                            spinDirection: playerVM.vinylSpinDirection,
-                            spinSpeed: playerVM.vinylSpinSpeed,
-                            vinylSize: 44,
-                            coverSize: 15,
-                            holeSize: 1
-                        )
+                        ZStack {
+                            SpinningVinylView(
+                                track: track,
+                                isPlaying: isPlaying,
+                                isLoading: coverVM.isLoading,
+                                isSeekScrubbing: playerVM.isSeekScrubbing,
+                                isTapSpinning: playerVM.isVinylTapSpinning,
+                                progress: progress,
+                                revolutionDuration: playerVM.vinylRevolutionDuration,
+                                spinDirection: playerVM.vinylSpinDirection,
+                                spinSpeed: playerVM.vinylSpinSpeed,
+                                vinylSize: 44,
+                                coverSize: 15,
+                                holeSize: 1
+                            )
+                            .id(vinylAlbumKey(for: track))
+                            .transition(.opacity.combined(with: .scale(scale: 0.88)))
+                        }
+                        .frame(size: 44)
+                        .animation(.easeInOut(duration: 0.35), value: vinylAlbumKey(for: track))
 
                         Button(action: {
                             onTrackInfoTap()
@@ -144,6 +150,10 @@ struct CompactPlayerView: View {
     @Injected private var importManagingVM: ImportManaging
     @Injected private var playerVM: PlayerManaging
     @Injected private var coverVM: CoverManaging
+
+    private func vinylAlbumKey(for track: TrackEntity) -> String {
+        "\(track.artistName)|\(track.albumName)"
+    }
 
     private var sourceFormatLabel: some View {
         Text(sourceFormatText)

@@ -58,7 +58,11 @@ struct VinylPlateView: View {
 
             Circle()
                 .frame(size: centerHoleSize)
-                .foregroundColor(.black)
+                .foregroundStyle(.black)
+                .overlay {
+                    Circle()
+                        .stroke(.gray, lineWidth: 1)
+                }
 
             if isLoading {
                 SpinnerView(

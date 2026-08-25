@@ -20,35 +20,41 @@ struct AlbumDetailsView: View {
         if let album = currentAlbum {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 20) {
-                    if let track = playerVM.track,
-                       let albumTrack = album.tracks.first(where: { $0.id == track.id }) {
-                        SpinningVinylView(
-                            track: albumTrack,
-                            isPlaying: playerVM.isPlaying,
-                            isLoading: coverVM.isLoading,
-                            isSeekScrubbing: playerVM.isSeekScrubbing,
-                            isTapSpinning: playerVM.isVinylTapSpinning,
-                            progress: playerVM.progress,
-                            revolutionDuration: playerVM.vinylRevolutionDuration,
-                            spinDirection: playerVM.vinylSpinDirection,
-                            spinSpeed: playerVM.vinylSpinSpeed,
-                            vinylSize: maximumSize,
-                            coverSize: minimumSize,
-                            holeSize: centerHoleSize,
-                            onTap: {
-                                coordinator.push(.covers(album))
-                            }
-                        )
-                    } else {
-                        CoverView(
-                            coverPath: album.cover,
-                            size: maximumSize,
-                            cornerRadius: 5,
-                            onTap: {
-                                coordinator.push(.covers(album))
-                            }
-                        )
+                    ZStack {
+                        if isVinylVisible,
+                           let track = playerVM.track {
+                            SpinningVinylView(
+                                track: track,
+                                isPlaying: playerVM.isPlaying,
+                                isLoading: coverVM.isLoading,
+                                isSeekScrubbing: playerVM.isSeekScrubbing,
+                                isTapSpinning: playerVM.isVinylTapSpinning,
+                                progress: playerVM.progress,
+                                revolutionDuration: playerVM.vinylRevolutionDuration,
+                                spinDirection: playerVM.vinylSpinDirection,
+                                spinSpeed: playerVM.vinylSpinSpeed,
+                                vinylSize: maximumSize,
+                                coverSize: minimumSize,
+                                holeSize: centerHoleSize,
+                                onTap: {
+                                    coordinator.push(.covers(album))
+                                }
+                            )
+                            .transition(.opacity.combined(with: .scale(scale: 0.88)))
+                        } else {
+                            CoverView(
+                                coverPath: album.cover,
+                                size: maximumSize,
+                                cornerRadius: 5,
+                                onTap: {
+                                    coordinator.push(.covers(album))
+                                }
+                            )
+                            .transition(.opacity.combined(with: .scale(scale: 0.88)))
+                        }
                     }
+                    .frame(size: maximumSize)
+                    .animation(.easeInOut(duration: 0.35), value: isVinylVisible)
 
                     LazyVStack(spacing: 0) {
                         ForEach(Array(album.tracks.enumerated()), id: \.element.id) { index, track in
@@ -117,6 +123,14 @@ struct AlbumDetailsView: View {
     private let minimumSize: CGFloat = 106
     private let maximumSize: CGFloat = 300
     private let centerHoleSize: CGFloat = 10
+
+    private var isVinylVisible: Bool {
+        guard let track = playerVM.track else {
+            return false
+        }
+
+        return album?.tracks.contains { $0.id == track.id } ?? false
+    }
 
     private var currentAlbum: MusicLibrary.Album? {
         guard let album else { return nil }

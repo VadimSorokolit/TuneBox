@@ -93,6 +93,7 @@ struct SpinningVinylView: View {
                     Circle()
                         .frame(size: visibleSize)
                 }
+                .animation(progressAnimation, value: progress)
             }
             .contentShape(Circle())
             .onTapGesture {
@@ -126,6 +127,14 @@ struct SpinningVinylView: View {
 
     private var visibleSize: CGFloat {
         vinylSize - (vinylSize - coverSize) * progress
+    }
+
+    private var progressAnimation: Animation? {
+        if isSeekScrubbing || isTapSpinning {
+            return .easeInOut(duration: 0.35)
+        }
+
+        return nil
     }
 
     // MARK: - Methods. Private

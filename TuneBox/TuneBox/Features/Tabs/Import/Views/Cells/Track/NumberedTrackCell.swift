@@ -36,6 +36,7 @@ struct NumberedTrackCell: View {
                         .lineLimit(4)
                         .font(.system(size: 18, weight: .regular))
                 }
+                .animation(.smooth(duration: 0.25), value: isPlaying)
 
                 Spacer()
 
