@@ -22,15 +22,22 @@ struct NumberedTrackCell: View {
         VStack(spacing: 10) {
             HStack {
                 HStack(spacing: 12) {
-                    Circle()
-                        .fill(isPlaying ? .black : .clear)
-                        .stroke(.gray.opacity(0.8), lineWidth: 1.5)
-                        .frame(size: isPlaying ? 23 : 20)
-                        .overlay {
-                            Text("\(index)")
-                                .font(.system(size: 13, weight: .medium))
-                                .foregroundStyle(isPlaying ? .white : .gray)
-                        }
+                    ZStack {
+                        Circle()
+                            .fill(.black)
+                            .opacity(0)
+
+                        Circle()
+                            .fill(isPlaying ? .black : .clear)
+                            .stroke(.gray.opacity(0.8), lineWidth: 1.5)
+                            .frame(size: isPlaying ? 23 : 20)
+                            .overlay {
+                                Text("\(index)")
+                                    .font(.system(size: 13, weight: .medium))
+                                    .foregroundStyle(isPlaying ? .white : .gray)
+                            }
+                    }
+                    .frame(size: 23)
 
                     Text("\(track.songName)")
                         .lineLimit(4)

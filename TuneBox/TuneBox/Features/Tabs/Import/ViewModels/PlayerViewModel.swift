@@ -62,6 +62,7 @@ final class PlayerViewModel: PlayerManaging {
             .sink { [weak self] value in
                 guard let self else { return }
                 self.progress = value
+                self.stopSeekScrubbingIfNeeded(at: value)
                 self.persistPlaybackSessionIfNeeded()
             }
             .store(in: &cancellables)
@@ -269,11 +270,11 @@ final class PlayerViewModel: PlayerManaging {
     }
 
     func resetPlayback() {
+        self.clearSeekScrubbing()
         self.audioService.stop()
         self.track = nil
         self.progress = 0
         self.isPlaying = false
-        self.isSeekScrubbing = false
         self.isVinylTapSpinning = false
         self.vinylSpinDirection = 1
         self.vinylSpinSpeed = 1
@@ -288,6 +289,7 @@ final class PlayerViewModel: PlayerManaging {
 
     func stopAudioPreservingSession() {
         self.persistPlaybackSession()
+        self.clearSeekScrubbing()
         self.audioService.stop()
         self.isPlaying = false
     }
@@ -433,6 +435,27 @@ final class PlayerViewModel: PlayerManaging {
         self.vinylTapSpinTask?.cancel()
         self.vinylTapSpinTask = nil
         self.isVinylTapSpinning = false
+    }
+
+    private func clearSeekScrubbing() {
+        guard self.isSeekScrubbing else { return }
+        self.setSeekScrubbing(false)
+    }
+
+    private func stopSeekScrubbingIfNeeded(at progress: Double) {
+        guard self.isSeekScrubbing else { return }
+
+        let reachedStart = self.vinylSpinDirection < 0 && progress <= 0
+        let reachedEnd = self.vinylSpinDirection > 0 && progress >= 1
+        guard reachedStart || reachedEnd else { return }
+
+        if reachedEnd {
+            self.progress = 1
+        } else if reachedStart {
+            self.progress = 0
+        }
+
+        self.setSeekScrubbing(false)
     }
 
     private func handleTrackFinished() {

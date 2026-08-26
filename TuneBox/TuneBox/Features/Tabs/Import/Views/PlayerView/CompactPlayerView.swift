@@ -228,7 +228,7 @@ struct CompactPlayerView: View {
                 SeekHoldButton(
                     systemImage: "backward",
                     direction: -1,
-                    isDisabled: progress == 0,
+                    isDisabled: progress <= 0,
                     onSeek: onSeek,
                     onSeekHoldChanged: onSeekHoldChanged
                 )
@@ -247,7 +247,7 @@ struct CompactPlayerView: View {
                 SeekHoldButton(
                     systemImage: "forward",
                     direction: 1,
-                    isDisabled: progress == 1,
+                    isDisabled: progress >= 1,
                     onSeek: onSeek,
                     onSeekHoldChanged: onSeekHoldChanged
                 )
@@ -295,7 +295,11 @@ struct CompactPlayerView: View {
                             endPress()
                         }
                 )
-                .allowsHitTesting(isDisabled.isFalse)
+                .allowsHitTesting(isDisabled.isFalse || isPressed)
+                .onChange(of: isDisabled) { _, disabled in
+                    guard disabled, isPressed else { return }
+                    endPress()
+                }
                 .onDisappear {
                     endPress()
                 }

@@ -170,7 +170,7 @@ final class AudioService: NSObject, AudioServicing {
             _ = player.seek(backward: abs(deltaSeconds))
         }
 
-        self.notifyProgress(progressValue)
+        self.notifyProgress(self.clampedProgressValue(for: deltaSeconds))
         self.refreshNowPlayingElapsed()
     }
 
@@ -250,6 +250,22 @@ final class AudioService: NSObject, AudioServicing {
     private var isNearEnd: Bool {
         guard self.duration > 0 else { return false }
         return (self.duration - self.currentTime) <= Self.endThreshold
+    }
+
+    private var isNearStart: Bool {
+        self.currentTime <= Self.endThreshold
+    }
+
+    private func clampedProgressValue(for deltaSeconds: TimeInterval) -> Double {
+        if deltaSeconds >= 0, self.isNearEnd {
+            return 1
+        }
+
+        if deltaSeconds < 0, self.isNearStart {
+            return 0
+        }
+
+        return min(max(self.progressValue, 0), 1)
     }
 
     // MARK: - Methods. Private
