@@ -36,7 +36,7 @@ struct LibraryMenuCell: View {
             rowContent
                 .padding(.top, 15)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(isEditMode && isSelected ? Color.gray.opacity(0.5) : Color.clear)
+                .background(isEditMode && isSelected ? Color.gray.opacity(0.25) : Color.clear)
                 .transaction { transaction in
                     transaction.animation = nil
                 }
