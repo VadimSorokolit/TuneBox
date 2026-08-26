@@ -212,7 +212,7 @@ struct ImportsView: View {
         var body: some View {
             if importManagingVM.hasVisibleItems || importManagingVM.isEditSectionModeEnabled {
                 ScrollView {
-                    LazyVStack(spacing: 10, pinnedViews: [.sectionHeaders]) {
+                    LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
                         ForEach(importManagingVM.sections) { section in
                             if section.items.isNotEmpty {
                                 Section {
@@ -230,7 +230,9 @@ struct ImportsView: View {
                                         section.kind.rawValue.capitalized,
                                         font: .system(size: 14, weight: .bold),
                                         background: GlobalConstants.AppColor.defaultBackground,
-                                        foregroundStyle: .gray
+                                        foregroundStyle: .gray,
+                                        topPadding: 20,
+                                        bottomPadding: 0
                                     )
                                 }
                             }
