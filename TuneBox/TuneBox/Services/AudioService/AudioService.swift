@@ -81,6 +81,7 @@ final class AudioService: NSObject, AudioServicing {
             self.notifyStateChange(true)
             self.startProgressTimer()
             self.refreshFormatInfo(for: url)
+            self.refreshNowPlayingElapsed()
         } catch {
             AppLogger.audio.error("Failed to play audio: \(error.localizedDescription)")
             self.notifyStateChange(false)
@@ -196,6 +197,25 @@ final class AudioService: NSObject, AudioServicing {
         self.refreshNowPlayingElapsed()
     }
 
+    func seekToStartAndPause() {
+        if self.player.seek(position: 0) {
+            self.pause()
+            self.notifyProgress(0)
+            return
+        }
+
+        guard let url = self.currentURL, let trackId = self.currentTrackId else {
+            self.pause()
+            self.notifyProgress(0)
+            return
+        }
+
+        self.play(trackId: trackId, url: url, loop: self.shouldLoop)
+        _ = self.player.seek(position: 0)
+        self.pause()
+        self.notifyProgress(0)
+    }
+
     func playEffect(name: String, ext: AudioFileExtension = .mp3) {
         guard let url = Bundle.main.url(forResource: name, withExtension: ext.rawValue) else {
             AppLogger.audio.error("Effect file not found: \(name).\(ext.rawValue)")
@@ -210,6 +230,18 @@ final class AudioService: NSObject, AudioServicing {
     }
 
     func setNowPlaying(track: TrackEntity) {
+        let playbackDuration: TimeInterval = {
+            if self.duration > 0 {
+                return self.duration
+            }
+
+            if let trackDuration = track.duration, trackDuration > 0 {
+                return TimeInterval(trackDuration)
+            }
+
+            return 0
+        }()
+
         var info: [String: Any] = [
             MPMediaItemPropertyTitle: track.songName,
             MPMediaItemPropertyArtist: track.artistName,
@@ -217,8 +249,8 @@ final class AudioService: NSObject, AudioServicing {
             MPNowPlayingInfoPropertyPlaybackRate: player.isPlaying ? 1.0 : 0.0
         ]
 
-        if self.duration > 0 {
-            info[MPMediaItemPropertyPlaybackDuration] = duration
+        if playbackDuration > 0 {
+            info[MPMediaItemPropertyPlaybackDuration] = playbackDuration
         }
 
         if let coverImage = self.coverImage(from: track) {
@@ -386,6 +418,7 @@ final class AudioService: NSObject, AudioServicing {
         let timer = Timer(timeInterval: Self.progressInterval, repeats: true) { [weak self] _ in
             guard let self, self.player.isPlaying, self.duration > 0 else { return }
             self.notifyProgress(self.progressValue)
+            self.refreshNowPlayingElapsed()
         }
         self.progressTimer = timer
         RunLoop.main.add(timer, forMode: .common)

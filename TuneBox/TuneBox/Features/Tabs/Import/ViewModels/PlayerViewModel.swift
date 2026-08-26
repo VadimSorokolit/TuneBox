@@ -328,16 +328,21 @@ final class PlayerViewModel: PlayerManaging {
     }
 
     func playNext() {
-        self.advance(direction: .next, userInitiated: true)
+        self.advance(direction: .next)
     }
 
     func playPrevious() {
+        if self.repeatMode == .off, self.isAtFirstTrack {
+            self.returnToTrackStartAndPause()
+            return
+        }
+
         if self.audioService.currentTime > Self.restartThreshold {
             self.audioService.seek(to: 0)
             return
         }
 
-        self.advance(direction: .previous, userInitiated: true)
+        self.advance(direction: .previous)
     }
 
     func setRepeatMode(_ mode: RepeatMode) {
@@ -402,6 +407,18 @@ final class PlayerViewModel: PlayerManaging {
         return shuffleOrder.compactMap { byId[$0] }
     }
 
+    private var isAtFirstTrack: Bool {
+        let tracks = self.playOrder
+        guard
+            let current = self.track,
+            let index = tracks.firstIndex(where: { $0.id == current.id })
+        else {
+            return true
+        }
+
+        return index == 0
+    }
+
     private func startVinylTapSpin(direction: Double) {
         self.cancelVinylTapSpin()
 
@@ -464,12 +481,12 @@ final class PlayerViewModel: PlayerManaging {
                 self.audioService.restartCurrentTrack()
 
             case .all, .off:
-                self.advance(direction: .next, userInitiated: false)
+                self.advance(direction: .next)
         }
     }
 
-    private func advance(direction: PlaybackDirection, userInitiated: Bool) {
-        if self.repeatMode == .one, userInitiated == false {
+    private func advance(direction: PlaybackDirection) {
+        if self.repeatMode == .one {
             self.audioService.restartCurrentTrack()
             return
         }
@@ -504,15 +521,19 @@ final class PlayerViewModel: PlayerManaging {
                 self.play(tracks[wrapped])
 
             case .off:
-                if userInitiated {
-                    return
-                }
-                self.stopAudioPreservingSession()
-                self.progress = 0
+                self.returnToTrackStartAndPause()
 
             case .one:
                 self.audioService.restartCurrentTrack()
         }
+    }
+
+    private func returnToTrackStartAndPause() {
+        self.clearSeekScrubbing()
+        self.audioService.seekToStartAndPause()
+        self.progress = 0
+        self.isPlaying = false
+        self.persistPlaybackSession()
     }
 
     private func play(_ track: TrackEntity) {
