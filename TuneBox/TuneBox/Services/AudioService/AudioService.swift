@@ -10,6 +10,7 @@ import Combine
 import AVFoundation
 import SFBAudioEngine
 import MediaPlayer
+import UIKit
 
 final class AudioService: NSObject, AudioServicing {
 
@@ -109,6 +110,8 @@ final class AudioService: NSObject, AudioServicing {
         self.isDoPPlayback = false
         self.shouldLoop = false
         self.isSeekScrubbing = false
+        self.wasPlayingBeforeInterruption = false
+        self.interruptedProgress = 0
         self.notifyStateChange(false)
         self.notifyProgress(0)
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
@@ -238,6 +241,8 @@ final class AudioService: NSObject, AudioServicing {
     private var isDoPPlayback = false
     private var supportsDoP: Bool?
     private var isSeekScrubbing = false
+    private var wasPlayingBeforeInterruption = false
+    private var interruptedProgress: Double = 0
 
     private static let progressInterval: TimeInterval = 0.1
     private static let endThreshold: TimeInterval = 0.05
@@ -410,10 +415,55 @@ final class AudioService: NSObject, AudioServicing {
     private func setupObservers() {
         NotificationCenter.default.addObserver(
             self,
+            selector: #selector(self.handleAudioInterruption),
+            name: AVAudioSession.interruptionNotification,
+            object: AVAudioSession.sharedInstance()
+        )
+
+        NotificationCenter.default.addObserver(
+            self,
             selector: #selector(self.audioRouteChanged),
             name: AVAudioSession.routeChangeNotification,
             object: nil
         )
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(self.handleAppDidBecomeActive),
+            name: UIApplication.didBecomeActiveNotification,
+            object: nil
+        )
+    }
+
+    private func resumeAfterInterruption() {
+        do {
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            AppLogger.audio.error(
+                "Failed to reactivate audio session: \(error.localizedDescription)"
+            )
+            return
+        }
+
+        if self.player.resume() {
+            self.startProgressTimer()
+            self.notifyStateChange(true)
+            self.refreshNowPlayingElapsed()
+            return
+        }
+
+        guard let url = self.currentURL, let trackId = self.currentTrackId else {
+            return
+        }
+
+        let progressToRestore = self.interruptedProgress
+        self.play(trackId: trackId, url: url, loop: self.shouldLoop)
+
+        if progressToRestore > 0 {
+            _ = self.player.seek(position: progressToRestore)
+            self.notifyProgress(progressToRestore)
+            self.refreshNowPlayingElapsed()
+        }
     }
 
     private func refreshNowPlayingElapsed() {
@@ -493,6 +543,53 @@ final class AudioService: NSObject, AudioServicing {
     // MARK: - Events
 
     @objc
+    private func handleAudioInterruption(_ notification: Notification) {
+        guard
+            let typeValue = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt,
+            let type = AVAudioSession.InterruptionType(rawValue: typeValue)
+        else {
+            return
+        }
+
+        switch type {
+            case .began:
+                let wasPlaying = self.player.isPlaying || self.stateChangeSubject.value
+                self.wasPlayingBeforeInterruption = wasPlaying
+                self.interruptedProgress = min(max(self.progressValue, 0), 1)
+
+                if wasPlaying {
+                    self.pause()
+                }
+
+            case .ended:
+                guard self.wasPlayingBeforeInterruption else {
+                    return
+                }
+
+                let optionsValue = notification.userInfo?[AVAudioSessionInterruptionOptionKey] as? UInt ?? 0
+                let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
+
+                if options.contains(.shouldResume) {
+                    self.wasPlayingBeforeInterruption = false
+                    self.resumeAfterInterruption()
+                }
+
+            @unknown default:
+                break
+        }
+    }
+
+    @objc
+    private func handleAppDidBecomeActive(_ notification: Notification) {
+        guard self.wasPlayingBeforeInterruption else {
+            return
+        }
+
+        self.wasPlayingBeforeInterruption = false
+        self.resumeAfterInterruption()
+    }
+
+    @objc
     private func audioRouteChanged(_ notification: Notification) {
         guard
             let value = notification.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt,
@@ -535,7 +632,6 @@ extension AudioService: AudioPlayer.Delegate {
 
     func audioPlayerEndOfAudio(_ audioPlayer: AudioPlayer) {
         AppLogger.audio.info("AudioService END: \(self.currentTrackId ?? "nil")")
-
         self.onTrackFinished?()
     }
 
