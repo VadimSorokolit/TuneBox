@@ -33,8 +33,7 @@ struct AlbumsView: View {
                                 unitSingular: String(LibraryItem.albums.rawValue.dropLast()),
                                 unitPlural: LibraryItem.albums.rawValue,
                                 duration: importManagingVM.tracksDuration(library.albums.flatMap(\.tracks)),
-                                size: importManagingVM.tracksSize(library.albums.flatMap(\.tracks)),
-                                topPadding: 10
+                                size: importManagingVM.tracksSize(library.albums.flatMap(\.tracks))
                             )
                         }
                     }

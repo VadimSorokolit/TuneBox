@@ -13,7 +13,8 @@ struct LibrarySummaryFooter: View {
     let unitPlural: String
     let duration: Int
     let size: Int
-    var topPadding: CGFloat = 0
+    var topPadding: CGFloat = 14
+    var bottomPadding: CGFloat = 20
 
     var body: some View {
         Text(
@@ -22,6 +23,7 @@ struct LibrarySummaryFooter: View {
             + "\(size.formattedFileSize)"
         )
         .padding(.top, topPadding)
+        .padding(.bottom, bottomPadding)
         .multilineTextAlignment(.center)
         .font(.system(size: 13, weight: .regular))
         .foregroundStyle(.gray)

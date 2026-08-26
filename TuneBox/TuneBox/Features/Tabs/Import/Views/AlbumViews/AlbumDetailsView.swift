@@ -77,8 +77,7 @@ struct AlbumDetailsView: View {
                             unitSingular: "track",
                             unitPlural: "tracks",
                             duration: importManagingVM.tracksDuration(album.tracks),
-                            size: importManagingVM.tracksSize(album.tracks),
-                            topPadding: 10
+                            size: importManagingVM.tracksSize(album.tracks)
                         )
                     }
 

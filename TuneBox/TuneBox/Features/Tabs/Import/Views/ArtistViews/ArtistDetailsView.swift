@@ -166,8 +166,7 @@ struct ArtistDetailsView: View {
                     unitSingular: "album",
                     unitPlural: "albums",
                     duration: importManagingVM.tracksDuration(albums.flatMap(\.tracks)),
-                    size: importManagingVM.tracksSize(albums.flatMap(\.tracks)),
-                    topPadding: 10
+                    size: importManagingVM.tracksSize(albums.flatMap(\.tracks))
                 )
             }
         }
@@ -204,8 +203,7 @@ struct ArtistDetailsView: View {
                     unitSingular: "track",
                     unitPlural: "tracks",
                     duration: importManagingVM.tracksDuration(tracks),
-                    size: importManagingVM.tracksSize(tracks),
-                    topPadding: 10
+                    size: importManagingVM.tracksSize(tracks)
                 )
             }
         }

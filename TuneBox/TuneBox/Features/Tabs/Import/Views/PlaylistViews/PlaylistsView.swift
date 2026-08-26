@@ -30,8 +30,7 @@ struct PlaylistsView: View {
                         unitSingular: String(LibraryItem.playlists.rawValue.dropLast()),
                         unitPlural: LibraryItem.playlists.rawValue.capitalized,
                         duration: importManagingVM.tracksDuration(library.playlists.flatMap(\.tracks)),
-                        size: importManagingVM.tracksSize(library.playlists.flatMap(\.tracks)),
-                        topPadding: 10
+                        size: importManagingVM.tracksSize(library.playlists.flatMap(\.tracks))
                     )
                 }
             }

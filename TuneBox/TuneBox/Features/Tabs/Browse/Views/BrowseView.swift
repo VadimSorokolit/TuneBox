@@ -210,7 +210,8 @@ struct BrowseView: View {
 
                             if transferManagingVM.isPaginationSearchLoading {
                                 SpinnerView(size: .regular)
-                                    .padding(.vertical, 10)
+                                    .padding(.top, 14)
+                                    .padding(.bottom, 20)
                             }
 
                             PaginationFooterView(
@@ -310,7 +311,8 @@ struct BrowseView: View {
 
                             if transferManagingVM.isPaginationPopularLoading {
                                 SpinnerView(size: .regular)
-                                    .padding(.vertical, 10)
+                                    .padding(.top, 14)
+                                    .padding(.bottom, 20)
                             }
 
                             PaginationFooterView(

@@ -30,8 +30,7 @@ struct SourceView: View {
                     unitSingular: String(LibraryItem.tracks.rawValue.dropLast()),
                     unitPlural: LibraryItem.tracks.rawValue,
                     duration: importManagingVM.tracksDuration(tracks),
-                    size: importManagingVM.tracksSize(tracks),
-                    topPadding: 10
+                    size: importManagingVM.tracksSize(tracks)
                 )
             }
         }

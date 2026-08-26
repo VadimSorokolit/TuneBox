@@ -72,8 +72,7 @@ struct TracksView: View {
                             unitSingular: "track",
                             unitPlural: "tracks",
                             duration: importManagingVM.tracksDuration(tracks),
-                            size: importManagingVM.tracksSize(tracks),
-                            topPadding: 10
+                            size: importManagingVM.tracksSize(tracks)
                         )
                         .frame(maxWidth: .infinity)
                         .listRowInsets(EdgeInsets())
