@@ -52,6 +52,7 @@ struct NumberedTrackCell: View {
                     .foregroundStyle(.gray)
             }
             .padding(.horizontal, 26)
+            .padding(.vertical, 2)
 
             Rectangle()
                 .fill(.gray.opacity(0.2))
@@ -59,7 +60,7 @@ struct NumberedTrackCell: View {
                 .padding(.leading, 65)
                 .padding(.trailing, 26)
         }
-        .padding(.top, 10)
+        .padding(.top, 14)
         .frame(maxWidth: .infinity)
         .contentShape(Rectangle())
         .onTapGesture {
