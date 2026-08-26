@@ -32,7 +32,12 @@ struct ImportsView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(.gray.opacity(0.025))
-        .bottomContentMargin(isPlayerVisible: playerVM.isPlayerVisible, isTabBarVisible: rootTabsVM.isTabBarVisible)
+        .bottomContentMargin(
+            10,
+            0,
+            isPlayerVisible: playerVM.isPlayerVisible,
+            isTabBarVisible: rootTabsVM.isTabBarVisible
+        )
         .onAppear {
             Task {
                 importManagingVM.startObservingTracksChanges()

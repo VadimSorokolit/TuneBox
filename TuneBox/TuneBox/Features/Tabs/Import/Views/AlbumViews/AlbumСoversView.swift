@@ -24,6 +24,12 @@ struct AlbumСoversView: View {
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar { trailingToolbar }
             .animation(.easeInOut(duration: 0.2), value: selectedIndex)
+            .bottomContentMargin(
+                10,
+                0,
+                isPlayerVisible: playerVM.isPlayerVisible,
+                isTabBarVisible: rootTabsVM.isTabBarVisible
+            )
             .fullScreenCover(isPresented: $isPagerPresented) {
                 pagerView
             }
@@ -37,6 +43,8 @@ struct AlbumСoversView: View {
 
     @Environment(AppCoordinator.self) private var coordinator
     @Injected private var importManagingVM: ImportManaging
+    @Injected private var playerVM: PlayerManaging
+    @Injected private var rootTabsVM: RootTabsManaging
     @State private var coverPaths: [String] = []
     @State private var selectedIndex: Int?
     @State private var isPagerPresented = false

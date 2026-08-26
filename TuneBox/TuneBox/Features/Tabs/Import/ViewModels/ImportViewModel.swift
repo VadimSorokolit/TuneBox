@@ -387,14 +387,8 @@ final class ImportViewModel: ImportManaging {
         }
         defer { rootURL.stopAccessingSecurityScopedResource() }
 
-        let components = relativePath.split(separator: "/").map(String.init)
-
-        let folderToScan: URL
-        if components.count >= 3 {
-            folderToScan = rootURL.appendingPathComponent(components[0])
-        } else {
-            folderToScan = rootURL
-        }
+        let trackURL = rootURL.appendingPathComponent(relativePath)
+        let folderToScan = trackURL.deletingLastPathComponent()
 
         guard let enumerator = FileManager.default.enumerator(
             at: folderToScan,
