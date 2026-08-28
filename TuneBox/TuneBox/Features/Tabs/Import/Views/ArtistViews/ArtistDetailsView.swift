@@ -55,7 +55,7 @@ struct ArtistDetailsView: View {
                     )
                 }
             }
-            .navigationTitle(artist.name)
+            .customNavigationTitle(artist.name)
         } else {
             ContentUnavailableView(
                 "Artist not found",

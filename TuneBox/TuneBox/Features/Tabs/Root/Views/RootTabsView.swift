@@ -257,7 +257,7 @@ struct RootTabsView: View {
         let path = playerVM.playbackNavigationPath
         guard path.isNotEmpty else { return }
 
-        coordinator.switchToTab(.importFiles)
+        coordinator.switchToTab(.importFiles, animated: false)
         coordinator.syncPath(path)
     }
 

@@ -144,6 +144,7 @@
 		5BDA04CA300A677F00C7B763 /* SourceFolderItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDA04C9300A677F00C7B763 /* SourceFolderItem.swift */; };
 		5BECD77C3010E0750028FC67 /* LibrarySummaryFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BECD77B3010E0740028FC67 /* LibrarySummaryFooter.swift */; };
 		5BECD77E301380E10028FC67 /* TrackCoverCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BECD77D301380DF0028FC67 /* TrackCoverCell.swift */; };
+		5BF3AF003041A48B008193AC /* View+customNavigationTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF3AEFF3041A48A008193AC /* View+customNavigationTitle.swift */; };
 		5BFCA7D22FCE0DDE009C6AD9 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA7D12FCE0DDD009C6AD9 /* AppTheme.swift */; };
 		5BFCA7D42FCE1148009C6AD9 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA7D32FCE1130009C6AD9 /* ThemeManager.swift */; };
 		5BFCA7D62FCE118B009C6AD9 /* Theme+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA7D52FCE118A009C6AD9 /* Theme+Extensions.swift */; };
@@ -343,6 +344,7 @@
 		5BDA04C9300A677F00C7B763 /* SourceFolderItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceFolderItem.swift; sourceTree = "<group>"; };
 		5BECD77B3010E0740028FC67 /* LibrarySummaryFooter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibrarySummaryFooter.swift; sourceTree = "<group>"; };
 		5BECD77D301380DF0028FC67 /* TrackCoverCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackCoverCell.swift; sourceTree = "<group>"; };
+		5BF3AEFF3041A48A008193AC /* View+customNavigationTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+customNavigationTitle.swift"; sourceTree = "<group>"; };
 		5BFCA7D12FCE0DDD009C6AD9 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		5BFCA7D32FCE1130009C6AD9 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
 		5BFCA7D52FCE118A009C6AD9 /* Theme+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Theme+Extensions.swift"; sourceTree = "<group>"; };
@@ -722,6 +724,7 @@
 				5BFCA8442FCEE251009C6AD9 /* TransferPrioritizable+mergePriority.swift */,
 				5BA48CFD3018BDB900192BAF /* View+bottomContentMargin.swift */,
 				5BFCA83D2FCED841009C6AD9 /* View+cornerRadius.swift */,
+				5BF3AEFF3041A48A008193AC /* View+customNavigationTitle.swift */,
 				5B6B8CD42FED1DEC00C23D3E /* View+dismissKeyboardOnTap.swift */,
 				5B3D227C2FF53A54004B8356 /* View+frame.swift */,
 				5B6B8CD62FED326700C23D3E /* View+sectionTracksTitle.swift */,
@@ -1548,6 +1551,7 @@
 				5BC8D9063000ED5500742822 /* CompactPlayerView.swift in Sources */,
 				5B1875C62FD06EBD00D8A042 /* SearchBarView.swift in Sources */,
 				5B40F405302DFC240025693E /* CoverViewModel.swift in Sources */,
+				5BF3AF003041A48B008193AC /* View+customNavigationTitle.swift in Sources */,
 				5B8382B52FC59381003625CD /* BrowseView+.swift in Sources */,
 				5BDA04CA300A677F00C7B763 /* SourceFolderItem.swift in Sources */,
 				5BD579A22FAB25E300503BA2 /* TuneBoxApp.swift in Sources */,

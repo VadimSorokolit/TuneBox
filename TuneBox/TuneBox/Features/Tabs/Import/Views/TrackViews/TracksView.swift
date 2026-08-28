@@ -98,7 +98,7 @@ struct TracksView: View {
                 .environment(\.defaultMinListRowHeight, 1)
             }
         }
-        .navigationTitle(navigationTitle)
+        .customNavigationTitle(navigationTitle)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .onAppear {
             Task {

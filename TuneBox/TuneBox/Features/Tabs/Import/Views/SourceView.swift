@@ -40,10 +40,8 @@ struct SourceView: View {
             isPlayerVisible: playerVM.isPlayerVisible,
             isTabBarVisible: rootTabsVM.isTabBarVisible
         )
-        .navigationTitle(
-            path?.components(separatedBy: "/").last
-            ?? importManagingVM.source(for: sourceID)?.title ?? ImportSection.sources.rawValue.capitalized
-        )
+        .customNavigationTitle(navigationTitle)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .task(id: path) {
             guard let items = await importManagingVM.fetchfolderItems(sourceID: sourceID, path: path) else { return }
             self.items = items
@@ -58,6 +56,11 @@ struct SourceView: View {
     @Injected private var playerVM: PlayerManaging
 
     @State private var items: [SourceFolderItem] = []
+
+    private var navigationTitle: String {
+        path?.components(separatedBy: "/").last
+        ?? importManagingVM.source(for: sourceID)?.title ?? ImportSection.sources.rawValue.capitalized
+    }
 
     // MARK: - Methods. Private
 

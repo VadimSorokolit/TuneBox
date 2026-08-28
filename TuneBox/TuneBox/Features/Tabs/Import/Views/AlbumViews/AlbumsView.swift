@@ -47,16 +47,7 @@ struct AlbumsView: View {
                     LibraryEmptyStateView(item: LibraryItem.albums)
                 }
             }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text(LibraryItem.albums.rawValue.capitalized)
-                        .font(.headline)
-                        .lineLimit(2)
-                        .multilineTextAlignment(.center)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                }
-            }
+            .customNavigationTitle(LibraryItem.albums.rawValue.capitalized)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
     }
