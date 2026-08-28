@@ -94,18 +94,17 @@ struct AlbumDetailsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    VStack(spacing: album.artist.isEmpty ? 0 : 2) {
+                    VStack(spacing: 2) {
                         Text(album.name)
-                            .lineLimit(album.artist.isEmpty ? 2 : 1)
                             .font(.headline)
+                            .lineLimit(1)
 
-                        if album.artist.isNotEmpty {
-                            Text(album.artist)
-                                .lineLimit(1)
-                                .font(.caption)
-                        }
+                        Text(album.artist)
+                            .font(.caption)
+                            .lineLimit(1)
                     }
-                    .frame(maxWidth: .infinity, alignment: .center)
+                    .multilineTextAlignment(.center)
+                    .frame(width: 250)
                 }
             }
         }
