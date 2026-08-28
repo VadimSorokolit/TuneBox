@@ -44,7 +44,6 @@ struct ZoomableCoverPageView: View {
                 .onTapGesture(count: 1, perform: onSingleTap)
             }
             .frame(width: geo.size.width, height: geo.size.height)
-            .clipped()
         }
         .onChange(of: isActive) { _, active in
             guard !active else { return }

@@ -50,12 +50,8 @@ struct CoverPagerView: View {
             .tabViewStyle(.page(indexDisplayMode: .never))
             .ignoresSafeArea()
 
-            if isControlsVisible {
-                controls
-                    .transition(.opacity)
-            }
+            controls
         }
-        .statusBarHidden(!isControlsVisible)
         .onAppear {
             currentIndex = coverIndex
         }
@@ -76,16 +72,10 @@ struct CoverPagerView: View {
                 } label: {
                     Image(systemName: "xmark")
                         .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(.white)
-                        .frame(width: 36, height: 36)
-                        .background(.ultraThinMaterial.opacity(0.35), in: Circle())
+                        .foregroundStyle(.black)
+                        .frame(size: 36)
+                        .background(.ultraThinMaterial, in: Circle())
                 }
-
-                Spacer()
-
-                Text("\(currentIndex + 1) of \(coverPaths.count)")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.white)
 
                 Spacer()
 
@@ -100,7 +90,33 @@ struct CoverPagerView: View {
                         .background(.ultraThinMaterial.opacity(0.35), in: Capsule())
                 })
             }
-            .padding(.horizontal, 16)
+            .overlay {
+                ZStack {
+                    Text("\(currentIndex + 1) of \(coverPaths.count)")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .offset(x: -1, y: 0)
+
+                    Text("\(currentIndex + 1) of \(coverPaths.count)")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .offset(x: 1, y: 0)
+
+                    Text("\(currentIndex + 1) of \(coverPaths.count)")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .offset(x: 0, y: -1)
+
+                    Text("\(currentIndex + 1) of \(coverPaths.count)")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .offset(x: 0, y: 1)
+
+                    Text("\(currentIndex + 1) of \(coverPaths.count)")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.black)
+                }
+            }            .padding(.horizontal, 16)
             .padding(.top, 8)
             .padding(.bottom, 12)
 

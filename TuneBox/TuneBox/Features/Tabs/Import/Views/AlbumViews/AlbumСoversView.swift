@@ -21,7 +21,6 @@ struct AlbumСoversView: View {
             .background(Color.black.opacity(0.0))
             .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar { trailingToolbar }
             .animation(.easeInOut(duration: 0.2), value: selectedIndex)
             .bottomContentMargin(
