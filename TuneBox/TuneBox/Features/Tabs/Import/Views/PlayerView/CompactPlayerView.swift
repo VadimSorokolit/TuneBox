@@ -33,6 +33,7 @@ struct CompactPlayerView: View {
         if let track {
             VStack(spacing: 5) {
                 MarqueeText(text: track.songName)
+                    .equatable()
                     .padding(.leading, 20)
 
                 ZStack(alignment: .bottom) {
@@ -504,11 +505,17 @@ struct CompactPlayerView: View {
         }
     }
 
-    private struct MarqueeText: View {
+    private struct MarqueeText: View, Equatable {
 
         // MARK: - Properties. Public
 
         let text: String
+
+        // MARK: - Equatable
+
+        static func == (lhs: Self, rhs: Self) -> Bool {
+            lhs.text == rhs.text
+        }
 
         // MARK: - Body
 
@@ -529,7 +536,7 @@ struct CompactPlayerView: View {
                             if canScroll {
                                 TimelineView(
                                     .animation(
-                                        minimumInterval: 1.0 / 30.0,
+                                        minimumInterval: 1.0 / 60.0,
                                         paused: false
                                     )
                                 ) { context in
@@ -582,9 +589,9 @@ struct CompactPlayerView: View {
         @State private var textWidth: CGFloat = 0
         @State private var cycleStartedAt: Date = Date()
 
-        private let speed: CGFloat = 60
+        private let speed: CGFloat = 35
         private let textSpacing: CGFloat = 100
-        private let pauseDuration: TimeInterval = 2
+        private let pauseDuration: TimeInterval = 2.5
         private let fadeWidth: CGFloat = 0
 
         private var textView: some View {
