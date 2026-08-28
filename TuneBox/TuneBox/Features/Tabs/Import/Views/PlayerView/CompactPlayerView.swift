@@ -225,9 +225,10 @@ struct CompactPlayerView: View {
         // MARK: - Body
 
         var body: some View {
-            HStack(spacing: 16) {
+            HStack(spacing: 0) {
                 SeekHoldButton(
                     systemImage: "backward",
+                    imageSize: imageSize,
                     direction: -1,
                     isDisabled: progress <= 0,
                     onSeek: onSeek,
@@ -239,6 +240,7 @@ struct CompactPlayerView: View {
                     repeatMode: repeatMode,
                     isShuffleEnabled: isShuffleEnabled,
                     trackID: trackID,
+                    imageSize: imageSize,
                     onPlayPauseTap: onPlayPauseTap,
                     onRepeatModeChange: onRepeatModeChange,
                     onShuffleToggle: onShuffleToggle
@@ -247,6 +249,7 @@ struct CompactPlayerView: View {
 
                 SeekHoldButton(
                     systemImage: "forward",
+                    imageSize: imageSize,
                     direction: 1,
                     isDisabled: progress >= 1,
                     onSeek: onSeek,
@@ -255,6 +258,10 @@ struct CompactPlayerView: View {
             }
             .font(.title3)
         }
+
+        // MARK: - Private. Properties
+
+        private let imageSize: CGFloat = 50
     }
 
     private struct SeekHoldButton: View {
@@ -262,6 +269,7 @@ struct CompactPlayerView: View {
         // MARK: - Properties. Public
 
         let systemImage: String
+        let imageSize: CGFloat
         let direction: Double
         let isDisabled: Bool
         let onSeek: (TimeInterval) -> Void
@@ -273,7 +281,7 @@ struct CompactPlayerView: View {
             Image(systemName: systemImage)
                 .foregroundStyle(.tint)
                 .frame(size: imageSize)
-                .contentShape(Circle())
+                .contentShape(Rectangle())
                 .background {
                     Circle()
                         .fill(.white.opacity(isPressed ? 0.22 : 0))
@@ -312,7 +320,6 @@ struct CompactPlayerView: View {
         @State private var didEnterHold = false
         @State private var isPressed = false
 
-        private let imageSize: CGFloat = 40
         private let tapSeekSeconds: TimeInterval = 10
         private let holdStepSeconds: TimeInterval = 1
         private let holdDelayNanoseconds: UInt64 = 300_000_000
@@ -377,6 +384,7 @@ struct CompactPlayerView: View {
         let repeatMode: RepeatMode
         let isShuffleEnabled: Bool
         let trackID: String?
+        let imageSize: CGFloat
         let onPlayPauseTap: () -> Void
         let onRepeatModeChange: (RepeatMode) -> Void
         let onShuffleToggle: () -> Void
@@ -400,7 +408,7 @@ struct CompactPlayerView: View {
                     Image(systemName: isPlaying ? "pause" : "play")
                         .foregroundStyle(.tint)
                         .frame(size: imageSize)
-                        .contentShape(Circle())
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(PressCircleGlassButtonStyle())
                 .contextMenu {
@@ -458,14 +466,10 @@ struct CompactPlayerView: View {
                     Text(repeatMode == .one ? "•" : repeatMode == .all ? "••" : "")
                         .foregroundStyle(.blue)
                         .font(.system(size: 16))
-                        .offset(y: 6)
+                        .offset(y: 2)
                 }
             }
         }
-
-        // MARK: - Private. Properties
-
-        private let imageSize: CGFloat = 40
     }
 
     private struct ProgressBar: View {
