@@ -8,7 +8,7 @@
 import SwiftUI
 
 extension View {
-    
+
     func customNavigationTitle(
         _ title: String,
         lineLimit: Int = 2
@@ -25,5 +25,5 @@ extension View {
                 }
             }
     }
-    
+
 }

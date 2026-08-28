@@ -116,24 +116,29 @@ struct CoverPagerView: View {
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.black)
                 }
-            }            .padding(.horizontal, 16)
+            }
+            .padding(.horizontal, 16)
             .padding(.top, 8)
             .padding(.bottom, 12)
 
             Spacer()
 
-            if coverPaths.count > 1, coverPaths.count <= 12 {
-                pageIndicator
+            if coverPaths.count > 1, coverPaths.count <= Constants.maxPageIndicatorCount {
+                pageIndicatorDots
                     .padding(.bottom, 28)
             }
         }
     }
 
-    private var pageIndicator: some View {
+    private var pageIndicatorDots: some View {
         HStack(spacing: 6) {
             ForEach(coverPaths.indices, id: \.self) { index in
                 Capsule()
-                    .fill(index == currentIndex ? Color.white : Color.white.opacity(0.35))
+                    .fill(
+                        index == currentIndex
+                            ? theme.tokens.primaryText
+                            : theme.tokens.secondaryText.opacity(0.45)
+                    )
                     .frame(
                         width: index == currentIndex ? 16 : 6,
                         height: 6
@@ -142,4 +147,10 @@ struct CoverPagerView: View {
             }
         }
     }
+}
+
+// MARK: - Constants
+
+private enum Constants {
+    static let maxPageIndicatorCount = 12
 }
