@@ -328,10 +328,12 @@ final class PlayerViewModel: PlayerManaging {
     }
 
     func playNext() {
-        self.advance(direction: .next)
+        self.advance(direction: .next, autoplay: self.isPlaying)
     }
 
     func playPrevious() {
+        self.ensureShuffleOrderIfNeeded()
+
         if self.repeatMode == .off, self.isAtFirstTrack {
             self.returnToTrackStartAndPause()
             return
@@ -342,7 +344,7 @@ final class PlayerViewModel: PlayerManaging {
             return
         }
 
-        self.advance(direction: .previous)
+        self.advance(direction: .previous, autoplay: self.isPlaying)
     }
 
     func setRepeatMode(_ mode: RepeatMode) {
@@ -485,7 +487,9 @@ final class PlayerViewModel: PlayerManaging {
         }
     }
 
-    private func advance(direction: PlaybackDirection) {
+    private func advance(direction: PlaybackDirection, autoplay: Bool = true) {
+        self.ensureShuffleOrderIfNeeded()
+
         if self.repeatMode == .one {
             self.audioService.restartCurrentTrack()
             return
@@ -496,7 +500,7 @@ final class PlayerViewModel: PlayerManaging {
 
         guard let current = self.track,
               let index = tracks.firstIndex(where: { $0.id == current.id }) else {
-            self.play(tracks[0])
+            self.play(tracks[0], autoplay: autoplay)
             return
         }
 
@@ -511,14 +515,14 @@ final class PlayerViewModel: PlayerManaging {
         }
 
         if tracks.indices.contains(candidate) {
-            self.play(tracks[candidate])
+            self.play(tracks[candidate], autoplay: autoplay)
             return
         }
 
         switch self.repeatMode {
             case .all:
                 let wrapped = direction == .next ? 0 : tracks.count - 1
-                self.play(tracks[wrapped])
+                self.play(tracks[wrapped], autoplay: autoplay)
 
             case .off:
                 self.returnToTrackStartAndPause()
@@ -536,9 +540,16 @@ final class PlayerViewModel: PlayerManaging {
         self.persistPlaybackSession()
     }
 
-    private func play(_ track: TrackEntity) {
+    private func play(_ track: TrackEntity, autoplay: Bool = true) {
         self.start(track, using: { trackId, url, _ in
-            self.audioService.play(trackId: trackId, url: url, loop: false)
+            if autoplay {
+                self.audioService.play(trackId: trackId, url: url, loop: false)
+            } else {
+                self.audioService.setSeekScrubbing(true)
+                self.audioService.play(trackId: trackId, url: url, loop: false)
+                self.audioService.pause()
+                self.audioService.setSeekScrubbing(false)
+            }
         })
     }
 
@@ -741,6 +752,12 @@ final class PlayerViewModel: PlayerManaging {
         }
 
         self.shuffleOrder = ids
+    }
+
+    private func ensureShuffleOrderIfNeeded() {
+        guard self.isShuffleEnabled else { return }
+        guard self.shuffleOrder == nil else { return }
+        self.rebuildShuffleOrder(startingWith: self.track)
     }
 
     private func handleError(_ error: Error) {

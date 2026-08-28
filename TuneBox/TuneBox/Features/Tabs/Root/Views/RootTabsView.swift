@@ -102,11 +102,11 @@ struct RootTabsView: View {
                     onTrackInfoTap: {
                         openTrackSource()
                     },
-                    onSeek: { delta in
-                        playerVM.seek(by: delta)
+                    onPlayPrevious: {
+                        playerVM.playPrevious()
                     },
-                    onSeekHoldChanged: { isHolding, direction in
-                        playerVM.setSeekScrubbing(isHolding, direction: direction)
+                    onPlayNext: {
+                        playerVM.playNext()
                     },
                     onPlayPauseTap: {
                         playerVM.togglePlayPause()
