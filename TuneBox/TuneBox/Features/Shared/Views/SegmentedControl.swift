@@ -18,45 +18,77 @@ struct SegmentedControl<T>: View where T: SegmentedItem & RawRepresentable, T.Ra
     // MARK: - Main Body
 
     var body: some View {
-        HStack(spacing: 0) {
-            ForEach(items, id: \.self) { segment in
-                Button {
-                    withAnimation(.snappy(duration: 0.28)) {
-                        direction = segment.rawValue > selected.rawValue
-                            ? .backward
-                            : .forward
-                        selected = segment
+        GlassEffectContainer(spacing: Constants.containerSpacing) {
+            HStack(spacing: 0) {
+                ForEach(items, id: \.self) { segment in
+                    Button {
+                        withAnimation(.snappy(duration: 0.28)) {
+                            direction = segment.rawValue > selected.rawValue
+                                ? .backward
+                                : .forward
+                            selected = segment
+                        }
+                    } label: {
+                        Text(segment.title)
+                            .font(.subheadline.weight(.medium))
+                            .foregroundStyle(
+                                selected == segment
+                                    ? theme.tokens.primaryText.opacity(0.9)
+                                    : theme.tokens.secondaryText
+                            )
+                            .animation(nil, value: selected)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: Constants.segmentHeight)
+                            .contentShape(Rectangle())
                     }
-                } label: {
-                    Text(segment.title)
-                        .font(.subheadline.weight(.medium))
-                        .foregroundStyle(
-                            selected == segment
-                                ? Color.primary.opacity(0.9)
-                                : Color.primary.opacity(0.45)
-                        )
-                        .animation(nil, value: selected)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 22)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .background {
-                    if selected == segment {
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .glassEffect(.identity.interactive(), in: .rect(cornerRadius: 12))
-                            .matchedGeometryEffect(id: "segmentPill", in: namespace)
+                    .buttonStyle(.plain)
+                    .background {
+                        if selected == segment {
+                            RoundedRectangle(
+                                cornerRadius: Constants.selectedCornerRadius,
+                                style: .continuous
+                            )
+                            .glassEffect(
+                                .regular.tint(selectedGlassTint).interactive(),
+                                in: .rect(cornerRadius: Constants.selectedCornerRadius)
+                            )
+                            .glassEffectID("segmentPill", in: namespace)
+                        }
                     }
                 }
             }
+            .padding(Constants.containerPadding)
+            .glassEffect(
+                .regular.tint(trackGlassTint),
+                in: .rect(cornerRadius: Constants.trackCornerRadius)
+            )
         }
-        .padding(4)
-        .glassEffect(.regular, in: .rect(cornerRadius: 16))
     }
 
     // MARK: - Properties. Private
 
+    @Environment(\.themeManager) private var theme
     @Namespace private var namespace
+
+    private var trackGlassTint: Color {
+        theme.tokens.cellBackground.opacity(
+            theme.systemColorScheme == .dark ? 0.55 : 0.9
+        )
+    }
+
+    private var selectedGlassTint: Color {
+        theme.systemColorScheme == .dark
+            ? Color.white.opacity(0.22)
+            : Color.white.opacity(0.82)
+    }
+
+    private enum Constants {
+        static let segmentHeight: CGFloat = 22
+        static let containerPadding: CGFloat = 4
+        static let containerSpacing: CGFloat = 4
+        static let selectedCornerRadius: CGFloat = 12
+        static let trackCornerRadius: CGFloat = 16
+    }
 }
 
     // MARK: - Objects. Private (For Preview)
@@ -102,9 +134,12 @@ private struct SegmentedControlPreview: View {
 }
 
 #Preview {
+    @Previewable @State var themeManager = ThemeManager()
+
     ZStack {
-        Color(.systemBackground).ignoresSafeArea()
+        themeManager.tokens.appBackground.ignoresSafeArea()
 
         SegmentedControlPreview()
     }
+    .environment(\.themeManager, themeManager)
 }
