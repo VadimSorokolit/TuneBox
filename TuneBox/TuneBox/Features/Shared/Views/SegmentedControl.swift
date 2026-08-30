@@ -8,7 +8,7 @@
 import SwiftUI
 
 private enum SegmentedControlConstants {
-    static let segmentHeight: CGFloat = 22
+    static let segmentHeight: CGFloat = 26
     static let containerPadding: CGFloat = 4
     static let containerSpacing: CGFloat = 4
     static let selectedCornerRadius: CGFloat = 12
@@ -87,7 +87,7 @@ struct SegmentedControl<T>: View where T: SegmentedItem & RawRepresentable, T.Ra
     private var selectedGlassTint: Color {
         theme.systemColorScheme == .dark
             ? Color.white.opacity(0.22)
-            : Color.white.opacity(0.82)
+            : Color.white.opacity(0.9)
     }
 }
 
