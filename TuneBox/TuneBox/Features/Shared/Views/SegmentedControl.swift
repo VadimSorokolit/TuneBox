@@ -7,6 +7,14 @@
 
 import SwiftUI
 
+private enum SegmentedControlConstants {
+    static let segmentHeight: CGFloat = 22
+    static let containerPadding: CGFloat = 4
+    static let containerSpacing: CGFloat = 4
+    static let selectedCornerRadius: CGFloat = 12
+    static let trackCornerRadius: CGFloat = 16
+}
+
 struct SegmentedControl<T>: View where T: SegmentedItem & RawRepresentable, T.RawValue == Int {
 
     // MARK: - Properties. Public
@@ -18,7 +26,7 @@ struct SegmentedControl<T>: View where T: SegmentedItem & RawRepresentable, T.Ra
     // MARK: - Main Body
 
     var body: some View {
-        GlassEffectContainer(spacing: Constants.containerSpacing) {
+        GlassEffectContainer(spacing: SegmentedControlConstants.containerSpacing) {
             HStack(spacing: 0) {
                 ForEach(items, id: \.self) { segment in
                     Button {
@@ -38,29 +46,29 @@ struct SegmentedControl<T>: View where T: SegmentedItem & RawRepresentable, T.Ra
                             )
                             .animation(nil, value: selected)
                             .frame(maxWidth: .infinity)
-                            .frame(height: Constants.segmentHeight)
+                            .frame(height: SegmentedControlConstants.segmentHeight)
                             .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
                     .background {
                         if selected == segment {
                             RoundedRectangle(
-                                cornerRadius: Constants.selectedCornerRadius,
+                                cornerRadius: SegmentedControlConstants.selectedCornerRadius,
                                 style: .continuous
                             )
                             .glassEffect(
                                 .regular.tint(selectedGlassTint).interactive(),
-                                in: .rect(cornerRadius: Constants.selectedCornerRadius)
+                                in: .rect(cornerRadius: SegmentedControlConstants.selectedCornerRadius)
                             )
                             .glassEffectID("segmentPill", in: namespace)
                         }
                     }
                 }
             }
-            .padding(Constants.containerPadding)
+            .padding(SegmentedControlConstants.containerPadding)
             .glassEffect(
                 .regular.tint(trackGlassTint),
-                in: .rect(cornerRadius: Constants.trackCornerRadius)
+                in: .rect(cornerRadius: SegmentedControlConstants.trackCornerRadius)
             )
         }
     }
@@ -80,14 +88,6 @@ struct SegmentedControl<T>: View where T: SegmentedItem & RawRepresentable, T.Ra
         theme.systemColorScheme == .dark
             ? Color.white.opacity(0.22)
             : Color.white.opacity(0.82)
-    }
-
-    private enum Constants {
-        static let segmentHeight: CGFloat = 22
-        static let containerPadding: CGFloat = 4
-        static let containerSpacing: CGFloat = 4
-        static let selectedCornerRadius: CGFloat = 12
-        static let trackCornerRadius: CGFloat = 16
     }
 }
 
