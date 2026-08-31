@@ -18,6 +18,7 @@ protocol ImportManaging: LoadStateManaging {
 
     func refreshLibrary() async
     func sortedTracksAlphabetically(_ tracks: [TrackEntity]) -> [TrackEntity]
+    func orderedAlbumTracks(_ tracks: [TrackEntity]) -> [TrackEntity]
     func startObservingTracksChanges()
     func stopObservingTracksChanges()
     func source(for id: ImportSource.ID) -> ImportSource?

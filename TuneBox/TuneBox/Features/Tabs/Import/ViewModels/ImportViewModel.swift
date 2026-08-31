@@ -620,6 +620,10 @@ final class ImportViewModel: ImportManaging {
         }
     }
 
+    func orderedAlbumTracks(_ tracks: [TrackEntity]) -> [TrackEntity] {
+        AlbumTrackOrdering.ordered(tracks)
+    }
+
     func beginEditSections() {
         self.isEditSectionModeEnabled = true
         self.ensureSections()
@@ -1008,11 +1012,7 @@ final class ImportViewModel: ImportManaging {
             $0.albumName
         }
         .map { name, albumTracks -> MusicLibrary.Album in
-            let orderedTracks = albumTracks.sorted { lhs, rhs in
-                let left = (lhs.trackNumber ?? Int.max, lhs.songName.localizedLowercase)
-                let right = (rhs.trackNumber ?? Int.max, rhs.songName.localizedLowercase)
-                return left < right
-            }
+            let orderedTracks = AlbumTrackOrdering.ordered(albumTracks)
 
             return MusicLibrary.Album(
                 id: name,
@@ -1161,5 +1161,31 @@ final class ImportViewModel: ImportManaging {
         let message = error.localizedDescription
         self.error = message
         AppLogger.imported.warning("\(message)")
+    }
+}
+
+enum AlbumTrackOrdering {
+
+    static func ordered(_ tracks: [TrackEntity]) -> [TrackEntity] {
+        let sortByTrackNumberOnly = tracks.isEmpty == false
+            && tracks.allSatisfy { self.number(for: $0) != nil }
+
+        return tracks.sorted { lhs, rhs in
+            if sortByTrackNumberOnly {
+                let lhsNumber = self.number(for: lhs) ?? 0
+                let rhsNumber = self.number(for: rhs) ?? 0
+                return lhsNumber < rhsNumber
+            }
+
+            return lhs.songName.localizedStandardCompare(rhs.songName) == .orderedAscending
+        }
+    }
+
+    static func number(for track: TrackEntity) -> Int? {
+        if let trackNumber = track.trackNumber, trackNumber > 0 {
+            return trackNumber
+        }
+
+        return AudioMetadataService.parseTrackNumber(from: track.songName)
     }
 }

@@ -57,15 +57,15 @@ struct AlbumDetailsView: View {
                     .animation(.easeInOut(duration: 0.35), value: isVinylVisible)
 
                     LazyVStack(spacing: 0) {
-                        ForEach(Array(album.tracks.enumerated()), id: \.element.id) { index, track in
+                        ForEach(Array(orderedTracks.enumerated()), id: \.element.id) { index, track in
                             NumberedTrackCell(
-                                index: track.trackNumber ?? index + 1,
+                                index: index + 1,
                                 track: track,
                                 isPlaying: track === playerVM.track,
                                 onTapGesture: {
                                     playerVM.handlePlayAction(
                                         for: track,
-                                        in: album.tracks,
+                                        in: orderedTracks,
                                         navigationPath: coordinator.path
                                     )
                                 }
@@ -73,11 +73,11 @@ struct AlbumDetailsView: View {
                         }
 
                         LibrarySummaryFooter(
-                            count: album.tracks.count,
+                            count: orderedTracks.count,
                             unitSingular: "track",
                             unitPlural: "tracks",
-                            duration: importManagingVM.tracksDuration(album.tracks),
-                            size: importManagingVM.tracksSize(album.tracks)
+                            duration: importManagingVM.tracksDuration(orderedTracks),
+                            size: importManagingVM.tracksSize(orderedTracks)
                         )
                     }
 
@@ -133,6 +133,11 @@ struct AlbumDetailsView: View {
     private var currentAlbum: MusicLibrary.Album? {
         guard let album else { return nil }
         return importManagingVM.library?.albums.first { $0.id == album.id } ?? album
+    }
+
+    private var orderedTracks: [TrackEntity] {
+        guard let album = currentAlbum else { return [] }
+        return importManagingVM.orderedAlbumTracks(album.tracks)
     }
 }
 

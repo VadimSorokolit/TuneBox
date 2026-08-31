@@ -27,7 +27,10 @@ final class AudioMetadataService: AudioMetadataServicing {
         let metadata = file.metadata
         let additional = metadata.additionalMetadata
 
-        let trackNumber = metadata.trackNumber
+        let trackNumber = Self.resolvedTrackNumber(
+            from: metadata.trackNumber,
+            additional: additional
+        )
 
         let title = Self.cleanMetadataValue(
             metadata.title
@@ -119,6 +122,42 @@ final class AudioMetadataService: AudioMetadataServicing {
     }
 
     // MARK: - Methods. Private
+
+    static func parseTrackNumber(from raw: String) -> Int? {
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if let match = trimmed.firstMatch(of: /^(\d+)\s*\/\s*\d+/) {
+            return Int(match.1)
+        }
+
+        if let match = trimmed.firstMatch(of: /(\d+)\s*\/\s*\d+/) {
+            return Int(match.1)
+        }
+
+        guard let number = Int(trimmed), number > 0 else {
+            return nil
+        }
+
+        return number
+    }
+
+    private static func resolvedTrackNumber(
+        from metadataNumber: Int?,
+        additional: [AnyHashable: Any]?
+    ) -> Int? {
+        if let metadataNumber, metadataNumber > 0 {
+            return metadataNumber
+        }
+
+        guard let raw = additionalValue(
+            for: ["TRACKNUMBER", "TRCK", "TRACK"],
+            in: additional
+        ) else {
+            return nil
+        }
+
+        return parseTrackNumber(from: raw)
+    }
 
     private static func cleanMetadataValue(_ value: String?) -> String? {
         guard let value else { return nil }

@@ -702,13 +702,10 @@ final class PlayerViewModel: PlayerManaging {
         persistence: PersistenceServicing
     ) -> MusicLibrary.Album? {
         // Album.id is the album name in parseLibrary.
-        let tracks = ((try? persistence.getImportTracks()) ?? [])
-            .filter { $0.albumName == id }
-            .sorted { lhs, rhs in
-                let left = (lhs.trackNumber ?? Int.max, lhs.songName.localizedLowercase)
-                let right = (rhs.trackNumber ?? Int.max, rhs.songName.localizedLowercase)
-                return left < right
-            }
+        let tracks = AlbumTrackOrdering.ordered(
+            ((try? persistence.getImportTracks()) ?? [])
+                .filter { $0.albumName == id }
+        )
         guard tracks.isNotEmpty else { return nil }
 
         return MusicLibrary.Album(
