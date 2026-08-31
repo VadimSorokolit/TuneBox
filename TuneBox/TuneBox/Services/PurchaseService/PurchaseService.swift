@@ -22,7 +22,7 @@ final class PurchaseService: PurchaseServicing {
 
     // MARK: - Initializer
 
-    init(entitlementService: EntitlementService) {
+    init(entitlementService: EntitlementServicing) {
         self.entitlementService = entitlementService
         self.updatesTask = Task { [weak self] in
             await self?.observeTransactionUpdates()

@@ -16,7 +16,26 @@ extension Resolver: @retroactive ResolverRegistering {
         self.registerCoverService()
         self.registerStorageService()
         self.registerPersistenceService()
+        self.registerPurchaseServices()
         self.registerViewModels()
+    }
+
+    private static func registerPurchaseServices() {
+        self.register {
+            MainActor.assumeIsolated {
+                EntitlementService() as EntitlementServicing
+            }
+        }
+        .scope(.application)
+
+        self.register {
+            MainActor.assumeIsolated {
+                PurchaseService(
+                    entitlementService: self.resolve(EntitlementServicing.self)
+                ) as PurchaseServicing
+            }
+        }
+        .scope(.application)
     }
 
     private static func registerJamendoService() {
