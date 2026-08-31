@@ -165,6 +165,7 @@ struct RootTabsView: View {
 
     @Injected private var rootTabsVM: RootTabsManaging
     @Injected private var playerVM: PlayerManaging
+    @Injected private var importManagingVM: ImportManaging
     @Injected private var coverVM: CoverManaging
     @Environment(\.themeManager) private var theme
     @Environment(AppCoordinator.self) private var coordinator
@@ -257,14 +258,18 @@ struct RootTabsView: View {
 
     private func openTrackSource() {
         if playerVM.playbackNavigationPath.isEmpty {
-            playerVM.refreshPlaybackNavigationPath(library: nil)
+            playerVM.refreshPlaybackNavigationPath(library: importManagingVM.library)
         }
 
         let path = playerVM.playbackNavigationPath
         guard path.isNotEmpty else { return }
 
         coordinator.switchToTab(.importFiles, animated: false)
-        coordinator.syncPath(path)
+        coordinator.popToRoot(animated: false)
+
+        for route in path {
+            coordinator.push(route, animated: false)
+        }
     }
 
     // MARK: - Private. Object
