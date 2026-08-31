@@ -35,12 +35,12 @@ private struct Constants {
     }
 
     static let mockAPIKey = "88888888"
-    static let сlientIDKey = "JAMENDO_CLIENT_ID"
+    static let clientIDKey = "JAMENDO_CLIENT_ID"
     static let warningMessage = "Using mock API key"
 
     static var apiKey: String {
         if let key = Bundle.main.object(
-            forInfoDictionaryKey: Constants.сlientIDKey
+            forInfoDictionaryKey: Constants.clientIDKey
         ) as? String {
             return key
         } else {

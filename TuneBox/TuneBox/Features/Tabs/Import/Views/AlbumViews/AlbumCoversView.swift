@@ -1,5 +1,5 @@
 //
-//  AlbumСoversView.swift
+//  AlbumCoversView.swift
 //  TuneBox
 //
 //  Created by Vadim Sorokolit on 11.08.2026.
@@ -8,7 +8,7 @@
 import SwiftUI
 import Resolver
 
-struct AlbumСoversView: View {
+struct AlbumCoversView: View {
 
     // MARK: - Properties. Public
 

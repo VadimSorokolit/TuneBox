@@ -69,7 +69,7 @@
 		5B586CC32FAC912500BCEAD2 /* MoyaProvider+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CC22FAC912400BCEAD2 /* MoyaProvider+Async.swift */; };
 		5B586CC72FACA8E300BCEAD2 /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CC62FACA8E200BCEAD2 /* AppError.swift */; };
 		5B586CCC2FACB61500BCEAD2 /* TracksResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CCB2FACB61400BCEAD2 /* TracksResponse.swift */; };
-		5B601ECD302B0D05005D7548 /* AlbumСoversView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B601ECC302B0CF2005D7548 /* AlbumСoversView.swift */; };
+		5B601ECD302B0D05005D7548 /* AlbumCoversView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B601ECC302B0CF2005D7548 /* AlbumCoversView.swift */; };
 		5B601ED0302B1688005D7548 /* CoverCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B601ECF302B1687005D7548 /* CoverCell.swift */; };
 		5B601ED2302B2001005D7548 /* CoverPagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B601ED1302B2001005D7548 /* CoverPagerView.swift */; };
 		5B601ED2302C56A6005D7548 /* ZoomableCoverPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B601ED1302C56A4005D7548 /* ZoomableCoverPageView.swift */; };
@@ -100,7 +100,7 @@
 		5B8860A52FB1CF910056BE9A /* NotificationNames+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8860A42FB1CF900056BE9A /* NotificationNames+Extension.swift */; };
 		5B899F782FCF13A8002D3232 /* RootTabsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B899F772FCF13A8002D3232 /* RootTabsView.swift */; };
 		5B92B905304556D700E9FB5D /* TuneBoxConfiguration.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 5B92B904304556D700E9FB5D /* TuneBoxConfiguration.storekit */; };
-		5B92B9073045626500E9FB5D /* EntitlemenServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B9063045615C00E9FB5D /* EntitlemenServicing.swift */; };
+		5B92B9073045626500E9FB5D /* EntitlementServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B9063045615C00E9FB5D /* EntitlementServicing.swift */; };
 		5B92B909304562EE00E9FB5D /* PurchaseServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B908304562ED00E9FB5D /* PurchaseServicing.swift */; };
 		5B92B90C304566E700E9FB5D /* EntitlementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B90B304566E600E9FB5D /* EntitlementService.swift */; };
 		5B92B90F304567D000E9FB5D /* PurchaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B90E304567CF00E9FB5D /* PurchaseService.swift */; };
@@ -270,7 +270,7 @@
 		5B586CC22FAC912400BCEAD2 /* MoyaProvider+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MoyaProvider+Async.swift"; sourceTree = "<group>"; };
 		5B586CC62FACA8E200BCEAD2 /* AppError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppError.swift; sourceTree = "<group>"; };
 		5B586CCB2FACB61400BCEAD2 /* TracksResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TracksResponse.swift; sourceTree = "<group>"; };
-		5B601ECC302B0CF2005D7548 /* AlbumСoversView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AlbumСoversView.swift"; sourceTree = "<group>"; };
+		5B601ECC302B0CF2005D7548 /* AlbumCoversView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AlbumCoversView.swift"; sourceTree = "<group>"; };
 		5B601ECF302B1687005D7548 /* CoverCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoverCell.swift; sourceTree = "<group>"; };
 		5B601ED1302B2001005D7548 /* CoverPagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoverPagerView.swift; sourceTree = "<group>"; };
 		5B601ED1302C56A4005D7548 /* ZoomableCoverPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomableCoverPageView.swift; sourceTree = "<group>"; };
@@ -299,7 +299,7 @@
 		5B8860A42FB1CF900056BE9A /* NotificationNames+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationNames+Extension.swift"; sourceTree = "<group>"; };
 		5B899F772FCF13A8002D3232 /* RootTabsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabsView.swift; sourceTree = "<group>"; };
 		5B92B904304556D700E9FB5D /* TuneBoxConfiguration.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; name = TuneBoxConfiguration.storekit; path = ../TuneBoxConfiguration.storekit; sourceTree = "<group>"; };
-		5B92B9063045615C00E9FB5D /* EntitlemenServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlemenServicing.swift; sourceTree = "<group>"; };
+		5B92B9063045615C00E9FB5D /* EntitlementServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementServicing.swift; sourceTree = "<group>"; };
 		5B92B908304562ED00E9FB5D /* PurchaseServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseServicing.swift; sourceTree = "<group>"; };
 		5B92B90B304566E600E9FB5D /* EntitlementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementService.swift; sourceTree = "<group>"; };
 		5B92B90E304567CF00E9FB5D /* PurchaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseService.swift; sourceTree = "<group>"; };
@@ -437,7 +437,7 @@
 			children = (
 				5B0BC2C63007A3A800E8F2A5 /* AlbumDetailsView.swift */,
 				5B0BC2BA3007828C00E8F2A5 /* AlbumsView.swift */,
-				5B601ECC302B0CF2005D7548 /* AlbumСoversView.swift */,
+				5B601ECC302B0CF2005D7548 /* AlbumCoversView.swift */,
 				5B601ED1302B2001005D7548 /* CoverPagerView.swift */,
 				5B601ED1302C56A4005D7548 /* ZoomableCoverPageView.swift */,
 			);
@@ -811,7 +811,7 @@
 				5B8382AC2FC4CFEF003625CD /* DownloadManaging.swift */,
 				5B9D45DE2FDF122F00F86C1B /* DownloadsPresenting.swift */,
 				5B8382B02FC4D05C003625CD /* DownloadStateProviding.swift */,
-				5B92B9063045615C00E9FB5D /* EntitlemenServicing.swift */,
+				5B92B9063045615C00E9FB5D /* EntitlementServicing.swift */,
 				5B8382A62FC4CEF6003625CD /* FileManagerServicing.swift */,
 				5B0BC2C23007905B00E8F2A5 /* FolderDisplayable.swift */,
 				5B0BC2AD30065A4E00E8F2A5 /* ImportManaging.swift */,
@@ -1484,7 +1484,7 @@
 				5B6B8CD72FED326800C23D3E /* View+sectionTracksTitle.swift in Sources */,
 				5B8382992FC4C9EE003625CD /* SpinnerView.swift in Sources */,
 				5BFCA84D2FCEE5D4009C6AD9 /* Onboarding.swift in Sources */,
-				5B601ECD302B0D05005D7548 /* AlbumСoversView.swift in Sources */,
+				5B601ECD302B0D05005D7548 /* AlbumCoversView.swift in Sources */,
 				5B9D45DC2FDF0B1C00F86C1B /* TracksSection.swift in Sources */,
 				5B9CE54B2FB32589001BE37F /* AppDelegate.swift in Sources */,
 				5B0BC2B93007699100E8F2A5 /* LibraryMenuCell.swift in Sources */,
@@ -1495,7 +1495,7 @@
 				5B0BC2B03006638700E8F2A5 /* ImportsView.swift in Sources */,
 				5B40F40A302E18090025693E /* CoverManaging.swift in Sources */,
 				5BA581922FD7055C00B498D7 /* EmptyTrackCell.swift in Sources */,
-				5B92B9073045626500E9FB5D /* EntitlemenServicing.swift in Sources */,
+				5B92B9073045626500E9FB5D /* EntitlementServicing.swift in Sources */,
 				5B586CC32FAC912500BCEAD2 /* MoyaProvider+Async.swift in Sources */,
 				5B0BC2C73007A3AA00E8F2A5 /* AlbumDetailsView.swift in Sources */,
 				5BCF3F98301BCC52003AF4AF /* LibraryEmptyStateView.swift in Sources */,

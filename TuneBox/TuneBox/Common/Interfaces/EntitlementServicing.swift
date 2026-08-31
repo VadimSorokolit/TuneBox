@@ -1,5 +1,5 @@
 //
-//  EntitlemenServicing.swift
+//  EntitlementServicing.swift
 //  TuneBox
 //
 //  Created by Vadim Sorokolit on 31.08.2026.
