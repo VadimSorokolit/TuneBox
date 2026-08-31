@@ -100,6 +100,10 @@
 		5B8860A52FB1CF910056BE9A /* NotificationNames+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8860A42FB1CF900056BE9A /* NotificationNames+Extension.swift */; };
 		5B899F782FCF13A8002D3232 /* RootTabsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B899F772FCF13A8002D3232 /* RootTabsView.swift */; };
 		5B92B905304556D700E9FB5D /* TuneBoxConfiguration.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 5B92B904304556D700E9FB5D /* TuneBoxConfiguration.storekit */; };
+		5B92B9073045626500E9FB5D /* EntitlemenServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B9063045615C00E9FB5D /* EntitlemenServicing.swift */; };
+		5B92B909304562EE00E9FB5D /* PurchaseServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B908304562ED00E9FB5D /* PurchaseServicing.swift */; };
+		5B92B90C304566E700E9FB5D /* EntitlementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B90B304566E600E9FB5D /* EntitlementService.swift */; };
+		5B92B90F304567D000E9FB5D /* PurchaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B90E304567CF00E9FB5D /* PurchaseService.swift */; };
 		5B970E0B301CDA88006E674C /* SFBAudioEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 5B970E0A301CDA88006E674C /* SFBAudioEngine */; };
 		5B992F5230090FE400276008 /* SegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B992F5130090FE200276008 /* SegmentedControl.swift */; };
 		5B992F54300913E800276008 /* View+segmentTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B992F53300913E700276008 /* View+segmentTransition.swift */; };
@@ -295,6 +299,10 @@
 		5B8860A42FB1CF900056BE9A /* NotificationNames+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationNames+Extension.swift"; sourceTree = "<group>"; };
 		5B899F772FCF13A8002D3232 /* RootTabsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabsView.swift; sourceTree = "<group>"; };
 		5B92B904304556D700E9FB5D /* TuneBoxConfiguration.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; name = TuneBoxConfiguration.storekit; path = ../TuneBoxConfiguration.storekit; sourceTree = "<group>"; };
+		5B92B9063045615C00E9FB5D /* EntitlemenServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlemenServicing.swift; sourceTree = "<group>"; };
+		5B92B908304562ED00E9FB5D /* PurchaseServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseServicing.swift; sourceTree = "<group>"; };
+		5B92B90B304566E600E9FB5D /* EntitlementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementService.swift; sourceTree = "<group>"; };
+		5B92B90E304567CF00E9FB5D /* PurchaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseService.swift; sourceTree = "<group>"; };
 		5B992F5130090FE200276008 /* SegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedControl.swift; sourceTree = "<group>"; };
 		5B992F53300913E700276008 /* View+segmentTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+segmentTransition.swift"; sourceTree = "<group>"; };
 		5B9C3DF92FD03DA300138645 /* TrackCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackCell.swift; sourceTree = "<group>"; };
@@ -795,6 +803,7 @@
 		5B8382952FC4C89C003625CD /* Interfaces */ = {
 			isa = PBXGroup;
 			children = (
+				5B92B908304562ED00E9FB5D /* PurchaseServicing.swift */,
 				5B74DF9E2FF4452A007EB36D /* AudioMetadataServicing.swift */,
 				5B8382A22FC4CB4C003625CD /* AudioServicing.swift */,
 				5B40F409302E18080025693E /* CoverManaging.swift */,
@@ -802,6 +811,7 @@
 				5B8382AC2FC4CFEF003625CD /* DownloadManaging.swift */,
 				5B9D45DE2FDF122F00F86C1B /* DownloadsPresenting.swift */,
 				5B8382B02FC4D05C003625CD /* DownloadStateProviding.swift */,
+				5B92B9063045615C00E9FB5D /* EntitlemenServicing.swift */,
 				5B8382A62FC4CEF6003625CD /* FileManagerServicing.swift */,
 				5B0BC2C23007905B00E8F2A5 /* FolderDisplayable.swift */,
 				5B0BC2AD30065A4E00E8F2A5 /* ImportManaging.swift */,
@@ -869,6 +879,22 @@
 				5B3FEB412FB453CB00DC1562 /* Settings */,
 			);
 			path = Tabs;
+			sourceTree = "<group>";
+		};
+		5B92B90A304566E100E9FB5D /* EntitlementService */ = {
+			isa = PBXGroup;
+			children = (
+				5B92B90B304566E600E9FB5D /* EntitlementService.swift */,
+			);
+			path = EntitlementService;
+			sourceTree = "<group>";
+		};
+		5B92B90D304567B000E9FB5D /* PurchaseService */ = {
+			isa = PBXGroup;
+			children = (
+				5B92B90E304567CF00E9FB5D /* PurchaseService.swift */,
+			);
+			path = PurchaseService;
 			sourceTree = "<group>";
 		};
 		5B9C3DF82FD03D9700138645 /* Cells */ = {
@@ -1079,10 +1105,12 @@
 				5B74DF9B2FF444BA007EB36D /* AudioMetadataService */,
 				5BD0DAF82FBF6C4A00268A48 /* AudioService */,
 				5B40F401302DE4D00025693E /* CoverService */,
+				5B92B90A304566E100E9FB5D /* EntitlementService */,
 				5B586CB32FAC611E00BCEAD2 /* FileManagerService */,
 				5B586CB22FAC610400BCEAD2 /* JamendoService */,
 				5BC5EECF303846BC001A16A9 /* NetworkMonitorService */,
 				5B11C3382FB716590089BAD2 /* PersistenceService */,
+				5B92B90D304567B000E9FB5D /* PurchaseService */,
 				5BCF3F9B301BE84A003AF4AF /* WaveformService */,
 			);
 			path = Services;
@@ -1446,6 +1474,7 @@
 				5BC5EED33038470B001A16A9 /* NetworkMonitoring.swift in Sources */,
 				5BA581942FD70BC300B498D7 /* EmptyGenreCell.swift in Sources */,
 				5BFCA83A2FCED71E009C6AD9 /* Color+hex.swift in Sources */,
+				5B92B90C304566E700E9FB5D /* EntitlementService.swift in Sources */,
 				5B0BC2B230068A4A00E8F2A5 /* CentralSpinnerModifier.swift in Sources */,
 				5B0BC2A330051A8300E8F2A5 /* ImportTracksViewV1.swift in Sources */,
 				5B3D227D2FF53A55004B8356 /* View+frame.swift in Sources */,
@@ -1461,10 +1490,12 @@
 				5B0BC2B93007699100E8F2A5 /* LibraryMenuCell.swift in Sources */,
 				5BB3012A3026020200A2AA47 /* PlaybackSessionSnapshot.swift in Sources */,
 				5B586CBA2FAC842200BCEAD2 /* Resolver+Injection.swift in Sources */,
+				5B92B909304562EE00E9FB5D /* PurchaseServicing.swift in Sources */,
 				5B2CF4612FBC7C6B00C5BA4C /* TransferDownloadObserverTokens.swift in Sources */,
 				5B0BC2B03006638700E8F2A5 /* ImportsView.swift in Sources */,
 				5B40F40A302E18090025693E /* CoverManaging.swift in Sources */,
 				5BA581922FD7055C00B498D7 /* EmptyTrackCell.swift in Sources */,
+				5B92B9073045626500E9FB5D /* EntitlemenServicing.swift in Sources */,
 				5B586CC32FAC912500BCEAD2 /* MoyaProvider+Async.swift in Sources */,
 				5B0BC2C73007A3AA00E8F2A5 /* AlbumDetailsView.swift in Sources */,
 				5BCF3F98301BCC52003AF4AF /* LibraryEmptyStateView.swift in Sources */,
@@ -1508,6 +1539,7 @@
 				5B11C3412FB728390089BAD2 /* PersistenceService.swift in Sources */,
 				5B8382B82FC5AEA9003625CD /* Notification+value.swift in Sources */,
 				5B586CC72FACA8E300BCEAD2 /* AppError.swift in Sources */,
+				5B92B90F304567D000E9FB5D /* PurchaseService.swift in Sources */,
 				5B586CCC2FACB61500BCEAD2 /* TracksResponse.swift in Sources */,
 				5BCF3F9D301BE84E003AF4AF /* WaveformService.swift in Sources */,
 				5B0BC2DD3008D91C00E8F2A5 /* ArtistDetailsView.swift in Sources */,

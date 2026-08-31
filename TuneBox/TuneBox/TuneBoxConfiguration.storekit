@@ -15,7 +15,7 @@
   ],
   "products" : [
     {
-      "displayPrice" : "34",
+      "displayPrice" : "34.99",
       "familyShareable" : false,
       "internalID" : "3611D3D6",
       "localizations" : [
@@ -59,8 +59,8 @@
           "billingPlans" : [
             {
               "billingPlanType" : "BILLED_UPFRONT",
-              "commitmentDisplayPrice" : "4",
-              "displayPrice" : "4",
+              "commitmentDisplayPrice" : "1.99",
+              "displayPrice" : "1.99",
               "internalID" : "3CCD59B8",
               "isEnabled" : true
             }
@@ -68,7 +68,7 @@
           "codeOffers" : [
 
           ],
-          "displayPrice" : "4",
+          "displayPrice" : "1.99",
           "familyShareable" : false,
           "groupNumber" : 1,
           "internalID" : "4715503B",
