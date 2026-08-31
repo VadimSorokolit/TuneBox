@@ -29,6 +29,8 @@ final class PurchaseService: PurchaseServicing {
         }
     }
 
+    // MARK: - Deinitializer
+
     deinit {
         self.updatesTask?.cancel()
     }

@@ -8,10 +8,15 @@
 import Foundation
 
 final class TransferDownloadObserverTokens: @unchecked Sendable {
+
+    // MARK: - Properties. Public
+
     var progressToken: NSObjectProtocol?
     var finishedToken: NSObjectProtocol?
     var failedToken: NSObjectProtocol?
     var interruptedToken: NSObjectProtocol?
+
+    // MARK: - Deinitializer
 
     deinit {
         if let progressToken {
