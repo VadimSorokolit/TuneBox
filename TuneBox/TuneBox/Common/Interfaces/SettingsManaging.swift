@@ -6,5 +6,15 @@
 //
 
 import Foundation
+import StoreKit
 
-protocol SettingsManaging: AnyObject {}
+@MainActor
+protocol SettingsManaging: LoadStateManaging {
+    var hasPremium: Bool { get }
+    var isPaywallPresented: Bool { get set }
+    var products: [Product] { get }
+    var purchasedProductIDs: Set<String> { get }
+
+    func purchase(_ product: Product) async
+    func restorePurchases() async
+}

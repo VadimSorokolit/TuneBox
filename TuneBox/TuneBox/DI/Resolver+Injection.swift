@@ -87,6 +87,14 @@ extension Resolver: @retroactive ResolverRegistering {
     private static func registerViewModels() {
         self.register {
             MainActor.assumeIsolated {
+                RootTabsViewModel()
+                as RootTabsManaging
+            }
+        }
+        .scope(.application)
+
+        self.register {
+            MainActor.assumeIsolated {
                 TransferViewModel(
                     jamendoService: self.resolve(JamendoServicing.self),
                     storageService: self.resolve(FileManagerServicing.self)
@@ -137,8 +145,7 @@ extension Resolver: @retroactive ResolverRegistering {
 
         self.register {
             MainActor.assumeIsolated {
-                RootTabsViewModel()
-                as RootTabsManaging
+                SettingsViewModel() as SettingsManaging
             }
         }
         .scope(.application)
