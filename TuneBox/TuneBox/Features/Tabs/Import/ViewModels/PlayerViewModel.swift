@@ -334,13 +334,13 @@ final class PlayerViewModel: PlayerManaging {
     func playPrevious() {
         self.ensureShuffleOrderIfNeeded()
 
-        if self.repeatMode == .off, self.isAtFirstTrack {
-            self.returnToTrackStartAndPause()
+        if self.playbackElapsedTime > Self.restartThreshold {
+            self.restartCurrentTrackPlayback()
             return
         }
 
-        if self.audioService.currentTime > Self.restartThreshold {
-            self.audioService.seek(to: 0)
+        if self.repeatMode == .off, self.isAtFirstTrack {
+            self.returnToTrackStartAndPause()
             return
         }
 
@@ -384,7 +384,7 @@ final class PlayerViewModel: PlayerManaging {
     private var needsNavigationPathRebuild = false
     private var vinylTapSpinTask: Task<Void, Never>?
 
-    private static let restartThreshold: TimeInterval = 3
+    private static let restartThreshold: TimeInterval = 5
     private static let persistProgressInterval: TimeInterval = 5
     private static let vinylScrubSpinSpeed: Double = 2.5
     private static let vinylTapSpinSpeed: Double = 3.0
@@ -419,6 +419,27 @@ final class PlayerViewModel: PlayerManaging {
         }
 
         return index == 0
+    }
+
+    private var playbackElapsedTime: TimeInterval {
+        let currentTime = self.audioService.currentTime
+
+        if currentTime > 0 {
+            return currentTime
+        }
+
+        guard let duration = self.track?.duration, duration > 0 else {
+            return 0
+        }
+
+        return Double(duration) * self.progress
+    }
+
+    private func restartCurrentTrackPlayback() {
+        self.clearSeekScrubbing()
+        self.audioService.seek(to: 0)
+        self.progress = 0
+        self.persistPlaybackSession()
     }
 
     private func startVinylTapSpin(direction: Double) {
