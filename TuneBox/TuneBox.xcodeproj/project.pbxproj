@@ -104,6 +104,7 @@
 		5B92B909304562EE00E9FB5D /* PurchaseServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B908304562ED00E9FB5D /* PurchaseServicing.swift */; };
 		5B92B90C304566E700E9FB5D /* EntitlementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B90B304566E600E9FB5D /* EntitlementService.swift */; };
 		5B92B90F304567D000E9FB5D /* PurchaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B90E304567CF00E9FB5D /* PurchaseService.swift */; };
+		5B92B9113045CCD200E9FB5D /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B9103045CCD100E9FB5D /* PaywallView.swift */; };
 		5B970E0B301CDA88006E674C /* SFBAudioEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 5B970E0A301CDA88006E674C /* SFBAudioEngine */; };
 		5B992F5230090FE400276008 /* SegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B992F5130090FE200276008 /* SegmentedControl.swift */; };
 		5B992F54300913E800276008 /* View+segmentTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B992F53300913E700276008 /* View+segmentTransition.swift */; };
@@ -270,7 +271,7 @@
 		5B586CC22FAC912400BCEAD2 /* MoyaProvider+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MoyaProvider+Async.swift"; sourceTree = "<group>"; };
 		5B586CC62FACA8E200BCEAD2 /* AppError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppError.swift; sourceTree = "<group>"; };
 		5B586CCB2FACB61400BCEAD2 /* TracksResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TracksResponse.swift; sourceTree = "<group>"; };
-		5B601ECC302B0CF2005D7548 /* AlbumCoversView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AlbumCoversView.swift"; sourceTree = "<group>"; };
+		5B601ECC302B0CF2005D7548 /* AlbumCoversView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumCoversView.swift; sourceTree = "<group>"; };
 		5B601ECF302B1687005D7548 /* CoverCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoverCell.swift; sourceTree = "<group>"; };
 		5B601ED1302B2001005D7548 /* CoverPagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoverPagerView.swift; sourceTree = "<group>"; };
 		5B601ED1302C56A4005D7548 /* ZoomableCoverPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomableCoverPageView.swift; sourceTree = "<group>"; };
@@ -303,6 +304,7 @@
 		5B92B908304562ED00E9FB5D /* PurchaseServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseServicing.swift; sourceTree = "<group>"; };
 		5B92B90B304566E600E9FB5D /* EntitlementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementService.swift; sourceTree = "<group>"; };
 		5B92B90E304567CF00E9FB5D /* PurchaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseService.swift; sourceTree = "<group>"; };
+		5B92B9103045CCD100E9FB5D /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		5B992F5130090FE200276008 /* SegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedControl.swift; sourceTree = "<group>"; };
 		5B992F53300913E700276008 /* View+segmentTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+segmentTransition.swift"; sourceTree = "<group>"; };
 		5B9C3DF92FD03DA300138645 /* TrackCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackCell.swift; sourceTree = "<group>"; };
@@ -499,8 +501,6 @@
 		5B1875C72FD0842400D8A042 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				5BC5EED430388AB8001A16A9 /* VinylPlateView.swift */,
-				96095791DA314523A802F6CC /* SpinningVinylView.swift */,
 				5B0BC2CE3007DF7100E8F2A5 /* CoverView.swift */,
 				5BA581912FD7055B00B498D7 /* EmptyTrackCell.swift */,
 				5BA581952FD8603400B498D7 /* HighlightedText.swift */,
@@ -509,7 +509,10 @@
 				5B1875C52FD06EBC00D8A042 /* SearchBarView.swift */,
 				5B1875C82FD084CA00D8A042 /* SegmentedChipControl.swift */,
 				5B992F5130090FE200276008 /* SegmentedControl.swift */,
+				96095791DA314523A802F6CC /* SpinningVinylView.swift */,
+				5B92B9103045CCD100E9FB5D /* PaywallView.swift */,
 				5B9C3DF92FD03DA300138645 /* TrackCell.swift */,
+				5BC5EED430388AB8001A16A9 /* VinylPlateView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1566,6 +1569,7 @@
 				5B8382AB2FC4CF88003625CD /* PersistenceTrackServicing.swift in Sources */,
 				5B8382AF2FC4D01C003625CD /* PersistenceManaging.swift in Sources */,
 				5BC8D8F62FFD769300742822 /* ImportedPlaylistCell.swift in Sources */,
+				5B92B9113045CCD200E9FB5D /* PaywallView.swift in Sources */,
 				5B601ED0302B1688005D7548 /* CoverCell.swift in Sources */,
 				5B601ED2302B2001005D7548 /* CoverPagerView.swift in Sources */,
 				5BC5EED9303C86DC001A16A9 /* Optional+Extensions.swift in Sources */,

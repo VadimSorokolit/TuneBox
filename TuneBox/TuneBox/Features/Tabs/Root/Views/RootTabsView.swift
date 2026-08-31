@@ -118,7 +118,7 @@ struct RootTabsView: View {
                         playerVM.togglePlayPause()
                     },
                     onProgressTap: {
-                        isShowingExpandedPlayer = true
+                        isExpandedPlayerPresented = true
                     },
                     onRepeatModeChange: { mode in
                         playerVM.setRepeatMode(mode)
@@ -141,10 +141,21 @@ struct RootTabsView: View {
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
         .navigationBarBackButtonHidden(true)
-        .sheet(isPresented: $isShowingExpandedPlayer) {
-            Text("Expanded player")
+        .sheet(isPresented: $isExpandedPlayerPresented) {
+            ExpandedPlayerView()
         }
-        .animation(.easeInOut(duration: 0.25), value: isShowingExpandedPlayer)
+        .sheet(isPresented: $isPaywallPresented) {
+            PaywallView()
+                .presentationDetents([.fraction(0.45)])
+                .presentationDragIndicator(.visible)
+        }
+        .onChange(of: isPaywallPresented) { _, presented in
+            settingsVM.isPaywallPresented = presented
+        }
+        .onChange(of: settingsVM.isPaywallPresented) { _, presented in
+            isPaywallPresented = presented
+        }
+        .animation(.easeInOut(duration: 0.25), value: isExpandedPlayerPresented)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
         .onAppear {
             restoreSelectedTab()
@@ -167,9 +178,11 @@ struct RootTabsView: View {
     @Injected private var playerVM: PlayerManaging
     @Injected private var importManagingVM: ImportManaging
     @Injected private var coverVM: CoverManaging
+    @Injected private var settingsVM: SettingsManaging
     @Environment(\.themeManager) private var theme
     @Environment(AppCoordinator.self) private var coordinator
-    @State private var isShowingExpandedPlayer: Bool = false
+    @State private var isPaywallPresented: Bool = false
+    @State private var isExpandedPlayerPresented: Bool = false
 
     private var content: some View {
         Group {

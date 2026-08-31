@@ -20,7 +20,8 @@ final class EntitlementService: EntitlementServicing {
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
-        self.hasPremium = userDefaults.bool(forKey: Constants.userDefaultsKey)
+//      self.hasPremium = userDefaults.bool(forKey: Constants.userDefaultsKey)
+        self.hasPremium = true
     }
 
     // MARK: - Methods. Public

@@ -38,8 +38,8 @@ final class PurchaseService: PurchaseServicing {
     // MARK: - Methods. Public
 
     func start() async {
-        await self.loadProducts()
-        await self.updatePurchasedProducts()
+//        await self.loadProducts()
+//        await self.updatePurchasedProducts()
     }
 
     func purchase(_ product: Product) async {

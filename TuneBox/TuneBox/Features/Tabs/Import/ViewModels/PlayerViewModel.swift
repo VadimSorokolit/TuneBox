@@ -44,7 +44,8 @@ final class PlayerViewModel: PlayerManaging {
     private(set) var isShuffleEnabled = false
 
     var isPlayerVisible: Bool {
-        self.track != nil
+        self.settingsVM.hasPremium
+        && self.track.isNotNil
     }
 
     // MARK: - Initializer
@@ -124,6 +125,12 @@ final class PlayerViewModel: PlayerManaging {
     }
 
     func handlePlayAction(for track: TrackEntity, in queue: [TrackEntity], navigationPath: [AppRoute]? = nil) {
+        guard self.settingsVM.hasPremium else {
+            self.settingsVM.isPaywallPresented = true
+
+            return
+        }
+
         if let navigationPath {
             self.playbackNavigationPath = navigationPath
             self.playbackOrigin = self.makeOrigin(from: navigationPath)
@@ -374,6 +381,9 @@ final class PlayerViewModel: PlayerManaging {
     @Injected
     @ObservationIgnored
     private var persistenceService: PersistenceServicing
+    @ObservationIgnored
+    @Injected
+    private var settingsVM: SettingsManaging
     private let audioService = AudioService.shared
     private var isLoading: Bool = false
     private var cancellables = Set<AnyCancellable>()
@@ -584,6 +594,10 @@ final class PlayerViewModel: PlayerManaging {
         _ track: TrackEntity,
         using playAction: (_ trackId: String, _ url: URL, _ loop: Bool) -> Void
     ) {
+        guard self.settingsVM.hasPremium else {
+            return
+        }
+
         switch track.source {
             case .api:
                 do {
