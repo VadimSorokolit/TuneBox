@@ -25,7 +25,11 @@ final class SettingsViewModel: SettingsManaging {
     private(set) var error: String?
 
     var paywallHeaderTitle: String {
-        self.purchasedProductIDs.isNotEmpty ? "TuneBox Premium" : "Purchase TuneBox"
+        self.purchasedProductIDs.isNotEmpty
+        ? self.hasLifetimePurchase
+        ? "Lifetime Plan"
+        : "TuneBox Premium"
+        : "Purchase TuneBox"
     }
 
     var hasLifetimePurchase: Bool {

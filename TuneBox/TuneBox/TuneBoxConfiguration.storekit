@@ -72,9 +72,21 @@
           "familyShareable" : false,
           "groupNumber" : 1,
           "internalID" : "4715503B",
-          "introductoryOffer" : null,
+          "introductoryOffer" : {
+            "billingPlanType" : "BILLED_UPFRONT",
+            "internalID" : "C8853F8E",
+            "numberOfPeriods" : 1,
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P1M"
+          },
           "introductoryOffers" : [
-
+            {
+              "billingPlanType" : "BILLED_UPFRONT",
+              "internalID" : "C8853F8E",
+              "numberOfPeriods" : 1,
+              "paymentMode" : "free",
+              "subscriptionPeriod" : "P1M"
+            }
           ],
           "localizations" : [
             {

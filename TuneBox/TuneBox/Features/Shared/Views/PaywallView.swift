@@ -75,16 +75,25 @@ struct PaywallView: View {
             VStack(spacing: 10) {
                 appIcon
 
-                Text(settingsVM.paywallStatusMessage)
-                    .font(.satoshi.regular.size(13))
-                    .foregroundStyle(theme.tokens.secondaryText)
-                    .multilineTextAlignment(.center)
-                    .opacity(settingsVM.isLoading ? 0.4 : 1)
+                if settingsVM.hasLifetimePurchase.isFalse {
+                    Text(settingsVM.paywallStatusMessage)
+                        .font(.satoshi.regular.size(13))
+                        .foregroundStyle(theme.tokens.secondaryText)
+                        .multilineTextAlignment(.center)
+                        .opacity(settingsVM.isLoading ? 0.4 : 1)
+                }
 
                 Text(settingsVM.paywallHeaderTitle)
                     .font(.satoshi.bold.size(28))
                     .foregroundStyle(theme.tokens.primaryText)
                     .multilineTextAlignment(.center)
+
+                if settingsVM.hasLifetimePurchase {
+                    Text("Thank you for supporting TuneBox!")
+                        .font(.satoshi.medium.size(18))
+                        .foregroundStyle(theme.tokens.primaryText)
+                        .multilineTextAlignment(.center)
+                }
             }
             .padding(.top, 20)
         }
