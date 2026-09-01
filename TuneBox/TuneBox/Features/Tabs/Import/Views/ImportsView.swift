@@ -16,7 +16,8 @@ struct ImportsView: View {
         VStack(spacing: 20) {
             HeaderView(
                 isFileImporterPresented: $isFileImporterPresented,
-                importManagingVM: importManagingVM
+                importManagingVM: importManagingVM,
+                settingsVM: settingsVM
             )
 
             if importManagingVM.hasLibrary {
@@ -91,6 +92,7 @@ struct ImportsView: View {
     @Injected private var rootTabsVM: RootTabsManaging
     @Injected private var importManagingVM: ImportManaging
     @Injected private var playerVM: PlayerManaging
+    @Injected private var settingsVM: SettingsManaging
     @State private var sourceIDToDelete: ImportSource.ID?
     @State private var isFileImporterPresented: Bool = false
     @State private var isErrorPresented = false
@@ -103,6 +105,7 @@ struct ImportsView: View {
 
         @Binding var isFileImporterPresented: Bool
         let importManagingVM: ImportManaging
+        let settingsVM: SettingsManaging
 
         // MARK: - Body
 
@@ -136,6 +139,12 @@ struct ImportsView: View {
                                 Label("Edit Sections", systemImage: "slider.horizontal.3")
                             }
                         )
+
+                        Button(action: {
+                            settingsVM.isPaywallPresented = true
+                        }, label: {
+                            Label("License", systemImage: "checkmark.seal.fill")
+                        })
                     } label: {
                         Image(systemName: "ellipsis")
                         .font(.system(size: imageFontSize, weight: .medium))

@@ -33,6 +33,9 @@ struct PaywallView: View {
             in: .rect(cornerRadius: 28)
         )
         .ignoresSafeArea()
+        .task(id: monthlyProduct?.id) {
+            await refreshStoreIntroEligibility()
+        }
         .onChange(of: settingsVM.hasPremium) { _, hasPremium in
             if hasPremium {
                 dismiss()
@@ -46,6 +49,7 @@ struct PaywallView: View {
     @Environment(\.themeManager) private var theme
     @Environment(\.dismiss) private var dismiss
     @State private var purchasingProductID: String?
+    @State private var isEligibleForStoreIntro = false
 
     private var lifetimeProduct: Product? {
         settingsVM.products.first { $0.id == ProductID.lifetime }
@@ -61,7 +65,7 @@ struct PaywallView: View {
         VStack(spacing: 10) {
             appIcon
 
-            Text(trialSubtitle)
+            Text(settingsVM.paywallStatusMessage)
                 .font(.satoshi.regular.size(13))
                 .foregroundStyle(theme.tokens.secondaryText)
                 .multilineTextAlignment(.center)
@@ -85,8 +89,39 @@ struct PaywallView: View {
         }
     }
 
-    private var trialSubtitle: String {
-        return "Unlock full playback access"
+    private func monthlySubscriptionSubtitle(for product: Product) -> String {
+        if isEligibleForStoreIntro,
+           let offer = product.subscription?.introductoryOffer,
+           offer.paymentMode == .freeTrial {
+            let period = Self.formattedSubscriptionPeriod(offer.period)
+            return "\(period) free trial via subscription, then unlocks all playback functionality."
+        }
+
+        return "Unlocks all playback functionality."
+    }
+
+    private func refreshStoreIntroEligibility() async {
+        guard let subscription = monthlyProduct?.subscription else {
+            isEligibleForStoreIntro = false
+            return
+        }
+
+        isEligibleForStoreIntro = await subscription.isEligibleForIntroOffer
+    }
+
+    private static func formattedSubscriptionPeriod(_ period: Product.SubscriptionPeriod) -> String {
+        switch period.unit {
+            case .day:
+                period.value == 1 ? "1 day" : "\(period.value) days"
+            case .week:
+                period.value == 1 ? "1 week" : "\(period.value) weeks"
+            case .month:
+                period.value == 1 ? "1 month" : "\(period.value) months"
+            case .year:
+                period.value == 1 ? "1 year" : "\(period.value) years"
+            @unknown default:
+                "trial"
+        }
     }
 
     private var purchaseOptions: some View {
@@ -116,10 +151,6 @@ struct PaywallView: View {
                     .padding(.top, 8)
             }
         }
-    }
-
-    private func monthlySubscriptionSubtitle(for product: Product) -> String {
-        return "Unlocks all playback functionality."
     }
 
     private func purchaseRow(

@@ -16,6 +16,7 @@ struct TuneBoxApp: App {
     @State private var coordinator = AppCoordinator(root: .main)
     @Injected private var viewModel: TransferManaging
     @Injected private var playerViewModel: PlayerManaging
+    @Injected private var settingsVM: SettingsManaging
 
     var body: some Scene {
         WindowGroup {
@@ -26,6 +27,8 @@ struct TuneBoxApp: App {
                 .onChange(of: scenePhase) { _, newPhase in
                     switch newPhase {
                         case .active:
+                            settingsVM.refreshAccessState()
+
                             Task {
                                 await viewModel.restoreDownloadsOnForeground()
                             }

@@ -44,6 +44,7 @@ final class PurchaseService: PurchaseServicing {
     // MARK: - Methods. Public
 
     func start() async {
+        self.entitlementService.bootstrapLocalTrialIfNeeded()
         await self.loadProducts()
         await self.updatePurchasedProducts()
     }

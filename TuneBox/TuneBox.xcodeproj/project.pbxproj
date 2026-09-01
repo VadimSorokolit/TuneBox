@@ -103,6 +103,7 @@
 		5B92B9073045626500E9FB5D /* EntitlementServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B9063045615C00E9FB5D /* EntitlementServicing.swift */; };
 		5B92B909304562EE00E9FB5D /* PurchaseServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B908304562ED00E9FB5D /* PurchaseServicing.swift */; };
 		5B92B90C304566E700E9FB5D /* EntitlementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B90B304566E600E9FB5D /* EntitlementService.swift */; };
+		5B92B914304568A100E9FB5D /* LocalTrialStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B915304568A100E9FB5D /* LocalTrialStatus.swift */; };
 		5B92B90F304567D000E9FB5D /* PurchaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B90E304567CF00E9FB5D /* PurchaseService.swift */; };
 		5B92B9113045CCD200E9FB5D /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B9103045CCD100E9FB5D /* PaywallView.swift */; };
 		5B970E0B301CDA88006E674C /* SFBAudioEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 5B970E0A301CDA88006E674C /* SFBAudioEngine */; };
@@ -303,6 +304,7 @@
 		5B92B9063045615C00E9FB5D /* EntitlementServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementServicing.swift; sourceTree = "<group>"; };
 		5B92B908304562ED00E9FB5D /* PurchaseServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseServicing.swift; sourceTree = "<group>"; };
 		5B92B90B304566E600E9FB5D /* EntitlementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementService.swift; sourceTree = "<group>"; };
+		5B92B915304568A100E9FB5D /* LocalTrialStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalTrialStatus.swift; sourceTree = "<group>"; };
 		5B92B90E304567CF00E9FB5D /* PurchaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseService.swift; sourceTree = "<group>"; };
 		5B92B9103045CCD100E9FB5D /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		5B992F5130090FE200276008 /* SegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedControl.swift; sourceTree = "<group>"; };
@@ -888,6 +890,7 @@
 			isa = PBXGroup;
 			children = (
 				5B92B90B304566E600E9FB5D /* EntitlementService.swift */,
+				5B92B915304568A100E9FB5D /* LocalTrialStatus.swift */,
 			);
 			path = EntitlementService;
 			sourceTree = "<group>";
@@ -1478,6 +1481,7 @@
 				5BA581942FD70BC300B498D7 /* EmptyGenreCell.swift in Sources */,
 				5BFCA83A2FCED71E009C6AD9 /* Color+hex.swift in Sources */,
 				5B92B90C304566E700E9FB5D /* EntitlementService.swift in Sources */,
+				5B92B914304568A100E9FB5D /* LocalTrialStatus.swift in Sources */,
 				5B0BC2B230068A4A00E8F2A5 /* CentralSpinnerModifier.swift in Sources */,
 				5B0BC2A330051A8300E8F2A5 /* ImportTracksViewV1.swift in Sources */,
 				5B3D227D2FF53A55004B8356 /* View+frame.swift in Sources */,

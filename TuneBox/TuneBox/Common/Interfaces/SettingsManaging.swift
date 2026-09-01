@@ -11,13 +11,22 @@ import StoreKit
 @MainActor
 protocol SettingsManaging: LoadStateManaging {
     var hasPremium: Bool { get }
+    var paywallStatusMessage: String { get }
     var isPaywallPresented: Bool { get set }
     var products: [Product] { get }
     var purchasedProductIDs: Set<String> { get }
 
     func purchase(_ product: Product) async
+    func refreshAccessState()
     func restorePurchases() async
     func restorePurchase()
     func openTerms()
     func openPrivacy()
+
+    #if DEBUG
+    var localTrialStatus: LocalTrialStatus? { get }
+
+    func debugExpireTrial()
+    func debugResetTrial()
+    #endif
 }

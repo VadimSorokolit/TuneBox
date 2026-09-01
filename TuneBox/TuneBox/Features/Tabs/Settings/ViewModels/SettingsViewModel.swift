@@ -26,6 +26,10 @@ final class SettingsViewModel: SettingsManaging {
         self.entitlementService.hasPremium
     }
 
+    var paywallStatusMessage: String {
+        self.entitlementService.paywallStatusMessage
+    }
+
     var products: [Product] {
         self.purchaseService.products
     }
@@ -56,11 +60,31 @@ final class SettingsViewModel: SettingsManaging {
         await self.purchaseService.restorePurchases()
     }
 
+    func refreshAccessState() {
+        self.entitlementService.refreshAccessState()
+    }
+
     func restorePurchase() {}
 
     func openTerms() {}
 
     func openPrivacy() {}
+
+    #if DEBUG
+
+    var localTrialStatus: LocalTrialStatus? {
+        self.entitlementService.localTrialStatus
+    }
+
+    func debugExpireTrial() {
+        self.entitlementService.debugExpireTrial()
+    }
+
+    func debugResetTrial() {
+        self.entitlementService.debugResetTrial()
+    }
+
+    #endif
 
     // MARK: - Properties. Private
 
