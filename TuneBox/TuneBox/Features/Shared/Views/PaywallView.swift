@@ -34,15 +34,12 @@ struct PaywallView: View {
         var body: some View {
             VStack(spacing: 0) {
                 header
-                    .padding(.top, 20)
 
                 purchaseOptions
-                    .padding(.top, 28)
 
                 Spacer(minLength: 16)
 
                 footerButtons
-                    .padding(.bottom, 18)
             }
             .padding(.horizontal, 24)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -89,6 +86,7 @@ struct PaywallView: View {
                     .foregroundStyle(theme.tokens.primaryText)
                     .multilineTextAlignment(.center)
             }
+            .padding(.top, 20)
         }
 
         private var appIcon: some View {
@@ -140,7 +138,8 @@ struct PaywallView: View {
 
         private var purchaseOptions: some View {
             VStack(spacing: 24) {
-                if let lifetimeProduct {
+                if let lifetimeProduct,
+                   settingsVM.hasLifetimePurchase.isFalse {
                     purchaseRow(
                         title: "Lifetime License",
                         subtitle: "Unlocks all playback functionality.",
@@ -150,7 +149,9 @@ struct PaywallView: View {
                     )
                 }
 
-                if let monthlyProduct {
+                if let monthlyProduct,
+                   settingsVM.hasMonthlyPurchase.isFalse,
+                   settingsVM.hasLifetimePurchase.isFalse {
                     purchaseRow(
                         title: "Monthly Subscription",
                         subtitle: monthlySubscriptionSubtitle(for: monthlyProduct),
@@ -165,6 +166,7 @@ struct PaywallView: View {
                         .padding(.top, 8)
                 }
             }
+            .padding(.top, 28)
         }
 
         private func purchaseRow(
@@ -252,6 +254,7 @@ struct PaywallView: View {
                     title: "Privacy"
                 )
             }
+            .padding(.bottom, 38)
         }
 
         private func footerButton(

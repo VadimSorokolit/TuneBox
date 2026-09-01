@@ -28,6 +28,14 @@ final class SettingsViewModel: SettingsManaging {
         self.purchasedProductIDs.isNotEmpty ? "TuneBox Premium" : "Purchase TuneBox"
     }
 
+    var hasLifetimePurchase: Bool {
+        self.purchasedProductIDs.contains(ProductID.lifetime)
+    }
+
+    var hasMonthlyPurchase: Bool {
+        self.purchasedProductIDs.contains(ProductID.monthly)
+    }
+
     // MARK: - Initializer
 
     init() {}

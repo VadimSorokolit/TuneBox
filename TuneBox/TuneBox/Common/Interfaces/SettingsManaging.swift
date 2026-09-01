@@ -11,6 +11,8 @@ import StoreKit
 @MainActor
 protocol SettingsManaging: LoadStateManaging {
     var hasPremium: Bool { get }
+    var hasLifetimePurchase: Bool { get }
+    var hasMonthlyPurchase: Bool { get }
     var paywallStatusMessage: String { get }
     var paywallHeaderTitle: String { get }
     var isPaywallPresented: Bool { get set }
