@@ -17,4 +17,7 @@ protocol SettingsManaging: LoadStateManaging {
 
     func purchase(_ product: Product) async
     func restorePurchases() async
+    func restorePurchase()
+    func openTerms()
+    func openPrivacy()
 }

@@ -56,6 +56,12 @@ final class SettingsViewModel: SettingsManaging {
         await self.purchaseService.restorePurchases()
     }
 
+    func restorePurchase() {}
+
+    func openTerms() {}
+
+    func openPrivacy() {}
+
     // MARK: - Properties. Private
 
     @ObservationIgnored

@@ -146,8 +146,7 @@ struct RootTabsView: View {
         }
         .sheet(isPresented: $isPaywallPresented) {
             PaywallView()
-                .presentationDetents([.fraction(0.45)])
-                .presentationDragIndicator(.visible)
+                .presentationDetents([.fraction(0.58)])
         }
         .onChange(of: isPaywallPresented) { _, presented in
             settingsVM.isPaywallPresented = presented

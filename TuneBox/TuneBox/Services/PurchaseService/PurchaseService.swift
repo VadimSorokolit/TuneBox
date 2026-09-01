@@ -9,6 +9,12 @@ import Foundation
 import Observation
 import StoreKit
 
+enum ProductID {
+    static let monthly = "com.TuneBox.premium.monthly"
+    static let lifetime = "com.TuneBox.premium.lifetime"
+    static let all = [monthly, lifetime]
+}
+
 @MainActor
 @Observable
 final class PurchaseService: PurchaseServicing {
@@ -38,8 +44,8 @@ final class PurchaseService: PurchaseServicing {
     // MARK: - Methods. Public
 
     func start() async {
-//        await self.loadProducts()
-//        await self.updatePurchasedProducts()
+        await self.loadProducts()
+        await self.updatePurchasedProducts()
     }
 
     func purchase(_ product: Product) async {
@@ -84,12 +90,6 @@ final class PurchaseService: PurchaseServicing {
     }
 
     // MARK: - Properties. Private
-
-    private enum ProductID {
-        static let monthly = "com.TuneBox.premium.monthly"
-        static let lifetime = "com.TuneBox.premium.lifetime"
-        static let all = [monthly, lifetime]
-    }
 
     private let entitlementService: EntitlementServicing
     private var productsLoaded = false

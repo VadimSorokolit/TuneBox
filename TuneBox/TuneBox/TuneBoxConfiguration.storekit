@@ -20,8 +20,8 @@
       "internalID" : "3611D3D6",
       "localizations" : [
         {
-          "description" : "",
-          "displayName" : "",
+          "description" : "Unlocks all playback functionality.",
+          "displayName" : "Lifetime License",
           "locale" : "en_US"
         }
       ],
@@ -72,13 +72,26 @@
           "familyShareable" : false,
           "groupNumber" : 1,
           "internalID" : "4715503B",
+          "introductoryOffer" : {
+            "billingPlanType" : "BILLED_UPFRONT",
+            "internalID" : "E8F4A1B2",
+            "numberOfPeriods" : 1,
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P2W"
+          },
           "introductoryOffers" : [
-
+            {
+              "billingPlanType" : "BILLED_UPFRONT",
+              "internalID" : "E8F4A1B2",
+              "numberOfPeriods" : 1,
+              "paymentMode" : "free",
+              "subscriptionPeriod" : "P2W"
+            }
           ],
           "localizations" : [
             {
-              "description" : "",
-              "displayName" : "",
+              "description" : "Unlocks all playback functionality.",
+              "displayName" : "Monthly Subscription",
               "locale" : "en_US"
             }
           ],
