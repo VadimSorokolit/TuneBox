@@ -16,55 +16,64 @@ final class SettingsViewModel: SettingsManaging {
 
     // MARK: - Properties. Public
 
-    var purchasedProductIDs: Set<String> {
-        self.purchaseService.purchasedProductIDs
-    }
-
+    private(set) var purchasedProductIDs = Set<String>()
     var isPaywallPresented = false
+    private(set) var hasPremium: Bool = false
+    private(set) var paywallStatusMessage: String = "Unlock full playback access"
+    private(set) var products: [Product] = []
+    private(set) var isLoading = false
+    private(set) var error: String?
 
-    var hasPremium: Bool {
-        self.entitlementService.hasPremium
-    }
-
-    var paywallStatusMessage: String {
-        self.entitlementService.paywallStatusMessage
-    }
-
-    var products: [Product] {
-        self.purchaseService.products
-    }
-
-    var isLoading: Bool {
-        self.purchaseService.isLoading
-    }
-
-    var error: String? {
-        self.purchaseService.error
+    var paywallHeaderTitle: String {
+        self.purchasedProductIDs.isNotEmpty ? "TuneBox Premium" : "Purchase TuneBox"
     }
 
     // MARK: - Initializer
 
-    init() {
-        Task { [weak self] in
-            await self?.purchaseService.start()
-        }
-    }
+    init() {}
 
     // MARK: - Methods. Public
 
-    func purchase(_ product: Product) async {
-        await self.purchaseService.purchase(product)
+    func start() async {
+        await self.purchaseService.start()
+        self.syncFromServices()
+    }
+
+    func preparePaywall() async {
+        await self.purchaseService.preparePaywall()
+        self.syncFromServices()
+    }
+
+    @discardableResult
+    func purchase(_ product: Product) async -> Bool {
+        let didPurchase = await self.purchaseService.purchase(product)
+        self.syncFromServices()
+        return didPurchase
     }
 
     func restorePurchases() async {
         await self.purchaseService.restorePurchases()
+        self.syncFromServices()
     }
 
     func refreshAccessState() {
         self.entitlementService.refreshAccessState()
+        self.syncFromServices()
     }
 
-    func restorePurchase() {}
+    func restorePurchase() {
+        Task {
+            await self.restorePurchases()
+        }
+    }
+
+    func presentPaywall() {
+        self.isPaywallPresented = true
+    }
+
+    func dismissPaywall() {
+        self.isPaywallPresented = false
+    }
 
     func openTerms() {}
 
@@ -78,10 +87,12 @@ final class SettingsViewModel: SettingsManaging {
 
     func debugExpireTrial() {
         self.entitlementService.debugExpireTrial()
+        self.syncFromServices()
     }
 
     func debugResetTrial() {
         self.entitlementService.debugResetTrial()
+        self.syncFromServices()
     }
 
     #endif
@@ -93,4 +104,15 @@ final class SettingsViewModel: SettingsManaging {
 
     @ObservationIgnored
     @Injected private var entitlementService: EntitlementServicing
+
+    // MARK: - Methods. Private
+
+    private func syncFromServices() {
+        self.products = self.purchaseService.products
+        self.purchasedProductIDs = self.purchaseService.purchasedProductIDs
+        self.isLoading = self.purchaseService.isLoading
+        self.error = self.purchaseService.error
+        self.hasPremium = self.entitlementService.hasPremium
+        self.paywallStatusMessage = self.entitlementService.paywallStatusMessage
+    }
 }

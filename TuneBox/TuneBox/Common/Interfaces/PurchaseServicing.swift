@@ -14,6 +14,7 @@ protocol PurchaseServicing: LoadStateManaging {
     var purchasedProductIDs: Set<String> { get }
 
     func start() async
-    func purchase(_ product: Product) async
+    func preparePaywall() async
+    func purchase(_ product: Product) async -> Bool
     func restorePurchases() async
 }

@@ -24,12 +24,16 @@ struct TuneBoxApp: App {
                 .environment(\.themeManager, themeManager)
                 .applyTheme(themeManager)
                 .environment(coordinator)
+                .task {
+                    await settingsVM.start()
+                }
                 .onChange(of: scenePhase) { _, newPhase in
                     switch newPhase {
                         case .active:
                             settingsVM.refreshAccessState()
 
                             Task {
+                                await settingsVM.preparePaywall()
                                 await viewModel.restoreDownloadsOnForeground()
                             }
                             AppLogger.app.info("App is active")

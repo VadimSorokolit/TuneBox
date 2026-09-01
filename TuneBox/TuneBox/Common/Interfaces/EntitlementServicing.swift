@@ -12,10 +12,16 @@ protocol EntitlementServicing: AnyObject {
     var hasPremium: Bool { get }
     var localTrialStatus: LocalTrialStatus? { get }
     var paywallStatusMessage: String { get }
+    var subscriptionExpirationDate: Date? { get }
 
     func bootstrapLocalTrialIfNeeded()
     func refreshAccessState()
-    func setHasPremium(_ value: Bool)
+    func updatePurchasedProducts(
+        activeProductIDs: Set<String>,
+        subscriptionExpirationDate: Date?,
+        allowClearing: Bool
+    )
+    func isPurchaseStatusReady(for productID: String) -> Bool
 
     #if DEBUG
     func debugExpireTrial()

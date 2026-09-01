@@ -141,7 +141,7 @@ struct ImportsView: View {
                         )
 
                         Button(action: {
-                            settingsVM.isPaywallPresented = true
+                            settingsVM.presentPaywall()
                         }, label: {
                             Label("License", systemImage: "checkmark.seal.fill")
                         })

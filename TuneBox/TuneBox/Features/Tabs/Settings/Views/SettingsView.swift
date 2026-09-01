@@ -52,7 +52,7 @@ struct SettingsView: View {
             }
 
             Button("Show Paywall") {
-                settingsVM.isPaywallPresented = true
+                settingsVM.presentPaywall()
             }
         }
     }

@@ -17,13 +17,33 @@ final class EntitlementService: EntitlementServicing {
     private(set) var hasPremium: Bool = false
     private(set) var localTrialStatus: LocalTrialStatus?
     private(set) var paywallStatusMessage: String = "Unlock full playback access"
+    private(set) var subscriptionExpirationDate: Date?
 
     // MARK: - Initializer
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
         self.hasPurchasedPremium = userDefaults.bool(forKey: Constants.hasPurchasedPremiumKey)
+        self.subscriptionExpirationDate = userDefaults.object(forKey: Constants.subscriptionExpirationDateKey) as? Date
+
+        if let storedProductIDs = userDefaults.array(forKey: Constants.purchasedProductIDsKey) as? [String] {
+            self.purchasedProductIDs = Set(storedProductIDs)
+        }
+
         self.refreshAccessState()
+    }
+
+    func isPurchaseStatusReady(for productID: String) -> Bool {
+        guard self.hasPurchasedPremium,
+              self.purchasedProductIDs.contains(productID) else {
+            return false
+        }
+
+        if productID == ProductID.monthly {
+            return self.subscriptionExpirationDate != nil
+        }
+
+        return true
     }
 
     // MARK: - Methods. Public
@@ -42,28 +62,67 @@ final class EntitlementService: EntitlementServicing {
         self.paywallStatusMessage = self.makePaywallStatusMessage()
     }
 
-    func setHasPremium(_ value: Bool) {
-        guard self.hasPurchasedPremium != value else {
-            self.refreshAccessState()
+    func updatePurchasedProducts(
+        activeProductIDs: Set<String>,
+        subscriptionExpirationDate: Date?,
+        allowClearing: Bool = true
+    ) {
+        if activeProductIDs.isEmpty && allowClearing.isFalse {
+            if let subscriptionExpirationDate {
+                self.subscriptionExpirationDate = subscriptionExpirationDate
+                self.persistPurchaseState()
+                self.refreshAccessState()
+            }
+
             return
         }
 
-        self.hasPurchasedPremium = value
-        self.userDefaults.set(value, forKey: Constants.hasPurchasedPremiumKey)
+        let hasPurchase = activeProductIDs.isNotEmpty
+        var subscriptionExpirationDate = subscriptionExpirationDate
+
+        if subscriptionExpirationDate == nil,
+           activeProductIDs.contains(ProductID.monthly),
+           let existingExpirationDate = self.subscriptionExpirationDate,
+           existingExpirationDate > Date() {
+            subscriptionExpirationDate = existingExpirationDate
+        }
+
+        if self.hasPurchasedPremium != hasPurchase {
+            self.hasPurchasedPremium = hasPurchase
+        }
+
+        self.purchasedProductIDs = activeProductIDs
+        self.subscriptionExpirationDate = subscriptionExpirationDate
+        self.persistPurchaseState()
         self.refreshAccessState()
     }
 
     // MARK: - Properties. Private
 
     private var hasPurchasedPremium: Bool
+    private var purchasedProductIDs = Set<String>()
     private let userDefaults: UserDefaults
 
     private enum Constants {
         static let trialStartDateKey = "tunebox.trialStartDate"
         static let hasPurchasedPremiumKey = "UserDefaultsHasPremiumKey"
+        static let subscriptionExpirationDateKey = "tunebox.subscriptionExpirationDate"
+        static let purchasedProductIDsKey = "tunebox.purchasedProductIDs"
     }
 
     // MARK: - Methods. Private
+
+    private func persistPurchaseState() {
+        self.userDefaults.set(self.hasPurchasedPremium, forKey: Constants.hasPurchasedPremiumKey)
+
+        if let subscriptionExpirationDate = self.subscriptionExpirationDate {
+            self.userDefaults.set(subscriptionExpirationDate, forKey: Constants.subscriptionExpirationDateKey)
+        } else {
+            self.userDefaults.removeObject(forKey: Constants.subscriptionExpirationDateKey)
+        }
+
+        self.userDefaults.set(Array(self.purchasedProductIDs), forKey: Constants.purchasedProductIDsKey)
+    }
 
     private func makeLocalTrialStatus() -> LocalTrialStatus? {
         guard let trialStartDate = self.userDefaults.object(forKey: Constants.trialStartDateKey) as? Date else {
@@ -80,6 +139,18 @@ final class EntitlementService: EntitlementServicing {
     }
 
     private func makePaywallStatusMessage() -> String {
+        if self.hasPurchasedPremium {
+            if self.purchasedProductIDs.contains(ProductID.lifetime) {
+                return "Lifetime license active"
+            }
+
+            if let subscriptionExpirationDate = self.subscriptionExpirationDate {
+                return "Your subscription is active until \(Self.formatted(subscriptionExpirationDate))"
+            }
+
+            return "Premium active"
+        }
+
         switch self.localTrialStatus {
             case .active(until: let endDate):
                 return "Your trial ends on \(Self.formatted(endDate))"
@@ -103,13 +174,18 @@ final class EntitlementService: EntitlementServicing {
         self.userDefaults.set(expiredStartDate, forKey: Constants.trialStartDateKey)
         self.hasPurchasedPremium = false
         self.userDefaults.set(false, forKey: Constants.hasPurchasedPremiumKey)
+        self.purchasedProductIDs = []
+        self.subscriptionExpirationDate = nil
+        self.persistPurchaseState()
         self.refreshAccessState()
     }
 
     func debugResetTrial() {
         self.userDefaults.removeObject(forKey: Constants.trialStartDateKey)
         self.hasPurchasedPremium = false
-        self.userDefaults.set(false, forKey: Constants.hasPurchasedPremiumKey)
+        self.purchasedProductIDs = []
+        self.subscriptionExpirationDate = nil
+        self.persistPurchaseState()
         self.bootstrapLocalTrialIfNeeded()
     }
 

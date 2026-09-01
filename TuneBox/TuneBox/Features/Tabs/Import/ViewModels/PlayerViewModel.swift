@@ -126,7 +126,7 @@ final class PlayerViewModel: PlayerManaging {
 
     func handlePlayAction(for track: TrackEntity, in queue: [TrackEntity], navigationPath: [AppRoute]? = nil) {
         guard self.settingsVM.hasPremium else {
-            self.settingsVM.isPaywallPresented = true
+            self.settingsVM.presentPaywall()
 
             return
         }
