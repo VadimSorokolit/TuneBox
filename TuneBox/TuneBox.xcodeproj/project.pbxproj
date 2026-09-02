@@ -103,9 +103,9 @@
 		5B92B9073045626500E9FB5D /* EntitlementServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B9063045615C00E9FB5D /* EntitlementServicing.swift */; };
 		5B92B909304562EE00E9FB5D /* PurchaseServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B908304562ED00E9FB5D /* PurchaseServicing.swift */; };
 		5B92B90C304566E700E9FB5D /* EntitlementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B90B304566E600E9FB5D /* EntitlementService.swift */; };
-		5B92B914304568A100E9FB5D /* LocalTrialStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B915304568A100E9FB5D /* LocalTrialStatus.swift */; };
 		5B92B90F304567D000E9FB5D /* PurchaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B90E304567CF00E9FB5D /* PurchaseService.swift */; };
 		5B92B9113045CCD200E9FB5D /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B9103045CCD100E9FB5D /* PaywallView.swift */; };
+		5B92B914304568A100E9FB5D /* LocalTrialStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B915304568A100E9FB5D /* LocalTrialStatus.swift */; };
 		5B970E0B301CDA88006E674C /* SFBAudioEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 5B970E0A301CDA88006E674C /* SFBAudioEngine */; };
 		5B992F5230090FE400276008 /* SegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B992F5130090FE200276008 /* SegmentedControl.swift */; };
 		5B992F54300913E800276008 /* View+segmentTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B992F53300913E700276008 /* View+segmentTransition.swift */; };
@@ -149,6 +149,7 @@
 		5BD579A52FAB25EE00503BA2 /* NetworkServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD579A32FAB25EE00503BA2 /* NetworkServiceTests.swift */; };
 		5BDA04C8300A5DA900C7B763 /* SourceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDA04C7300A5DA700C7B763 /* SourceView.swift */; };
 		5BDA04CA300A677F00C7B763 /* SourceFolderItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDA04C9300A677F00C7B763 /* SourceFolderItem.swift */; };
+		5BEC057430481CF300BFC3FA /* WaveformKit in Frameworks */ = {isa = PBXBuildFile; productRef = 5BEC057330481CF300BFC3FA /* WaveformKit */; };
 		5BECD77C3010E0750028FC67 /* LibrarySummaryFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BECD77B3010E0740028FC67 /* LibrarySummaryFooter.swift */; };
 		5BECD77E301380E10028FC67 /* TrackCoverCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BECD77D301380DF0028FC67 /* TrackCoverCell.swift */; };
 		5BF3AF003041A48B008193AC /* View+customNavigationTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF3AEFF3041A48A008193AC /* View+customNavigationTitle.swift */; };
@@ -304,9 +305,9 @@
 		5B92B9063045615C00E9FB5D /* EntitlementServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementServicing.swift; sourceTree = "<group>"; };
 		5B92B908304562ED00E9FB5D /* PurchaseServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseServicing.swift; sourceTree = "<group>"; };
 		5B92B90B304566E600E9FB5D /* EntitlementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementService.swift; sourceTree = "<group>"; };
-		5B92B915304568A100E9FB5D /* LocalTrialStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalTrialStatus.swift; sourceTree = "<group>"; };
 		5B92B90E304567CF00E9FB5D /* PurchaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseService.swift; sourceTree = "<group>"; };
 		5B92B9103045CCD100E9FB5D /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
+		5B92B915304568A100E9FB5D /* LocalTrialStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalTrialStatus.swift; sourceTree = "<group>"; };
 		5B992F5130090FE200276008 /* SegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedControl.swift; sourceTree = "<group>"; };
 		5B992F53300913E700276008 /* View+segmentTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+segmentTransition.swift"; sourceTree = "<group>"; };
 		5B9C3DF92FD03DA300138645 /* TrackCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackCell.swift; sourceTree = "<group>"; };
@@ -401,6 +402,7 @@
 				5B586CBD2FAC846900BCEAD2 /* Resolver in Frameworks */,
 				5B4762872FAB5C570069E41A /* RxMoya in Frameworks */,
 				5B4762812FAB5C570069E41A /* CombineMoya in Frameworks */,
+				5BEC057430481CF300BFC3FA /* WaveformKit in Frameworks */,
 				5B4762852FAB5C570069E41A /* ReactiveMoya in Frameworks */,
 				5B84C01C2FAB353200ACE75A /* CustomAlerts in Frameworks */,
 				5B4762832FAB5C570069E41A /* Moya in Frameworks */,
@@ -1311,6 +1313,7 @@
 				5B586CBC2FAC846900BCEAD2 /* Resolver */,
 				5B7E1DAC2FE2A4FA00561D67 /* SDWebImageSwiftUI */,
 				5B970E0A301CDA88006E674C /* SFBAudioEngine */,
+				5BEC057330481CF300BFC3FA /* WaveformKit */,
 			);
 			productName = TuneBox;
 			productReference = 5BD579722FAB25BF00503BA2 /* TuneBox.app */;
@@ -1395,6 +1398,7 @@
 				5B586CBB2FAC846900BCEAD2 /* XCRemoteSwiftPackageReference "Resolver" */,
 				5B7E1DAB2FE2A4FA00561D67 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 				5B970E09301CDA88006E674C /* XCLocalSwiftPackageReference "../Vendor/SFBAudioEngine" */,
+				5BEC057230481CF300BFC3FA /* XCRemoteSwiftPackageReference "WaveformKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5BD579732FAB25BF00503BA2 /* Products */;
@@ -2025,6 +2029,14 @@
 				minimumVersion = 1.10.21;
 			};
 		};
+		5BEC057230481CF300BFC3FA /* XCRemoteSwiftPackageReference "WaveformKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/GRimAce11/WaveformKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.4.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -2072,6 +2084,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5B970E09301CDA88006E674C /* XCLocalSwiftPackageReference "../Vendor/SFBAudioEngine" */;
 			productName = SFBAudioEngine;
+		};
+		5BEC057330481CF300BFC3FA /* WaveformKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5BEC057230481CF300BFC3FA /* XCRemoteSwiftPackageReference "WaveformKit" */;
+			productName = WaveformKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

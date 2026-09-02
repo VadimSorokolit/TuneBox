@@ -1,5 +1,5 @@
 {
-  "originHash" : "796f3ef5bf65a8ff77e37e1a705f15cc841d8a5349cb4ade1b2abcb7fb8e44f4",
+  "originHash" : "038cc5fe3ad0618e21c05240f01b12e26cc43061dcdf95672999c89dc18ece02",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -314,6 +314,15 @@
       "state" : {
         "revision" : "842020eabcebe410e698c68545d6597b2d232e51",
         "version" : "0.1.2"
+      }
+    },
+    {
+      "identity" : "waveformkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/GRimAce11/WaveformKit",
+      "state" : {
+        "revision" : "a57b21fb64895aa89bea7df98151f1d039d443e7",
+        "version" : "0.4.1"
       }
     },
     {
