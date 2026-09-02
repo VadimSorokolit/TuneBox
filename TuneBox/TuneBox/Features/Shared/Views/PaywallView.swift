@@ -44,7 +44,7 @@ struct PaywallView: View {
             .padding(.horizontal, 24)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .glassEffect(
-                .regular.tint(.gray.opacity(0.35)),
+                .regular.tint(.white.opacity(0.35)),
                 in: .rect(cornerRadius: 28)
             )
             .ignoresSafeArea()
@@ -89,10 +89,15 @@ struct PaywallView: View {
                     .multilineTextAlignment(.center)
 
                 if settingsVM.hasLifetimePurchase {
-                    Text("Thank you for supporting TuneBox!")
-                        .font(.satoshi.medium.size(18))
-                        .foregroundStyle(theme.tokens.primaryText)
-                        .multilineTextAlignment(.center)
+                    VStack(spacing: 65) {
+                        Text("Thank you for supporting TuneBox!")
+                            .font(.satoshi.medium.size(18))
+                            .foregroundStyle(theme.tokens.primaryText)
+                            .multilineTextAlignment(.center)
+
+                        Image(systemName: "crown.fill")
+                            .font(.system(size: 120, weight: .medium))
+                    }
                 }
             }
             .padding(.top, 20)
@@ -287,5 +292,7 @@ struct PaywallView: View {
 
 #Preview {
     PaywallView()
+        .frame(maxWidth: .infinity)
+        .frame(height: 400)
         .environment(\.themeManager, ThemeManager())
 }
