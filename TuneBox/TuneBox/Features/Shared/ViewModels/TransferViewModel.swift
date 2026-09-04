@@ -620,8 +620,8 @@ final class TransferViewModel: TransferManaging {
 
         self.jamendoService.clearPersistedResumeData(trackId: track.id)
 
-        if AudioService.shared.currentTrackId == track.id {
-            AudioService.shared.stop()
+        if self.audioService.currentTrackId == track.id {
+            self.audioService.stop()
         }
 
         do {
@@ -698,7 +698,7 @@ final class TransferViewModel: TransferManaging {
         self.queuedDownloadTrackIDs.removeAll()
         self.inProgressTrackIDs.removeAll()
 
-        AudioService.shared.stop()
+        self.audioService.stop()
         self.clearDownloadState()
         self.sections.removeAll()
 
@@ -740,10 +740,13 @@ final class TransferViewModel: TransferManaging {
     @Injected
     @ObservationIgnored
     private var persistenceService: PersistenceServicing
-    private let limit: Int = 30
+    @Injected
+    @ObservationIgnored
+    private var audioService: AudioServicing
     private let jamendoService: JamendoServicing
     private let storageService: FileManagerServicing
     private let downloadObserverTokens = TransferDownloadObserverTokens()
+    private let limit: Int = 30
     private let minimumSearchLength: Int = 2
     private var fetchTracksCount: Int = .zero
     private var isInitialLoading = false

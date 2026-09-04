@@ -140,6 +140,9 @@
 		5BCF3F98301BCC52003AF4AF /* LibraryEmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCF3F97301BCC51003AF4AF /* LibraryEmptyStateView.swift */; };
 		5BCF3F9A301BE807003AF4AF /* WaveformServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCF3F99301BE805003AF4AF /* WaveformServicing.swift */; };
 		5BCF3F9D301BE84E003AF4AF /* WaveformService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCF3F9C301BE84D003AF4AF /* WaveformService.swift */; };
+		5BCF3FA1301C1000003AF4AF /* PlaybackSpectrumService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCF3FA0301C1000003AF4AF /* PlaybackSpectrumService.swift */; };
+		5BCF3FA2301C1000003AF4B0 /* PlaybackPCMMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCF3FA0301C1000003AF4B0 /* PlaybackPCMMonitor.swift */; };
+		5BCF3FA4301C3000003AF4AF /* PeakSquareHistogramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCF3FA5301C3000003AF4AF /* PeakSquareHistogramView.swift */; };
 		5BD0DAF72FBF6BA000268A48 /* AudioServiceV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD0DAF62FBF6B9F00268A48 /* AudioServiceV1.swift */; };
 		5BD3BF312FF56EDC006FED4B /* PlaylistEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD3BF302FF56EDB006FED4B /* PlaylistEntity.swift */; };
 		5BD3BF332FF5711D006FED4B /* PersistencePlaylistServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD3BF322FF5711C006FED4B /* PersistencePlaylistServicing.swift */; };
@@ -150,6 +153,9 @@
 		5BDA04C8300A5DA900C7B763 /* SourceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDA04C7300A5DA700C7B763 /* SourceView.swift */; };
 		5BDA04CA300A677F00C7B763 /* SourceFolderItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDA04C9300A677F00C7B763 /* SourceFolderItem.swift */; };
 		5BEC057430481CF300BFC3FA /* WaveformKit in Frameworks */ = {isa = PBXBuildFile; productRef = 5BEC057330481CF300BFC3FA /* WaveformKit */; };
+		5BEC058D30487B4E00BFC3FA /* PlaybackPCMMonitoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEC058C30487B4D00BFC3FA /* PlaybackPCMMonitoring.swift */; };
+		5BEC058F304982A500BFC3FA /* PlaybackSpectrumServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEC058E304982A400BFC3FA /* PlaybackSpectrumServicing.swift */; };
+		5BEC05923049864E00BFC3FA /* SpectrumAnalyzing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEC05913049864D00BFC3FA /* SpectrumAnalyzing.swift */; };
 		5BECD77C3010E0750028FC67 /* LibrarySummaryFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BECD77B3010E0740028FC67 /* LibrarySummaryFooter.swift */; };
 		5BECD77E301380E10028FC67 /* TrackCoverCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BECD77D301380DF0028FC67 /* TrackCoverCell.swift */; };
 		5BF3AF003041A48B008193AC /* View+customNavigationTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF3AEFF3041A48A008193AC /* View+customNavigationTitle.swift */; };
@@ -344,6 +350,9 @@
 		5BCF3F97301BCC51003AF4AF /* LibraryEmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryEmptyStateView.swift; sourceTree = "<group>"; };
 		5BCF3F99301BE805003AF4AF /* WaveformServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveformServicing.swift; sourceTree = "<group>"; };
 		5BCF3F9C301BE84D003AF4AF /* WaveformService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveformService.swift; sourceTree = "<group>"; };
+		5BCF3FA0301C1000003AF4AF /* PlaybackSpectrumService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackSpectrumService.swift; sourceTree = "<group>"; };
+		5BCF3FA0301C1000003AF4B0 /* PlaybackPCMMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackPCMMonitor.swift; sourceTree = "<group>"; };
+		5BCF3FA5301C3000003AF4AF /* PeakSquareHistogramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeakSquareHistogramView.swift; sourceTree = "<group>"; };
 		5BD0DAF62FBF6B9F00268A48 /* AudioServiceV1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioServiceV1.swift; sourceTree = "<group>"; };
 		5BD3BF302FF56EDB006FED4B /* PlaylistEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistEntity.swift; sourceTree = "<group>"; };
 		5BD3BF322FF5711C006FED4B /* PersistencePlaylistServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistencePlaylistServicing.swift; sourceTree = "<group>"; };
@@ -357,6 +366,9 @@
 		5BD579AB2FAB27A000503BA2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5BDA04C7300A5DA700C7B763 /* SourceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceView.swift; sourceTree = "<group>"; };
 		5BDA04C9300A677F00C7B763 /* SourceFolderItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceFolderItem.swift; sourceTree = "<group>"; };
+		5BEC058C30487B4D00BFC3FA /* PlaybackPCMMonitoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackPCMMonitoring.swift; sourceTree = "<group>"; };
+		5BEC058E304982A400BFC3FA /* PlaybackSpectrumServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackSpectrumServicing.swift; sourceTree = "<group>"; };
+		5BEC05913049864D00BFC3FA /* SpectrumAnalyzing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumAnalyzing.swift; sourceTree = "<group>"; };
 		5BECD77B3010E0740028FC67 /* LibrarySummaryFooter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibrarySummaryFooter.swift; sourceTree = "<group>"; };
 		5BECD77D301380DF0028FC67 /* TrackCoverCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackCoverCell.swift; sourceTree = "<group>"; };
 		5BF3AEFF3041A48A008193AC /* View+customNavigationTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+customNavigationTitle.swift"; sourceTree = "<group>"; };
@@ -655,6 +667,7 @@
 			children = (
 				5BC8D90730011EC000742822 /* ExpandedPlayerView.swift */,
 				5BC8D9053000ED4600742822 /* CompactPlayerView.swift */,
+				5BCF3FA5301C3000003AF4AF /* PeakSquareHistogramView.swift */,
 			);
 			path = PlayerView;
 			sourceTree = "<group>";
@@ -810,7 +823,6 @@
 		5B8382952FC4C89C003625CD /* Interfaces */ = {
 			isa = PBXGroup;
 			children = (
-				5B92B908304562ED00E9FB5D /* PurchaseServicing.swift */,
 				5B74DF9E2FF4452A007EB36D /* AudioMetadataServicing.swift */,
 				5B8382A22FC4CB4C003625CD /* AudioServicing.swift */,
 				5B40F409302E18080025693E /* CoverManaging.swift */,
@@ -829,10 +841,14 @@
 				5B8382AE2FC4D01B003625CD /* PersistenceManaging.swift */,
 				5BD3BF322FF5711C006FED4B /* PersistencePlaylistServicing.swift */,
 				5B8382AA2FC4CF84003625CD /* PersistenceTrackServicing.swift */,
+				5BEC058C30487B4D00BFC3FA /* PlaybackPCMMonitoring.swift */,
+				5BEC058E304982A400BFC3FA /* PlaybackSpectrumServicing.swift */,
 				5B8382BB2FC5D97E003625CD /* PlayerManaging.swift */,
+				5B92B908304562ED00E9FB5D /* PurchaseServicing.swift */,
 				5B9D8D743029F80A00E5E9E5 /* RootTabsManaging.swift */,
 				5B6E4DBE2FD17B8F00B4E663 /* SegmentedItem.swift */,
 				5BA5818D2FD6A45700B498D7 /* SettingsManaging.swift */,
+				5BEC05913049864D00BFC3FA /* SpectrumAnalyzing.swift */,
 				5B8382B22FC4D0D6003625CD /* StorageManaging.swift */,
 				5BFCA8422FCEE236009C6AD9 /* TransferPrioritizable.swift */,
 				5BCF3F99301BE805003AF4AF /* WaveformServicing.swift */,
@@ -1118,6 +1134,7 @@
 				5B586CB22FAC610400BCEAD2 /* JamendoService */,
 				5BC5EECF303846BC001A16A9 /* NetworkMonitorService */,
 				5B11C3382FB716590089BAD2 /* PersistenceService */,
+				5BEC0590304985B200BFC3FA /* PlaybackSpectrumService */,
 				5B92B90D304567B000E9FB5D /* PurchaseService */,
 				5BCF3F9B301BE84A003AF4AF /* WaveformService */,
 			);
@@ -1142,6 +1159,15 @@
 				5BD579AB2FAB27A000503BA2 /* Info.plist */,
 			);
 			path = SupportingFiles;
+			sourceTree = "<group>";
+		};
+		5BEC0590304985B200BFC3FA /* PlaybackSpectrumService */ = {
+			isa = PBXGroup;
+			children = (
+				5BCF3FA0301C1000003AF4AF /* PlaybackSpectrumService.swift */,
+				5BCF3FA0301C1000003AF4B0 /* PlaybackPCMMonitor.swift */,
+			);
+			path = PlaybackSpectrumService;
 			sourceTree = "<group>";
 		};
 		5BECD77F301381530028FC67 /* Album */ = {
@@ -1493,6 +1519,7 @@
 				5B8382912FC495F9003625CD /* PlayerViewModel.swift in Sources */,
 				5B0BC2C33007905C00E8F2A5 /* FolderDisplayable.swift in Sources */,
 				5B6B8CD72FED326800C23D3E /* View+sectionTracksTitle.swift in Sources */,
+				5BEC058F304982A500BFC3FA /* PlaybackSpectrumServicing.swift in Sources */,
 				5B8382992FC4C9EE003625CD /* SpinnerView.swift in Sources */,
 				5BFCA84D2FCEE5D4009C6AD9 /* Onboarding.swift in Sources */,
 				5B601ECD302B0D05005D7548 /* AlbumCoversView.swift in Sources */,
@@ -1504,6 +1531,7 @@
 				5B92B909304562EE00E9FB5D /* PurchaseServicing.swift in Sources */,
 				5B2CF4612FBC7C6B00C5BA4C /* TransferDownloadObserverTokens.swift in Sources */,
 				5B0BC2B03006638700E8F2A5 /* ImportsView.swift in Sources */,
+				5BEC05923049864E00BFC3FA /* SpectrumAnalyzing.swift in Sources */,
 				5B40F40A302E18090025693E /* CoverManaging.swift in Sources */,
 				5BA581922FD7055C00B498D7 /* EmptyTrackCell.swift in Sources */,
 				5B92B9073045626500E9FB5D /* EntitlementServicing.swift in Sources */,
@@ -1589,6 +1617,9 @@
 				5B6B8CD52FED1DED00C23D3E /* View+dismissKeyboardOnTap.swift in Sources */,
 				5B0BC2BB3007828E00E8F2A5 /* AlbumsView.swift in Sources */,
 				5BCF3F96301BBA41003AF4AF /* AudioService.swift in Sources */,
+				5BCF3FA2301C1000003AF4B0 /* PlaybackPCMMonitor.swift in Sources */,
+				5BCF3FA1301C1000003AF4AF /* PlaybackSpectrumService.swift in Sources */,
+				5BCF3FA4301C3000003AF4AF /* PeakSquareHistogramView.swift in Sources */,
 				5B7D62B32FEE8B7A0084738C /* EmptyTracksStateModifier.swift in Sources */,
 				5BA581962FD8603500B498D7 /* HighlightedText.swift in Sources */,
 				5BC5EED530388ABA001A16A9 /* VinylPlateView.swift in Sources */,
@@ -1598,6 +1629,7 @@
 				5B88609E2FAE184C0056BE9A /* GlobalConstants.swift in Sources */,
 				5BC8D9063000ED5500742822 /* CompactPlayerView.swift in Sources */,
 				5B1875C62FD06EBD00D8A042 /* SearchBarView.swift in Sources */,
+				5BEC058D30487B4E00BFC3FA /* PlaybackPCMMonitoring.swift in Sources */,
 				5B40F405302DFC240025693E /* CoverViewModel.swift in Sources */,
 				5BF3AF003041A48B008193AC /* View+customNavigationTitle.swift in Sources */,
 				5B8382B52FC59381003625CD /* BrowseView+.swift in Sources */,

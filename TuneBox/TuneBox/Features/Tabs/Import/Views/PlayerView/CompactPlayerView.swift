@@ -313,7 +313,7 @@ struct CompactPlayerView: View {
                         }
                 )
                 .onChange(of: isSeekDisabled) { _, disabled in
-                    guard disabled, isPressed, didEnterHold else { return }
+                    guard disabled, isPressed else { return }
                     endPress()
                 }
                 .onDisappear {

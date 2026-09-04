@@ -40,6 +40,12 @@ protocol AudioServicing: AnyObject {
     var volume: Float { get set }
     var sourceFormatText: String { get }
     var outputRouteText: String { get }
+    var spectrumBands: [Float] { get }
+    var spectrumBandCount: Int { get }
+    var spectrumBandCenters: [Float] { get }
+    var onRemotePlayNext: (() -> Void)? { get set }
+    var onRemotePlayPrevious: (() -> Void)? { get set }
+    var onTrackFinished: (() -> Void)? { get set }
     var stateChangeSubject: CurrentValueSubject<Bool, Never> { get }
     var progressSubject: PassthroughSubject<Double, Never> { get }
     var formatInfoSubject: CurrentValueSubject<(source: String, output: String), Never> { get }
@@ -55,4 +61,5 @@ protocol AudioServicing: AnyObject {
     func seekToStartAndPause()
     func setSeekScrubbing(_ isScrubbing: Bool)
     func refreshFormatInfo(for url: URL)
+    func restartCurrentTrack()
 }

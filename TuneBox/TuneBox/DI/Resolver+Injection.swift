@@ -17,7 +17,17 @@ extension Resolver: @retroactive ResolverRegistering {
         self.registerStorageService()
         self.registerPersistenceService()
         self.registerPurchaseServices()
+        self.registerAudioService()
         self.registerViewModels()
+    }
+
+    private static func registerAudioService() {
+        self.register {
+            AudioService(
+                spectrumService: PlaybackSpectrumService()
+            ) as AudioServicing
+        }
+        .scope(.application)
     }
 
     private static func registerPurchaseServices() {

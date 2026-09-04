@@ -7,16 +7,12 @@
 
 import Foundation
 import Combine
-import AVFoundation
 import SFBAudioEngine
 import MediaPlayer
-import UIKit
 
 final class AudioService: NSObject, AudioServicing {
 
     // MARK: - Properties. Public
-
-    static let shared = AudioService()
 
     private(set) var currentTrackId: String?
     private(set) var sourceFormatText: String = ""
@@ -45,14 +41,16 @@ final class AudioService: NSObject, AudioServicing {
         }
     }
 
-    // MARK: - Initializer
+    var spectrumBands: [Float] {
+        self.spectrumService.bands
+    }
 
-    private override init() {
-        super.init()
-        self.setupObservers()
-        self.player.delegate = self
-        self.configureAudioSession()
-        self.configureRemoteCommands()
+    var spectrumBandCount: Int {
+        type(of: self.spectrumService).bandCount
+    }
+
+    var spectrumBandCenters: [Float] {
+        type(of: self.spectrumService).bandCenters
     }
 
     // MARK: - Methods. Public
@@ -60,6 +58,7 @@ final class AudioService: NSObject, AudioServicing {
     func play(trackId: String, url: URL, loop: Bool = false) {
         AppLogger.audio.info("AudioService PLAY: \(trackId)")
 
+        self.spectrumService.detach(from: self.player)
         self.stopProgressTimer()
         self.currentTrackId = trackId
         self.currentURL = url
@@ -78,6 +77,7 @@ final class AudioService: NSObject, AudioServicing {
             }
 
             self.applyVolume()
+            self.attachSpectrumIfNeeded()
             self.notifyStateChange(true)
             self.startProgressTimer()
             self.refreshFormatInfo(for: url)
@@ -90,20 +90,25 @@ final class AudioService: NSObject, AudioServicing {
     }
 
     func pause() {
+        self.endSeekScrubbingIfNeeded()
         _ = self.player.pause()
+        self.spectrumService.setPlaybackActive(false)
         self.stopProgressTimer()
         self.notifyStateChange(false)
         self.refreshNowPlayingElapsed()
     }
 
     func resume() {
+        self.endSeekScrubbingIfNeeded()
         guard self.player.resume() else { return }
+        self.spectrumService.setPlaybackActive(true)
         self.startProgressTimer()
         self.notifyStateChange(true)
         self.refreshNowPlayingElapsed()
     }
 
     func stop() {
+        self.spectrumService.detach(from: self.player)
         self.player.stop()
         self.stopProgressTimer()
         self.currentTrackId = nil
@@ -111,6 +116,7 @@ final class AudioService: NSObject, AudioServicing {
         self.isDoPPlayback = false
         self.shouldLoop = false
         self.isSeekScrubbing = false
+        self.wasPlayingBeforeScrub = false
         self.wasPlayingBeforeInterruption = false
         self.interruptedProgress = 0
         self.notifyStateChange(false)
@@ -168,6 +174,10 @@ final class AudioService: NSObject, AudioServicing {
     func seek(by deltaSeconds: TimeInterval) {
         guard self.duration > 0 else { return }
 
+        if self.isSeekScrubbing.isFalse {
+            self.spectrumService.holdUpdatesTemporarily(for: self.spectrumHoldDuration)
+        }
+
         if deltaSeconds >= 0 {
             _ = self.player.seek(forward: deltaSeconds)
         } else {
@@ -180,8 +190,15 @@ final class AudioService: NSObject, AudioServicing {
 
     func setSeekScrubbing(_ isScrubbing: Bool) {
         guard self.isSeekScrubbing != isScrubbing else { return }
-        self.isSeekScrubbing = isScrubbing
-        self.applyVolume()
+
+        if isScrubbing {
+            self.wasPlayingBeforeScrub = self.player.isPlaying
+            self.isSeekScrubbing = true
+            self.spectrumService.holdUpdates()
+            return
+        }
+
+        self.endSeekScrubbingIfNeeded()
     }
 
     func refreshFormatInfo(for url: URL) {
@@ -191,6 +208,13 @@ final class AudioService: NSObject, AudioServicing {
 
     func seek(to progress: Double) {
         guard self.duration > 0 else { return }
+
+        if self.isSeekScrubbing {
+            self.spectrumService.holdUpdates()
+        } else {
+            self.spectrumService.holdUpdatesTemporarily(for: self.spectrumHoldDuration)
+        }
+
         let clamped = min(max(progress, 0), 1)
         _ = self.player.seek(position: clamped)
         self.notifyProgress(clamped)
@@ -262,19 +286,34 @@ final class AudioService: NSObject, AudioServicing {
         MPNowPlayingInfoCenter.default().nowPlayingInfo = info
     }
 
+    // MARK: - Initializer
+
+    init(spectrumService: PlaybackSpectrumServicing) {
+        self.spectrumService = spectrumService
+        super.init()
+
+        self.setupObservers()
+        self.player.delegate = self
+        self.configureAudioSession()
+        self.configureRemoteCommands()
+    }
+
     // MARK: - Properties. Private
 
     private let player = AudioPlayer()
     private let effectPlayer = AudioPlayer()
+    private let spectrumService: PlaybackSpectrumServicing
     private var progressTimer: Timer?
+    private var interruptedProgress: Double = 0
     private var storedVolume: Float = 1.0
+    private let spectrumHoldDuration: TimeInterval = 0.3
     private var currentURL: URL?
+    private var supportsDoP: Bool?
     private var shouldLoop = false
     private var isDoPPlayback = false
-    private var supportsDoP: Bool?
     private var isSeekScrubbing = false
+    private var wasPlayingBeforeScrub = false
     private var wasPlayingBeforeInterruption = false
-    private var interruptedProgress: Double = 0
 
     private static let progressInterval: TimeInterval = 0.1
     private static let endThreshold: TimeInterval = 0.05
@@ -389,6 +428,11 @@ final class AudioService: NSObject, AudioServicing {
         try decoder.open()
         try self.player.play(decoder)
         self.isDoPPlayback = false
+    }
+
+    private func attachSpectrumIfNeeded() {
+        guard self.isDoPPlayback.isFalse else { return }
+        self.spectrumService.attach(to: self.player, allowRetry: true)
     }
 
     private func isUSBAudioDACConnected() -> Bool {
@@ -513,18 +557,39 @@ final class AudioService: NSObject, AudioServicing {
     }
 
     private func applyVolume() {
-        let volume: Float
-
-        if self.isSeekScrubbing {
-            volume = 0
-        } else if self.isDoPPlayback {
-            volume = 1.0
-        } else {
-            volume = self.storedVolume
-        }
+        let volume: Float = self.isDoPPlayback ? 1.0 : self.storedVolume
 
         self.player.modifyProcessingGraph { engine in
             engine.mainMixerNode.outputVolume = volume
+        }
+    }
+
+    private func endSeekScrubbingIfNeeded() {
+        let shouldResume = self.wasPlayingBeforeScrub
+        let wasScrubbing = self.isSeekScrubbing
+
+        self.isSeekScrubbing = false
+        self.wasPlayingBeforeScrub = false
+        self.spectrumService.resumeUpdates()
+        self.applyVolume()
+
+        guard wasScrubbing || shouldResume else { return }
+        guard shouldResume, self.player.isPlaying.isFalse else { return }
+
+        if self.player.resume() {
+            self.spectrumService.setPlaybackActive(true)
+            self.startProgressTimer()
+            self.notifyStateChange(true)
+            self.refreshNowPlayingElapsed()
+            return
+        }
+
+        guard let url = self.currentURL, let trackId = self.currentTrackId else { return }
+        let progress = self.progressValue
+        self.play(trackId: trackId, url: url, loop: self.shouldLoop)
+        if progress > 0, progress < 1 {
+            _ = self.player.seek(position: progress)
+            self.notifyProgress(progress)
         }
     }
 

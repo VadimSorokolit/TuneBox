@@ -5,6 +5,8 @@
 //  Created by Vadim Sorokolit on 14.06.2026.
 //
 
+import Foundation
+
 @MainActor
 protocol DownloadsPresenting: AnyObject, Sendable {
     var isSearchLoading: Bool { get }

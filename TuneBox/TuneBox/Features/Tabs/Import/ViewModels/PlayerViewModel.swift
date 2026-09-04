@@ -48,6 +48,32 @@ final class PlayerViewModel: PlayerManaging {
         && self.track.isNotNil
     }
 
+    var currentPlaybackTime: TimeInterval {
+        let currentTime = self.audioService.currentTime
+
+        if currentTime > 0 {
+            return currentTime
+        }
+
+        guard let duration = self.track?.duration, duration > 0 else {
+            return 0
+        }
+
+        return Double(duration) * self.progress
+    }
+
+    var spectrumBands: [Float] {
+        self.audioService.spectrumBands
+    }
+
+    var spectrumBandCount: Int {
+        self.audioService.spectrumBandCount
+    }
+
+    var spectrumBandCenters: [Float] {
+        self.audioService.spectrumBandCenters
+    }
+
     // MARK: - Initializer
 
     init() {
@@ -156,6 +182,7 @@ final class PlayerViewModel: PlayerManaging {
 
     func togglePlayPause() {
         guard let track = self.track else { return }
+        self.clearSeekScrubbing()
         self.toggle(track)
         self.persistPlaybackSession()
     }
@@ -260,6 +287,11 @@ final class PlayerViewModel: PlayerManaging {
 
         let direction = deltaSeconds >= 0 ? 1.0 : -1.0
         self.startVinylTapSpin(direction: direction)
+    }
+
+    func seek(to progress: Double) {
+        self.audioService.seek(to: progress)
+        self.persistPlaybackSession()
     }
 
     func setSeekScrubbing(_ isScrubbing: Bool, direction: Double = 0) {
@@ -384,7 +416,9 @@ final class PlayerViewModel: PlayerManaging {
     @ObservationIgnored
     @Injected
     private var settingsVM: SettingsManaging
-    private let audioService = AudioService.shared
+    @Injected
+    @ObservationIgnored
+    private var audioService: AudioServicing
     private var isLoading: Bool = false
     private var cancellables = Set<AnyCancellable>()
     private var shuffleOrder: [String]?
