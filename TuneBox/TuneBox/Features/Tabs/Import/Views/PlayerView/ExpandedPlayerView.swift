@@ -7,6 +7,7 @@
 
 import Resolver
 import SwiftUI
+import SDWebImageSwiftUI
 
 struct ExpandedPlayerView: View {
 
@@ -56,17 +57,21 @@ struct ExpandedPlayerView: View {
                             holeSize: 8
                         )
                         .padding(.top, 8)
+                        .shadow(color: .black.opacity(0.35), radius: 24, y: 12)
 
                         VStack(spacing: 6) {
                             Text(track.songName)
                                 .font(.title2.weight(.semibold))
                                 .multilineTextAlignment(.center)
                                 .lineLimit(2)
+                                .foregroundStyle(Self.titleColor)
+                                .shadow(color: .black.opacity(0.55), radius: 2, y: 1)
 
                             Text(track.artistName)
                                 .font(.subheadline)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Self.subtitleColor)
                                 .lineLimit(1)
+                                .shadow(color: .black.opacity(0.5), radius: 1.5, y: 1)
                         }
                         .padding(.horizontal, 24)
 
@@ -79,7 +84,10 @@ struct ExpandedPlayerView: View {
                     .padding(.horizontal, 20)
                     .padding(.bottom, 32)
                 }
-                .background(Color(.systemBackground))
+                .background {
+                    BlurredCoverBackground(coverPath: track.imagePath)
+                        .animation(.easeInOut(duration: 0.4), value: track.id)
+                }
             } else {
                 ContentUnavailableView(
                     "No Track",
@@ -93,6 +101,11 @@ struct ExpandedPlayerView: View {
 
         @Environment(\.dismiss) private var dismiss
 
+        private static let titleColor = Color.white.mix(with: .primary, by: 0.12)
+        private static let subtitleColor = Color.white.mix(with: .secondary, by: 0.25)
+        private static let chromeColor = Color.white.mix(with: .primary, by: 0.18)
+        private static let accentColor = Color.orange.mix(with: .white, by: 0.35)
+
         private var header: some View {
             HStack {
                 Spacer()
@@ -102,7 +115,8 @@ struct ExpandedPlayerView: View {
                 } label: {
                     Image(systemName: "chevron.compact.down")
                         .font(.title3.weight(.semibold))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Self.chromeColor)
+                        .shadow(color: .black.opacity(0.45), radius: 1.5, y: 1)
                         .frame(width: 44, height: 28)
                         .contentShape(Rectangle())
                 }
@@ -125,14 +139,6 @@ struct ExpandedPlayerView: View {
                 )
                 .frame(height: 140)
                 .padding(.bottom, 2)
-                .clipShape(
-                    UnevenRoundedRectangle(
-                        topLeadingRadius: 16,
-                        bottomLeadingRadius: 4,
-                        bottomTrailingRadius: 4,
-                        topTrailingRadius: 16
-                    )
-                )
 
                 HStack {
                     Text(formatClock(playerVM.currentPlaybackTime))
@@ -144,7 +150,8 @@ struct ExpandedPlayerView: View {
                     }
                 }
                 .font(.caption.monospacedDigit())
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Self.subtitleColor)
+                .shadow(color: .black.opacity(0.45), radius: 1.5, y: 1)
             }
         }
 
@@ -159,7 +166,7 @@ struct ExpandedPlayerView: View {
                 ) { editing in
                     playerVM.setSeekScrubbing(editing, direction: 0)
                 }
-                .tint(.orange)
+                .tint(Self.accentColor)
 
                 HStack(spacing: 36) {
                     Button {
@@ -183,7 +190,8 @@ struct ExpandedPlayerView: View {
                             .font(.title2)
                     }
                 }
-                .foregroundStyle(.primary)
+                .foregroundStyle(Self.chromeColor)
+                .shadow(color: .black.opacity(0.45), radius: 2, y: 1)
                 .buttonStyle(.plain)
             }
         }
@@ -198,7 +206,8 @@ struct ExpandedPlayerView: View {
                     .multilineTextAlignment(.trailing)
             }
             .font(.caption2)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(Self.subtitleColor)
+            .shadow(color: .black.opacity(0.45), radius: 1.5, y: 1)
         }
 
         private func formatClock(_ seconds: TimeInterval) -> String {
@@ -207,6 +216,65 @@ struct ExpandedPlayerView: View {
             let remaining = total % 60
 
             return String(format: "%d:%02d", minutes, remaining)
+        }
+    }
+
+    private struct BlurredCoverBackground: View {
+
+        // MARK: - Properties. Public
+
+        let coverPath: String?
+
+        // MARK: - Body
+
+        var body: some View {
+            GeometryReader { geometry in
+                ZStack {
+                    Color(.systemBackground)
+
+                    WebImage(url: coverURL) { image in
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    } placeholder: {
+                        Color.clear
+                    }
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .clipped()
+                    .blur(radius: 48)
+                    .scaleEffect(1.12)
+
+                    LinearGradient(
+                        colors: [
+                            Color.black.opacity(0.2),
+                            Color.black.opacity(0.45),
+                            Color.black.opacity(0.65)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+
+                    Rectangle()
+                        .fill(.ultraThinMaterial)
+                        .opacity(0.35)
+                }
+            }
+            .ignoresSafeArea()
+            .allowsHitTesting(false)
+        }
+
+        // MARK: - Properties. Private
+
+        private var coverURL: URL? {
+            guard let coverPath, coverPath.isEmpty == false else {
+                return nil
+            }
+
+            if coverPath.hasPrefix("http://") || coverPath.hasPrefix("https://") {
+                return URL(string: coverPath)
+            }
+
+            return AudioMetadataService.coverURL(for: coverPath)
         }
     }
 
