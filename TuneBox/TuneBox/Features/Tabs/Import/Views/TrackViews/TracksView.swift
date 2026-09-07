@@ -56,7 +56,7 @@ struct TracksView: View {
                                     onTapGesture: {
                                         playerVM.handlePlayAction(
                                             for: track,
-                                            in: section.tracks,
+                                            in: playbackQueue,
                                             navigationPath: coordinator.path
                                         )
                                     }
@@ -138,5 +138,9 @@ struct TracksView: View {
             case .fixed(let tracks):
                 tracks
         }
+    }
+
+    private var playbackQueue: [TrackEntity] {
+        importManagingVM.sortedTracksAlphabetically(tracks)
     }
 }

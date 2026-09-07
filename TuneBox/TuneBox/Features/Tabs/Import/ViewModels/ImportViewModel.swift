@@ -609,7 +609,7 @@ final class ImportViewModel: ImportManaging {
         return sortedLetters.map { letter in
             TrackAlphabetSection(
                 letter: letter,
-                tracks: grouped[letter] ?? []
+                tracks: self.sortedTracksAlphabetically(grouped[letter] ?? [])
             )
         }
     }
