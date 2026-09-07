@@ -61,6 +61,7 @@ struct TracksView: View {
                                         )
                                     }
                                 )
+                                .id(track.id)
                                 .listRowInsets(EdgeInsets())
                                 .listRowBackground(Color.clear)
                                 .listRowSeparator(.hidden)
@@ -100,6 +101,11 @@ struct TracksView: View {
                 }
                 .listStyle(.plain)
                 .environment(\.defaultMinListRowHeight, 1)
+                .scrollToCurrentTrackOnAppear(
+                    id: playerVM.track?.id,
+                    in: tracks,
+                    trigger: navigationTitle
+                )
             }
         }
         .customNavigationTitle(navigationTitle)

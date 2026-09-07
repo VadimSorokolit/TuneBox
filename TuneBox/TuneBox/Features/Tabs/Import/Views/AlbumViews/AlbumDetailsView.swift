@@ -73,6 +73,7 @@ struct AlbumDetailsView: View {
                                     )
                                 }
                             )
+                            .id(track.id)
                         }
 
                         LibrarySummaryFooter(
@@ -86,6 +87,11 @@ struct AlbumDetailsView: View {
 
                 }
             }
+            .scrollToCurrentTrackOnAppear(
+                id: playerVM.track?.id,
+                in: orderedTracks,
+                trigger: album.id
+            )
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .bottomContentMargin(
                 10,

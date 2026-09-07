@@ -34,11 +34,18 @@ struct ArtistDetailsView: View {
         if let artist {
             Group {
                 if artist.albums.isEmpty {
-                    TracksContentView(
-                        coordinator: coordinator,
-                        importManagingVM: importManagingVM,
-                        playerVM: playerVM,
-                        tracks: artist.tracks
+                    ScrollView {
+                        TracksContentView(
+                            coordinator: coordinator,
+                            importManagingVM: importManagingVM,
+                            playerVM: playerVM,
+                            tracks: artist.tracks
+                        )
+                    }
+                    .scrollToCurrentTrackOnAppear(
+                        id: playerVM.track?.id,
+                        in: artist.tracks,
+                        trigger: artist.id
                     )
                     .bottomContentMargin(
                         20,
@@ -121,6 +128,11 @@ struct ArtistDetailsView: View {
                     }
                     .animation(.easeInOut(duration: 0.25), value: selected)
                 }
+                .scrollToCurrentTrackOnAppear(
+                    id: selected == .tracks ? playerVM.track?.id : nil,
+                    in: artist.tracks,
+                    trigger: selected
+                )
                 .bottomContentMargin(
                     10,
                     0,
@@ -200,6 +212,7 @@ struct ArtistDetailsView: View {
                             )
                         }
                     )
+                    .id(track.id)
                 }
 
                 LibrarySummaryFooter(

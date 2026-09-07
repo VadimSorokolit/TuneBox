@@ -28,6 +28,7 @@ struct SourceView: View {
                     )
 
                     row(for: item, appearance: appearance)
+                        .id(scrollIdentity(for: item))
                 }
 
                 let tracks = importManagingVM.tracks(for: sourceID)
@@ -40,6 +41,11 @@ struct SourceView: View {
                 )
             }
         }
+        .scrollToCurrentTrackOnAppear(
+            id: playerVM.track?.id,
+            trackIDs: trackScrollIDs,
+            trigger: "\(path ?? "")-\(items.count)"
+        )
         .bottomContentMargin(
             10,
             0,
@@ -68,7 +74,23 @@ struct SourceView: View {
         ?? importManagingVM.source(for: sourceID)?.title ?? ImportSection.sources.rawValue.capitalized
     }
 
+    private var trackScrollIDs: [String] {
+        items.compactMap { item in
+            guard item.kind == .track else { return nil }
+            return importManagingVM.track(for: item.url)?.id
+        }
+    }
+
     // MARK: - Methods. Private
+
+    private func scrollIdentity(for item: SourceFolderItem) -> String {
+        if item.kind == .track,
+           let track = importManagingVM.track(for: item.url) {
+            return track.id
+        }
+
+        return item.url.absoluteString
+    }
 
     @ViewBuilder
     private func row(for item: SourceFolderItem, appearance: TrackPlaybackRow) -> some View {
