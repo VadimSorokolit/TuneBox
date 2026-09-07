@@ -184,3 +184,31 @@ struct SpinningVinylView: View {
         baseRotation += elapsed / revolutionDuration * 360 * activeDirection * activeSpeed
     }
 }
+
+#Preview {
+    SpinningVinylView(
+        track: TrackEntity(
+            id: "1",
+            image: nil,
+            songName: "Get Lucky",
+            duration: 369,
+            artistName: "Daft Punk",
+            albumName: "Random Access Memories",
+            releaseDate: "2013",
+            download: nil,
+            waveformData: nil,
+            size: 5_242_880
+        ),
+        isPlaying: false,
+        isLoading: false,
+        isSeekScrubbing: false,
+        isTapSpinning: false,
+        progress: 0.6,
+        revolutionDuration: 2.5,
+        spinDirection: 1,
+        spinSpeed: 1,
+        vinylSize: 240,
+        coverSize: 96,
+        holeSize: 8
+    )
+}

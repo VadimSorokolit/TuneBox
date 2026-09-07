@@ -54,6 +54,11 @@ struct VinylPlateView: View {
                 cornerRadius: coverImageSize / 2,
                 placeholderOpacity: 1.0
             )
+            .overlay {
+                Circle()
+                    .stroke(.white, lineWidth: 0.2)
+
+            }
             .allowsHitTesting(false)
 
             Circle()
@@ -78,4 +83,32 @@ struct VinylPlateView: View {
             onTap?()
         }
     }
+}
+
+#Preview {
+    SpinningVinylView(
+        track: TrackEntity(
+            id: "1",
+            image: nil,
+            songName: "Get Lucky",
+            duration: 369,
+            artistName: "Daft Punk",
+            albumName: "Random Access Memories",
+            releaseDate: "2013",
+            download: nil,
+            waveformData: nil,
+            size: 5_242_880
+        ),
+        isPlaying: true,
+        isLoading: false,
+        isSeekScrubbing: false,
+        isTapSpinning: false,
+        progress: 0.35,
+        revolutionDuration: 2.5,
+        spinDirection: 1,
+        spinSpeed: 1,
+        vinylSize: 240,
+        coverSize: 96,
+        holeSize: 8
+    )
 }

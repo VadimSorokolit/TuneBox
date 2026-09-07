@@ -428,15 +428,15 @@ struct CompactPlayerView: View {
                     ) {
                         Text("Repeat One")
                             .tag(RepeatMode.one)
-                        
+
                         Text("Repeat All")
                             .tag(RepeatMode.all)
-                        
+
                         Text("No Repeat").tag(RepeatMode.off)
                     }
 
                     Divider()
-                    
+
                     Toggle(
                         "Shuffle",
                         isOn: Binding(
