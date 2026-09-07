@@ -14,6 +14,7 @@ struct NumberedTrackCell: View {
     let index: Int
     let track: TrackEntity
     let isPlaying: Bool
+    let hidesSeparator: Bool
     let onTapGesture: () -> Void
 
     // MARK: - Main Body
@@ -55,13 +56,17 @@ struct NumberedTrackCell: View {
             .padding(.vertical, 2)
 
             Rectangle()
-                .fill(.gray.opacity(0.2))
+                .fill(hidesSeparator
+                      ? .gray.opacity(0)
+                      : .gray.opacity(0.2)
+                )
                 .frame(height: 1)
                 .padding(.leading, 65)
                 .padding(.trailing, 26)
         }
         .padding(.top, 14)
         .frame(maxWidth: .infinity)
+        .backgroundPlayingCell(isPlaying: isPlaying)
         .contentShape(Rectangle())
         .onTapGesture {
             onTapGesture()
@@ -85,6 +90,7 @@ struct NumberedTrackCell: View {
             size: 5_242_880
         ),
         isPlaying: true,
+        hidesSeparator: true,
         onTapGesture: {}
     )
 }

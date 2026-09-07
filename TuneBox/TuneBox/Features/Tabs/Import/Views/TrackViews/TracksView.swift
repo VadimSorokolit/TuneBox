@@ -46,9 +46,13 @@ struct TracksView: View {
                             )
                             .listRowInsets(EdgeInsets())
 
-                            ForEach(section.tracks) { track in
+                            ForEach(Array(section.tracks.enumerated()), id: \.element.id) { index, track in
+                                let row = section.tracks.playbackRow(at: index, currentTrack: playerVM.track)
+
                                 TrackCoverCell(
                                     track: track,
+                                    isPlaying: row.isPlaying,
+                                    hidesSeparator: row.hidesSeparator,
                                     onTapGesture: {
                                         playerVM.handlePlayAction(
                                             for: track,

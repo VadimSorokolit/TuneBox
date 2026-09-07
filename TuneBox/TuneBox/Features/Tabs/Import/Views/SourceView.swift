@@ -20,8 +20,14 @@ struct SourceView: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             LazyVStack(spacing: 0) {
-                ForEach(items) { item in
-                    row(for: item)
+                ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                    let appearance = items.playbackRow(
+                        at: index,
+                        currentTrack: playerVM.track,
+                        trackFor: importManagingVM.track(for:)
+                    )
+
+                    row(for: item, appearance: appearance)
                 }
 
                 let tracks = importManagingVM.tracks(for: sourceID)
@@ -65,12 +71,13 @@ struct SourceView: View {
     // MARK: - Methods. Private
 
     @ViewBuilder
-    private func row(for item: SourceFolderItem) -> some View {
+    private func row(for item: SourceFolderItem, appearance: TrackPlaybackRow) -> some View {
         switch item.kind {
             case .folder:
                 sourceRow(
                     icon: "folder",
                     title: item.url.lastPathComponent,
+                    hidesSeparator: appearance.hidesSeparator,
                     showsChevron: true,
                     onTapGesture: {
                         coordinator.push(
@@ -86,6 +93,8 @@ struct SourceView: View {
                 sourceRow(
                     icon: LibraryItem.tracks.systemImage,
                     title: item.url.deletingPathExtension().lastPathComponent,
+                    isPlaying: appearance.isPlaying,
+                    hidesSeparator: appearance.hidesSeparator,
                     onTapGesture: {
                         guard let track = importManagingVM.track(for: item.url) else {
                             return
@@ -134,6 +143,8 @@ struct SourceView: View {
     private func sourceRow(
         icon: String,
         title: String,
+        isPlaying: Bool = false,
+        hidesSeparator: Bool = false,
         showsChevron: Bool = false,
         onTapGesture: @escaping () -> Void
     ) -> some View {
@@ -159,12 +170,17 @@ struct SourceView: View {
             .padding(.horizontal, 26)
 
             Rectangle()
-                .fill(.gray.opacity(0.2))
+                .fill(hidesSeparator
+                      ? .gray.opacity(0)
+                      : .gray.opacity(0.2)
+                )
                 .frame(height: 1)
                 .padding(.leading, 58)
                 .padding(.trailing, 26)
         }
         .padding(.top, 15)
+        .frame(maxWidth: .infinity)
+        .backgroundPlayingCell(isPlaying: isPlaying)
         .contentShape(Rectangle())
         .onTapGesture(perform: onTapGesture)
     }

@@ -185,9 +185,13 @@ struct ArtistDetailsView: View {
 
         var body: some View {
             LazyVStack(spacing: 0) {
-                ForEach(tracks) { track in
+                ForEach(Array(tracks.enumerated()), id: \.element.id) { index, track in
+                    let row = tracks.playbackRow(at: index, currentTrack: playerVM.track)
+
                     TrackCoverCell(
                         track: track,
+                        isPlaying: row.isPlaying,
+                        hidesSeparator: row.hidesSeparator,
                         onTapGesture: {
                             playerVM.handlePlayAction(
                                 for: track,

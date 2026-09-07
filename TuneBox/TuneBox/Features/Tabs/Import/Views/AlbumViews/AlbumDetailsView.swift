@@ -58,10 +58,13 @@ struct AlbumDetailsView: View {
 
                     LazyVStack(spacing: 0) {
                         ForEach(Array(orderedTracks.enumerated()), id: \.element.id) { index, track in
+                            let row = orderedTracks.playbackRow(at: index, currentTrack: playerVM.track)
+
                             NumberedTrackCell(
                                 index: index + 1,
                                 track: track,
-                                isPlaying: track === playerVM.track,
+                                isPlaying: row.isPlaying,
+                                hidesSeparator: row.hidesSeparator,
                                 onTapGesture: {
                                     playerVM.handlePlayAction(
                                         for: track,

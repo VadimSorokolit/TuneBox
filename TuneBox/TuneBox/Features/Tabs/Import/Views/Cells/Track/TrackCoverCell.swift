@@ -12,6 +12,8 @@ struct TrackCoverCell: View {
     // MARK: - Properties. Public
 
     let track: TrackEntity
+    let isPlaying: Bool
+    let hidesSeparator: Bool
     let verticalPadding: CGFloat = 8
     let defaultPadding: CGFloat = GlobalConstants.Cell.defaultPadding
     let onTapGesture: () -> Void
@@ -51,13 +53,17 @@ struct TrackCoverCell: View {
             .padding(.horizontal, defaultPadding)
 
             Rectangle()
-                .fill(.gray.opacity(0.2))
+                .fill(hidesSeparator
+                      ? .gray.opacity(0)
+                      : .gray.opacity(0.2)
+                )
                 .frame(height: 1)
                 .padding(.leading, 82)
                 .padding(.trailing, defaultPadding)
         }
         .padding(.top, verticalPadding)
         .frame(maxWidth: .infinity)
+        .backgroundPlayingCell(isPlaying: isPlaying)
         .contentShape(Rectangle())
         .onTapGesture {
             onTapGesture()
@@ -79,6 +85,8 @@ struct TrackCoverCell: View {
             waveformData: nil,
             size: 5_242_880
         ),
+        isPlaying: true,
+        hidesSeparator: true,
         onTapGesture: {}
     )
 }
