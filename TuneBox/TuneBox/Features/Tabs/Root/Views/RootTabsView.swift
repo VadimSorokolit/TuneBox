@@ -203,8 +203,8 @@ struct RootTabsView: View {
                                     case .albums:
                                         AlbumsView()
 
-                                    case .artist(artist: let artist):
-                                        ArtistDetailsView(artist: artist)
+                                    case .artist(let artist, let segment):
+                                        ArtistDetailsView(artist: artist, initialSegment: segment)
 
                                     case .artists:
                                         ArtistsView()
@@ -273,7 +273,12 @@ struct RootTabsView: View {
             playerVM.refreshPlaybackNavigationPath(library: importManagingVM.library)
         }
 
-        let path = playerVM.playbackNavigationPath
+        let path = playerVM.playbackNavigationPath.map { route -> AppRoute in
+            if case .artist(let artist, _) = route {
+                return .artist(artist, segment: .tracks)
+            }
+            return route
+        }
         guard path.isNotEmpty else { return }
 
         coordinator.switchToTab(.importFiles, animated: false)

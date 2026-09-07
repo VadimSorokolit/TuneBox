@@ -27,6 +27,7 @@ struct ArtistDetailsView: View {
     // MARK: - Properties. Public
 
     let artist: MusicLibrary.Artist?
+    var initialSegment: LibrarySegment? = nil
 
     // MARK: - Main Body
 
@@ -58,7 +59,8 @@ struct ArtistDetailsView: View {
                         rootTabsVM: rootTabsVM,
                         importManagingVM: importManagingVM,
                         playerVM: playerVM,
-                        artist: artist
+                        artist: artist,
+                        initialSegment: initialSegment ?? .albums
                     )
                 }
             }
@@ -90,6 +92,7 @@ struct ArtistDetailsView: View {
         let importManagingVM: ImportManaging
         let playerVM: PlayerManaging
         let artist: MusicLibrary.Artist
+        let initialSegment: LibrarySegment
 
         // MARK: - Body
 
@@ -146,8 +149,27 @@ struct ArtistDetailsView: View {
 
         // MARK: - Properties. Private
 
-        @State private var selected: LibrarySegment = .albums
+        @State private var selected: LibrarySegment
         @State private var direction: SlideDirection = .forward
+
+        // MARK: - Initializer
+
+        init(
+            coordinator: AppCoordinator,
+            rootTabsVM: RootTabsManaging,
+            importManagingVM: ImportManaging,
+            playerVM: PlayerManaging,
+            artist: MusicLibrary.Artist,
+            initialSegment: LibrarySegment
+        ) {
+            self.coordinator = coordinator
+            self.rootTabsVM = rootTabsVM
+            self.importManagingVM = importManagingVM
+            self.playerVM = playerVM
+            self.artist = artist
+            self.initialSegment = initialSegment
+            _selected = State(initialValue: initialSegment)
+        }
     }
 
     private struct AlbumsContentView: View {

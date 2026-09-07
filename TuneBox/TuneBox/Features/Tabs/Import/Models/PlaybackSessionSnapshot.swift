@@ -35,7 +35,7 @@ extension PlaybackOriginSnapshot {
             case .album(let album):
                 self = .album(id: album.id)
 
-            case .artist(let artist):
+            case .artist(let artist, _):
                 self = .artist(id: artist.id)
 
             case .tracks(let title, .library):

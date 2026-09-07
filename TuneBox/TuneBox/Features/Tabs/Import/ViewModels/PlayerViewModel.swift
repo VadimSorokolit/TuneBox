@@ -746,10 +746,10 @@ final class PlayerViewModel: PlayerManaging {
 
             case .artist(let id):
                 if let artist = library?.artists.first(where: { $0.id == id }) {
-                    return [.artists, .artist(artist)]
+                    return [.artists, .artist(artist, segment: .tracks)]
                 }
                 guard let artist = Self.makeArtist(id: id, persistence: persistence) else { return [] }
-                return [.artists, .artist(artist)]
+                return [.artists, .artist(artist, segment: .tracks)]
 
             case .playlist(let id, let title):
                 let playlist =

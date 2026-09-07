@@ -15,7 +15,7 @@ enum AppRoute: Hashable {
     case album(_ album: MusicLibrary.Album)
     case artists
     case covers(_ album: MusicLibrary.Album)
-    case artist(_ artist: MusicLibrary.Artist)
+    case artist(_ artist: MusicLibrary.Artist, segment: LibrarySegment? = nil)
     case tracks(String?, TracksContent)
     case playlists
     case sourceFolder(sourceID: ImportSource.ID, path: String?)
