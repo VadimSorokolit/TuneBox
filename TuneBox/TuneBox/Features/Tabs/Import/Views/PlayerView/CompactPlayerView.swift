@@ -94,12 +94,12 @@ struct CompactPlayerView: View {
                     .padding(.horizontal, 16)
                     .frame(maxWidth: .infinity)
 
-                    if progress > 0 {
-                        ProgressBar(
-                            progress: progress,
-                            onProgressTap: onProgressTap
-                        )
-                    }
+                    ProgressBar(
+                        progress: progress,
+                        onProgressTap: onProgressTap
+                    )
+                    .opacity(progress > 0 ? 1 : 0)
+                    .allowsHitTesting(progress > 0)
                 }
                 .frame(maxWidth: .infinity)
 
@@ -302,7 +302,6 @@ struct CompactPlayerView: View {
                     in: .circle
                 )
                 .animation(.easeOut(duration: 0.15), value: isPressed)
-                .opacity(isSeekDisabled && isPressed.isFalse ? 0.35 : 1)
                 .gesture(
                     DragGesture(minimumDistance: 0)
                         .onChanged { _ in

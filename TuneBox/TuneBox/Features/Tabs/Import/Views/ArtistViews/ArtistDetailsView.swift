@@ -27,7 +27,7 @@ struct ArtistDetailsView: View {
     // MARK: - Properties. Public
 
     let artist: MusicLibrary.Artist?
-    var initialSegment: LibrarySegment? = nil
+    var initialSegment: LibrarySegment?
 
     // MARK: - Main Body
 
