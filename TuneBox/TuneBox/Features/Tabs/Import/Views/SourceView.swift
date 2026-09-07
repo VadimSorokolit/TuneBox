@@ -75,9 +75,13 @@ struct SourceView: View {
     }
 
     private var trackScrollIDs: [String] {
+        folderPlaybackQueue.map(\.id)
+    }
+
+    private var folderPlaybackQueue: [TrackEntity] {
         items.compactMap { item in
             guard item.kind == .track else { return nil }
-            return importManagingVM.track(for: item.url)?.id
+            return importManagingVM.track(for: item.url)
         }
     }
 
@@ -121,10 +125,9 @@ struct SourceView: View {
                         guard let track = importManagingVM.track(for: item.url) else {
                             return
                         }
-                        let tracks = importManagingVM.tracks(for: sourceID)
                         playerVM.handlePlayAction(
                             for: track,
-                            in: tracks,
+                            in: folderPlaybackQueue,
                             navigationPath: coordinator.path
                         )
                     }
