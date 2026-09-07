@@ -419,55 +419,29 @@ struct CompactPlayerView: View {
                 }
                 .buttonStyle(PressCircleGlassButtonStyle())
                 .contextMenu {
-                    Button {
-                        onRepeatModeChange(.one)
-                    } label: {
-                        Label {
-                            Text("Repeat One")
-                        } icon: {
-                            if repeatMode == .one {
-                                Image(systemName: "checkmark")
-                            }
-                        }
-                    }
-
-                    Button {
-                        onRepeatModeChange(.all)
-                    } label: {
-                        Label {
-                            Text("Repeat All")
-                        } icon: {
-                            if repeatMode == .all {
-                                Image(systemName: "checkmark")
-                            }
-                        }
-                    }
-
-                    Button {
-                        onRepeatModeChange(.off)
-                    } label: {
-                        Label {
-                            Text("No Repeat")
-                        } icon: {
-                            if repeatMode == .off {
-                                Image(systemName: "checkmark")
-                            }
-                        }
+                    Picker(
+                        "Repeat",
+                        selection: Binding(
+                            get: { repeatMode },
+                            set: onRepeatModeChange
+                        )
+                    ) {
+                        Text("Repeat One").tag(RepeatMode.one)
+                        
+                        Text("Repeat All").tag(RepeatMode.all)
+                        
+                        Text("No Repeat").tag(RepeatMode.off)
                     }
 
                     Divider()
 
-                    Button {
-                        onShuffleToggle()
-                    } label: {
-                        Label {
-                            Text("Shuffle")
-                        } icon: {
-                            if isShuffleEnabled {
-                                Image(systemName: "checkmark")
-                            }
-                        }
-                    }
+                    Toggle(
+                        "Shuffle",
+                        isOn: Binding(
+                            get: { isShuffleEnabled },
+                            set: { _ in onShuffleToggle() }
+                        )
+                    )
                 }
                 .overlay(alignment: .bottom) {
                     Text(repeatMode == .one ? "•" : repeatMode == .all ? "••" : "")
