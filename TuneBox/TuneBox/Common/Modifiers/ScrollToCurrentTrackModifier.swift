@@ -12,7 +12,7 @@ private struct ScrollToCurrentTrackModifier<Trigger: Hashable>: ViewModifier {
     let trackID: String?
     let trackIDs: Set<String>
     let trigger: Trigger
-    let animated: Bool
+    let followsTrackChanges: Bool
 
     @State private var isReady = false
 
@@ -26,30 +26,60 @@ private struct ScrollToCurrentTrackModifier<Trigger: Hashable>: ViewModifier {
             content
                 .opacity(needsInitialScroll && isReady == false ? 0 : 1)
                 .task(id: trigger) {
-                    isReady = false
-
-                    guard let trackID, trackIDs.contains(trackID) else {
-                        isReady = true
-                        return
-                    }
-
-                    // Wait one frame so LazyVStack registers row ids.
-                    await Task.yield()
-
-                    let scroll = {
-                        proxy.scrollTo(trackID, anchor: .center)
-                    }
-
-                    if animated {
-                        withAnimation(.easeInOut(duration: 0.35), scroll)
-                    } else {
-                        var transaction = Transaction()
-                        transaction.disablesAnimations = true
-                        withTransaction(transaction, scroll)
-                    }
-
-                    isReady = true
+                    await scrollToCurrentTrack(
+                        proxy: proxy,
+                        animated: false,
+                        prepareAppearance: true
+                    )
                 }
+                .onChange(of: trackID) { _, newID in
+                    guard followsTrackChanges, isReady else { return }
+                    guard let newID, trackIDs.contains(newID) else { return }
+
+                    scroll(proxy: proxy, to: newID, animated: true)
+                }
+        }
+    }
+
+    // MARK: - Methods. Private
+
+    @MainActor
+    private func scrollToCurrentTrack(
+        proxy: ScrollViewProxy,
+        animated: Bool,
+        prepareAppearance: Bool
+    ) async {
+        if prepareAppearance {
+            isReady = false
+        }
+
+        guard let trackID, trackIDs.contains(trackID) else {
+            isReady = true
+            return
+        }
+
+        // Wait one frame so LazyVStack / List can register row ids.
+        await Task.yield()
+
+        scroll(proxy: proxy, to: trackID, animated: animated)
+        isReady = true
+    }
+
+    private func scroll(
+        proxy: ScrollViewProxy,
+        to trackID: String,
+        animated: Bool
+    ) {
+        let action = {
+            proxy.scrollTo(trackID, anchor: .center)
+        }
+
+        if animated {
+            withAnimation(.smooth(duration: 0.4), action)
+        } else {
+            var transaction = Transaction()
+            transaction.disablesAnimations = true
+            withTransaction(transaction, action)
         }
     }
 }
@@ -60,14 +90,14 @@ extension View {
         id trackID: String?,
         in tracks: [TrackEntity],
         trigger: some Hashable,
-        animated: Bool = false
+        followsTrackChanges: Bool = true
     ) -> some View {
         modifier(
             ScrollToCurrentTrackModifier(
                 trackID: trackID,
                 trackIDs: Set(tracks.map(\.id)),
                 trigger: trigger,
-                animated: animated
+                followsTrackChanges: followsTrackChanges
             )
         )
     }
@@ -76,14 +106,14 @@ extension View {
         id trackID: String?,
         trackIDs: some Sequence<String>,
         trigger: some Hashable,
-        animated: Bool = false
+        followsTrackChanges: Bool = true
     ) -> some View {
         modifier(
             ScrollToCurrentTrackModifier(
                 trackID: trackID,
                 trackIDs: Set(trackIDs),
                 trigger: trigger,
-                animated: animated
+                followsTrackChanges: followsTrackChanges
             )
         )
     }

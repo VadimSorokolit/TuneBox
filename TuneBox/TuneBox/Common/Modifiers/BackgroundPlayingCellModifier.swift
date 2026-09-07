@@ -25,13 +25,13 @@ private struct BackgroundPlayingCellModifier: ViewModifier {
                                     AngularGradient(
                                         colors: [
                                             .clear,
-                                            .primary.opacity(0.55),
+                                            .primary.opacity(0.45),
                                             .clear
                                         ],
                                         center: .center,
                                         angle: .degrees(rotation)
                                     ),
-                                    lineWidth: 0.25
+                                    lineWidth: 0.35
                                 )
                         }
                         .padding(.horizontal, 8)
