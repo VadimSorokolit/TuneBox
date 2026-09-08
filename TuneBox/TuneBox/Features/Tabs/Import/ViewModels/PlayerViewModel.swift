@@ -88,11 +88,13 @@ final class PlayerViewModel: PlayerManaging {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] value in
                 guard let self else { return }
+                guard self.isSeekScrubbing.isFalse else { return }
+
                 self.progress = value
                 self.stopSeekScrubbingIfNeeded(at: value)
                 self.persistPlaybackSessionIfNeeded()
             }
-            .store(in: &cancellables)
+            .store(in: &self.cancellables)
 
         self.audioService.formatInfoSubject
             .receive(on: DispatchQueue.main)
@@ -282,6 +284,8 @@ final class PlayerViewModel: PlayerManaging {
         self.audioService.seek(by: deltaSeconds)
 
         guard self.isSeekScrubbing.isFalse else {
+            self.applyAudioProgress()
+            self.stopSeekScrubbingIfNeeded(at: self.progress)
             return
         }
 
@@ -290,22 +294,42 @@ final class PlayerViewModel: PlayerManaging {
     }
 
     func seek(to progress: Double) {
-        self.audioService.seek(to: progress)
+        let clamped = min(max(progress, 0), 1)
+
+        if self.isSeekScrubbing {
+            let previous = self.lastSeekProgress ?? self.progress
+            let delta = clamped - previous
+
+            if abs(delta) > Self.vinylScrubDirectionThreshold {
+                self.vinylSpinDirection = delta > 0 ? 1 : -1
+            }
+
+            self.lastSeekProgress = clamped
+            self.progress = clamped
+        }
+
+        self.audioService.seek(to: clamped)
         self.persistPlaybackSession()
     }
 
     func setSeekScrubbing(_ isScrubbing: Bool, direction: Double = 0) {
-        self.audioService.setSeekScrubbing(isScrubbing)
-        self.isSeekScrubbing = isScrubbing
         self.cancelVinylTapSpin()
 
         if isScrubbing {
+            if self.isSeekScrubbing.isFalse {
+                self.lastSeekProgress = self.progress
+            }
+
             self.vinylSpinDirection = direction >= 0 ? 1 : -1
             self.vinylSpinSpeed = Self.vinylScrubSpinSpeed
         } else {
             self.vinylSpinDirection = 1
             self.vinylSpinSpeed = 1
+            self.lastSeekProgress = nil
         }
+
+        self.audioService.setSeekScrubbing(isScrubbing)
+        self.isSeekScrubbing = isScrubbing
     }
 
     func resetPlayback() {
@@ -427,10 +451,13 @@ final class PlayerViewModel: PlayerManaging {
     private var lastPersistedProgressAt: Date?
     private var needsNavigationPathRebuild = false
     private var vinylTapSpinTask: Task<Void, Never>?
+    @ObservationIgnored
+    private var lastSeekProgress: Double?
 
     private static let restartThreshold: TimeInterval = 5
     private static let persistProgressInterval: TimeInterval = 5
     private static let vinylScrubSpinSpeed: Double = 2.5
+    private static let vinylScrubDirectionThreshold: Double = 0.0001
     private static let vinylTapSpinSpeed: Double = 3.0
     private static let vinylTapSpinDurationNanoseconds: UInt64 = 400_000_000
 
@@ -519,6 +546,13 @@ final class PlayerViewModel: PlayerManaging {
         self.vinylTapSpinTask?.cancel()
         self.vinylTapSpinTask = nil
         self.isVinylTapSpinning = false
+    }
+
+    private func applyAudioProgress() {
+        let duration = self.audioService.duration
+        guard duration > 0 else { return }
+
+        self.progress = min(max(self.audioService.currentTime / duration, 0), 1)
     }
 
     private func clearSeekScrubbing() {
