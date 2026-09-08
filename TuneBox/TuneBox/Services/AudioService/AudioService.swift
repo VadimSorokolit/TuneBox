@@ -195,6 +195,8 @@ final class AudioService: NSObject, AudioServicing {
             self.wasPlayingBeforeScrub = self.player.isPlaying
             self.isSeekScrubbing = true
             self.spectrumService.holdUpdates()
+            self.pauseForSeekScrubbingIfNeeded()
+            self.applyVolume()
             return
         }
 
@@ -557,11 +559,25 @@ final class AudioService: NSObject, AudioServicing {
     }
 
     private func applyVolume() {
-        let volume: Float = self.isDoPPlayback ? 1.0 : self.storedVolume
+        let volume: Float
+
+        if self.isSeekScrubbing {
+            volume = 0
+        } else {
+            volume = self.isDoPPlayback ? 1.0 : self.storedVolume
+        }
 
         self.player.modifyProcessingGraph { engine in
             engine.mainMixerNode.outputVolume = volume
         }
+    }
+
+    private func pauseForSeekScrubbingIfNeeded() {
+        guard self.player.isPlaying else { return }
+
+        _ = self.player.pause()
+        self.spectrumService.setPlaybackActive(false)
+        self.stopProgressTimer()
     }
 
     private func endSeekScrubbingIfNeeded() {

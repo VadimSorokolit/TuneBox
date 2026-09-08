@@ -122,7 +122,7 @@ struct SpinningVinylView: View {
     @State private var activeSpeed: Double = 1
 
     private var shouldSpin: Bool {
-        isPlaying || isSeekScrubbing || isTapSpinning
+        (isPlaying || isSeekScrubbing || isTapSpinning) && spinSpeed != 0
     }
 
     private var visibleSize: CGFloat {

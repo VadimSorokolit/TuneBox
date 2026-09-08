@@ -299,11 +299,7 @@ final class PlayerViewModel: PlayerManaging {
         if self.isSeekScrubbing {
             let previous = self.lastSeekProgress ?? self.progress
             let delta = clamped - previous
-
-            if abs(delta) > Self.vinylScrubDirectionThreshold {
-                self.vinylSpinDirection = delta > 0 ? 1 : -1
-            }
-
+            self.updateVinylScrubSpin(for: delta)
             self.lastSeekProgress = clamped
             self.progress = clamped
         }
@@ -314,14 +310,20 @@ final class PlayerViewModel: PlayerManaging {
 
     func setSeekScrubbing(_ isScrubbing: Bool, direction: Double = 0) {
         self.cancelVinylTapSpin()
+        self.cancelVinylScrubIdleFreeze()
+        self.resetPendingScrubDirection()
 
         if isScrubbing {
             if self.isSeekScrubbing.isFalse {
                 self.lastSeekProgress = self.progress
             }
 
-            self.vinylSpinDirection = direction >= 0 ? 1 : -1
-            self.vinylSpinSpeed = Self.vinylScrubSpinSpeed
+            if direction == 0 {
+                self.vinylSpinSpeed = 0
+            } else {
+                self.vinylSpinDirection = direction > 0 ? 1 : -1
+                self.vinylSpinSpeed = Self.vinylScrubSpinSpeed
+            }
         } else {
             self.vinylSpinDirection = 1
             self.vinylSpinSpeed = 1
@@ -343,6 +345,8 @@ final class PlayerViewModel: PlayerManaging {
         self.vinylSpinSpeed = 1
         self.vinylTapSpinTask?.cancel()
         self.vinylTapSpinTask = nil
+        self.vinylScrubIdleTask?.cancel()
+        self.vinylScrubIdleTask = nil
         self.playbackNavigationPath = []
         self.playbackOrigin = nil
         self.pendingRestoreProgress = nil
@@ -451,13 +455,19 @@ final class PlayerViewModel: PlayerManaging {
     private var lastPersistedProgressAt: Date?
     private var needsNavigationPathRebuild = false
     private var vinylTapSpinTask: Task<Void, Never>?
+    private var vinylScrubIdleTask: Task<Void, Never>?
     @ObservationIgnored
     private var lastSeekProgress: Double?
+    @ObservationIgnored
+    private var pendingScrubDirection: Double?
+    @ObservationIgnored
+    private var pendingScrubDirectionCount = 0
 
     private static let restartThreshold: TimeInterval = 5
     private static let persistProgressInterval: TimeInterval = 5
     private static let vinylScrubSpinSpeed: Double = 2.5
     private static let vinylScrubDirectionThreshold: Double = 0.0001
+    private static let vinylScrubIdleFreezeNanoseconds: UInt64 = 150_000_000
     private static let vinylTapSpinSpeed: Double = 3.0
     private static let vinylTapSpinDurationNanoseconds: UInt64 = 400_000_000
 
@@ -546,6 +556,70 @@ final class PlayerViewModel: PlayerManaging {
         self.vinylTapSpinTask?.cancel()
         self.vinylTapSpinTask = nil
         self.isVinylTapSpinning = false
+    }
+
+    private func updateVinylScrubSpin(for delta: Double) {
+        guard abs(delta) > Self.vinylScrubDirectionThreshold else {
+            return
+        }
+
+        let newDirection = delta > 0 ? 1.0 : -1.0
+        let isSpinning = self.vinylSpinSpeed != 0
+
+        if isSpinning, newDirection == self.vinylSpinDirection {
+            self.resetPendingScrubDirection()
+            self.scheduleVinylScrubIdleFreeze()
+            return
+        }
+
+        if self.pendingScrubDirection == newDirection {
+            self.pendingScrubDirectionCount += 1
+        } else {
+            self.pendingScrubDirection = newDirection
+            self.pendingScrubDirectionCount = 1
+        }
+
+        guard self.pendingScrubDirectionCount >= 2 else {
+            return
+        }
+
+        self.vinylSpinDirection = newDirection
+        self.vinylSpinSpeed = Self.vinylScrubSpinSpeed
+        self.resetPendingScrubDirection()
+        self.scheduleVinylScrubIdleFreeze()
+    }
+
+    private func resetPendingScrubDirection() {
+        self.pendingScrubDirection = nil
+        self.pendingScrubDirectionCount = 0
+    }
+
+    private func scheduleVinylScrubIdleFreeze() {
+        self.cancelVinylScrubIdleFreeze()
+
+        self.vinylScrubIdleTask = Task { @MainActor in
+            do {
+                try await Task.sleep(nanoseconds: Self.vinylScrubIdleFreezeNanoseconds)
+            } catch {
+                return
+            }
+
+            guard !Task.isCancelled else {
+                return
+            }
+
+            guard self.isSeekScrubbing else {
+                return
+            }
+
+            self.vinylSpinSpeed = 0
+            self.vinylScrubIdleTask = nil
+        }
+    }
+
+    private func cancelVinylScrubIdleFreeze() {
+        self.vinylScrubIdleTask?.cancel()
+        self.vinylScrubIdleTask = nil
     }
 
     private func applyAudioProgress() {
