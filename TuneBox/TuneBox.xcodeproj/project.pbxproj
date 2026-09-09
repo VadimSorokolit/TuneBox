@@ -43,6 +43,10 @@
 		5B17121C3051630C00BC9C3C /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 5B17121B3051630C00BC9C3C /* FirebaseAnalytics */; };
 		5B17121E3051630C00BC9C3C /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 5B17121D3051630C00BC9C3C /* FirebaseCrashlytics */; };
 		5B17122030519BD700BC9C3C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B17121F30519BD700BC9C3C /* GoogleService-Info.plist */; };
+		5B17122430519E4300BC9C3C /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B17122330519E4200BC9C3C /* AnalyticsService.swift */; };
+		5B17122630519EA500BC9C3C /* AnalyticsServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B17122530519EA300BC9C3C /* AnalyticsServicing.swift */; };
+		5B17122830519F1F00BC9C3C /* CrashlyticsServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B17122730519F1700BC9C3C /* CrashlyticsServicing.swift */; };
+		5B17122A30519F4700BC9C3C /* CrashlyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B17122930519F4600BC9C3C /* CrashlyticsService.swift */; };
 		5B1875C62FD06EBD00D8A042 /* SearchBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1875C52FD06EBC00D8A042 /* SearchBarView.swift */; };
 		5B1875C92FD084CB00D8A042 /* SegmentedChipControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1875C82FD084CA00D8A042 /* SegmentedChipControl.swift */; };
 		5B2AEF41300A35BC00436CD3 /* PlaylistCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2AEF40300A35B400436CD3 /* PlaylistCell.swift */; };
@@ -263,6 +267,10 @@
 		5B17121430515C1B00BC9C3C /* ExpandedPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandedPlayerView.swift; sourceTree = "<group>"; };
 		5B17121530515C1B00BC9C3C /* PeakSquareHistogramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeakSquareHistogramView.swift; sourceTree = "<group>"; };
 		5B17121F30519BD700BC9C3C /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		5B17122330519E4200BC9C3C /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
+		5B17122530519EA300BC9C3C /* AnalyticsServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsServicing.swift; sourceTree = "<group>"; };
+		5B17122730519F1700BC9C3C /* CrashlyticsServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashlyticsServicing.swift; sourceTree = "<group>"; };
+		5B17122930519F4600BC9C3C /* CrashlyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashlyticsService.swift; sourceTree = "<group>"; };
 		5B1875C52FD06EBC00D8A042 /* SearchBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBarView.swift; sourceTree = "<group>"; };
 		5B1875C82FD084CA00D8A042 /* SegmentedChipControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedChipControl.swift; sourceTree = "<group>"; };
 		5B2AEF40300A35B400436CD3 /* PlaylistCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistCell.swift; sourceTree = "<group>"; };
@@ -534,6 +542,31 @@
 				5B17121530515C1B00BC9C3C /* PeakSquareHistogramView.swift */,
 			);
 			path = PlayerViews;
+			sourceTree = "<group>";
+		};
+		5B17122130519E0500BC9C3C /* Analytics */ = {
+			isa = PBXGroup;
+			children = (
+				5B17122330519E4200BC9C3C /* AnalyticsService.swift */,
+			);
+			path = Analytics;
+			sourceTree = "<group>";
+		};
+		5B17122230519E0B00BC9C3C /* Crashlytics */ = {
+			isa = PBXGroup;
+			children = (
+				5B17122930519F4600BC9C3C /* CrashlyticsService.swift */,
+			);
+			path = Crashlytics;
+			sourceTree = "<group>";
+		};
+		5B17122B3051A00C00BC9C3C /* Firebase */ = {
+			isa = PBXGroup;
+			children = (
+				5B17122130519E0500BC9C3C /* Analytics */,
+				5B17122230519E0B00BC9C3C /* Crashlytics */,
+			);
+			path = Firebase;
 			sourceTree = "<group>";
 		};
 		5B1875C72FD0842400D8A042 /* Views */ = {
@@ -838,10 +871,12 @@
 		5B8382952FC4C89C003625CD /* Interfaces */ = {
 			isa = PBXGroup;
 			children = (
+				5B17122530519EA300BC9C3C /* AnalyticsServicing.swift */,
 				5B74DF9E2FF4452A007EB36D /* AudioMetadataServicing.swift */,
 				5B8382A22FC4CB4C003625CD /* AudioServicing.swift */,
 				5B40F409302E18080025693E /* CoverManaging.swift */,
 				5B40F3FF302DE3540025693E /* CoverServicing.swift */,
+				5B17122730519F1700BC9C3C /* CrashlyticsServicing.swift */,
 				5B8382AC2FC4CFEF003625CD /* DownloadManaging.swift */,
 				5B9D45DE2FDF122F00F86C1B /* DownloadsPresenting.swift */,
 				5B8382B02FC4D05C003625CD /* DownloadStateProviding.swift */,
@@ -1158,6 +1193,7 @@
 				5B92B90A304566E100E9FB5D /* EntitlementService */,
 				5B97911A3051534900A58C89 /* EqualizerService */,
 				5B586CB32FAC611E00BCEAD2 /* FileManagerService */,
+				5B17122B3051A00C00BC9C3C /* Firebase */,
 				5B586CB22FAC610400BCEAD2 /* JamendoService */,
 				5BC5EECF303846BC001A16A9 /* NetworkMonitorService */,
 				5B11C3382FB716590089BAD2 /* PersistenceService */,
@@ -1622,6 +1658,7 @@
 				5B40F400302DE35A0025693E /* CoverServicing.swift in Sources */,
 				5BDA04C8300A5DA900C7B763 /* SourceView.swift in Sources */,
 				5B2CF45E2FBC7AA400C5BA4C /* TransferDownloadSlotLimiter.swift in Sources */,
+				5B17122A30519F4700BC9C3C /* CrashlyticsService.swift in Sources */,
 				5B0BC2B430068B6900E8F2A5 /* LoadStateManaging.swift in Sources */,
 				5BA5818E2FD6A45800B498D7 /* SettingsManaging.swift in Sources */,
 				5BFCA83E2FCED841009C6AD9 /* View+cornerRadius.swift in Sources */,
@@ -1633,9 +1670,11 @@
 				5B601ED0302B1688005D7548 /* CoverCell.swift in Sources */,
 				5B601ED2302B2001005D7548 /* CoverPagerView.swift in Sources */,
 				5BC5EED9303C86DC001A16A9 /* Optional+Extensions.swift in Sources */,
+				5B17122830519F1F00BC9C3C /* CrashlyticsServicing.swift in Sources */,
 				5B8860A52FB1CF910056BE9A /* NotificationNames+Extension.swift in Sources */,
 				5BFCA8432FCEE237009C6AD9 /* TransferPrioritizable.swift in Sources */,
 				5B0BC2CF3007DF7200E8F2A5 /* CoverView.swift in Sources */,
+				5B17122630519EA500BC9C3C /* AnalyticsServicing.swift in Sources */,
 				5BFCA8492FCEE470009C6AD9 /* Launch.swift in Sources */,
 				5B11C33B2FB719A80089BAD2 /* TrackEntity.swift in Sources */,
 				5B6B8CD52FED1DED00C23D3E /* View+dismissKeyboardOnTap.swift in Sources */,
@@ -1655,6 +1694,7 @@
 				5B40F405302DFC240025693E /* CoverViewModel.swift in Sources */,
 				5BF3AF003041A48B008193AC /* View+customNavigationTitle.swift in Sources */,
 				5B97911E305153EC00A58C89 /* EqualizerServicing.swift in Sources */,
+				5B17122430519E4300BC9C3C /* AnalyticsService.swift in Sources */,
 				5B8382B52FC59381003625CD /* BrowseView+.swift in Sources */,
 				5BDA04CA300A677F00C7B763 /* SourceFolderItem.swift in Sources */,
 				5BD579A22FAB25E300503BA2 /* TuneBoxApp.swift in Sources */,
