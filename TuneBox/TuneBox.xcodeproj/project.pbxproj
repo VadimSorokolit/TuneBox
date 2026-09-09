@@ -40,6 +40,8 @@
 		5B17121730515C1B00BC9C3C /* PeakSquareHistogramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B17121530515C1B00BC9C3C /* PeakSquareHistogramView.swift */; };
 		5B17121830515C1B00BC9C3C /* ExpandedPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B17121430515C1B00BC9C3C /* ExpandedPlayerView.swift */; };
 		5B17121930515C1B00BC9C3C /* CompactPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B17121330515C1B00BC9C3C /* CompactPlayerView.swift */; };
+		5B17121C3051630C00BC9C3C /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 5B17121B3051630C00BC9C3C /* FirebaseAnalytics */; };
+		5B17121E3051630C00BC9C3C /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 5B17121D3051630C00BC9C3C /* FirebaseCrashlytics */; };
 		5B1875C62FD06EBD00D8A042 /* SearchBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1875C52FD06EBC00D8A042 /* SearchBarView.swift */; };
 		5B1875C92FD084CB00D8A042 /* SegmentedChipControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1875C82FD084CA00D8A042 /* SegmentedChipControl.swift */; };
 		5B2AEF41300A35BC00436CD3 /* PlaylistCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2AEF40300A35B400436CD3 /* PlaylistCell.swift */; };
@@ -157,7 +159,6 @@
 		5BD579A52FAB25EE00503BA2 /* NetworkServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD579A32FAB25EE00503BA2 /* NetworkServiceTests.swift */; };
 		5BDA04C8300A5DA900C7B763 /* SourceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDA04C7300A5DA700C7B763 /* SourceView.swift */; };
 		5BDA04CA300A677F00C7B763 /* SourceFolderItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDA04C9300A677F00C7B763 /* SourceFolderItem.swift */; };
-		5BEC057430481CF300BFC3FA /* WaveformKit in Frameworks */ = {isa = PBXBuildFile; productRef = 5BEC057330481CF300BFC3FA /* WaveformKit */; };
 		5BEC058D30487B4E00BFC3FA /* PlaybackPCMMonitoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEC058C30487B4D00BFC3FA /* PlaybackPCMMonitoring.swift */; };
 		5BEC05923049864E00BFC3FA /* SpectrumAnalyzing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEC05913049864D00BFC3FA /* SpectrumAnalyzing.swift */; };
 		5BECD77C3010E0750028FC67 /* LibrarySummaryFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BECD77B3010E0740028FC67 /* LibrarySummaryFooter.swift */; };
@@ -422,10 +423,11 @@
 				5B586CBD2FAC846900BCEAD2 /* Resolver in Frameworks */,
 				5B4762872FAB5C570069E41A /* RxMoya in Frameworks */,
 				5B4762812FAB5C570069E41A /* CombineMoya in Frameworks */,
-				5BEC057430481CF300BFC3FA /* WaveformKit in Frameworks */,
 				5B4762852FAB5C570069E41A /* ReactiveMoya in Frameworks */,
 				5B84C01C2FAB353200ACE75A /* CustomAlerts in Frameworks */,
+				5B17121E3051630C00BC9C3C /* FirebaseCrashlytics in Frameworks */,
 				5B4762832FAB5C570069E41A /* Moya in Frameworks */,
+				5B17121C3051630C00BC9C3C /* FirebaseAnalytics in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1351,7 +1353,8 @@
 				5B586CBC2FAC846900BCEAD2 /* Resolver */,
 				5B7E1DAC2FE2A4FA00561D67 /* SDWebImageSwiftUI */,
 				5B970E0A301CDA88006E674C /* SFBAudioEngine */,
-				5BEC057330481CF300BFC3FA /* WaveformKit */,
+				5B17121B3051630C00BC9C3C /* FirebaseAnalytics */,
+				5B17121D3051630C00BC9C3C /* FirebaseCrashlytics */,
 			);
 			productName = TuneBox;
 			productReference = 5BD579722FAB25BF00503BA2 /* TuneBox.app */;
@@ -1436,7 +1439,7 @@
 				5B586CBB2FAC846900BCEAD2 /* XCRemoteSwiftPackageReference "Resolver" */,
 				5B7E1DAB2FE2A4FA00561D67 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 				5B970E09301CDA88006E674C /* XCLocalSwiftPackageReference "../Vendor/SFBAudioEngine" */,
-				5BEC057230481CF300BFC3FA /* XCRemoteSwiftPackageReference "WaveformKit" */,
+				5B17121A3051630C00BC9C3C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5BD579732FAB25BF00503BA2 /* Products */;
@@ -2037,6 +2040,14 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		5B17121A3051630C00BC9C3C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.18.0;
+			};
+		};
 		5B4762752FAB378B0069E41A /* XCRemoteSwiftPackageReference "swiftlint" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/realm/swiftlint";
@@ -2077,17 +2088,19 @@
 				minimumVersion = 1.10.21;
 			};
 		};
-		5BEC057230481CF300BFC3FA /* XCRemoteSwiftPackageReference "WaveformKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/GRimAce11/WaveformKit";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.4.1;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		5B17121B3051630C00BC9C3C /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5B17121A3051630C00BC9C3C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		5B17121D3051630C00BC9C3C /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5B17121A3051630C00BC9C3C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
 		5B4762762FAB37D90069E41A /* SwiftLintBuildToolPlugin */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 5B4762752FAB378B0069E41A /* XCRemoteSwiftPackageReference "swiftlint" */;
@@ -2132,11 +2145,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5B970E09301CDA88006E674C /* XCLocalSwiftPackageReference "../Vendor/SFBAudioEngine" */;
 			productName = SFBAudioEngine;
-		};
-		5BEC057330481CF300BFC3FA /* WaveformKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 5BEC057230481CF300BFC3FA /* XCRemoteSwiftPackageReference "WaveformKit" */;
-			productName = WaveformKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
