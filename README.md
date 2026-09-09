@@ -26,6 +26,8 @@ and automatically add album covers from the [MusicBrainz API](https://musicbrain
 * Resources – **SDWebImage**
 * Audio Playback - **SFBAudioEngine**
 * Media Controls - **MediaPlayer / MPRemoteCommandCenter**
+* Analytics & Crash Reporting - **Firebase Analytics / Firebase Crashlytics**
+* In-App Purchases - **StoreKit 2**
 * Dependency Management - **Swift Package Manager**
 * Linting - **SwiftLint**
 * Unit Testing - **Swift Testing**
