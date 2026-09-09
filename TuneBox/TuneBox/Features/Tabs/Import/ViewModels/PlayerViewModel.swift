@@ -450,6 +450,9 @@ final class PlayerViewModel: PlayerManaging {
     @Injected
     @ObservationIgnored
     private var analytics: AnalyticsServicing
+    @Injected
+    @ObservationIgnored
+    private var crashlytics: CrashlyticsServicing
     private var isLoading: Bool = false
     private var cancellables = Set<AnyCancellable>()
     private var shuffleOrder: [String]?
@@ -970,6 +973,7 @@ final class PlayerViewModel: PlayerManaging {
         let message = error.localizedDescription
         self.error = message
         AppLogger.imported.warning("\(message)")
+        self.crashlytics.record(error, area: .player)
     }
 
     private func resolveImportedURL(for track: TrackEntity) -> URL? {

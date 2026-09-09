@@ -707,6 +707,9 @@ final class ImportViewModel: ImportManaging {
     @Injected
     @ObservationIgnored
     private var analytics: AnalyticsServicing
+    @Injected
+    @ObservationIgnored
+    private var crashlytics: CrashlyticsServicing
     private var tracksObservationTask: Task<Void, Never>?
     private let supportedPlaylistExtensions: Set<PlaylistExtension> = [.m3u, .m3u8]
     private let supportedImageExtensions: Set<ImageFileExtension> = [.jpg, .jpeg, .png, .webp, .heic]
@@ -1169,6 +1172,7 @@ final class ImportViewModel: ImportManaging {
         let message = error.localizedDescription
         self.error = message
         AppLogger.imported.warning("\(message)")
+        self.crashlytics.record(error, area: .importFolder)
     }
 }
 

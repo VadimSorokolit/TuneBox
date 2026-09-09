@@ -66,6 +66,18 @@ final class SettingsViewModel: SettingsManaging {
                 success: didPurchase
             )
         )
+
+        if didPurchase.isFalse, let message = self.purchaseService.error {
+            self.crashlytics.record(
+                NSError(
+                    domain: "com.TuneBox.purchase",
+                    code: 1,
+                    userInfo: [NSLocalizedDescriptionKey: message]
+                ),
+                area: .purchase
+            )
+        }
+
         return didPurchase
     }
 
@@ -130,6 +142,9 @@ final class SettingsViewModel: SettingsManaging {
 
     @ObservationIgnored
     @Injected private var analytics: AnalyticsServicing
+
+    @ObservationIgnored
+    @Injected private var crashlytics: CrashlyticsServicing
 
     // MARK: - Methods. Private
 

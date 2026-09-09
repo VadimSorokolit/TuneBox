@@ -746,6 +746,9 @@ final class TransferViewModel: TransferManaging {
     @Injected
     @ObservationIgnored
     private var analytics: AnalyticsServicing
+    @Injected
+    @ObservationIgnored
+    private var crashlytics: CrashlyticsServicing
     private let jamendoService: JamendoServicing
     private let storageService: FileManagerServicing
     private let downloadObserverTokens = TransferDownloadObserverTokens()
@@ -1442,6 +1445,7 @@ final class TransferViewModel: TransferManaging {
         let message = error.localizedDescription
         self.error = message
         self.logTransferWarning(message)
+        self.crashlytics.record(error, area: .download)
     }
 
     private func setupNotificationObservers() {
