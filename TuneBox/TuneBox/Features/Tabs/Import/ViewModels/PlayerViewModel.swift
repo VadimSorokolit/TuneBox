@@ -63,15 +63,15 @@ final class PlayerViewModel: PlayerManaging {
     }
 
     var spectrumBands: [Float] {
-        self.audioService.spectrumBands
+        self.equalizerService.bands
     }
 
     var spectrumBandCount: Int {
-        self.audioService.spectrumBandCount
+        self.equalizerService.bandCount
     }
 
     var spectrumBandCenters: [Float] {
-        self.audioService.spectrumBandCenters
+        self.equalizerService.bandCenters
     }
 
     // MARK: - Initializer
@@ -447,6 +447,9 @@ final class PlayerViewModel: PlayerManaging {
     @Injected
     @ObservationIgnored
     private var audioService: AudioServicing
+    @Injected
+    @ObservationIgnored
+    private var equalizerService: EqualizerServicing
     private var isLoading: Bool = false
     private var cancellables = Set<AnyCancellable>()
     private var shuffleOrder: [String]?

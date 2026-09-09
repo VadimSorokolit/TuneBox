@@ -41,24 +41,12 @@ final class AudioService: NSObject, AudioServicing {
         }
     }
 
-    var spectrumBands: [Float] {
-        self.spectrumService.bands
-    }
-
-    var spectrumBandCount: Int {
-        type(of: self.spectrumService).bandCount
-    }
-
-    var spectrumBandCenters: [Float] {
-        type(of: self.spectrumService).bandCenters
-    }
-
     // MARK: - Methods. Public
 
     func play(trackId: String, url: URL, loop: Bool = false) {
         AppLogger.audio.info("AudioService PLAY: \(trackId)")
 
-        self.spectrumService.detach(from: self.player)
+        self.detachEqualizerTap()
         self.stopProgressTimer()
         self.currentTrackId = trackId
         self.currentURL = url
@@ -92,7 +80,7 @@ final class AudioService: NSObject, AudioServicing {
     func pause() {
         self.endSeekScrubbingIfNeeded()
         _ = self.player.pause()
-        self.spectrumService.setPlaybackActive(false)
+        self.equalizerService.setPlaybackActive(false)
         self.stopProgressTimer()
         self.notifyStateChange(false)
         self.refreshNowPlayingElapsed()
@@ -101,14 +89,14 @@ final class AudioService: NSObject, AudioServicing {
     func resume() {
         self.endSeekScrubbingIfNeeded()
         guard self.player.resume() else { return }
-        self.spectrumService.setPlaybackActive(true)
+        self.equalizerService.setPlaybackActive(true)
         self.startProgressTimer()
         self.notifyStateChange(true)
         self.refreshNowPlayingElapsed()
     }
 
     func stop() {
-        self.spectrumService.detach(from: self.player)
+        self.detachEqualizerTap()
         self.player.stop()
         self.stopProgressTimer()
         self.currentTrackId = nil
@@ -175,7 +163,7 @@ final class AudioService: NSObject, AudioServicing {
         guard self.duration > 0 else { return }
 
         if self.isSeekScrubbing.isFalse {
-            self.spectrumService.holdUpdatesTemporarily(for: self.spectrumHoldDuration)
+            self.equalizerService.holdUpdatesTemporarily(for: self.spectrumHoldDuration)
         }
 
         if deltaSeconds >= 0 {
@@ -194,7 +182,7 @@ final class AudioService: NSObject, AudioServicing {
         if isScrubbing {
             self.wasPlayingBeforeScrub = self.player.isPlaying
             self.isSeekScrubbing = true
-            self.spectrumService.holdUpdates()
+            self.equalizerService.holdUpdates()
             self.pauseForSeekScrubbingIfNeeded()
             self.applyVolume()
             return
@@ -212,9 +200,9 @@ final class AudioService: NSObject, AudioServicing {
         guard self.duration > 0 else { return }
 
         if self.isSeekScrubbing {
-            self.spectrumService.holdUpdates()
+            self.equalizerService.holdUpdates()
         } else {
-            self.spectrumService.holdUpdatesTemporarily(for: self.spectrumHoldDuration)
+            self.equalizerService.holdUpdatesTemporarily(for: self.spectrumHoldDuration)
         }
 
         let clamped = min(max(progress, 0), 1)
@@ -290,8 +278,8 @@ final class AudioService: NSObject, AudioServicing {
 
     // MARK: - Initializer
 
-    init(spectrumService: PlaybackSpectrumServicing) {
-        self.spectrumService = spectrumService
+    init(equalizerService: EqualizerServicing) {
+        self.equalizerService = equalizerService
         super.init()
 
         self.setupObservers()
@@ -304,7 +292,8 @@ final class AudioService: NSObject, AudioServicing {
 
     private let player = AudioPlayer()
     private let effectPlayer = AudioPlayer()
-    private let spectrumService: PlaybackSpectrumServicing
+    private let equalizerService: EqualizerServicing
+    private let equalizerTap = PlaybackPCMMonitor()
     private var progressTimer: Timer?
     private var interruptedProgress: Double = 0
     private var storedVolume: Float = 1.0
@@ -434,7 +423,30 @@ final class AudioService: NSObject, AudioServicing {
 
     private func attachSpectrumIfNeeded() {
         guard self.isDoPPlayback.isFalse else { return }
-        self.spectrumService.attach(to: self.player, allowRetry: true)
+
+        self.detachEqualizerTap()
+        self.equalizerService.setPlaybackActive(true)
+        self.installEqualizerTap(allowRetry: true)
+    }
+
+    private func detachEqualizerTap() {
+        self.equalizerTap.remove(from: self.player)
+        self.equalizerService.reset()
+    }
+
+    private func installEqualizerTap(allowRetry: Bool) {
+        let installed = self.equalizerTap.install(
+            on: self.player,
+            bufferSize: self.equalizerService.hopSize
+        ) { [weak self] buffer in
+            self?.equalizerService.process(buffer)
+        }
+
+        guard installed.isFalse, allowRetry else { return }
+
+        DispatchQueue.main.async { [weak self] in
+            self?.installEqualizerTap(allowRetry: false)
+        }
     }
 
     private func isUSBAudioDACConnected() -> Bool {
@@ -576,7 +588,7 @@ final class AudioService: NSObject, AudioServicing {
         guard self.player.isPlaying else { return }
 
         _ = self.player.pause()
-        self.spectrumService.setPlaybackActive(false)
+        self.equalizerService.setPlaybackActive(false)
         self.stopProgressTimer()
     }
 
@@ -586,14 +598,14 @@ final class AudioService: NSObject, AudioServicing {
 
         self.isSeekScrubbing = false
         self.wasPlayingBeforeScrub = false
-        self.spectrumService.resumeUpdates()
+        self.equalizerService.resumeUpdates()
         self.applyVolume()
 
         guard wasScrubbing || shouldResume else { return }
         guard shouldResume, self.player.isPlaying.isFalse else { return }
 
         if self.player.resume() {
-            self.spectrumService.setPlaybackActive(true)
+            self.equalizerService.setPlaybackActive(true)
             self.startProgressTimer()
             self.notifyStateChange(true)
             self.refreshNowPlayingElapsed()

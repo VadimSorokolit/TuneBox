@@ -40,9 +40,6 @@ protocol AudioServicing: AnyObject {
     var volume: Float { get set }
     var sourceFormatText: String { get }
     var outputRouteText: String { get }
-    var spectrumBands: [Float] { get }
-    var spectrumBandCount: Int { get }
-    var spectrumBandCenters: [Float] { get }
     var onRemotePlayNext: (() -> Void)? { get set }
     var onRemotePlayPrevious: (() -> Void)? { get set }
     var onTrackFinished: (() -> Void)? { get set }

@@ -23,8 +23,13 @@ extension Resolver: @retroactive ResolverRegistering {
 
     private static func registerAudioService() {
         self.register {
+            EqualizerService() as EqualizerServicing
+        }
+        .scope(.application)
+
+        self.register {
             AudioService(
-                spectrumService: PlaybackSpectrumService()
+                equalizerService: self.resolve(EqualizerServicing.self)
             ) as AudioServicing
         }
         .scope(.application)

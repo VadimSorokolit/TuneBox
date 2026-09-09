@@ -6,9 +6,9 @@
 //
 
 import Foundation
-import SFBAudioEngine
+import AVFoundation
 
-protocol SpectrumAnalyzing: AnyObject, Sendable {
+nonisolated protocol SpectrumAnalyzing: AnyObject, Sendable {
     func enqueue(
         _ buffer: AVAudioPCMBuffer,
         onResult: @escaping ([Float]) -> Void
