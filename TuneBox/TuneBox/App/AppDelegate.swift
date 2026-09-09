@@ -7,11 +7,21 @@
 
 import UIKit
 import Resolver
+import FirebaseCore
 
 class AppDelegate: NSObject, UIApplicationDelegate {
 
     // MARK: - Methods. Public
-
+    
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
+    ) -> Bool {
+        FirebaseApp.configure()
+        
+        return true
+    }
+    
     func applicationWillTerminate(_ application: UIApplication) {
         let semaphore = DispatchSemaphore(value: 0)
 

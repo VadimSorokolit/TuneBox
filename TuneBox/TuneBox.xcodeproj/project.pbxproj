@@ -42,6 +42,7 @@
 		5B17121930515C1B00BC9C3C /* CompactPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B17121330515C1B00BC9C3C /* CompactPlayerView.swift */; };
 		5B17121C3051630C00BC9C3C /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 5B17121B3051630C00BC9C3C /* FirebaseAnalytics */; };
 		5B17121E3051630C00BC9C3C /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 5B17121D3051630C00BC9C3C /* FirebaseCrashlytics */; };
+		5B17122030519BD700BC9C3C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B17121F30519BD700BC9C3C /* GoogleService-Info.plist */; };
 		5B1875C62FD06EBD00D8A042 /* SearchBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1875C52FD06EBC00D8A042 /* SearchBarView.swift */; };
 		5B1875C92FD084CB00D8A042 /* SegmentedChipControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1875C82FD084CA00D8A042 /* SegmentedChipControl.swift */; };
 		5B2AEF41300A35BC00436CD3 /* PlaylistCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2AEF40300A35B400436CD3 /* PlaylistCell.swift */; };
@@ -261,6 +262,7 @@
 		5B17121330515C1B00BC9C3C /* CompactPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompactPlayerView.swift; sourceTree = "<group>"; };
 		5B17121430515C1B00BC9C3C /* ExpandedPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandedPlayerView.swift; sourceTree = "<group>"; };
 		5B17121530515C1B00BC9C3C /* PeakSquareHistogramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeakSquareHistogramView.swift; sourceTree = "<group>"; };
+		5B17121F30519BD700BC9C3C /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		5B1875C52FD06EBC00D8A042 /* SearchBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBarView.swift; sourceTree = "<group>"; };
 		5B1875C82FD084CA00D8A042 /* SegmentedChipControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedChipControl.swift; sourceTree = "<group>"; };
 		5B2AEF40300A35B400436CD3 /* PlaylistCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistCell.swift; sourceTree = "<group>"; };
@@ -1141,6 +1143,7 @@
 			children = (
 				5BFCA7D72FCED398009C6AD9 /* Fonts */,
 				5BD5799C2FAB25E300503BA2 /* Assets.xcassets */,
+				5B17121F30519BD700BC9C3C /* GoogleService-Info.plist */,
 				5B92B904304556D700E9FB5D /* TuneBoxConfiguration.storekit */,
 			);
 			path = Resources;
@@ -1477,6 +1480,7 @@
 				5BFCA8352FCED5BF009C6AD9 /* SpaceGrotesk-Light.otf in Resources */,
 				5BFCA8362FCED5BF009C6AD9 /* SpaceGrotesk-Medium.otf in Resources */,
 				5BFCA8372FCED5BF009C6AD9 /* SpaceGrotesk-Regular.otf in Resources */,
+				5B17122030519BD700BC9C3C /* GoogleService-Info.plist in Resources */,
 				5BFCA8382FCED5BF009C6AD9 /* SpaceGrotesk-SemiBold.otf in Resources */,
 				5BFCA8252FCED45F009C6AD9 /* JetBrainsMono-Regular.ttf in Resources */,
 				5BFCA82B2FCED45F009C6AD9 /* JetBrainsMono-Thin.ttf in Resources */,
