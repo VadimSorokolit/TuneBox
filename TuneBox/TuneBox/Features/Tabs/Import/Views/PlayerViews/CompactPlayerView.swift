@@ -19,13 +19,13 @@ struct CompactPlayerView: View {
     let isShuffleEnabled: Bool
     let sourceFormatText: String
     let outputRouteText: String
-    let onTrackInfoTap: () -> Void
+    let onVinylPlateTap: () -> Void
     let onPlayPrevious: () -> Void
     let onPlayNext: () -> Void
     let onSeek: (TimeInterval) -> Void
     let onSeekHoldChanged: (Bool, Double) -> Void
     let onPlayPauseTap: () -> Void
-    let onProgressTap: () -> Void
+    let onOpenExpandedPlayerTap: () -> Void
     let onRepeatModeChange: (RepeatMode) -> Void
     let onShuffleToggle: () -> Void
 
@@ -36,44 +36,48 @@ struct CompactPlayerView: View {
             VStack(spacing: 5) {
                 MarqueeText(text: track.songName)
                     .equatable()
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        onOpenExpandedPlayerTap()
+                    }
                     .padding(.leading, 20)
 
                 ZStack(alignment: .bottom) {
                     HStack(spacing: 12) {
-                        ZStack {
-                            SpinningVinylView(
-                                track: track,
-                                isPlaying: isPlaying,
-                                isLoading: coverVM.isLoading,
-                                isSeekScrubbing: playerVM.isSeekScrubbing,
-                                isTapSpinning: playerVM.isVinylTapSpinning,
-                                progress: progress,
-                                revolutionDuration: playerVM.vinylRevolutionDuration,
-                                spinDirection: playerVM.vinylSpinDirection,
-                                spinSpeed: playerVM.vinylSpinSpeed,
-                                vinylSize: 44,
-                                coverSize: 15,
-                                holeSize: 1
-                            )
-                            .id(vinylAlbumKey(for: track))
-                            .transition(.opacity.combined(with: .scale(scale: 0.88)))
-                        }
+                        SpinningVinylView(
+                            track: track,
+                            isPlaying: isPlaying,
+                            isLoading: coverVM.isLoading,
+                            isSeekScrubbing: playerVM.isSeekScrubbing,
+                            isTapSpinning: playerVM.isVinylTapSpinning,
+                            progress: progress,
+                            revolutionDuration: playerVM.vinylRevolutionDuration,
+                            spinDirection: playerVM.vinylSpinDirection,
+                            spinSpeed: playerVM.vinylSpinSpeed,
+                            vinylSize: 44,
+                            coverSize: 15,
+                            holeSize: 1,
+                            onTap: onVinylPlateTap
+                        )
+                        .id(vinylAlbumKey(for: track))
+                        .transition(.opacity.combined(with: .scale(scale: 0.88)))
                         .frame(size: 44)
-                        .animation(.easeInOut(duration: 0.35), value: vinylAlbumKey(for: track))
+                        .animation(
+                            .easeInOut(duration: 0.35),
+                            value: vinylAlbumKey(for: track)
+                        )
 
-                        Button(action: {
-                            onTrackInfoTap()
-                        }, label: {
-                            Text(track.artistName)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(1)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 14)
-                                .contentShape(Capsule())
-                        })
-                        .buttonStyle(PressGlassButtonStyle())
+                        Text(track.artistName)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 14)
+                            .contentShape(Capsule())
+                            .onTapGesture {
+                                onOpenExpandedPlayerTap()
+                            }
 
                         PlaybackControls(
                             progress: progress,
@@ -95,8 +99,7 @@ struct CompactPlayerView: View {
                     .frame(maxWidth: .infinity)
 
                     ProgressBar(
-                        progress: progress,
-                        onProgressTap: onProgressTap
+                        progress: progress
                     )
                     .opacity(progress > 0 ? 1 : 0)
                     .allowsHitTesting(progress > 0)
@@ -111,6 +114,10 @@ struct CompactPlayerView: View {
                     outputRouteLabel
                 }
                 .frame(height: 10)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    onOpenExpandedPlayerTap()
+                }
                 .padding(.horizontal, 24)
             }
             .padding(.top, 5)
@@ -460,7 +467,6 @@ struct CompactPlayerView: View {
         // MARK: - Properties. Public
 
         let progress: Double
-        let onProgressTap: () -> Void
 
         // MARK: - Body
 
@@ -479,12 +485,8 @@ struct CompactPlayerView: View {
                         )
                 }
 
-                Button {
-                    onProgressTap()
-                } label: {
-                    Color.clear
-                        .frame(maxHeight: .infinity)
-                }
+                Color.clear
+                    .frame(maxHeight: .infinity)
             }
             .frame(height: 15)
             .frame(maxWidth: .infinity)
@@ -671,13 +673,13 @@ struct CompactPlayerView: View {
         isShuffleEnabled: false,
         sourceFormatText: "24 bit • 192 kHz • FLAC",
         outputRouteText: "Speaker • 48 kHz",
-        onTrackInfoTap: {},
+        onVinylPlateTap: {},
         onPlayPrevious: {},
         onPlayNext: {},
         onSeek: { _ in },
         onSeekHoldChanged: { _, _ in },
         onPlayPauseTap: {},
-        onProgressTap: {},
+        onOpenExpandedPlayerTap: {},
         onRepeatModeChange: {_ in },
         onShuffleToggle: {}
     )

@@ -42,9 +42,9 @@ enum TabsMode: String {
 }
 
 enum CustomTab: String, Hashable, Identifiable, CaseIterable {
+    case importFiles
     case browse
     case downloads
-    case importFiles
     case settings
 
     var id: Self { self }
@@ -99,7 +99,7 @@ struct RootTabsView: View {
                     isShuffleEnabled: playerVM.isShuffleEnabled,
                     sourceFormatText: playerVM.sourceFormatText,
                     outputRouteText: playerVM.outputRouteText,
-                    onTrackInfoTap: {
+                    onVinylPlateTap: {
                         openTrackSource()
                     },
                     onPlayPrevious: {
@@ -117,7 +117,7 @@ struct RootTabsView: View {
                     onPlayPauseTap: {
                         playerVM.togglePlayPause()
                     },
-                    onProgressTap: {
+                    onOpenExpandedPlayerTap: {
                         isExpandedPlayerPresented = true
                     },
                     onRepeatModeChange: { mode in
