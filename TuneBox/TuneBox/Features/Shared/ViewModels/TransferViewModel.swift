@@ -743,6 +743,9 @@ final class TransferViewModel: TransferManaging {
     @Injected
     @ObservationIgnored
     private var audioService: AudioServicing
+    @Injected
+    @ObservationIgnored
+    private var analytics: AnalyticsServicing
     private let jamendoService: JamendoServicing
     private let storageService: FileManagerServicing
     private let downloadObserverTokens = TransferDownloadObserverTokens()
@@ -1318,6 +1321,7 @@ final class TransferViewModel: TransferManaging {
             fileState: .exists,
             downloadingSize: track.size ?? .zero
         )
+        self.analytics.log(.downloadComplete)
 
         Task { @MainActor [weak self] in
             await self?.finishActiveDownload(trackId: trackID)

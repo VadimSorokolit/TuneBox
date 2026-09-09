@@ -275,7 +275,10 @@ final class ImportViewModel: ImportManaging {
     }
 
     func importFolder(_ url: URL) async {
-        guard url.startAccessingSecurityScopedResource() else { return }
+        guard url.startAccessingSecurityScopedResource() else {
+            self.analytics.log(.importFolder(success: false, trackCount: 0))
+            return
+        }
 
         defer {
             url.stopAccessingSecurityScopedResource()
@@ -329,8 +332,10 @@ final class ImportViewModel: ImportManaging {
             }
 
             await self.refreshLibrary()
+            self.analytics.log(.importFolder(success: true, trackCount: trackFiles.count))
 
         } catch {
+            self.analytics.log(.importFolder(success: false, trackCount: 0))
             self.handleError(error)
         }
     }
@@ -699,6 +704,9 @@ final class ImportViewModel: ImportManaging {
     @Injected
     @ObservationIgnored
     private var playerViewModel: PlayerManaging
+    @Injected
+    @ObservationIgnored
+    private var analytics: AnalyticsServicing
     private var tracksObservationTask: Task<Void, Never>?
     private let supportedPlaylistExtensions: Set<PlaylistExtension> = [.m3u, .m3u8]
     private let supportedImageExtensions: Set<ImageFileExtension> = [.jpg, .jpeg, .png, .webp, .heic]

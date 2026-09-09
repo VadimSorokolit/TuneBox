@@ -240,10 +240,7 @@ final class PlayerViewModel: PlayerManaging {
         self.refreshFormatInfo(for: track)
 
         if self.pendingRestoreProgress != nil {
-            self.audioService.setSeekScrubbing(true)
-            self.play(track)
-            self.audioService.pause()
-            self.audioService.setSeekScrubbing(false)
+            self.play(track, autoplay: false)
         }
     }
 
@@ -450,6 +447,9 @@ final class PlayerViewModel: PlayerManaging {
     @Injected
     @ObservationIgnored
     private var equalizerService: EqualizerServicing
+    @Injected
+    @ObservationIgnored
+    private var analytics: AnalyticsServicing
     private var isLoading: Bool = false
     private var cancellables = Set<AnyCancellable>()
     private var shuffleOrder: [String]?
@@ -726,7 +726,7 @@ final class PlayerViewModel: PlayerManaging {
                 self.audioService.pause()
                 self.audioService.setSeekScrubbing(false)
             }
-        })
+        }, reportPlayStart: autoplay)
     }
 
     private func toggle(_ track: TrackEntity) {
@@ -737,7 +737,8 @@ final class PlayerViewModel: PlayerManaging {
 
     private func start(
         _ track: TrackEntity,
-        using playAction: (_ trackId: String, _ url: URL, _ loop: Bool) -> Void
+        using playAction: (_ trackId: String, _ url: URL, _ loop: Bool) -> Void,
+        reportPlayStart: Bool = false
     ) {
         guard self.settingsVM.hasPremium else {
             return
@@ -752,6 +753,7 @@ final class PlayerViewModel: PlayerManaging {
                     self.audioService.setNowPlaying(track: track)
                     self.applyPendingRestoreSeekIfNeeded()
                     self.persistPlaybackSession()
+                    self.logPlayStartIfNeeded(reportPlayStart, track: track, url: url)
                 } catch {
                     AppLogger.audio.error("Failed to make track URL: \(String(describing: error))")
                 }
@@ -767,6 +769,33 @@ final class PlayerViewModel: PlayerManaging {
                 self.audioService.setNowPlaying(track: track)
                 self.applyPendingRestoreSeekIfNeeded()
                 self.persistPlaybackSession()
+                self.logPlayStartIfNeeded(reportPlayStart, track: track, url: url)
+        }
+    }
+
+    private func logPlayStartIfNeeded(_ shouldLog: Bool, track: TrackEntity, url: URL) {
+        guard shouldLog else { return }
+
+        self.analytics.log(
+            .playStart(
+                source: track.source.rawValue,
+                format: Self.analyticsFormat(for: url)
+            )
+        )
+    }
+
+    private static func analyticsFormat(for url: URL) -> String {
+        let ext = url.pathExtension.lowercased()
+
+        switch ext {
+            case "dsf", "dff":
+                return "dsd"
+
+            case "":
+                return "unknown"
+
+            default:
+                return ext
         }
     }
 

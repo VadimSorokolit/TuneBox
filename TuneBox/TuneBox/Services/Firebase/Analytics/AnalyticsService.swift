@@ -7,4 +7,9 @@
 
 import FirebaseAnalytics
 
-final class AnalyticsService: AnalyticsServicing {}
+final class AnalyticsService: AnalyticsServicing {
+
+    func log(_ event: AnalyticsEvent) {
+        Analytics.logEvent(event.name, parameters: event.parameters)
+    }
+}

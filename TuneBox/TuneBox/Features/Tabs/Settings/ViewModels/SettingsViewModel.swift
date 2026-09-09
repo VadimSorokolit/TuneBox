@@ -60,6 +60,12 @@ final class SettingsViewModel: SettingsManaging {
     func purchase(_ product: Product) async -> Bool {
         let didPurchase = await self.purchaseService.purchase(product)
         self.syncFromServices()
+        self.analytics.log(
+            .purchase(
+                product: Self.analyticsProductName(for: product),
+                success: didPurchase
+            )
+        )
         return didPurchase
     }
 
@@ -80,7 +86,12 @@ final class SettingsViewModel: SettingsManaging {
     }
 
     func presentPaywall() {
+        let wasPresented = self.isPaywallPresented
         self.isPaywallPresented = true
+
+        guard wasPresented.isFalse else { return }
+
+        self.analytics.log(.paywallView)
     }
 
     func dismissPaywall() {
@@ -117,7 +128,23 @@ final class SettingsViewModel: SettingsManaging {
     @ObservationIgnored
     @Injected private var entitlementService: EntitlementServicing
 
+    @ObservationIgnored
+    @Injected private var analytics: AnalyticsServicing
+
     // MARK: - Methods. Private
+
+    private static func analyticsProductName(for product: Product) -> String {
+        switch product.id {
+            case ProductID.monthly:
+                "monthly"
+
+            case ProductID.lifetime:
+                "lifetime"
+
+            default:
+                "unknown"
+        }
+    }
 
     private func syncFromServices() {
         self.products = self.purchaseService.products

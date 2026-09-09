@@ -12,6 +12,7 @@ import Resolver
 extension Resolver: @retroactive ResolverRegistering {
 
     public static func registerAllServices() {
+        self.registerFirebaseServices()
         self.registerJamendoService()
         self.registerCoverService()
         self.registerStorageService()
@@ -19,6 +20,13 @@ extension Resolver: @retroactive ResolverRegistering {
         self.registerPurchaseServices()
         self.registerAudioService()
         self.registerViewModels()
+    }
+
+    private static func registerFirebaseServices() {
+        self.register {
+            AnalyticsService() as AnalyticsServicing
+        }
+        .scope(.application)
     }
 
     private static func registerAudioService() {
