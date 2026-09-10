@@ -56,6 +56,7 @@ struct ExpandedPlayerView: View {
                             coverSize: 96,
                             holeSize: 8
                         )
+                        .equatable()
                         .padding(.top, 8)
                         .shadow(color: .black.opacity(0.35), radius: 24, y: 12)
 

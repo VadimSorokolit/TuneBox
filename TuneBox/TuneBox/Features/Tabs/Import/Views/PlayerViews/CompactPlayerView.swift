@@ -59,6 +59,7 @@ struct CompactPlayerView: View {
                             holeSize: 1,
                             onTap: onVinylPlateTap
                         )
+                        .equatable()
                         .id(vinylAlbumKey(for: track))
                         .transition(.opacity.combined(with: .scale(scale: 0.88)))
                         .frame(size: 44)

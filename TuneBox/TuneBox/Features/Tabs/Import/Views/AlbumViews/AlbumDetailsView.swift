@@ -40,6 +40,7 @@ struct AlbumDetailsView: View {
                                     coordinator.push(.covers(album))
                                 }
                             )
+                            .equatable()
                             .transition(.opacity.combined(with: .scale(scale: 0.88)))
                         } else {
                             CoverView(
