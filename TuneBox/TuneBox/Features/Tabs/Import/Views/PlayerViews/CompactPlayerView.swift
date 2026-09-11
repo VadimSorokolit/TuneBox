@@ -36,8 +36,7 @@ struct CompactPlayerView: View {
             VStack(spacing: 5) {
                 MarqueeText(text: track.songName)
                     .equatable()
-                    .contentShape(Rectangle())
-                    .onTapGesture {
+                    .leadingTapArea {
                         onOpenExpandedPlayerTap()
                     }
                     .modifier(LeadingWipeModifier(isRevealed: isPlaying))
@@ -117,9 +116,9 @@ struct CompactPlayerView: View {
                     outputRouteLabel
                 }
                 .frame(height: 10)
-                .contentShape(Rectangle())
-                .onTapGesture {
+                .leadingTapArea {
                     onOpenExpandedPlayerTap()
+
                 }
                 .padding(.horizontal, 24)
             }
