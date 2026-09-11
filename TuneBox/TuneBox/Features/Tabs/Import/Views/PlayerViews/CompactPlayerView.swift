@@ -40,6 +40,7 @@ struct CompactPlayerView: View {
                     .onTapGesture {
                         onOpenExpandedPlayerTap()
                     }
+                    .modifier(LeadingWipeModifier(isRevealed: isPlaying))
                     .padding(.leading, 20)
 
                 ZStack(alignment: .bottom) {
@@ -64,7 +65,7 @@ struct CompactPlayerView: View {
                         .transition(.opacity.combined(with: .scale(scale: 0.88)))
                         .frame(size: 44)
                         .animation(
-                            .easeInOut(duration: 0.35),
+                            .smooth(duration: 0.35),
                             value: vinylAlbumKey(for: track)
                         )
 
@@ -79,6 +80,7 @@ struct CompactPlayerView: View {
                             .onTapGesture {
                                 onOpenExpandedPlayerTap()
                             }
+                            .modifier(LeadingWipeModifier(isRevealed: isPlaying))
 
                         PlaybackControls(
                             progress: progress,
@@ -184,6 +186,28 @@ struct CompactPlayerView: View {
     }
 
     // MARK: - Private. Objects
+
+    private struct LeadingWipeModifier: ViewModifier {
+
+        // MARK: - Properties. Public
+
+        let isRevealed: Bool
+
+        // MARK: - Body
+
+        func body(content: Content) -> some View {
+            content
+                .mask(alignment: .leading) {
+                    Rectangle()
+                        .scaleEffect(
+                            x: isRevealed ? 1 : 0,
+                            y: 1,
+                            anchor: .leading
+                        )
+                }
+                .animation(.easeInOut(duration: 0.35), value: isRevealed)
+        }
+    }
 
     private struct PressGlassButtonStyle: ButtonStyle {
         func makeBody(configuration: Configuration) -> some View {
