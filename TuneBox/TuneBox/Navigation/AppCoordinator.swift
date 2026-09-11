@@ -34,7 +34,7 @@ final class AppCoordinator {
 
     // MARK: - Tabs
 
-    var selectedTab: CustomTab = .browse
+    var selectedTab: CustomTab = .importFiles
 
     // MARK: - Navigation
 
