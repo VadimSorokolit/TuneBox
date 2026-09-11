@@ -44,7 +44,8 @@ struct SourceView: View {
         .scrollToCurrentTrackOnAppear(
             id: playerVM.track?.id,
             trackIDs: trackScrollIDs,
-            trigger: "\(path ?? "")-\(items.count)"
+            trigger: "\(path ?? "")-\(items.count)",
+            animatedRequest: playerVM.scrollToCurrentTrackRequest
         )
         .bottomContentMargin(
             10,

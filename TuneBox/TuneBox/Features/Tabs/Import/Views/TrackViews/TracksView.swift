@@ -104,7 +104,8 @@ struct TracksView: View {
                 .scrollToCurrentTrackOnAppear(
                     id: playerVM.track?.id,
                     in: tracks,
-                    trigger: navigationTitle
+                    trigger: navigationTitle,
+                    animatedRequest: playerVM.scrollToCurrentTrackRequest
                 )
             }
         }

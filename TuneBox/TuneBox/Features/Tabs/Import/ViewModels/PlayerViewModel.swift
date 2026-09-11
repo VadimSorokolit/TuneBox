@@ -34,6 +34,7 @@ final class PlayerViewModel: PlayerManaging {
     private(set) var isPlaying = false
     private(set) var error: String?
     private(set) var playbackNavigationPath: [AppRoute] = []
+    private(set) var scrollToCurrentTrackRequest = 0
     private(set) var sourceFormatText: String = ""
     private(set) var outputRouteText: String = ""
     let vinylRevolutionDuration: TimeInterval = 12
@@ -275,6 +276,10 @@ final class PlayerViewModel: PlayerManaging {
 
         self.playbackNavigationPath = path
         self.needsNavigationPathRebuild = false
+    }
+
+    func requestScrollToCurrentTrack() {
+        self.scrollToCurrentTrackRequest += 1
     }
 
     func seek(by deltaSeconds: TimeInterval) {

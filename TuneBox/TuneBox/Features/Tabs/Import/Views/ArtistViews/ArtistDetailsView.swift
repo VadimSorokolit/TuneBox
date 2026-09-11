@@ -46,7 +46,8 @@ struct ArtistDetailsView: View {
                     .scrollToCurrentTrackOnAppear(
                         id: playerVM.track?.id,
                         in: artist.tracks,
-                        trigger: artist.id
+                        trigger: artist.id,
+                        animatedRequest: playerVM.scrollToCurrentTrackRequest
                     )
                     .bottomContentMargin(
                         20,
@@ -134,8 +135,13 @@ struct ArtistDetailsView: View {
                 .scrollToCurrentTrackOnAppear(
                     id: selected == .tracks ? playerVM.track?.id : nil,
                     in: artist.tracks,
-                    trigger: selected
+                    trigger: selected,
+                    animatedRequest: playerVM.scrollToCurrentTrackRequest
                 )
+                .onChange(of: playerVM.scrollToCurrentTrackRequest) { _, _ in
+                    guard selected != .tracks else { return }
+                    selected = .tracks
+                }
                 .bottomContentMargin(
                     10,
                     0,

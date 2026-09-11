@@ -11,6 +11,7 @@ protocol PlayerManaging: AnyObject, Sendable {
     var track: TrackEntity? { get }
     var playlist: PlaylistEntity? { get }
     var playbackNavigationPath: [AppRoute] { get }
+    var scrollToCurrentTrackRequest: Int { get }
     var repeatMode: RepeatMode { get }
     var spectrumBands: [Float] { get }
     var spectrumBandCount: Int { get }
@@ -33,6 +34,7 @@ protocol PlayerManaging: AnyObject, Sendable {
     func restoreLastPlaybackSession()
     func persistPlaybackSession()
     func refreshPlaybackNavigationPath(library: MusicLibrary?)
+    func requestScrollToCurrentTrack()
     func resetPlayback()
     func stopAudioPreservingSession()
     func clearPlaybackIfAffected(byRemovedSourceID sourceID: UUID, isAPISource: Bool)

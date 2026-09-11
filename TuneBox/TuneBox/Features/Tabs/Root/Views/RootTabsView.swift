@@ -281,12 +281,26 @@ struct RootTabsView: View {
         }
         guard path.isNotEmpty else { return }
 
+        if isAtPlaybackSource(path) {
+            playerVM.requestScrollToCurrentTrack()
+            return
+        }
+
         coordinator.switchToTab(.importFiles, animated: false)
         coordinator.popToRoot(animated: false)
 
         for route in path {
             coordinator.push(route, animated: false)
         }
+    }
+
+    private func isAtPlaybackSource(_ path: [AppRoute]) -> Bool {
+        guard coordinator.selectedTab == .importFiles else { return false }
+
+        let currentOrigin = PlaybackOriginSnapshot(from: coordinator.path)
+        let targetOrigin = PlaybackOriginSnapshot(from: path)
+
+        return currentOrigin != nil && currentOrigin == targetOrigin
     }
 
     // MARK: - Private. Object

@@ -13,6 +13,7 @@ private struct ScrollToCurrentTrackModifier<Trigger: Hashable>: ViewModifier {
     let trackIDs: Set<String>
     let trigger: Trigger
     let followsTrackChanges: Bool
+    let animatedRequest: Int
 
     @State private var isReady = false
 
@@ -37,6 +38,12 @@ private struct ScrollToCurrentTrackModifier<Trigger: Hashable>: ViewModifier {
                     guard let newID, trackIDs.contains(newID) else { return }
 
                     scroll(proxy: proxy, to: newID, animated: true)
+                }
+                .onChange(of: animatedRequest) { _, _ in
+                    guard isReady else { return }
+                    guard let trackID, trackIDs.contains(trackID) else { return }
+
+                    scroll(proxy: proxy, to: trackID, animated: true)
                 }
         }
     }
@@ -90,14 +97,16 @@ extension View {
         id trackID: String?,
         in tracks: [TrackEntity],
         trigger: some Hashable,
-        followsTrackChanges: Bool = true
+        followsTrackChanges: Bool = true,
+        animatedRequest: Int = 0
     ) -> some View {
         modifier(
             ScrollToCurrentTrackModifier(
                 trackID: trackID,
                 trackIDs: Set(tracks.map(\.id)),
                 trigger: trigger,
-                followsTrackChanges: followsTrackChanges
+                followsTrackChanges: followsTrackChanges,
+                animatedRequest: animatedRequest
             )
         )
     }
@@ -106,14 +115,16 @@ extension View {
         id trackID: String?,
         trackIDs: some Sequence<String>,
         trigger: some Hashable,
-        followsTrackChanges: Bool = true
+        followsTrackChanges: Bool = true,
+        animatedRequest: Int = 0
     ) -> some View {
         modifier(
             ScrollToCurrentTrackModifier(
                 trackID: trackID,
                 trackIDs: Set(trackIDs),
                 trigger: trigger,
-                followsTrackChanges: followsTrackChanges
+                followsTrackChanges: followsTrackChanges,
+                animatedRequest: animatedRequest
             )
         )
     }

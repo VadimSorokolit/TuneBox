@@ -91,7 +91,8 @@ struct AlbumDetailsView: View {
             .scrollToCurrentTrackOnAppear(
                 id: playerVM.track?.id,
                 in: orderedTracks,
-                trigger: album.id
+                trigger: album.id,
+                animatedRequest: playerVM.scrollToCurrentTrackRequest
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .bottomContentMargin(
