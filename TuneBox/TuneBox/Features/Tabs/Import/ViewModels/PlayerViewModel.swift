@@ -37,7 +37,7 @@ final class PlayerViewModel: PlayerManaging {
     private(set) var scrollToCurrentTrackRequest = 0
     private(set) var sourceFormatText: String = ""
     private(set) var outputRouteText: String = ""
-    let vinylRevolutionDuration: TimeInterval = 12
+    let vinylRevolutionDuration: TimeInterval = 18
     private(set) var vinylSpinDirection: Double = 1
     private(set) var vinylSpinSpeed: Double = 1
     private(set) var isSeekScrubbing = false

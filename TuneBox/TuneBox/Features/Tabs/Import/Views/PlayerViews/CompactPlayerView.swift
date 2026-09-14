@@ -33,97 +33,109 @@ struct CompactPlayerView: View {
 
     var body: some View {
         if let track {
-            VStack(spacing: 5) {
-                MarqueeText(text: track.songName)
+            ZStack(alignment: .trailing) {
+                VStack(spacing: 0) {
+                    MarqueeText(
+                        text: track.songName,
+                        isPlaying: isPlaying
+                    )
                     .equatable()
-                    .leadingTapArea {
-                        onOpenExpandedPlayerTap()
-                    }
-                    .modifier(LeadingWipeModifier(isRevealed: isPlaying))
                     .padding(.leading, 20)
+                    .padding(.bottom, 5)
+                    .allowsHitTesting(false)
 
-                ZStack(alignment: .bottom) {
-                    HStack(spacing: 12) {
-                        SpinningVinylView(
-                            track: track,
-                            isPlaying: isPlaying,
-                            isLoading: coverVM.isLoading,
-                            isSeekScrubbing: playerVM.isSeekScrubbing,
-                            isTapSpinning: playerVM.isVinylTapSpinning,
-                            progress: progress,
-                            revolutionDuration: playerVM.vinylRevolutionDuration,
-                            spinDirection: playerVM.vinylSpinDirection,
-                            spinSpeed: playerVM.vinylSpinSpeed,
-                            vinylSize: 44,
-                            coverSize: 15,
-                            holeSize: 1,
-                            onTap: onVinylPlateTap
-                        )
-                        .equatable()
-                        .id(vinylAlbumKey(for: track))
-                        .transition(.opacity.combined(with: .scale(scale: 0.88)))
-                        .frame(size: 44)
-                        .animation(
-                            .smooth(duration: 0.35),
-                            value: vinylAlbumKey(for: track)
-                        )
+                    ZStack(alignment: .bottom) {
+                        HStack(spacing: Layout.rowSpacing) {
+                            SpinningVinylView(
+                                track: track,
+                                isPlaying: isPlaying,
+                                isLoading: coverVM.isLoading,
+                                isSeekScrubbing: playerVM.isSeekScrubbing,
+                                isTapSpinning: playerVM.isVinylTapSpinning,
+                                progress: progress,
+                                revolutionDuration: playerVM.vinylRevolutionDuration,
+                                spinDirection: playerVM.vinylSpinDirection,
+                                spinSpeed: playerVM.vinylSpinSpeed,
+                                vinylSize: Layout.vinylSize,
+                                coverSize: 15,
+                                holeSize: 1
+                            )
+                            .equatable()
+                            .id(vinylAlbumKey(for: track))
+                            .transition(.opacity.combined(with: .scale(scale: 0.88)))
+                            .frame(size: Layout.vinylSize)
+                            .allowsHitTesting(false)
+                            .animation(
+                                .smooth(duration: 0.35),
+                                value: vinylAlbumKey(for: track)
+                            )
 
-                        Text(track.artistName)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 14)
-                            .contentShape(Capsule())
-                            .onTapGesture {
-                                onOpenExpandedPlayerTap()
-                            }
-                            .modifier(LeadingWipeModifier(isRevealed: isPlaying))
+                            Text(track.artistName)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                                .frame(maxWidth: 120, alignment: .leading)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 14)
+                                .allowsHitTesting(false)
 
-                        PlaybackControls(
-                            progress: progress,
-                            isPlaying: isPlaying,
-                            repeatMode: repeatMode,
-                            isShuffleEnabled: isShuffleEnabled,
-                            trackID: track.id,
-                            onPlayPrevious: onPlayPrevious,
-                            onPlayNext: onPlayNext,
-                            onSeek: onSeek,
-                            onSeekHoldChanged: onSeekHoldChanged,
-                            onPlayPauseTap: onPlayPauseTap,
-                            onRepeatModeChange: onRepeatModeChange,
-                            onShuffleToggle: onShuffleToggle
+                            Spacer()
+                        }
+                        .padding(.horizontal, Layout.horizontalPadding)
+                        .frame(maxWidth: .infinity)
+
+                        ProgressBar(
+                            progress: progress
                         )
-                        .fixedSize()
+                        .opacity(progress > 0 ? 1 : 0)
+                        .allowsHitTesting(false)
                     }
-                    .padding(.horizontal, 16)
                     .frame(maxWidth: .infinity)
 
-                    ProgressBar(
-                        progress: progress
+                    HStack {
+                        sourceFormatLabel
+
+                        Spacer()
+
+                        outputRouteLabel
+                    }
+                    .frame(height: 10)
+                    .padding(.horizontal, 24)
+                    .padding(.top, 5)
+                    .frame(
+                        height: isPlaying ? 15 : 0,
+                        alignment: .top
                     )
-                    .opacity(progress > 0 ? 1 : 0)
-                    .allowsHitTesting(progress > 0)
+                    .opacity(isPlaying ? 1 : 0)
+                    .scaleEffect(
+                        x: 1,
+                        y: isPlaying ? 1 : 0,
+                        anchor: .top
+                    )
+                    .clipped()
+                    .allowsHitTesting(false)
                 }
-                .frame(maxWidth: .infinity)
+                .padding(.top, 5)
+                .padding(.bottom, isPlaying ? 10 : 5)
 
-                HStack {
-                    sourceFormatLabel
-
-                    Spacer()
-
-                    outputRouteLabel
-                }
-                .frame(height: 10)
-                .leadingTapArea {
-                    onOpenExpandedPlayerTap()
-
-                }
-                .padding(.horizontal, 24)
+                PlaybackControls(
+                    progress: progress,
+                    isPlaying: isPlaying,
+                    repeatMode: repeatMode,
+                    isShuffleEnabled: isShuffleEnabled,
+                    trackID: track.id,
+                    onPlayPrevious: onPlayPrevious,
+                    onPlayNext: onPlayNext,
+                    onSeek: onSeek,
+                    onSeekHoldChanged: onSeekHoldChanged,
+                    onPlayPauseTap: onPlayPauseTap,
+                    onRepeatModeChange: onRepeatModeChange,
+                    onShuffleToggle: onShuffleToggle
+                )
+                .padding(.trailing, Layout.horizontalPadding)
+                .frame(maxHeight: .infinity)
             }
-            .padding(.top, 5)
-            .padding(.bottom, 10)
+            .frame(height: Layout.playerHeight(isPlaying: isPlaying))
             .glassEffect(
                 in: RoundedRectangle(
                     cornerRadius: 30,
@@ -141,6 +153,10 @@ struct CompactPlayerView: View {
                 radius: 12,
                 y: 4
             )
+            .overlay {
+                tapZones
+            }
+            .animation(.easeInOut(duration: 0.35), value: isPlaying)
             .task(id: "\(track.id)-\(coverVM.isConnected)") {
                 guard coverVM.isConnected else { return }
                 guard track.imagePath == nil else { return }
@@ -164,6 +180,44 @@ struct CompactPlayerView: View {
     @Injected private var importManagingVM: ImportManaging
     @Injected private var playerVM: PlayerManaging
     @Injected private var coverVM: CoverManaging
+
+    private enum Layout {
+        static let vinylSize: CGFloat = 44
+        static let rowSpacing: CGFloat = 12
+        static let horizontalPadding: CGFloat = 16
+        static let controlButtonSize: CGFloat = 50
+        static let controlButtonCount = 3
+
+        static var vinylTapZoneWidth: CGFloat {
+            horizontalPadding + vinylSize + rowSpacing
+        }
+
+        static var controlsTapZoneWidth: CGFloat {
+            controlButtonSize * CGFloat(controlButtonCount) + horizontalPadding
+        }
+
+        static func playerHeight(isPlaying: Bool) -> CGFloat {
+            GlobalConstants.CompactPlayer.height(isPlaying: isPlaying)
+        }
+    }
+
+    private var tapZones: some View {
+        HStack(spacing: 0) {
+            Color.clear
+                .frame(width: Layout.vinylTapZoneWidth)
+                .contentShape(Rectangle())
+                .onTapGesture(perform: onVinylPlateTap)
+
+            Color.clear
+                .frame(maxWidth: .infinity)
+                .contentShape(Rectangle())
+                .onTapGesture(perform: onOpenExpandedPlayerTap)
+
+            Color.clear
+                .frame(width: Layout.controlsTapZoneWidth)
+                .allowsHitTesting(false)
+        }
+    }
 
     private func vinylAlbumKey(for track: TrackEntity) -> String {
         "\(track.artistName)|\(track.albumName)"
@@ -208,6 +262,36 @@ struct CompactPlayerView: View {
         }
     }
 
+    private struct PressCircleGlassButtonStyle: ButtonStyle {
+        func makeBody(configuration: Configuration) -> some View {
+            configuration.label
+                .background {
+                    Circle()
+                        .fill(.white.opacity(configuration.isPressed ? 0.22 : 0))
+                        .frame(
+                            width: Layout.controlButtonSize,
+                            height: Layout.controlButtonSize
+                        )
+                }
+                .overlay {
+                    Circle()
+                        .fill(.clear)
+                        .frame(
+                            width: Layout.controlButtonSize,
+                            height: Layout.controlButtonSize
+                        )
+                        .glassEffect(
+                            configuration.isPressed
+                                ? .regular.interactive()
+                                : .identity,
+                            in: .circle
+                        )
+                        .allowsHitTesting(false)
+                }
+                .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
+        }
+    }
+
     private struct PressGlassButtonStyle: ButtonStyle {
         func makeBody(configuration: Configuration) -> some View {
             configuration.label
@@ -220,23 +304,6 @@ struct CompactPlayerView: View {
                         ? .regular.interactive()
                         : .identity,
                     in: .capsule
-                )
-                .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
-        }
-    }
-
-    private struct PressCircleGlassButtonStyle: ButtonStyle {
-        func makeBody(configuration: Configuration) -> some View {
-            configuration.label
-                .background {
-                    Circle()
-                        .fill(.white.opacity(configuration.isPressed ? 0.22 : 0))
-                }
-                .glassEffect(
-                    configuration.isPressed
-                        ? .regular.interactive()
-                        : .identity,
-                    in: .circle
                 )
                 .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
         }
@@ -296,11 +363,12 @@ struct CompactPlayerView: View {
                 )
             }
             .font(.title3)
+            .frame(maxHeight: .infinity)
         }
 
         // MARK: - Private. Properties
 
-        private let imageSize: CGFloat = 50
+        private let imageSize: CGFloat = Layout.controlButtonSize
     }
 
     private struct TrackSkipHoldButton: View {
@@ -318,20 +386,25 @@ struct CompactPlayerView: View {
         // MARK: - Body
 
         var body: some View {
-            Image(systemName: systemImage)
-                .foregroundStyle(.tint)
-                .frame(size: imageSize)
+            Color.clear
+                .frame(width: imageSize)
+                .frame(maxHeight: .infinity)
                 .contentShape(Rectangle())
-                .background {
-                    Circle()
-                        .fill(.white.opacity(isPressed ? 0.22 : 0))
+                .overlay {
+                    Image(systemName: systemImage)
+                        .foregroundStyle(.tint)
+                        .frame(size: imageSize)
+                        .background {
+                            Circle()
+                                .fill(.white.opacity(isPressed ? 0.22 : 0))
+                        }
+                        .glassEffect(
+                            isPressed
+                                ? .regular.interactive()
+                                : .identity,
+                            in: .circle
+                        )
                 }
-                .glassEffect(
-                    isPressed
-                        ? .regular.interactive()
-                        : .identity,
-                    in: .circle
-                )
                 .animation(.easeOut(duration: 0.15), value: isPressed)
                 .gesture(
                     DragGesture(minimumDistance: 0)
@@ -439,50 +512,63 @@ struct CompactPlayerView: View {
         // MARK: - Body
 
         var body: some View {
-            VStack(spacing: 0) {
-                Button {
-                    onPlayPauseTap()
-                } label: {
-                    Image(systemName: isPlaying ? "pause" : "play")
-                        .foregroundStyle(.tint)
-                        .frame(size: imageSize)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(PressCircleGlassButtonStyle())
-                .contextMenu {
-                    Picker(
-                        "Repeat",
-                        selection: Binding(
-                            get: { repeatMode },
-                            set: onRepeatModeChange
-                        )
-                    ) {
-                        Text("Repeat One")
-                            .tag(RepeatMode.one)
-
-                        Text("Repeat All")
-                            .tag(RepeatMode.all)
-
-                        Text("No Repeat").tag(RepeatMode.off)
+            Button(action: onPlayPauseTap) {
+                Color.clear
+                    .frame(width: imageSize)
+                    .frame(maxHeight: .infinity)
+                    .overlay {
+                        Image(systemName: isPlaying ? "pause" : "play")
+                            .font(.system(size: 18))
+                            .foregroundStyle(.tint)
+                            .frame(size: imageSize)
                     }
-
-                    Divider()
-
-                    Toggle(
-                        "Shuffle",
-                        isOn: Binding(
-                            get: { isShuffleEnabled },
-                            set: { _ in onShuffleToggle() }
-                        )
-                    )
-                }
-                .overlay(alignment: .bottom) {
-                    Text(repeatMode == .one ? "•" : repeatMode == .all ? "••" : "")
-                        .foregroundStyle(.blue)
-                        .font(.system(size: 16))
-                        .offset(y: 2)
-                }
+                    .contentShape(Rectangle())
             }
+            .buttonStyle(PressCircleGlassButtonStyle())
+            .contextMenu {
+                menuContent
+            } preview: {
+                Image(systemName: isPlaying ? "pause" : "play")
+                    .foregroundStyle(.tint)
+                    .font(.title3)
+                    .frame(size: imageSize)
+            }
+            .overlay {
+                Text(repeatMode == .one ? "•" : repeatMode == .all ? "••" : "")
+                    .foregroundStyle(.blue)
+                    .font(.system(size: 16))
+                    .offset(y: imageSize / 2 + 2)
+                    .allowsHitTesting(false)
+            }
+        }
+
+        @ViewBuilder
+        private var menuContent: some View {
+            Picker(
+                "Repeat",
+                selection: Binding(
+                    get: { repeatMode },
+                    set: onRepeatModeChange
+                )
+            ) {
+                Text("Repeat One")
+                    .tag(RepeatMode.one)
+
+                Text("Repeat All")
+                    .tag(RepeatMode.all)
+
+                Text("No Repeat").tag(RepeatMode.off)
+            }
+
+            Divider()
+
+            Toggle(
+                "Shuffle",
+                isOn: Binding(
+                    get: { isShuffleEnabled },
+                    set: { _ in onShuffleToggle() }
+                )
+            )
         }
     }
 
@@ -523,11 +609,13 @@ struct CompactPlayerView: View {
         // MARK: - Properties. Public
 
         let text: String
+        let isPlaying: Bool
 
         // MARK: - Equatable
 
         static func == (lhs: Self, rhs: Self) -> Bool {
             lhs.text == rhs.text
+                && lhs.isPlaying == rhs.isPlaying
         }
 
         // MARK: - Body
@@ -555,6 +643,7 @@ struct CompactPlayerView: View {
                                 ) { context in
                                     HStack(spacing: textSpacing) {
                                         textView
+
                                         textView
                                     }
                                     .offset(x: offset(at: context.date))
@@ -611,6 +700,12 @@ struct CompactPlayerView: View {
             Text(text)
                 .font(.headline)
                 .lineLimit(1)
+                .foregroundStyle(
+                    isPlaying
+                    ? .black
+                    : .gray
+                )
+                .animation(.easeInOut(duration: 0.35), value: isPlaying)
                 .fixedSize(
                     horizontal: true,
                     vertical: false
@@ -684,14 +779,14 @@ struct CompactPlayerView: View {
             image: "https://usercontent.jamendo.com/?type=album&id=24&width=300&trackid=168",
             songName: "Believer Very Very Very Very Very Very Very Very Long Title For Marquee Preview",
             duration: 200,
-            artistName: "Imagine Dragons",
+            artistName: "Imagine Dragons Dragons",
             albumName: "Evolve",
             releaseDate: "2017-02-01",
             download: nil,
             waveformData: nil,
             size: 5_242_880
         ),
-        isPlaying: true,
+        isPlaying: false,
         progress: 0.5,
         repeatMode: .one,
         isShuffleEnabled: false,

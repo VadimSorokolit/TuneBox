@@ -133,6 +133,7 @@ struct RootTabsView: View {
                     ? rootTabsVM.tabBarHeight
                     : GlobalConstants.CompactPlayer.bottomPadding
                 )
+                .animation(.easeInOut(duration: 0.35), value: playerVM.isPlaying)
             }
 
             if rootTabsVM.isTabBarVisible {
