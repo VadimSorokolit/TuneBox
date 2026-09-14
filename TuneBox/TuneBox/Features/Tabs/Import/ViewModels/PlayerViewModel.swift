@@ -50,17 +50,16 @@ final class PlayerViewModel: PlayerManaging {
     }
 
     var currentPlaybackTime: TimeInterval {
-        let currentTime = self.audioService.currentTime
+        if self.isSeekScrubbing {
+            return self.playbackTime(for: self.progress)
+        }
 
+        let currentTime = self.audioService.currentTime
         if currentTime > 0 {
             return currentTime
         }
 
-        guard let duration = self.track?.duration, duration > 0 else {
-            return 0
-        }
-
-        return Double(duration) * self.progress
+        return self.playbackTime(for: self.progress)
     }
 
     var spectrumBands: [Float] {
@@ -286,8 +285,7 @@ final class PlayerViewModel: PlayerManaging {
         self.audioService.seek(by: deltaSeconds)
 
         guard self.isSeekScrubbing.isFalse else {
-            self.applyAudioProgress()
-            self.stopSeekScrubbingIfNeeded(at: self.progress)
+            self.applySeekHoldProgress(deltaSeconds: deltaSeconds)
             return
         }
 
@@ -638,6 +636,33 @@ final class PlayerViewModel: PlayerManaging {
         guard duration > 0 else { return }
 
         self.progress = min(max(self.audioService.currentTime / duration, 0), 1)
+    }
+
+    private func applySeekHoldProgress(deltaSeconds: TimeInterval) {
+        let duration = self.audioService.duration
+        if duration > 0 {
+            let newProgress = min(max(self.progress + (deltaSeconds / duration), 0), 1)
+            self.progress = newProgress
+            self.lastSeekProgress = newProgress
+            self.stopSeekScrubbingIfNeeded(at: newProgress)
+            return
+        }
+
+        self.applyAudioProgress()
+        self.stopSeekScrubbingIfNeeded(at: self.progress)
+    }
+
+    private func playbackTime(for progress: Double) -> TimeInterval {
+        let duration = self.audioService.duration
+        if duration > 0 {
+            return duration * progress
+        }
+
+        guard let duration = self.track?.duration, duration > 0 else {
+            return 0
+        }
+
+        return Double(duration) * progress
     }
 
     private func clearSeekScrubbing() {

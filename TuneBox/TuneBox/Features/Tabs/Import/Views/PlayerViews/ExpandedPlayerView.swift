@@ -170,12 +170,21 @@ struct ExpandedPlayerView: View {
                 .tint(Self.accentColor)
 
                 HStack(spacing: 36) {
-                    Button {
-                        playerVM.playPrevious()
-                    } label: {
-                        Image(systemName: "backward.fill")
-                            .font(.title2)
-                    }
+                    TrackSkipHoldButton(
+                        systemImage: "backward.fill",
+                        imageSize: 44,
+                        direction: -1,
+                        isSeekDisabled: playerVM.progress <= 0,
+                        onSkip: {
+                            playerVM.playPrevious()
+                        },
+                        onSeek: { delta in
+                            playerVM.seek(by: delta)
+                        },
+                        onSeekHoldChanged: { isHolding, direction in
+                            playerVM.setSeekScrubbing(isHolding, direction: direction)
+                        }
+                    )
 
                     Button {
                         playerVM.togglePlayPause()
@@ -184,12 +193,21 @@ struct ExpandedPlayerView: View {
                             .font(.system(size: 56))
                     }
 
-                    Button {
-                        playerVM.playNext()
-                    } label: {
-                        Image(systemName: "forward.fill")
-                            .font(.title2)
-                    }
+                    TrackSkipHoldButton(
+                        systemImage: "forward.fill",
+                        imageSize: 44,
+                        direction: 1,
+                        isSeekDisabled: playerVM.progress >= 1,
+                        onSkip: {
+                            playerVM.playNext()
+                        },
+                        onSeek: { delta in
+                            playerVM.seek(by: delta)
+                        },
+                        onSeekHoldChanged: { isHolding, direction in
+                            playerVM.setSeekScrubbing(isHolding, direction: direction)
+                        }
+                    )
                 }
                 .foregroundStyle(Self.chromeColor)
                 .shadow(color: .black.opacity(0.45), radius: 2, y: 1)
@@ -209,6 +227,14 @@ struct ExpandedPlayerView: View {
             .font(.caption2)
             .foregroundStyle(Self.subtitleColor)
             .shadow(color: .black.opacity(0.45), radius: 1.5, y: 1)
+            .frame(height: 15)
+            .scaleEffect(
+                x: 1,
+                y: playerVM.isPlaying ? 1 : 0,
+                anchor: .center
+            )
+            .opacity(playerVM.isPlaying ? 1 : 0)
+            .animation(.easeInOut(duration: 0.35), value: playerVM.isPlaying)
         }
 
         private func formatClock(_ seconds: TimeInterval) -> String {
@@ -217,6 +243,112 @@ struct ExpandedPlayerView: View {
             let remaining = total % 60
 
             return String(format: "%d:%02d", minutes, remaining)
+        }
+
+        private struct TrackSkipHoldButton: View {
+
+            // MARK: - Properties. Public
+
+            let systemImage: String
+            let imageSize: CGFloat
+            let direction: Double
+            let isSeekDisabled: Bool
+            let onSkip: () -> Void
+            let onSeek: (TimeInterval) -> Void
+            let onSeekHoldChanged: (Bool, Double) -> Void
+
+            // MARK: - Body
+
+            var body: some View {
+                Color.clear
+                    .frame(width: imageSize, height: imageSize)
+                    .contentShape(Rectangle())
+                    .overlay {
+                        Image(systemName: systemImage)
+                            .font(.title2)
+                            .opacity(isPressed ? 0.55 : 1)
+                            .scaleEffect(isPressed ? 0.92 : 1)
+                    }
+                    .animation(.easeOut(duration: 0.15), value: isPressed)
+                    .gesture(
+                        DragGesture(minimumDistance: 0)
+                            .onChanged { _ in
+                                beginPress()
+                            }
+                            .onEnded { _ in
+                                endPress()
+                            }
+                    )
+                    .onChange(of: isSeekDisabled) { _, disabled in
+                        guard disabled, isPressed else { return }
+                        endPress()
+                    }
+                    .onDisappear {
+                        endPress()
+                    }
+            }
+
+            // MARK: - Private. Properties
+
+            @State private var holdTask: Task<Void, Never>?
+            @State private var didEnterHold = false
+            @State private var isPressed = false
+
+            private let holdStepSeconds: TimeInterval = 1
+            private let holdDelayNanoseconds: UInt64 = 300_000_000
+            private let holdTickNanoseconds: UInt64 = 120_000_000
+
+            // MARK: - Private. Methods
+
+            private func beginPress() {
+                guard holdTask == nil else { return }
+
+                isPressed = true
+                didEnterHold = false
+                holdTask = Task { @MainActor in
+                    do {
+                        try await Task.sleep(nanoseconds: holdDelayNanoseconds)
+                    } catch {
+                        return
+                    }
+
+                    guard !Task.isCancelled else { return }
+                    guard isSeekDisabled.isFalse else { return }
+
+                    didEnterHold = true
+                    onSeekHoldChanged(true, direction)
+
+                    while !Task.isCancelled {
+                        onSeek(direction * holdStepSeconds)
+                        do {
+                            try await Task.sleep(nanoseconds: holdTickNanoseconds)
+                        } catch {
+                            return
+                        }
+                    }
+                }
+            }
+
+            private func endPress() {
+                let wasHolding = didEnterHold
+                let wasPressed = isPressed
+                cancelHold()
+                isPressed = false
+
+                guard wasPressed else { return }
+
+                if wasHolding {
+                    onSeekHoldChanged(false, direction)
+                } else {
+                    onSkip()
+                }
+            }
+
+            private func cancelHold() {
+                holdTask?.cancel()
+                holdTask = nil
+                didEnterHold = false
+            }
         }
     }
 
