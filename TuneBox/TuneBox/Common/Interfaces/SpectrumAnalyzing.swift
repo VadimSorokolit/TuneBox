@@ -15,4 +15,5 @@ nonisolated protocol SpectrumAnalyzing: AnyObject, Sendable {
     )
     func reset()
     func resetInputBuffers()
+    func seedEnvelope(_ values: [Float])
 }

@@ -303,6 +303,32 @@ private final class VinylSpinContainer: UIView {
             self.plateView.topAnchor.constraint(equalTo: self.spinHost.topAnchor),
             self.plateView.bottomAnchor.constraint(equalTo: self.spinHost.bottomAnchor)
         ])
+
+        self.routePauseObserver = NotificationCenter.default.addObserver(
+            forName: .playbackDidPauseForRouteChange,
+            object: nil,
+            queue: nil
+        ) { [weak self] _ in
+            VinylSpinGate.block()
+            self?.stopSpinOnCurrentThread()
+        }
+        self.spinAllowObserver = NotificationCenter.default.addObserver(
+            forName: .vinylSpinGateDidAllow,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.startSpinIfRequested()
+        }
+    }
+
+    deinit {
+        self.displayLink?.invalidate()
+        if let routePauseObserver {
+            NotificationCenter.default.removeObserver(routePauseObserver)
+        }
+        if let spinAllowObserver {
+            NotificationCenter.default.removeObserver(spinAllowObserver)
+        }
     }
 
     @available(*, unavailable)
@@ -343,25 +369,111 @@ private final class VinylSpinContainer: UIView {
         speed: Double,
         duration: TimeInterval
     ) {
-        let spinning = isSpinning && speed != 0 && duration > 0
-        let sameParams = self.lastSpinning == spinning
-            && self.lastDirection == direction
-            && abs(self.lastSpeed - speed) < 0.001
-            && abs(self.lastDuration - duration) < 0.001
-
-        guard sameParams.isFalse else { return }
-
-        let angle = self.presentationRotation()
-        self.spinHost.layer.removeAnimation(forKey: Self.spinKey)
-        self.spinHost.layer.setValue(angle, forKeyPath: Self.rotationKeyPath)
-
-        self.lastSpinning = spinning
+        self.lastRequestedSpinning = isSpinning && speed != 0 && duration > 0
         self.lastDirection = direction
         self.lastSpeed = speed
         self.lastDuration = duration
 
+        if VinylSpinGate.isAllowed {
+            self.suppressSpinUntilStopped = false
+        } else if self.lastRequestedSpinning {
+            self.suppressSpinUntilStopped = true
+            self.lastSpinning = false
+            _ = self.haltSpinAnimation()
+            return
+        }
+
+        if self.suppressSpinUntilStopped {
+            if self.lastRequestedSpinning {
+                self.lastSpinning = false
+                _ = self.haltSpinAnimation()
+                return
+            }
+
+            self.suppressSpinUntilStopped = false
+        }
+
+        let spinning = self.lastRequestedSpinning && VinylSpinGate.isAllowed
+        let sameParams = self.lastSpinning == spinning
+
+        guard sameParams.isFalse else { return }
+
+        let angle = self.haltSpinAnimation()
+        self.lastSpinning = spinning
+
         guard spinning else { return }
 
+        self.startDisplayLink()
+        self.startSpinAnimation(angle: angle, direction: direction, speed: speed, duration: duration)
+    }
+
+    private func startSpinIfRequested() {
+        self.suppressSpinUntilStopped = false
+        guard self.lastRequestedSpinning, VinylSpinGate.isAllowed else { return }
+
+        self.applySpin(
+            isSpinning: true,
+            direction: self.lastDirection,
+            speed: self.lastSpeed,
+            duration: self.lastDuration
+        )
+    }
+
+    private func stopSpinOnCurrentThread() {
+        if Thread.isMainThread {
+            self.stopSpinImmediately()
+        } else {
+            DispatchQueue.main.async { [weak self] in
+                self?.stopSpinImmediately()
+            }
+        }
+    }
+
+    private func stopSpinImmediately() {
+        self.suppressSpinUntilStopped = true
+        self.lastSpinning = false
+        self.stopDisplayLink()
+        _ = self.haltSpinAnimation()
+    }
+
+    @objc
+    private func handleSpinGateTick() {
+        guard VinylSpinGate.isAllowed.isFalse else { return }
+        self.stopSpinImmediately()
+    }
+
+    private func startDisplayLink() {
+        guard self.displayLink == nil else { return }
+
+        let link = CADisplayLink(target: self, selector: #selector(self.handleSpinGateTick))
+        link.add(to: .main, forMode: .common)
+        self.displayLink = link
+    }
+
+    private func stopDisplayLink() {
+        self.displayLink?.invalidate()
+        self.displayLink = nil
+    }
+
+    @discardableResult
+    private func haltSpinAnimation() -> Double {
+        self.stopDisplayLink()
+        let angle = self.presentationRotation()
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        self.spinHost.layer.removeAnimation(forKey: Self.spinKey)
+        self.spinHost.layer.removeAllAnimations()
+        self.spinHost.layer.setValue(angle, forKeyPath: Self.rotationKeyPath)
+        CATransaction.commit()
+        return angle
+    }
+
+    private func startSpinAnimation(
+        angle: Double,
+        direction: Double,
+        speed: Double,
+        duration: TimeInterval
+    ) {
         let turn = 2 * Double.pi * (direction >= 0 ? 1 : -1)
         let animation = CABasicAnimation(keyPath: Self.rotationKeyPath)
         animation.fromValue = angle
@@ -380,6 +492,11 @@ private final class VinylSpinContainer: UIView {
     private let plateView = UIImageView()
     private var pendingPlate: AnyView?
     private var contentIdentity: String?
+    private var routePauseObserver: NSObjectProtocol?
+    private var spinAllowObserver: NSObjectProtocol?
+    private var displayLink: CADisplayLink?
+    private var suppressSpinUntilStopped = false
+    private var lastRequestedSpinning = false
     private var lastSpinning = false
     private var lastDirection: Double = 1
     private var lastSpeed: Double = 1

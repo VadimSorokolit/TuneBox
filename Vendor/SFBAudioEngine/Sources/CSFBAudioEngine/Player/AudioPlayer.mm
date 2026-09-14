@@ -58,6 +58,15 @@ constexpr uint64_t nanosecondsPerMillisecond = 1'000'000;
 #if TARGET_OS_IPHONE
 /// Sample rates within this tolerance are considered equivalent
 constexpr double sampleRateTolerance = 1.0;
+
+NSString *OutputRouteSignature() noexcept {
+    NSMutableArray<NSString *> *parts = [[NSMutableArray alloc] init];
+    for (AVAudioSessionPortDescription *port in AVAudioSession.sharedInstance.currentRoute.outputs) {
+        [parts addObject:[NSString stringWithFormat:@"%@:%@", port.portType, port.UID ?: @""]];
+    }
+    [parts sortUsingSelector:@selector(compare:)];
+    return [parts componentsJoinedByString:@"|"] ?: @"";
+}
 #endif /* TARGET_OS_IPHONE */
 
 /// Objective-C associated object key indicating if a decoder has been canceled
@@ -637,6 +646,7 @@ sfb::AudioPlayer::AudioPlayer() {
                                     (__bridge CFStringRef)AVAudioSessionInterruptionNotification,
                                     (__bridge void *)[AVAudioSession sharedInstance],
                                     CFNotificationSuspensionBehaviorDeliverImmediately);
+    lastOutputRouteSignature_ = OutputRouteSignature();
 #endif /* TARGET_OS_IPHONE */
 }
 
@@ -886,6 +896,14 @@ void sfb::AudioPlayer::reset() noexcept {
 
 bool sfb::AudioPlayer::engineIsRunning() const noexcept {
     return engine_.isRunning;
+}
+
+bool sfb::AudioPlayer::restoresPlaybackAfterEngineReset() const noexcept {
+    return restoresPlaybackAfterEngineReset_.load(std::memory_order_relaxed);
+}
+
+void sfb::AudioPlayer::setRestoresPlaybackAfterEngineReset(bool restoresPlayback) noexcept {
+    restoresPlaybackAfterEngineReset_.store(restoresPlayback, std::memory_order_relaxed);
 }
 
 sfb::AudioPlayer::Decoder sfb::AudioPlayer::currentDecoder() const noexcept {
@@ -2384,6 +2402,27 @@ void sfb::AudioPlayer::handleAudioEngineConfigurationChange(AVAudioEngine *engin
     // AVAudioEngine posts this notification from a dedicated internal dispatch queue
     os_log_debug(log_, "Received AVAudioEngineConfigurationChangeNotification");
 
+    const bool allowRestore = restoresPlaybackAfterEngineReset_.load(std::memory_order_relaxed);
+    bool outputDeviceChanged = false;
+#if TARGET_OS_IPHONE
+    NSString *signature = OutputRouteSignature();
+    outputDeviceChanged = lastOutputRouteSignature_ != nil && ![signature isEqualToString:lastOutputRouteSignature_];
+    lastOutputRouteSignature_ = signature;
+#endif /* TARGET_OS_IPHONE */
+    // Same-device sample-rate changes still restore. Device changes honor the property.
+    const bool restorePlayback = allowRestore || !outputDeviceChanged;
+    bool wasPlaying = false;
+
+    if (!restorePlayback) {
+        const auto flags = loadFlags();
+        if (bits::has_all(flags, Flags::engineIsRunning | Flags::isPlaying)) {
+            if (__strong id<SFBAudioPlayerDelegate> delegate = player_.delegate; delegate != nil &&
+                [delegate respondsToSelector:@selector(audioPlayer:audioEngineConfigurationWillChange:)]) {
+                [delegate audioPlayer:player_ audioEngineConfigurationWillChange:userInfo];
+            }
+        }
+    }
+
     // The output hardware’s channel count or sample rate changed
     {
         std::unique_lock lock{engineMutex_};
@@ -2392,9 +2431,16 @@ void sfb::AudioPlayer::handleAudioEngineConfigurationChange(AVAudioEngine *engin
         // Preserve the logical playback state across processing graph updates
         const auto prevFlags = clearFlags(Flags::engineIsRunning | Flags::isPlaying);
         const auto prevState = prevFlags & (Flags::engineIsRunning | Flags::isPlaying);
+        wasPlaying = bits::has_all(prevState, Flags::engineIsRunning | Flags::isPlaying);
 
         AVAudioOutputNode *outputNode = engine_.outputNode;
         AVAudioMixerNode *mixerNode = engine_.mainMixerNode;
+        const float previousMixerVolume = mixerNode.outputVolume;
+
+        // Mute before reconnect/restart so a headphone unplug cannot
+        // briefly play through the speaker, and a plug-in cannot
+        // push a new sample-rate into the spectrum tap.
+        mixerNode.outputVolume = 0;
 
         AVAudioFormat *outputNodeOutputFormat = [outputNode outputFormatForBus:0];
         AVAudioFormat *mixerNodeOutputFormat = [mixerNode outputFormatForBus:0];
@@ -2440,21 +2486,35 @@ void sfb::AudioPlayer::handleAudioEngineConfigurationChange(AVAudioEngine *engin
             [engine_ prepare];
         }
 
-        // Restart AVAudioEngine if previously playing
-        if (bits::has_all(prevState, Flags::engineIsRunning | Flags::isPlaying)) {
-            if (NSError *startError = nil; ![engine_ startAndReturnError:&startError]) {
-                os_log_error(log_, "Error starting AVAudioEngine: %{public}@", startError);
-                lock.unlock();
-                if (__strong id<SFBAudioPlayerDelegate> delegate = player_.delegate;
-                    delegate != nil && [delegate respondsToSelector:@selector(audioPlayer:encounteredError:)]) {
-                    [delegate audioPlayer:player_ encounteredError:startError];
+        if (restorePlayback) {
+            // Restart AVAudioEngine if previously playing
+            if (wasPlaying) {
+                if (NSError *startError = nil; ![engine_ startAndReturnError:&startError]) {
+                    os_log_error(log_, "Error starting AVAudioEngine: %{public}@", startError);
+                    lock.unlock();
+                    if (__strong id<SFBAudioPlayerDelegate> delegate = player_.delegate;
+                        delegate != nil && [delegate respondsToSelector:@selector(audioPlayer:encounteredError:)]) {
+                        [delegate audioPlayer:player_ encounteredError:startError];
+                    }
+                    return;
                 }
-                return;
+            }
+
+            setFlags(prevState);
+            mixerNode.outputVolume = previousMixerVolume;
+        } else {
+            os_log_debug(log_, "Skipping playback restore after output-device change");
+            if (engine_.isRunning) {
+                [engine_ stop];
             }
         }
+    }
 
-        // Restore previous playback state
-        setFlags(prevState);
+    if (!restorePlayback && wasPlaying) {
+        if (__strong id<SFBAudioPlayerDelegate> delegate = player_.delegate;
+            delegate != nil && [delegate respondsToSelector:@selector(audioPlayer:playbackStateChanged:)]) {
+            [delegate audioPlayer:player_ playbackStateChanged:SFBAudioPlayerPlaybackStateStopped];
+        }
     }
 
     if (__strong id<SFBAudioPlayerDelegate> delegate = player_.delegate;
@@ -2502,6 +2562,13 @@ void sfb::AudioPlayer::handleAudioSessionInterruption(NSDictionary *userInfo) no
         if (const auto interruptionOption =
                     [[userInfo objectForKey:AVAudioSessionInterruptionOptionKey] unsignedIntegerValue];
             !(interruptionOption & AVAudioSessionInterruptionOptionShouldResume)) {
+            return;
+        }
+
+        // Headphone plug/unplug often arrives as shouldResume. The host decides
+        // whether to continue; do not auto-start when restore is disabled.
+        if (!restoresPlaybackAfterEngineReset_.load(std::memory_order_relaxed)) {
+            os_log_debug(log_, "Skipping interruption resume; restoresPlaybackAfterEngineReset is false");
             return;
         }
 

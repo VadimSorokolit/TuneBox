@@ -57,6 +57,7 @@ struct ExpandedPlayerView: View {
                             holeSize: 8
                         )
                         .equatable()
+                        .transaction { $0.animation = nil }
                         .padding(.top, 8)
                         .shadow(color: .black.opacity(0.35), radius: 24, y: 12)
 

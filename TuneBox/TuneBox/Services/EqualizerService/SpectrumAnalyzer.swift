@@ -35,6 +35,11 @@ nonisolated final class SpectrumAnalyzer: SpectrumAnalyzing, @unchecked Sendable
             guard let self else { return }
 
             self.lock.lock()
+            if abs(self.sampleRate - rate) > 1 {
+                self.leftoverLeft.removeAll(keepingCapacity: true)
+                self.leftoverRight.removeAll(keepingCapacity: true)
+                self.framesToSkip = 3
+            }
             self.sampleRate = rate
             self.leftoverLeft.append(contentsOf: frames.left)
             if let right = frames.right {
@@ -58,9 +63,17 @@ nonisolated final class SpectrumAnalyzer: SpectrumAnalyzing, @unchecked Sendable
                 latest = self.analyze(left: left, right: right)
                 self.lock.lock()
             }
+            var shouldPublish = false
+            if latest != nil {
+                if self.framesToSkip > 0 {
+                    self.framesToSkip -= 1
+                } else {
+                    shouldPublish = true
+                }
+            }
             self.lock.unlock()
 
-            if let latest {
+            if shouldPublish, let latest {
                 onResult(latest)
             }
         }
@@ -70,6 +83,7 @@ nonisolated final class SpectrumAnalyzer: SpectrumAnalyzing, @unchecked Sendable
         self.lock.lock()
         self.leftoverLeft.removeAll(keepingCapacity: true)
         self.leftoverRight.removeAll(keepingCapacity: true)
+        self.framesToSkip = 0
         self.envelopeDB = [Float](repeating: Self.floorDB, count: Self.bandCount)
         self.lock.unlock()
     }
@@ -78,6 +92,15 @@ nonisolated final class SpectrumAnalyzer: SpectrumAnalyzing, @unchecked Sendable
         self.lock.lock()
         self.leftoverLeft.removeAll(keepingCapacity: true)
         self.leftoverRight.removeAll(keepingCapacity: true)
+        self.framesToSkip = 3
+        self.lock.unlock()
+    }
+
+    func seedEnvelope(_ values: [Float]) {
+        guard values.count == Self.bandCount else { return }
+
+        self.lock.lock()
+        self.envelopeDB = values
         self.lock.unlock()
     }
 
@@ -114,6 +137,7 @@ nonisolated final class SpectrumAnalyzer: SpectrumAnalyzing, @unchecked Sendable
     private var leftoverRight: [Float] = []
     private var envelopeDB: [Float]
     private var sampleRate: Float = 44_100
+    private var framesToSkip = 0
     private var log2n = vDSP_Length(log2(Float(fftSize)))
 
     // MARK: - Methods. Private

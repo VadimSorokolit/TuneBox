@@ -161,6 +161,12 @@ NS_SWIFT_NAME(AudioPlayer)
 /// `YES` if the `AVAudioEngine` is running
 @property(nonatomic, readonly) BOOL engineIsRunning;
 
+/// When `YES` (the default), playback is restored after an `AVAudioEngine`
+/// configuration change or an audio session interruption that requests resume.
+/// Set to `NO` to stay paused after an output-device change. Sample-rate changes
+/// on the same output still restore playback.
+@property(nonatomic) BOOL restoresPlaybackAfterEngineReset;
+
 /// The current playback state
 @property(nonatomic, readonly) SFBAudioPlayerPlaybackState playbackState;
 /// `YES` if the `AVAudioEngine` is running and the player is rendering audio
@@ -420,6 +426,13 @@ NS_SWIFT_NAME(AudioPlayer.Delegate)
         reconfigureProcessingGraph:(AVAudioEngine *)engine
                         withFormat:(AVAudioFormat *)format
         NS_SWIFT_NAME(audioPlayer(_:reconfigureProcessingGraph:with:));
+/// Called before the processing graph is updated for an output-device change that will not restore playback.
+///
+/// Use this to freeze UI (spectrum, vinyl) on the last live frame before sample-rate remapping.
+/// - parameter audioPlayer: The `SFBAudioPlayer` object
+/// - parameter userInfo: The `userInfo` object from the notification
+- (void)audioPlayer:(SFBAudioPlayer *)audioPlayer
+        audioEngineConfigurationWillChange:(nullable NSDictionary *)userInfo;
 /// Called to notify the delegate when the hardware channel count or sample rate of the `AVAudioEngine` output unit
 /// changes
 ///

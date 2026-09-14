@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import AVFoundation
 import SFBAudioEngine
 import MediaPlayer
 
@@ -46,11 +47,24 @@ final class AudioService: NSObject, AudioServicing {
     func play(trackId: String, url: URL, loop: Bool = false) {
         AppLogger.audio.info("AudioService PLAY: \(trackId)")
 
-        self.detachEqualizerTap()
+        let isNewTrack = self.currentTrackId != trackId
+        if isNewTrack {
+            self.savedProgress = 0
+            self.cancelPendingProgressRestore()
+            self.cancelRestore()
+        }
+
+        self.isPausedDueToRouteChange = false
+        self.ignoreAutomaticResumeUntil = .distantPast
+        self.allowEnginePlaybackRestore()
+
+        self.detachEqualizerTap(resetSpectrum: isNewTrack)
         self.stopProgressTimer()
         self.currentTrackId = trackId
         self.currentURL = url
         self.shouldLoop = loop
+        self.silenceOutput()
+        self.activateAudioSession()
 
         do {
             let ext = url.pathExtension.lowercased()
@@ -60,12 +74,16 @@ final class AudioService: NSObject, AudioServicing {
             if isDSD {
                 try self.playDSD(url: url)
             } else {
-                try self.player.play(url)
+                try self.startPCMFile(url)
                 self.isDoPPlayback = false
             }
 
+            self.silenceOutput()
             self.applyVolume()
             self.attachSpectrumIfNeeded()
+            self.unfreezeSpectrumAfterRestore()
+            self.isPausedDueToRouteChange = false
+            self.ignoreAutomaticResumeUntil = .distantPast
             self.notifyStateChange(true)
             self.startProgressTimer()
             self.refreshFormatInfo(for: url)
@@ -78,7 +96,17 @@ final class AudioService: NSObject, AudioServicing {
     }
 
     func pause() {
+        self.pause(captureProgress: true)
+    }
+
+    func pause(captureProgress: Bool) {
         self.endSeekScrubbingIfNeeded()
+        self.forbidEnginePlaybackRestore()
+
+        if captureProgress {
+            self.captureProgress()
+        }
+
         _ = self.player.pause()
         self.equalizerService.setPlaybackActive(false)
         self.stopProgressTimer()
@@ -87,12 +115,29 @@ final class AudioService: NSObject, AudioServicing {
     }
 
     func resume() {
+        self.isPausedDueToRouteChange = false
+        self.ignoreAutomaticResumeUntil = .distantPast
+        self.allowEnginePlaybackRestore()
         self.endSeekScrubbingIfNeeded()
-        guard self.player.resume() else { return }
-        self.equalizerService.setPlaybackActive(true)
-        self.startProgressTimer()
-        self.notifyStateChange(true)
-        self.refreshNowPlayingElapsed()
+        self.activateAudioSession()
+
+        if self.player.isPlaying {
+            self.restoreProgressIfNeeded()
+            return
+        }
+
+        if self.needsEngineRebuild.isFalse, self.player.resume() {
+            self.attachSpectrumIfNeeded()
+            self.unfreezeSpectrumAfterRestore()
+            self.startProgressTimer()
+            self.isPausedDueToRouteChange = false
+            self.notifyStateChange(true)
+            self.refreshNowPlayingElapsed()
+            self.restoreProgressIfNeeded()
+            return
+        }
+
+        _ = self.restoreCurrentTrack()
     }
 
     func stop() {
@@ -106,7 +151,13 @@ final class AudioService: NSObject, AudioServicing {
         self.isSeekScrubbing = false
         self.wasPlayingBeforeScrub = false
         self.wasPlayingBeforeInterruption = false
-        self.interruptedProgress = 0
+        self.isPausedDueToRouteChange = false
+        self.ignoreAutomaticResumeUntil = .distantPast
+        self.forbidEnginePlaybackRestore()
+        self.needsEngineRebuild = false
+        self.savedProgress = 0
+        self.cancelPendingProgressRestore()
+        self.cancelRestore()
         self.notifyStateChange(false)
         self.notifyProgress(0)
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
@@ -131,6 +182,7 @@ final class AudioService: NSObject, AudioServicing {
             }
         }
 
+        self.savedProgress = 0
         self.play(trackId: trackId, url: url, loop: self.shouldLoop)
     }
 
@@ -142,21 +194,19 @@ final class AudioService: NSObject, AudioServicing {
             return
         }
 
-        if self.player.isStopped {
-            self.play(trackId: trackId, url: url, loop: loop)
+        if self.player.isPlaying {
+            self.pause()
             return
         }
 
-        if self.isNearEnd {
+        // After a headphone/route teardown the engine reports stopped, but this is
+        // still the same track — resume from the saved position instead of restarting.
+        if self.player.isStopped.isFalse, self.isNearEnd {
             self.stop()
             return
         }
 
-        if self.player.isPlaying {
-            self.pause()
-        } else {
-            self.resume()
-        }
+        self.resume()
     }
 
     func seek(by deltaSeconds: TimeInterval) {
@@ -267,12 +317,6 @@ final class AudioService: NSObject, AudioServicing {
             info[MPMediaItemPropertyPlaybackDuration] = playbackDuration
         }
 
-        if let coverImage = self.coverImage(from: track) {
-            info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: coverImage.size) { _ in
-                coverImage
-            }
-        }
-
         MPNowPlayingInfoCenter.default().nowPlayingInfo = info
     }
 
@@ -284,8 +328,12 @@ final class AudioService: NSObject, AudioServicing {
 
         self.setupObservers()
         self.player.delegate = self
+        self.player.restoresPlaybackAfterEngineReset = false
         self.configureAudioSession()
         self.configureRemoteCommands()
+        self.checkHeadphonesConnection(
+            outputs: AVAudioSession.sharedInstance().currentRoute.outputs
+        )
     }
 
     // MARK: - Properties. Private
@@ -295,7 +343,8 @@ final class AudioService: NSObject, AudioServicing {
     private let equalizerService: EqualizerServicing
     private let equalizerTap = PlaybackPCMMonitor()
     private var progressTimer: Timer?
-    private var interruptedProgress: Double = 0
+    private var savedProgress: Double = 0
+    private var progressRestoreGeneration = 0
     private var storedVolume: Float = 1.0
     private let spectrumHoldDuration: TimeInterval = 0.3
     private var currentURL: URL?
@@ -305,9 +354,31 @@ final class AudioService: NSObject, AudioServicing {
     private var isSeekScrubbing = false
     private var wasPlayingBeforeScrub = false
     private var wasPlayingBeforeInterruption = false
+    private var isRestoringPlayback = false
+    private var isSpectrumFrozenForRestore = false
+    private var needsEngineRebuild = false
+    private var restoreTargetProgress: Double = 0
+    private var restoreSeekRounds = 0
+    private var isPausedDueToRouteChange = false
+    private var ignoreRoutePauseUntil = Date.distantPast
+    private var ignoreAutomaticResumeUntil = Date.distantPast
+    private var engineRestoreGeneration = 0
+    private var headphonesConnected = false
+    private var outputWasExternalAtInterruptionBegan = false
+    private var routeWatchTimer: Timer?
+    private var lastOutputRouteSignature = ""
 
     private static let progressInterval: TimeInterval = 0.1
     private static let endThreshold: TimeInterval = 0.05
+    private static let progressRestoreTolerance: TimeInterval = 0.25
+    private static let progressRestoreRetryInterval: TimeInterval = 0.05
+    private static let progressRestoreRetryCount = 24
+    private static let progressRestoreMaxRounds = 3
+    private static let restoreUnmuteDelay: TimeInterval = 0.08
+    private static let userPlaybackRouteGrace: TimeInterval = 1.0
+    private static let automaticResumeIgnoreDuration: TimeInterval = 1.5
+    private static let progressCaptureFloor: TimeInterval = 0.05
+    private static let routeWatchInterval: TimeInterval = 0.03
 
     private var progressValue: Double {
         guard self.duration > 0 else { return 0 }
@@ -340,7 +411,12 @@ final class AudioService: NSObject, AudioServicing {
     private func configureRemoteCommands() {
         let center = MPRemoteCommandCenter.shared()
         center.playCommand.addTarget { [weak self] _ in
-            self?.resume()
+            guard let self else { return .commandFailed }
+            guard self.shouldIgnoreAutomaticResume().isFalse else {
+                return .success
+            }
+
+            self.resume()
             return .success
         }
         center.pauseCommand.addTarget { [weak self] _ in
@@ -349,7 +425,16 @@ final class AudioService: NSObject, AudioServicing {
         }
         center.togglePlayPauseCommand.addTarget { [weak self] _ in
             guard let self else { return .commandFailed }
-            if self.player.isPlaying { self.pause() } else { self.resume() }
+            if self.player.isPlaying {
+                self.pause()
+                return .success
+            }
+
+            guard self.shouldIgnoreAutomaticResume().isFalse else {
+                return .success
+            }
+
+            self.resume()
             return .success
         }
         center.changePlaybackPositionCommand.addTarget { [weak self] event in
@@ -410,28 +495,55 @@ final class AudioService: NSObject, AudioServicing {
     private func playDSDAsDoP(url: URL) throws {
         let decoder = try DoPDecoder(url: url)
         try decoder.open()
-        try self.player.play(decoder)
+        try self.startDecoder(decoder)
         self.isDoPPlayback = true
     }
 
     private func playDSDAsPCM(url: URL) throws {
         let decoder = try DSDPCMDecoder(url: url)
         try decoder.open()
-        try self.player.play(decoder)
+        try self.startDecoder(decoder)
         self.isDoPPlayback = false
+    }
+
+    private func startPCMFile(_ url: URL) throws {
+        if self.isRestoringPlayback {
+            try self.player.enqueue(url, immediate: true)
+        } else {
+            try self.player.play(url)
+        }
+    }
+
+    private func startDecoder(_ decoder: PCMDecoding) throws {
+        if self.isRestoringPlayback {
+            try self.player.enqueue(decoder, immediate: true)
+        } else {
+            try self.player.play(decoder)
+        }
+    }
+
+    private func silenceOutput() {
+        self.player.modifyProcessingGraph { engine in
+            engine.mainMixerNode.outputVolume = 0
+        }
     }
 
     private func attachSpectrumIfNeeded() {
         guard self.isDoPPlayback.isFalse else { return }
 
-        self.detachEqualizerTap()
+        self.equalizerTap.remove(from: self.player)
         self.equalizerService.setPlaybackActive(true)
         self.installEqualizerTap(allowRetry: true)
     }
 
-    private func detachEqualizerTap() {
+    private func detachEqualizerTap(resetSpectrum: Bool = true) {
         self.equalizerTap.remove(from: self.player)
-        self.equalizerService.reset()
+
+        if resetSpectrum {
+            self.equalizerService.reset()
+        } else {
+            self.equalizerService.setPlaybackActive(false)
+        }
     }
 
     private func installEqualizerTap(allowRetry: Bool) {
@@ -454,27 +566,12 @@ final class AudioService: NSObject, AudioServicing {
             .contains { $0.portType == .usbAudio }
     }
 
-    private func coverImage(from track: TrackEntity) -> UIImage? {
-        guard let path = track.imagePath, !path.isEmpty else { return nil }
-
-        if path.hasPrefix("http://") || path.hasPrefix("https://"),
-           let url = URL(string: path),
-           let data = try? Data(contentsOf: url) {
-            return UIImage(data: data)
-        }
-
-        if let url = AudioMetadataService.coverURL(for: path),
-           let data = try? Data(contentsOf: url) {
-            return UIImage(data: data)
-        }
-
-        return nil
-    }
-
     private func startProgressTimer() {
         self.stopProgressTimer()
+        self.startRouteWatch()
         let timer = Timer(timeInterval: Self.progressInterval, repeats: true) { [weak self] _ in
             guard let self, self.player.isPlaying, self.duration > 0 else { return }
+            guard self.isRestoringPlayback.isFalse else { return }
             self.notifyProgress(self.progressValue)
             self.refreshNowPlayingElapsed()
         }
@@ -485,18 +582,252 @@ final class AudioService: NSObject, AudioServicing {
     private func stopProgressTimer() {
         self.progressTimer?.invalidate()
         self.progressTimer = nil
+        self.stopRouteWatch()
     }
 
     private func notifyStateChange(_ playing: Bool) {
-        DispatchQueue.main.async {
+        if playing, self.isPausedDueToRouteChange {
+            return
+        }
+
+        if Thread.isMainThread {
             self.stateChangeSubject.send(playing)
+        } else {
+            DispatchQueue.main.async {
+                self.stateChangeSubject.send(playing)
+            }
         }
     }
 
     private func notifyProgress(_ progress: Double) {
-        DispatchQueue.main.async {
-            self.progressSubject.send(progress)
+        let clamped = min(max(progress, 0), 1)
+
+        if self.isRestoringPlayback {
+            DispatchQueue.main.async {
+                self.progressSubject.send(self.restoreTargetProgress)
+            }
+            return
         }
+
+        if clamped > 0 || self.player.currentTime != nil {
+            self.savedProgress = clamped
+        }
+
+        DispatchQueue.main.async {
+            self.progressSubject.send(clamped)
+        }
+    }
+
+    private func captureProgress() {
+        guard let currentTime = self.player.currentTime, self.duration > 0 else {
+            return
+        }
+
+        // A route/engine teardown often reports 0 while the real pause
+        // position is already in savedProgress. Don't clobber it.
+        if currentTime < Self.progressCaptureFloor, self.savedProgress > 0 {
+            return
+        }
+
+        self.savedProgress = min(max(currentTime / self.duration, 0), 1)
+    }
+
+    private func cancelPendingProgressRestore() {
+        self.progressRestoreGeneration += 1
+    }
+
+    @discardableResult
+    private func restoreCurrentTrack() -> Bool {
+        guard let url = self.currentURL, let trackId = self.currentTrackId else {
+            return false
+        }
+
+        let progressToRestore = self.savedProgress
+        AppLogger.audio.info(
+            "Restoring playback at progress \(progressToRestore) for \(trackId)"
+        )
+        self.beginRestore(to: progressToRestore)
+        self.play(trackId: trackId, url: url, loop: self.shouldLoop)
+        self.seekWhenReady(to: progressToRestore)
+        return true
+    }
+
+    private func restoreProgressIfNeeded() {
+        guard self.isRestoringPlayback.isFalse else { return }
+        guard self.savedProgress > 0, self.savedProgress < 1, self.duration > 0 else {
+            return
+        }
+
+        let savedTime = self.savedProgress * self.duration
+        let currentTime = self.player.currentTime ?? 0
+        guard abs(currentTime - savedTime) > Self.progressRestoreTolerance else {
+            return
+        }
+
+        AppLogger.audio.info(
+            "Playback position reset to \(currentTime)s; restoring \(savedTime)s"
+        )
+        self.beginRestore(to: self.savedProgress)
+        self.seekWhenReady(to: self.savedProgress)
+    }
+
+    private func seekWhenReady(to progress: Double) {
+        guard progress > 0, progress < 1 else {
+            self.finishRestore()
+            return
+        }
+
+        self.cancelPendingProgressRestore()
+        let generation = self.progressRestoreGeneration
+        self.attemptProgressRestore(
+            to: progress,
+            generation: generation,
+            attemptsLeft: Self.progressRestoreRetryCount
+        )
+    }
+
+    private func attemptProgressRestore(to progress: Double, generation: Int, attemptsLeft: Int) {
+        guard generation == self.progressRestoreGeneration else { return }
+
+        if self.player.seek(position: progress) {
+            self.notifyProgress(progress)
+            self.refreshNowPlayingElapsed()
+            self.scheduleRestoreCompletion(
+                targetProgress: progress,
+                generation: generation,
+                attemptsLeft: Self.progressRestoreRetryCount
+            )
+            return
+        }
+
+        guard attemptsLeft > 0 else {
+            AppLogger.audio.warning(
+                "Failed to restore playback progress \(progress) after route/engine reset"
+            )
+            self.finishRestore()
+            return
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.progressRestoreRetryInterval) { [weak self] in
+            self?.attemptProgressRestore(
+                to: progress,
+                generation: generation,
+                attemptsLeft: attemptsLeft - 1
+            )
+        }
+    }
+
+    private func scheduleRestoreCompletion(
+        targetProgress: Double,
+        generation: Int,
+        attemptsLeft: Int
+    ) {
+        guard generation == self.progressRestoreGeneration else { return }
+        guard self.isRestoringPlayback else { return }
+
+        if self.hasReached(progress: targetProgress) {
+            self.finishRestore()
+            return
+        }
+
+        guard attemptsLeft > 0 else {
+            if self.restoreSeekRounds < Self.progressRestoreMaxRounds {
+                self.restoreSeekRounds += 1
+                self.attemptProgressRestore(
+                    to: targetProgress,
+                    generation: generation,
+                    attemptsLeft: Self.progressRestoreRetryCount
+                )
+                return
+            }
+
+            self.finishRestore()
+            return
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.progressRestoreRetryInterval) { [weak self] in
+            self?.scheduleRestoreCompletion(
+                targetProgress: targetProgress,
+                generation: generation,
+                attemptsLeft: attemptsLeft - 1
+            )
+        }
+    }
+
+    private func hasReached(progress: Double) -> Bool {
+        guard self.duration > 0 else { return false }
+
+        let targetTime = progress * self.duration
+        let currentTime = self.player.currentTime ?? 0
+        return abs(currentTime - targetTime) <= Self.progressRestoreTolerance
+    }
+
+    private func beginRestore(to progress: Double) {
+        self.isRestoringPlayback = true
+        self.restoreTargetProgress = min(max(progress, 0), 1)
+        self.restoreSeekRounds = 0
+        self.needsEngineRebuild = false
+        self.freezeSpectrumForRestore()
+        self.silenceOutput()
+        self.applyVolume()
+    }
+
+    private func cancelRestore() {
+        guard self.isRestoringPlayback || self.isSpectrumFrozenForRestore else { return }
+
+        self.isRestoringPlayback = false
+        self.unfreezeSpectrumAfterRestore()
+    }
+
+    private func finishRestore() {
+        let shouldUnmute = self.isRestoringPlayback
+        guard shouldUnmute else {
+            self.unfreezeSpectrumAfterRestore()
+            return
+        }
+
+        self.silenceOutput()
+
+        if self.player.isPlaying.isFalse {
+            do {
+                try self.player.play()
+            } catch {
+                AppLogger.audio.error(
+                    "Failed to start restored playback: \(error.localizedDescription)"
+                )
+            }
+        }
+
+        self.attachSpectrumIfNeeded()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.restoreUnmuteDelay) { [weak self] in
+            guard let self, self.isRestoringPlayback else { return }
+
+            self.isRestoringPlayback = false
+            self.applyVolume()
+            self.unfreezeSpectrumAfterRestore()
+
+            let progress = self.restoreTargetProgress
+            if progress > 0, progress < 1 {
+                self.savedProgress = progress
+                self.progressSubject.send(progress)
+            }
+            self.refreshNowPlayingElapsed()
+        }
+    }
+
+    private func freezeSpectrumForRestore() {
+        guard self.isSpectrumFrozenForRestore.isFalse else { return }
+
+        self.isSpectrumFrozenForRestore = true
+        self.equalizerService.holdUpdates()
+    }
+
+    private func unfreezeSpectrumAfterRestore() {
+        guard self.isSpectrumFrozenForRestore else { return }
+
+        self.isSpectrumFrozenForRestore = false
+        self.equalizerService.resumeUpdates()
     }
 
     private func clampVolume(_ value: Float) -> Float {
@@ -508,7 +839,7 @@ final class AudioService: NSObject, AudioServicing {
             self,
             selector: #selector(self.handleAudioInterruption),
             name: AVAudioSession.interruptionNotification,
-            object: AVAudioSession.sharedInstance()
+            object: nil
         )
 
         NotificationCenter.default.addObserver(
@@ -520,41 +851,47 @@ final class AudioService: NSObject, AudioServicing {
 
         NotificationCenter.default.addObserver(
             self,
+            selector: #selector(self.handleMediaServicesReset),
+            name: AVAudioSession.mediaServicesWereLostNotification,
+            object: nil
+        )
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(self.handleMediaServicesReset),
+            name: AVAudioSession.mediaServicesWereResetNotification,
+            object: nil
+        )
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(self.handleOutputDropout),
+            name: .playbackOutputDropoutDetected,
+            object: nil
+        )
+
+        NotificationCenter.default.addObserver(
+            self,
             selector: #selector(self.handleAppDidBecomeActive),
             name: UIApplication.didBecomeActiveNotification,
             object: nil
         )
     }
 
-    private func resumeAfterInterruption() {
+    private func activateAudioSession() {
         do {
-            try AVAudioSession.sharedInstance().setActive(true)
+            let session = AVAudioSession.sharedInstance()
+            try session.setCategory(.playback, mode: .default)
+            try session.setActive(true)
         } catch {
             AppLogger.audio.error(
-                "Failed to reactivate audio session: \(error.localizedDescription)"
+                "Failed to activate audio session: \(error.localizedDescription)"
             )
-            return
         }
+    }
 
-        if self.player.resume() {
-            self.startProgressTimer()
-            self.notifyStateChange(true)
-            self.refreshNowPlayingElapsed()
-            return
-        }
-
-        guard let url = self.currentURL, let trackId = self.currentTrackId else {
-            return
-        }
-
-        let progressToRestore = self.interruptedProgress
-        self.play(trackId: trackId, url: url, loop: self.shouldLoop)
-
-        if progressToRestore > 0 {
-            _ = self.player.seek(position: progressToRestore)
-            self.notifyProgress(progressToRestore)
-            self.refreshNowPlayingElapsed()
-        }
+    private func resumeAfterInterruption() {
+        self.resume()
     }
 
     private func refreshNowPlayingElapsed() {
@@ -573,7 +910,7 @@ final class AudioService: NSObject, AudioServicing {
     private func applyVolume() {
         let volume: Float
 
-        if self.isSeekScrubbing {
+        if self.isSeekScrubbing || self.isRestoringPlayback {
             volume = 0
         } else {
             volume = self.isDoPPlayback ? 1.0 : self.storedVolume
@@ -598,26 +935,182 @@ final class AudioService: NSObject, AudioServicing {
 
         self.isSeekScrubbing = false
         self.wasPlayingBeforeScrub = false
-        self.equalizerService.resumeUpdates()
+
+        if wasScrubbing {
+            self.equalizerService.resumeUpdates()
+        }
+
         self.applyVolume()
 
         guard wasScrubbing || shouldResume else { return }
         guard shouldResume, self.player.isPlaying.isFalse else { return }
 
-        if self.player.resume() {
+        if self.needsEngineRebuild.isFalse, self.player.resume() {
             self.equalizerService.setPlaybackActive(true)
             self.startProgressTimer()
             self.notifyStateChange(true)
             self.refreshNowPlayingElapsed()
+            self.restoreProgressIfNeeded()
             return
         }
 
-        guard let url = self.currentURL, let trackId = self.currentTrackId else { return }
-        let progress = self.progressValue
-        self.play(trackId: trackId, url: url, loop: self.shouldLoop)
-        if progress > 0, progress < 1 {
-            _ = self.player.seek(position: progress)
-            self.notifyProgress(progress)
+        _ = self.restoreCurrentTrack()
+    }
+
+    private func pauseForRouteChange() {
+        guard self.currentTrackId != nil else { return }
+
+        self.freezeSpectrumForRestore()
+        self.pauseEngineImmediately()
+        self.publishPausedForRouteChange()
+    }
+
+    private func publishPausedForRouteChange() {
+        self.equalizerService.setPlaybackActive(false)
+        self.stopProgressTimer()
+        self.notifyStateChange(false)
+        NotificationCenter.default.post(name: .playbackDidPauseForRouteChange, object: nil)
+        self.refreshNowPlayingElapsed()
+    }
+
+    private func pauseEngineImmediately() {
+        self.equalizerService.stopProcessing()
+        self.isPausedDueToRouteChange = true
+        self.wasPlayingBeforeInterruption = false
+        self.forbidEnginePlaybackRestore()
+        self.ignoreAutomaticResumeUntil = Date().addingTimeInterval(Self.automaticResumeIgnoreDuration)
+        self.needsEngineRebuild = true
+        self.captureProgress()
+        self.silenceOutput()
+        _ = self.player.pause()
+        self.notifyStateChange(false)
+        self.stopRouteWatch()
+        NotificationCenter.default.post(name: .playbackDidPauseForRouteChange, object: nil)
+    }
+
+    private func startRouteWatch() {
+        self.stopRouteWatch()
+        self.lastOutputRouteSignature = self.currentOutputRouteSignature()
+        self.checkHeadphonesConnection(
+            outputs: AVAudioSession.sharedInstance().currentRoute.outputs
+        )
+
+        let timer = Timer(timeInterval: Self.routeWatchInterval, repeats: true) { [weak self] _ in
+            self?.checkOutputRouteForPause()
+        }
+        self.routeWatchTimer = timer
+        RunLoop.main.add(timer, forMode: .common)
+    }
+
+    private func stopRouteWatch() {
+        self.routeWatchTimer?.invalidate()
+        self.routeWatchTimer = nil
+    }
+
+    private func currentOutputRouteSignature() -> String {
+        AVAudioSession.sharedInstance().currentRoute.outputs
+            .map { "\($0.portType.rawValue):\($0.uid)" }
+            .sorted()
+            .joined(separator: "|")
+    }
+
+    private func checkOutputRouteForPause() {
+        guard self.currentTrackId != nil else { return }
+        guard Date() >= self.ignoreRoutePauseUntil, self.isRestoringPlayback.isFalse else {
+            self.lastOutputRouteSignature = self.currentOutputRouteSignature()
+            return
+        }
+        guard self.isPausedDueToRouteChange.isFalse else { return }
+
+        let signature = self.currentOutputRouteSignature()
+        if self.lastOutputRouteSignature.isEmpty {
+            self.lastOutputRouteSignature = signature
+            return
+        }
+
+        guard signature != self.lastOutputRouteSignature else { return }
+        self.lastOutputRouteSignature = signature
+        self.pauseForRouteChange()
+    }
+
+    @objc
+    private func handleOutputDropout(_ notification: Notification) {
+        guard self.currentTrackId != nil else { return }
+        guard Date() >= self.ignoreRoutePauseUntil, self.isRestoringPlayback.isFalse else { return }
+        guard self.isPausedDueToRouteChange.isFalse else { return }
+
+        self.runOnMain {
+            self.pauseForRouteChange()
+        }
+    }
+
+    private func allowEnginePlaybackRestore() {
+        self.engineRestoreGeneration += 1
+        let generation = self.engineRestoreGeneration
+        self.player.restoresPlaybackAfterEngineReset = true
+        self.ignoreRoutePauseUntil = Date().addingTimeInterval(Self.userPlaybackRouteGrace)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.userPlaybackRouteGrace) { [weak self] in
+            guard let self, generation == self.engineRestoreGeneration else { return }
+            self.player.restoresPlaybackAfterEngineReset = false
+        }
+    }
+
+    private func forbidEnginePlaybackRestore() {
+        self.engineRestoreGeneration += 1
+        self.player.restoresPlaybackAfterEngineReset = false
+        self.ignoreRoutePauseUntil = .distantPast
+    }
+
+    private func shouldPauseForRouteChange(
+        _ notification: Notification,
+        reason: AVAudioSession.RouteChangeReason
+    ) -> Bool {
+        switch reason {
+            case .oldDeviceUnavailable, .newDeviceAvailable:
+                return true
+
+            case .routeConfigurationChange:
+                let previous = notification.userInfo?[AVAudioSessionRouteChangePreviousRouteKey]
+                    as? AVAudioSessionRouteDescription
+                let hadExternal = previous?.outputs.contains { self.isExternalOutput($0.portType) } ?? false
+                let hasExternal = AVAudioSession.sharedInstance().currentRoute.outputs
+                    .contains { self.isExternalOutput($0.portType) }
+
+                return hadExternal != hasExternal
+
+            default:
+                return false
+        }
+    }
+
+    private func shouldIgnoreAutomaticResume() -> Bool {
+        self.isPausedDueToRouteChange || Date() < self.ignoreAutomaticResumeUntil
+    }
+
+    private var shouldIgnoreRoutePause: Bool {
+        Date() < self.ignoreRoutePauseUntil || self.isRestoringPlayback
+    }
+
+    private func checkHeadphonesConnection(outputs: [AVAudioSessionPortDescription]) {
+        self.headphonesConnected = outputs.contains { self.isExternalOutput($0.portType) }
+    }
+
+    private func isExternalOutput(_ portType: AVAudioSession.Port) -> Bool {
+        portType == .headphones
+            || portType == .bluetoothA2DP
+            || portType == .bluetoothHFP
+            || portType == .bluetoothLE
+            || portType == .usbAudio
+            || portType == .carAudio
+            || portType == .airPlay
+    }
+
+    private func runOnMain(_ work: @escaping () -> Void) {
+        if Thread.isMainThread {
+            work()
+        } else {
+            DispatchQueue.main.async(execute: work)
         }
     }
 
@@ -677,18 +1170,67 @@ final class AudioService: NSObject, AudioServicing {
             return
         }
 
+        if type == .began {
+            self.outputWasExternalAtInterruptionBegan = AVAudioSession.sharedInstance().currentRoute.outputs
+                .contains { self.isExternalOutput($0.portType) }
+
+            if self.isPausedDueToRouteChange.isFalse,
+               self.player.isPlaying || self.stateChangeSubject.value {
+                self.equalizerService.stopProcessing()
+                self.silenceOutput()
+                _ = self.player.pause()
+                self.notifyStateChange(false)
+                NotificationCenter.default.post(name: .playbackDidPauseForRouteChange, object: nil)
+            }
+        }
+
+        self.runOnMain {
+            self.handleAudioInterruptionOnMain(notification)
+        }
+    }
+
+    private func handleAudioInterruptionOnMain(_ notification: Notification) {
+        guard
+            let typeValue = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt,
+            let type = AVAudioSession.InterruptionType(rawValue: typeValue)
+        else {
+            return
+        }
+
         switch type {
             case .began:
+                if self.isPausedDueToRouteChange {
+                    self.wasPlayingBeforeInterruption = false
+                    self.needsEngineRebuild = true
+                    self.captureProgress()
+                    return
+                }
+
                 let wasPlaying = self.player.isPlaying || self.stateChangeSubject.value
                 self.wasPlayingBeforeInterruption = wasPlaying
-                self.interruptedProgress = min(max(self.progressValue, 0), 1)
+                self.needsEngineRebuild = true
+                self.captureProgress()
 
                 if wasPlaying {
-                    self.pause()
+                    self.pause(captureProgress: false)
                 }
 
             case .ended:
+                let hasExternal = AVAudioSession.sharedInstance().currentRoute.outputs
+                    .contains { self.isExternalOutput($0.portType) }
+
+                if self.outputWasExternalAtInterruptionBegan != hasExternal {
+                    self.wasPlayingBeforeInterruption = false
+                    self.pauseForRouteChange()
+                    return
+                }
+
                 guard self.wasPlayingBeforeInterruption else {
+                    return
+                }
+
+                if self.shouldIgnoreAutomaticResume() {
+                    self.wasPlayingBeforeInterruption = false
                     return
                 }
 
@@ -707,12 +1249,25 @@ final class AudioService: NSObject, AudioServicing {
 
     @objc
     private func handleAppDidBecomeActive(_ notification: Notification) {
-        guard self.wasPlayingBeforeInterruption else {
-            return
-        }
+        DispatchQueue.main.async { [weak self] in
+            guard let self, self.wasPlayingBeforeInterruption else { return }
+            guard self.shouldIgnoreAutomaticResume().isFalse else {
+                self.wasPlayingBeforeInterruption = false
+                return
+            }
 
-        self.wasPlayingBeforeInterruption = false
-        self.resumeAfterInterruption()
+            self.wasPlayingBeforeInterruption = false
+            self.resumeAfterInterruption()
+        }
+    }
+
+    @objc
+    private func handleMediaServicesReset(_ notification: Notification) {
+        self.pauseEngineImmediately()
+        self.runOnMain {
+            self.activateAudioSession()
+            self.publishPausedForRouteChange()
+        }
     }
 
     @objc
@@ -724,12 +1279,45 @@ final class AudioService: NSObject, AudioServicing {
             return
         }
 
+        let shouldPause = self.shouldPauseForRouteChange(notification, reason: reason)
+            && self.shouldIgnoreRoutePause.isFalse
+
+        if shouldPause {
+            self.pauseEngineImmediately()
+        }
+
+        self.runOnMain {
+            self.handleAudioRouteChangeOnMain(
+                reason: reason,
+                notification: notification,
+                shouldPause: shouldPause
+            )
+        }
+    }
+
+    private func handleAudioRouteChangeOnMain(
+        reason: AVAudioSession.RouteChangeReason,
+        notification: Notification,
+        shouldPause: Bool
+    ) {
+        AppLogger.audio.info(
+            "Audio route changed: \(reason.rawValue), headphones: \(self.headphonesConnected), stopped: \(self.player.isStopped)"
+        )
+
         switch reason {
             case .newDeviceAvailable,
                     .oldDeviceUnavailable,
                     .routeConfigurationChange:
+                self.checkHeadphonesConnection(
+                    outputs: AVAudioSession.sharedInstance().currentRoute.outputs
+                )
                 self.supportsDoP = nil
+                self.needsEngineRebuild = true
                 self.updateOutputRoute()
+
+                if shouldPause {
+                    self.pauseForRouteChange()
+                }
 
             default:
                 break
@@ -744,15 +1332,74 @@ extension AudioService: AudioPlayer.Delegate {
     func audioPlayer(_ audioPlayer: AudioPlayer, playbackStateChanged playbackState: AudioPlayer.PlaybackState) {
         switch playbackState {
             case .playing:
+                if self.isPausedDueToRouteChange || self.shouldIgnoreAutomaticResume() {
+                    self.pauseEngineImmediately()
+                    self.runOnMain {
+                        self.publishPausedForRouteChange()
+                    }
+                    return
+                }
+
                 self.notifyStateChange(true)
                 self.startProgressTimer()
+                DispatchQueue.main.async { [weak self] in
+                    guard let self, self.isRestoringPlayback.isFalse else { return }
+                    self.restoreProgressIfNeeded()
+                }
 
             case .paused, .stopped:
+                guard self.isRestoringPlayback.isFalse else { return }
                 self.notifyStateChange(false)
                 self.stopProgressTimer()
 
             @unknown default:
                 break
+        }
+    }
+
+    func audioPlayer(
+        _ audioPlayer: AudioPlayer,
+        audioEngineConfigurationWillChange userInfo: [AnyHashable: Any]?
+    ) {
+        if self.shouldIgnoreRoutePause {
+            return
+        }
+
+        self.pauseEngineImmediately()
+    }
+
+    func audioPlayer(
+        _ audioPlayer: AudioPlayer,
+        audioEngineConfigurationChange userInfo: [AnyHashable: Any]?
+    ) {
+        let hadExternal = self.headphonesConnected
+        let hasExternal = AVAudioSession.sharedInstance().currentRoute.outputs
+            .contains { self.isExternalOutput($0.portType) }
+        self.checkHeadphonesConnection(
+            outputs: AVAudioSession.sharedInstance().currentRoute.outputs
+        )
+
+        if self.isPausedDueToRouteChange {
+            self.pauseEngineImmediately()
+            self.runOnMain {
+                self.pauseForRouteChange()
+            }
+            return
+        }
+
+        if Date() < self.ignoreRoutePauseUntil || self.isRestoringPlayback {
+            self.runOnMain {
+                self.attachSpectrumIfNeeded()
+                self.applyVolume()
+            }
+            return
+        }
+
+        if hadExternal != hasExternal {
+            self.pauseEngineImmediately()
+            self.runOnMain {
+                self.pauseForRouteChange()
+            }
         }
     }
 
@@ -763,7 +1410,14 @@ extension AudioService: AudioPlayer.Delegate {
 
     func audioPlayer(_ audioPlayer: AudioPlayer, encounteredError error: any Error) {
         AppLogger.audio.error("SFB player error: \(error.localizedDescription)")
-        self.stop()
+        self.captureProgress()
+        self.needsEngineRebuild = true
+        self.detachEqualizerTap(resetSpectrum: false)
+        self.player.stop()
+        self.equalizerService.setPlaybackActive(false)
+        self.stopProgressTimer()
+        self.notifyStateChange(false)
+        self.refreshNowPlayingElapsed()
     }
 
 }

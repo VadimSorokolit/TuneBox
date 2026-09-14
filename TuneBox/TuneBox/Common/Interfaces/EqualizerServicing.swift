@@ -16,6 +16,7 @@ protocol EqualizerServicing: AnyObject {
     nonisolated var hopSize: AVAudioFrameCount { get }
 
     nonisolated func process(_ buffer: AVAudioPCMBuffer)
+    nonisolated func stopProcessing()
     func reset()
     func setPlaybackActive(_ isActive: Bool)
     func holdUpdates()

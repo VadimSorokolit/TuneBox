@@ -80,9 +80,19 @@ final class PlayerViewModel: PlayerManaging {
         self.audioService.stateChangeSubject
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isPlaying in
-                self?.isPlaying = isPlaying
+                self?.applyPlayingState(isPlaying)
             }
             .store(in: &self.cancellables)
+
+        self.routePauseObserver = NotificationCenter.default.addObserver(
+            forName: .playbackDidPauseForRouteChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self else { return }
+            VinylSpinGate.block()
+            self.isPlaying = false
+        }
 
         self.audioService.progressSubject
             .receive(on: DispatchQueue.main)
@@ -458,6 +468,7 @@ final class PlayerViewModel: PlayerManaging {
     private var crashlytics: CrashlyticsServicing
     private var isLoading: Bool = false
     private var cancellables = Set<AnyCancellable>()
+    private var routePauseObserver: NSObjectProtocol?
     private var shuffleOrder: [String]?
     private var playbackOrigin: PlaybackOriginSnapshot?
     private var pendingRestoreProgress: Double?
@@ -749,7 +760,21 @@ final class PlayerViewModel: PlayerManaging {
         self.persistPlaybackSession()
     }
 
+    private func applyPlayingState(_ playing: Bool) {
+        if playing {
+            VinylSpinGate.allow()
+        } else {
+            VinylSpinGate.block()
+        }
+
+        self.isPlaying = playing
+    }
+
     private func play(_ track: TrackEntity, autoplay: Bool = true) {
+        if autoplay {
+            VinylSpinGate.allow()
+        }
+
         self.start(track, using: { trackId, url, _ in
             if autoplay {
                 self.audioService.play(trackId: trackId, url: url, loop: false)
@@ -763,6 +788,10 @@ final class PlayerViewModel: PlayerManaging {
     }
 
     private func toggle(_ track: TrackEntity) {
+        if self.isPlaying.isFalse {
+            VinylSpinGate.allow()
+        }
+
         self.start(track, using: { trackId, url, _ in
             self.audioService.toggle(trackId: trackId, url: url, loop: false)
         })
@@ -784,6 +813,7 @@ final class PlayerViewModel: PlayerManaging {
                     self.track = track
                     playAction(track.id, url, false)
                     self.audioService.setNowPlaying(track: track)
+                    CoverImageLoader.applyNowPlayingArtwork(from: track.imagePath)
                     self.applyPendingRestoreSeekIfNeeded()
                     self.persistPlaybackSession()
                     self.logPlayStartIfNeeded(reportPlayStart, track: track, url: url)
@@ -800,6 +830,7 @@ final class PlayerViewModel: PlayerManaging {
                 self.track = track
                 playAction(track.id, url, false)
                 self.audioService.setNowPlaying(track: track)
+                CoverImageLoader.applyNowPlayingArtwork(from: track.imagePath)
                 self.applyPendingRestoreSeekIfNeeded()
                 self.persistPlaybackSession()
                 self.logPlayStartIfNeeded(reportPlayStart, track: track, url: url)

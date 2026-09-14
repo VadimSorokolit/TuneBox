@@ -43,14 +43,24 @@ final class EqualizerService: EqualizerServicing {
     // MARK: - Methods. Public
 
     nonisolated func process(_ buffer: AVAudioPCMBuffer) {
+        guard self.processGate.isEnabled else { return }
+
+        let generation = self.processGate.generation
         self.analyzer.enqueue(buffer) { [weak self] result in
             Task { @MainActor [weak self] in
-                self?.publish(decibels: result)
+                guard let self, generation == self.processGate.generation else { return }
+                self.publish(decibels: result)
             }
         }
     }
 
+    nonisolated func stopProcessing() {
+        self.processGate.invalidate()
+        self.analyzer.resetInputBuffers()
+    }
+
     func reset() {
+        self.setProcessEnabled(true)
         self.analyzer.reset()
         self.isPlaybackActive = false
         self.isHolding = false
@@ -63,20 +73,33 @@ final class EqualizerService: EqualizerServicing {
         self.isPlaybackActive = isActive
 
         if isActive.isFalse {
-            // Keep the last RTA frame on screen. Only drop the PCM leftover
-            // so resume doesn't mix stale samples into the next FFT.
+            self.didReportDropout = false
+            self.setProcessEnabled(false)
             self.analyzer.resetInputBuffers()
+            return
+        }
+
+        self.didReportDropout = false
+
+        self.analyzer.seedEnvelope(self.decibels)
+        self.analyzer.resetInputBuffers()
+        if self.isHolding.isFalse {
+            self.setProcessEnabled(true)
         }
     }
 
     func holdUpdates() {
         self.holdGeneration += 1
         self.isHolding = true
+        self.setProcessEnabled(false)
     }
 
     func resumeUpdates() {
         self.holdGeneration += 1
         self.isHolding = false
+        self.analyzer.seedEnvelope(self.decibels)
+        self.analyzer.resetInputBuffers()
+        self.setProcessEnabled(true)
         self.ignoreQuietUntil = Date().addingTimeInterval(0.15)
     }
 
@@ -84,11 +107,15 @@ final class EqualizerService: EqualizerServicing {
         self.holdGeneration += 1
         let generation = self.holdGeneration
         self.isHolding = true
+        self.setProcessEnabled(false)
 
         Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
             guard let self, generation == self.holdGeneration else { return }
             self.isHolding = false
+            self.analyzer.seedEnvelope(self.decibels)
+            self.analyzer.resetInputBuffers()
+            self.setProcessEnabled(true)
             self.ignoreQuietUntil = Date().addingTimeInterval(0.15)
         }
     }
@@ -99,20 +126,40 @@ final class EqualizerService: EqualizerServicing {
     private static let bandCenters = SpectrumAnalyzer.thirdOctaveCenters
 
     private let analyzer = SpectrumAnalyzer()
+    nonisolated private let processGate = SpectrumProcessGate()
     private var isPlaybackActive = false
     private var isHolding = false
     private var holdGeneration = 0
     private var ignoreQuietUntil = Date.distantPast
+    private var didReportDropout = false
 
     // MARK: - Methods. Private
 
     private func publish(decibels values: [Float]) {
+        guard self.processGate.isEnabled else { return }
         guard self.isPlaybackActive, self.isHolding.isFalse, values.count == Self.bandCount else {
             return
         }
 
         let maximum = values.max() ?? SpectrumAnalyzer.floorDB
         if maximum <= SpectrumAnalyzer.floorDB + 1, Date() < self.ignoreQuietUntil {
+            return
+        }
+
+        let previousMaximum = self.decibels.max() ?? SpectrumAnalyzer.floorDB
+        let droppedOut = previousMaximum > SpectrumAnalyzer.floorDB + 8
+            && previousMaximum - maximum >= 8
+            && zip(self.decibels, values).allSatisfy { $1 <= $0 + 0.5 }
+
+        if droppedOut {
+            self.processGate.invalidate()
+            self.analyzer.resetInputBuffers()
+
+            if self.didReportDropout.isFalse {
+                self.didReportDropout = true
+                NotificationCenter.default.post(name: .playbackOutputDropoutDetected, object: nil)
+            }
+
             return
         }
 
@@ -130,4 +177,40 @@ final class EqualizerService: EqualizerServicing {
         let value = (decibels - SpectrumAnalyzer.floorDB) / span
         return min(1, max(0, value))
     }
+
+    private func setProcessEnabled(_ enabled: Bool) {
+        self.processGate.setEnabled(enabled)
+    }
+}
+
+nonisolated private final class SpectrumProcessGate: @unchecked Sendable {
+
+    nonisolated var isEnabled: Bool {
+        self.lock.lock()
+        defer { self.lock.unlock() }
+        return self.isEnabledFlag
+    }
+
+    nonisolated var generation: UInt64 {
+        self.lock.lock()
+        defer { self.lock.unlock() }
+        return self.generationValue
+    }
+
+    nonisolated func setEnabled(_ enabled: Bool) {
+        self.lock.lock()
+        self.isEnabledFlag = enabled
+        self.lock.unlock()
+    }
+
+    nonisolated func invalidate() {
+        self.lock.lock()
+        self.isEnabledFlag = false
+        self.generationValue += 1
+        self.lock.unlock()
+    }
+
+    private let lock = NSLock()
+    private var isEnabledFlag = true
+    private var generationValue: UInt64 = 0
 }

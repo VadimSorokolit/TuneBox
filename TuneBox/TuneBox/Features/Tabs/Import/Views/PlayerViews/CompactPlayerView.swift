@@ -61,6 +61,7 @@ struct CompactPlayerView: View {
                                 holeSize: 1
                             )
                             .equatable()
+                            .transaction { $0.animation = nil }
                             .id(vinylAlbumKey(for: track))
                             .transition(.opacity.combined(with: .scale(scale: 0.88)))
                             .frame(size: Layout.vinylSize)

@@ -100,9 +100,14 @@ class AudioPlayer final {
     std::atomic_uint flags_{0};
     static_assert(std::atomic_uint::is_always_lock_free, "Lock-free std::atomic_uint required");
 
+    /// When false, an output-device change leaves the player paused instead of restoring rendering
+    std::atomic<bool> restoresPlaybackAfterEngineReset_{true};
+
 #if TARGET_OS_IPHONE
     /// Playback state before audio session interruption
     unsigned int preInterruptState_{0};
+    /// Signature of the last observed audio session output ports
+    NSString *_Nullable lastOutputRouteSignature_{nil};
 #endif /* TARGET_OS_IPHONE */
 
   public:
@@ -138,6 +143,9 @@ class AudioPlayer final {
     // MARK: - Player State
 
     bool engineIsRunning() const noexcept;
+
+    bool restoresPlaybackAfterEngineReset() const noexcept;
+    void setRestoresPlaybackAfterEngineReset(bool restoresPlayback) noexcept;
 
     SFBAudioPlayerPlaybackState playbackState() const noexcept;
 
