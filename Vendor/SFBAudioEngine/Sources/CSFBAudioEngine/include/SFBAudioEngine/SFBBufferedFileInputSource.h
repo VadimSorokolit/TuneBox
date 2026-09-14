@@ -23,6 +23,7 @@ NS_SWIFT_NAME(BufferedFileInputSource)
 
 + (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
+- (instancetype)initWithURL:(nullable NSURL *)url NS_UNAVAILABLE;
 
 @end
 

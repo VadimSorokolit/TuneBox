@@ -138,7 +138,7 @@ private struct PreviewWrapper: View {
                 Text(selected.title)
                     .font(.satoshi.regular.size(17))
                     .id(selected)
-                    .transition(segmentTransition(direction))
+                    .segmentTransition(direction)
             }
             .frame(maxWidth: .infinity, minHeight: 80)
             .animation(.easeInOut(duration: 0.25), value: selected)
@@ -149,20 +149,6 @@ private struct PreviewWrapper: View {
 extension Genre: SegmentedItem {
 
     var title: String { displayName }
-
-}
-
-extension View {
-
-    func segmentTransition(_ direction: SlideDirection) -> AnyTransition {
-        let insertion: Edge = direction == .forward ? .trailing : .leading
-        let removal: Edge = direction == .forward ? .leading : .trailing
-
-        return .asymmetric(
-            insertion: .move(edge: insertion).combined(with: .opacity),
-            removal: .move(edge: removal).combined(with: .opacity)
-        )
-    }
 
 }
 

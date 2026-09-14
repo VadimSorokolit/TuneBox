@@ -38,6 +38,9 @@ static void *SFBBufferedFileInputSourceReaderMain(void *context);
     BOOL _readerAtEOF;
     NSError *_readerError;
 }
+
+- (instancetype)initWithURL:(nullable NSURL *)url NS_UNAVAILABLE;
+
 @end
 
 @implementation SFBBufferedFileInputSource
