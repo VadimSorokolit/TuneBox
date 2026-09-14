@@ -12,12 +12,13 @@ enum BottomLayout {
         base: CGFloat = 10,
         adjustment: CGFloat = 0,
         isPlayerVisible: Bool,
+        isPlaying: Bool,
         isTabBarVisible: Bool
     ) -> CGFloat {
         base
         - adjustment
         + (isPlayerVisible
-           ? GlobalConstants.CompactPlayer.height
+           ? GlobalConstants.CompactPlayer.height(isPlaying: isPlaying)
            : 0
         )
         + (isTabBarVisible
@@ -33,6 +34,7 @@ extension View {
         _ base: CGFloat = 0,
         _ adjustment: CGFloat = 10,
         isPlayerVisible: Bool,
+        isPlaying: Bool,
         isTabBarVisible: Bool
     ) -> some View {
         contentMargins(
@@ -41,9 +43,11 @@ extension View {
                 base: base,
                 adjustment: adjustment,
                 isPlayerVisible: isPlayerVisible,
+                isPlaying: isPlaying,
                 isTabBarVisible: isTabBarVisible
             )
         )
+        .animation(.easeInOut(duration: 0.35), value: isPlaying)
     }
 
 }

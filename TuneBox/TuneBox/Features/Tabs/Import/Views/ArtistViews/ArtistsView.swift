@@ -39,6 +39,7 @@ struct ArtistsView: View {
                 10,
                 0,
                 isPlayerVisible: playerVM.isPlayerVisible,
+                isPlaying: playerVM.isPlaying,
                 isTabBarVisible: rootTabsVM.isTabBarVisible
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)

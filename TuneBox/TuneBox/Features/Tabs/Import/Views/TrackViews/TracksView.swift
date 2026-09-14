@@ -90,9 +90,11 @@ struct TracksView: View {
                             .frame(
                                 height: BottomLayout.inset(
                                     isPlayerVisible: playerVM.isPlayerVisible,
+                                    isPlaying: playerVM.isPlaying,
                                     isTabBarVisible: rootTabsVM.isTabBarVisible
                                 )
                             )
+                            .animation(.easeInOut(duration: 0.35), value: playerVM.isPlaying)
                             .listRowInsets(EdgeInsets())
                             .listRowBackground(Color.clear)
                             .listRowSeparator(.hidden)

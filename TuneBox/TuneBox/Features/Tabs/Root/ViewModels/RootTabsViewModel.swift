@@ -77,10 +77,13 @@ final class RootTabsViewModel: RootTabsManaging {
         }
     }
 
-    func bottomInset(base: CGFloat, isPlayerVisible: Bool) -> CGFloat {
+    func bottomInset(base: CGFloat, isPlayerVisible: Bool, isPlaying: Bool) -> CGFloat {
         base
             + (self.isTabBarVisible ? self.tabBarHeight : 0)
-            + (isPlayerVisible ? self.playerHeight : 0)
+            + (isPlayerVisible
+               ? GlobalConstants.CompactPlayer.height(isPlaying: isPlaying)
+               : 0
+            )
     }
 
     // MARK: - Properties. Private

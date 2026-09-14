@@ -170,7 +170,7 @@ struct BrowseView: View {
                 }
             }
             .padding(.top, 10)
-            .bottomContentMargin(0, 0, isPlayerVisible: playerVM.isPlayerVisible, isTabBarVisible: rootTabsVM.isTabBarVisible)
+            .bottomContentMargin(0, 0, isPlayerVisible: playerVM.isPlayerVisible, isPlaying: playerVM.isPlaying, isTabBarVisible: rootTabsVM.isTabBarVisible)
             .refreshable {
                 await transferManagingVM.refreshBrowse()
             }

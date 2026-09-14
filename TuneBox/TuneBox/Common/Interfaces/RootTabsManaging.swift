@@ -19,5 +19,5 @@ protocol RootTabsManaging: AnyObject {
     func reloadTabsMode()
     func rememberSelectedTab(_ tab: CustomTab)
     func restoreSelectedTab() -> CustomTab
-    func bottomInset(base: CGFloat, isPlayerVisible: Bool) -> CGFloat
+    func bottomInset(base: CGFloat, isPlayerVisible: Bool, isPlaying: Bool) -> CGFloat
 }

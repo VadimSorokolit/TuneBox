@@ -41,6 +41,7 @@ struct AlbumsView: View {
                         10,
                         0,
                         isPlayerVisible: playerVM.isPlayerVisible,
+                        isPlaying: playerVM.isPlaying,
                         isTabBarVisible: rootTabsVM.isTabBarVisible
                     )
                 } else {

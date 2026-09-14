@@ -10,16 +10,20 @@ import SwiftUI
 private struct ScrollToCurrentTrackModifier<Trigger: Hashable>: ViewModifier {
 
     let trackID: String?
-    let trackIDs: Set<String>
+    let orderedTrackIDs: [String]
     let trigger: Trigger
     let followsTrackChanges: Bool
     let animatedRequest: Int
 
     @State private var isReady = false
 
+    private var trackIDSet: Set<String> {
+        Set(orderedTrackIDs)
+    }
+
     private var needsInitialScroll: Bool {
         guard let trackID else { return false }
-        return trackIDs.contains(trackID)
+        return trackIDSet.contains(trackID)
     }
 
     func body(content: Content) -> some View {
@@ -35,15 +39,18 @@ private struct ScrollToCurrentTrackModifier<Trigger: Hashable>: ViewModifier {
                 }
                 .onChange(of: trackID) { _, newID in
                     guard followsTrackChanges, isReady else { return }
-                    guard let newID, trackIDs.contains(newID) else { return }
+                    guard let newID, trackIDSet.contains(newID) else { return }
 
                     scroll(proxy: proxy, to: newID, animated: true)
                 }
                 .onChange(of: animatedRequest) { _, _ in
                     guard isReady else { return }
-                    guard let trackID, trackIDs.contains(trackID) else { return }
+                    guard let trackID, trackIDSet.contains(trackID) else { return }
 
-                    scroll(proxy: proxy, to: trackID, animated: true)
+                    Task { @MainActor in
+                        await Task.yield()
+                        scroll(proxy: proxy, to: trackID, animated: true)
+                    }
                 }
         }
     }
@@ -60,7 +67,7 @@ private struct ScrollToCurrentTrackModifier<Trigger: Hashable>: ViewModifier {
             isReady = false
         }
 
-        guard let trackID, trackIDs.contains(trackID) else {
+        guard let trackID, trackIDSet.contains(trackID) else {
             isReady = true
             return
         }
@@ -77,17 +84,53 @@ private struct ScrollToCurrentTrackModifier<Trigger: Hashable>: ViewModifier {
         to trackID: String,
         animated: Bool
     ) {
+        let anchor = Self.anchor(for: trackID, in: orderedTrackIDs)
         let action = {
-            proxy.scrollTo(trackID, anchor: .center)
+            proxy.scrollTo(trackID, anchor: anchor)
         }
 
         if animated {
-            withAnimation(.smooth(duration: 0.4), action)
+            // `.smooth` is a spring and overshoots. At the list bound that
+            // rubber-bands, so "Show" on a last track ended with a hitch.
+            withAnimation(.easeInOut(duration: 0.4), action)
         } else {
             var transaction = Transaction()
             transaction.disablesAnimations = true
             withTransaction(transaction, action)
         }
+    }
+
+    /// `.center` is often unreachable for the first/last rows, and SwiftUI
+    /// then eases into the clamped offset — that is the hitch at the end.
+    /// Pin those rows to a reachable edge so the animation can finish cleanly.
+    private static func anchor(
+        for trackID: String,
+        in orderedTrackIDs: [String]
+    ) -> UnitPoint {
+        guard let index = orderedTrackIDs.firstIndex(of: trackID) else {
+            return .center
+        }
+
+        let lastIndex = orderedTrackIDs.count - 1
+        let distanceFromEnd = lastIndex - index
+
+        if index == 0 {
+            return .top
+        }
+
+        if distanceFromEnd == 0 {
+            return .bottom
+        }
+
+        if index == 1 {
+            return UnitPoint(x: 0.5, y: 0.3)
+        }
+
+        if distanceFromEnd <= 2 {
+            return UnitPoint(x: 0.5, y: 0.82)
+        }
+
+        return .center
     }
 }
 
@@ -103,7 +146,7 @@ extension View {
         modifier(
             ScrollToCurrentTrackModifier(
                 trackID: trackID,
-                trackIDs: Set(tracks.map(\.id)),
+                orderedTrackIDs: tracks.map(\.id),
                 trigger: trigger,
                 followsTrackChanges: followsTrackChanges,
                 animatedRequest: animatedRequest
@@ -121,7 +164,7 @@ extension View {
         modifier(
             ScrollToCurrentTrackModifier(
                 trackID: trackID,
-                trackIDs: Set(trackIDs),
+                orderedTrackIDs: Array(trackIDs),
                 trigger: trigger,
                 followsTrackChanges: followsTrackChanges,
                 animatedRequest: animatedRequest
