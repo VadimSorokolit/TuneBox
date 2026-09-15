@@ -20,7 +20,7 @@ struct DownloadsView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HeaderView(viewModel: transferManagingVM)
+            HeaderView(transferManagingVM: transferManagingVM)
 
             SearchBarView(
                 searchQuery: $searchQuery,
@@ -86,37 +86,35 @@ struct DownloadsView: View {
     // MARK: - Subviews. Private
 
     private struct HeaderView: View {
-        @Environment(\.themeManager) private var theme
-        let viewModel: DownloadsPresenting
 
-        private let horizontalPadding: CGFloat = 26
+        // MARK: - Properties. Public
+
+        @Environment(\.themeManager) private var theme
+
+        let transferManagingVM: DownloadsPresenting
+
+        // MARK: - Body
 
         var body: some View {
-            HStack {
-                Text("Library")
-                    .foregroundStyle(theme.tokens.browseHeaderText)
-                    .font(.satoshi.regular.size(34))
-
-                Spacer()
-
+            TabHeaderView(title: "Library") {
                 Menu {
                     Button(action: {
-                        viewModel.setType(.active)
+                        transferManagingVM.setType(.active)
                     }, label: {
                         Label(
                             "Active Downloads",
-                            systemImage: viewModel.selectedTracksType == .active
+                            systemImage: transferManagingVM.selectedTracksType == .active
                             ? "checkmark"
                             : ""
                         )
                     })
 
                     Button(action: {
-                        viewModel.setType(.downloaded)
+                        transferManagingVM.setType(.downloaded)
                     }, label: {
                         Label(
                             "Downloaded",
-                            systemImage: viewModel.selectedTracksType == .downloaded
+                            systemImage: transferManagingVM.selectedTracksType == .downloaded
                             ? "checkmark"
                             : ""
                         )
@@ -127,7 +125,6 @@ struct DownloadsView: View {
                         .foregroundStyle(theme.tokens.browseHeaderText)
                 }
             }
-            .padding(.horizontal, horizontalPadding)
         }
     }
 

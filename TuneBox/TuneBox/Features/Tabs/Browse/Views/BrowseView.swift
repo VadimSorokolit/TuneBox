@@ -69,20 +69,12 @@ struct BrowseView: View {
 
         // MARK: - Properties. Public
 
-        @Environment(\.themeManager) private var theme
-
         let transferManagingVM: TransferManaging
 
         // MARK: - Body
 
         var body: some View {
-            HStack {
-                Text("Discover")
-                    .foregroundStyle(theme.tokens.browseHeaderText)
-                    .font(.satoshi.regular.size(34))
-
-                Spacer()
-
+            TabHeaderView(title: "Discover") {
                 Menu {
                     Button(action: {
                         transferManagingVM.cancelAllActiveDownloads()
@@ -113,12 +105,7 @@ struct BrowseView: View {
                     : 1
                 )
             }
-            .padding(.horizontal, horizontalPadding)
         }
-
-        // MARK: - Properties. Private
-
-        private let horizontalPadding: CGFloat = 26
     }
 
     private struct ContentView: View {
