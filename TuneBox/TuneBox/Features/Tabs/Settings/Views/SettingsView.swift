@@ -46,6 +46,17 @@ struct SettingsView: View {
         var body: some View {
             VStack(spacing: .zero) {
                 Form {
+                    Section(header: Text("Appearance")) {
+                        SettingsRow(
+                            title: "Default Tab",
+                            trailingText: "Import"
+                        ) {}
+                        
+                        SettingsRow(title: "Tabs Mode",
+                                    trailingText: "All tabs"
+                        ) {}
+                    }
+
                     Section(header: Text("About")) {
                         SettingsRow(title: "Privacy Policy") {
                             settingsVM.openPrivacy()

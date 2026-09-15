@@ -14,6 +14,7 @@ struct SettingsRow: View {
     let title: String
     var subtitle: String?
     var value: String?
+    var trailingText: String?
     var showsChevron: Bool = true
     var isDisabled: Bool = false
     var action: (() -> Void)?
@@ -61,9 +62,18 @@ struct SettingsRow: View {
             }
 
             if showsChevron {
-                Image(systemName: "chevron.right")
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.secondary)
+                HStack(spacing: trailingText?.isNotEmpty == true
+                       ? 4
+                       :0) {
+                    if let trailingText, trailingText.isNotEmpty {
+                        Text(trailingText)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                }
             }
         }
     }
@@ -72,6 +82,7 @@ struct SettingsRow: View {
 #Preview {
     Form {
         SettingsRow(title: "Privacy Policy", action: {})
+
         SettingsRow(
             title: "Version",
             value: "1.0",
