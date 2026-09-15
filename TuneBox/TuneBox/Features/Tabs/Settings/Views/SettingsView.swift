@@ -51,7 +51,7 @@ struct SettingsView: View {
                             title: "Default Tab",
                             trailingText: "Import"
                         ) {}
-                        
+
                         SettingsRow(title: "Tabs Mode",
                                     trailingText: "All tabs"
                         ) {}

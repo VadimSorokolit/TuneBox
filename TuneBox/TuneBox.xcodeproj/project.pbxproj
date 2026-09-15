@@ -44,7 +44,6 @@
 		5B17121930515C1B00BC9C3C /* CompactPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B17121330515C1B00BC9C3C /* CompactPlayerView.swift */; };
 		5B17121C3051630C00BC9C3C /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 5B17121B3051630C00BC9C3C /* FirebaseAnalytics */; };
 		5B17121E3051630C00BC9C3C /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 5B17121D3051630C00BC9C3C /* FirebaseCrashlytics */; };
-		5B17122030519BD700BC9C3C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B17121F30519BD700BC9C3C /* GoogleService-Info.plist */; };
 		5B17122430519E4300BC9C3C /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B17122330519E4200BC9C3C /* AnalyticsService.swift */; };
 		5B17122630519EA500BC9C3C /* AnalyticsServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B17122530519EA300BC9C3C /* AnalyticsServicing.swift */; };
 		5B17122830519F1F00BC9C3C /* CrashlyticsServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B17122730519F1700BC9C3C /* CrashlyticsServicing.swift */; };
@@ -110,6 +109,7 @@
 		5B84A1C0305E4A0100C0DE04 /* CoverImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B84A1C0305E4A0100C0DE03 /* CoverImageLoader.swift */; };
 		5B84C01C2FAB353200ACE75A /* CustomAlerts in Frameworks */ = {isa = PBXBuildFile; productRef = 5B84C01B2FAB353200ACE75A /* CustomAlerts */; };
 		5B84C0252FAB368D00ACE75A /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 5B84C0242FAB367B00ACE75A /* .swiftlint.yml */; };
+		5B8787913059A6CB00A9BBFA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B8787903059A6CB00A9BBFA /* GoogleService-Info.plist */; };
 		5B88609E2FAE184C0056BE9A /* GlobalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B88609D2FAE18450056BE9A /* GlobalConstants.swift */; };
 		5B8860A52FB1CF910056BE9A /* NotificationNames+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8860A42FB1CF900056BE9A /* NotificationNames+Extension.swift */; };
 		5B899F782FCF13A8002D3232 /* RootTabsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B899F772FCF13A8002D3232 /* RootTabsView.swift */; };
@@ -272,7 +272,6 @@
 		5B17121330515C1B00BC9C3C /* CompactPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompactPlayerView.swift; sourceTree = "<group>"; };
 		5B17121430515C1B00BC9C3C /* ExpandedPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandedPlayerView.swift; sourceTree = "<group>"; };
 		5B17121530515C1B00BC9C3C /* PeakSquareHistogramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeakSquareHistogramView.swift; sourceTree = "<group>"; };
-		5B17121F30519BD700BC9C3C /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		5B17122330519E4200BC9C3C /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
 		5B17122530519EA300BC9C3C /* AnalyticsServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsServicing.swift; sourceTree = "<group>"; };
 		5B17122730519F1700BC9C3C /* CrashlyticsServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashlyticsServicing.swift; sourceTree = "<group>"; };
@@ -330,6 +329,7 @@
 		5B84A1C0305E4A0100C0DE01 /* VinylSpinGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VinylSpinGate.swift; sourceTree = "<group>"; };
 		5B84A1C0305E4A0100C0DE03 /* CoverImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoverImageLoader.swift; sourceTree = "<group>"; };
 		5B84C0242FAB367B00ACE75A /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
+		5B8787903059A6CB00A9BBFA /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		5B88609D2FAE18450056BE9A /* GlobalConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalConstants.swift; sourceTree = "<group>"; };
 		5B8860A42FB1CF900056BE9A /* NotificationNames+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationNames+Extension.swift"; sourceTree = "<group>"; };
 		5B899F772FCF13A8002D3232 /* RootTabsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabsView.swift; sourceTree = "<group>"; };
@@ -1198,7 +1198,7 @@
 			children = (
 				5BFCA7D72FCED398009C6AD9 /* Fonts */,
 				5BD5799C2FAB25E300503BA2 /* Assets.xcassets */,
-				5B17121F30519BD700BC9C3C /* GoogleService-Info.plist */,
+				5B8787903059A6CB00A9BBFA /* GoogleService-Info.plist */,
 				5B92B904304556D700E9FB5D /* TuneBoxConfiguration.storekit */,
 			);
 			path = Resources;
@@ -1532,12 +1532,12 @@
 				5BFCA81A2FCED45F009C6AD9 /* JetBrainsMono-Medium.ttf in Resources */,
 				5BFCA81D2FCED45F009C6AD9 /* JetBrainsMono-ExtraLight.ttf in Resources */,
 				5B92B905304556D700E9FB5D /* TuneBoxConfiguration.storekit in Resources */,
+				5B8787913059A6CB00A9BBFA /* GoogleService-Info.plist in Resources */,
 				5BFCA8232FCED45F009C6AD9 /* JetBrainsMono-SemiBold.ttf in Resources */,
 				5BFCA8342FCED5BF009C6AD9 /* SpaceGrotesk-Bold.otf in Resources */,
 				5BFCA8352FCED5BF009C6AD9 /* SpaceGrotesk-Light.otf in Resources */,
 				5BFCA8362FCED5BF009C6AD9 /* SpaceGrotesk-Medium.otf in Resources */,
 				5BFCA8372FCED5BF009C6AD9 /* SpaceGrotesk-Regular.otf in Resources */,
-				5B17122030519BD700BC9C3C /* GoogleService-Info.plist in Resources */,
 				5BFCA8382FCED5BF009C6AD9 /* SpaceGrotesk-SemiBold.otf in Resources */,
 				5BFCA8252FCED45F009C6AD9 /* JetBrainsMono-Regular.ttf in Resources */,
 				5BFCA82B2FCED45F009C6AD9 /* JetBrainsMono-Thin.ttf in Resources */,

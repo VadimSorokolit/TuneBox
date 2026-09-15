@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.TuneBox</string>
+	<string>com.TuneBox1</string>
 	<key>PROJECT_ID</key>
 	<string>tunebox-68f56</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:484468090206:ios:64298044ac2fdeaada5bcf</string>
+	<string>1:484468090206:ios:a9787d42a4cfa2cbda5bcf</string>
 </dict>
 </plist>
