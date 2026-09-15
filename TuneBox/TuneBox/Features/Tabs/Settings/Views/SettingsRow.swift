@@ -15,53 +15,67 @@ struct SettingsRow: View {
     var subtitle: String?
     var value: String?
     var showsChevron: Bool = true
-    let action: () -> Void
+    var isDisabled: Bool = false
+    var action: (() -> Void)?
 
     // MARK: - Main Body
 
     var body: some View {
-        Button(action: action) {
-            HStack(spacing: 8) {
-                VStack(
-                    alignment: .leading,
-                    spacing: subtitle.isNotNil ? 4 : 0
-                ) {
-                    HStack(spacing: 8) {
-                        Text(title)
-                            .foregroundStyle(.primary)
+        if let action {
+            Button(action: action) {
+                rowContent
+            }
+            .tint(.primary)
+            .disabled(isDisabled)
+        } else {
+            rowContent
+        }
+    }
 
-                        Spacer(minLength: 8)
+    // MARK: - Properties. Private
 
-                        if let value {
-                            Text(value)
-                                .lineLimit(1)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
+    private var rowContent: some View {
+        HStack(spacing: 8) {
+            VStack(
+                alignment: .leading,
+                spacing: subtitle.isNotNil ? 4 : 0
+            ) {
+                HStack(spacing: 8) {
+                    Text(title)
+                        .foregroundStyle(.primary)
 
-                    if let subtitle {
-                        Text(subtitle)
+                    Spacer(minLength: 8)
+
+                    if let value, value.isNotEmpty {
+                        Text(value)
                             .lineLimit(1)
                             .foregroundStyle(.secondary)
                     }
                 }
 
-                if showsChevron {
-                    Image(systemName: "chevron.right")
-                        .font(.footnote.weight(.semibold))
+                if let subtitle {
+                    Text(subtitle)
+                        .lineLimit(1)
                         .foregroundStyle(.secondary)
                 }
+            }
+
+            if showsChevron {
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.secondary)
             }
         }
     }
 }
 
 #Preview {
-    SettingsRow(
-        title: "Privacy Policy",
-        subtitle: "Hello",
-        value: "dddddddddddddddddddddddrt4trt",
-        showsChevron: true,
-        action: {}
-    )
+    Form {
+        SettingsRow(title: "Privacy Policy", action: {})
+        SettingsRow(
+            title: "Version",
+            value: "1.0",
+            showsChevron: false
+        )
+    }
 }

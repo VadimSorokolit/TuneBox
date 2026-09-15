@@ -15,6 +15,7 @@ protocol SettingsManaging: LoadStateManaging {
     var hasMonthlyPurchase: Bool { get }
     var paywallStatusMessage: String { get }
     var paywallHeaderTitle: String { get }
+    var marketingVersion: String { get }
     var isPaywallPresented: Bool { get set }
     var products: [Product] { get }
     var purchasedProductIDs: Set<String> { get }

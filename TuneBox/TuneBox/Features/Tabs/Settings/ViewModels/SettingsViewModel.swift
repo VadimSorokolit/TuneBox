@@ -40,6 +40,18 @@ final class SettingsViewModel: SettingsManaging {
         self.purchasedProductIDs.contains(ProductID.monthly)
     }
 
+    var marketingVersion: String {
+        let version = Bundle.main.object(
+            forInfoDictionaryKey: "CFBundleShortVersionString"
+        ) as? String
+
+        guard let version, version.isNotEmpty else {
+            return Constants.fallbackVersion
+        }
+
+        return version
+    }
+
     // MARK: - Initializer
 
     init() {}
@@ -133,6 +145,10 @@ final class SettingsViewModel: SettingsManaging {
     #endif
 
     // MARK: - Properties. Private
+
+    private enum Constants {
+        static let fallbackVersion = "1.0"
+    }
 
     @ObservationIgnored
     @Injected private var purchaseService: PurchaseServicing

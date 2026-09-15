@@ -54,6 +54,12 @@ struct SettingsView: View {
                         SettingsRow(title: "Terms of Use") {
                             settingsVM.openTerms()
                         }
+
+                        SettingsRow(
+                            title: "Version",
+                            value: settingsVM.marketingVersion,
+                            showsChevron: false
+                        )
                     }
                 }
                 .listSectionSpacing(.compact)
