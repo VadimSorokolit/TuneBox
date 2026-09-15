@@ -47,6 +47,8 @@ enum CustomTab: String, Hashable, Identifiable, CaseIterable {
     case downloads
     case settings
 
+    static let `default`: Self = .importFiles
+
     var id: Self { self }
 
     var iconInactive: String {
@@ -359,7 +361,7 @@ struct RootTabsView: View {
             ForEach(CustomTab.allCases) { tab in
                 TabItem(
                     tab: tab,
-                    isSelected: tab == .browse,
+                    isSelected: tab == .default,
                     activeColor: Color(hex: 0x6B5CFF),
                     inactiveColor: Color.white.opacity(0.45)
                 ) {}

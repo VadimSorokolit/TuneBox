@@ -34,7 +34,7 @@ final class AppCoordinator {
 
     // MARK: - Tabs
 
-    var selectedTab: CustomTab = .importFiles
+    var selectedTab: CustomTab = .default
 
     // MARK: - Navigation
 
@@ -80,7 +80,7 @@ final class AppCoordinator {
         self.root = root
 
         if root == .main {
-            self.selectedTab = .browse
+            self.selectedTab = .default
         }
     }
 
@@ -97,7 +97,7 @@ final class AppCoordinator {
             self.presentedFullScreen = nil
 
             if route == .main {
-                self.selectedTab = .browse
+                self.selectedTab = .default
             }
         }
 

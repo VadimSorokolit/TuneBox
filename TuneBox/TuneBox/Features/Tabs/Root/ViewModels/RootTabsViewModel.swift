@@ -71,9 +71,9 @@ final class RootTabsViewModel: RootTabsManaging {
                 let raw = self.userDefaults.string(
                     forKey: Constants.Keys.lastSelectedTab
                 )
-                let restored = CustomTab(rawValue: raw ?? "") ?? .browse
+                let restored = CustomTab(rawValue: raw ?? "") ?? .default
 
-                return self.visibleTabs.contains(restored) ? restored : .browse
+                return self.visibleTabs.contains(restored) ? restored : .default
         }
     }
 
