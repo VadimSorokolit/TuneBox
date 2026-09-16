@@ -13,42 +13,45 @@ struct PlaylistsView: View {
     // MARK: - Main Body
 
     var body: some View {
-        if let library = importManagingVM.library, library.playlists.isNotEmpty {
-            ScrollView(showsIndicators: false) {
-                LazyVStack(spacing: 0) {
-                    ForEach(library.playlists) { playlist in
-                        PlaylistCell(
-                            playlist: playlist,
-                            onTapGesture: {
-                                coordinator.push(.tracks(playlist.title, .fixed(playlist.tracks)))
-                            }
+        Group {
+            if let library = importManagingVM.library, library.playlists.isNotEmpty {
+                ScrollView(showsIndicators: false) {
+                    LazyVStack(spacing: 0) {
+                        ForEach(library.playlists) { playlist in
+                            PlaylistCell(
+                                playlist: playlist,
+                                onTapGesture: {
+                                    coordinator.push(.tracks(playlist.title, .fixed(playlist.tracks)))
+                                }
+                            )
+                        }
+
+                        LibrarySummaryFooter(
+                            count: library.playlists.count,
+                            unitSingular: String(LibraryItem.playlists.rawValue.dropLast()),
+                            unitPlural: LibraryItem.playlists.rawValue.capitalized,
+                            duration: importManagingVM.tracksDuration(library.playlists.flatMap(\.tracks)),
+                            size: importManagingVM.tracksSize(library.playlists.flatMap(\.tracks))
                         )
                     }
-
-                    LibrarySummaryFooter(
-                        count: library.playlists.count,
-                        unitSingular: String(LibraryItem.playlists.rawValue.dropLast()),
-                        unitPlural: LibraryItem.playlists.rawValue.capitalized,
-                        duration: importManagingVM.tracksDuration(library.playlists.flatMap(\.tracks)),
-                        size: importManagingVM.tracksSize(library.playlists.flatMap(\.tracks))
-                    )
                 }
+                .bottomContentMargin(
+                    10,
+                    0,
+                    isPlayerVisible: playerVM.isPlayerVisible,
+                    isPlaying: playerVM.isPlaying,
+                    isTabBarVisible: rootTabsVM.isTabBarVisible
+                )
+            } else {
+                LibraryEmptyStateView(
+                    item: LibraryItem.playlists,
+                    prefixText: "Your",
+                    suffixText: "will appear here.",
+                    capitalizeItemText: false
+                )
             }
-            .navigationTitle(LibraryItem.playlists.rawValue.capitalized)
-            .bottomContentMargin(
-                10,
-                0,
-                isPlayerVisible: playerVM.isPlayerVisible,
-                isPlaying: playerVM.isPlaying,
-                isTabBarVisible: rootTabsVM.isTabBarVisible
-            )        } else {
-            LibraryEmptyStateView(
-                item: LibraryItem.playlists,
-                prefixText: "Your",
-                suffixText: "will appear here.",
-                capitalizeItemText: false
-            )
         }
+        .libraryMenuNavigationTitle(LibraryItem.playlists.rawValue.capitalized)
     }
 
     // MARK: - Properties. Private

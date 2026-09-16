@@ -13,44 +13,42 @@ struct AlbumsView: View {
     // MARK: - Main Body
 
     var body: some View {
-        if let library = importManagingVM.library {
-            Group {
-                if library.albums.isNotEmpty {
-                    ScrollView(showsIndicators: false) {
-                        LazyVStack(spacing: 0) {
-                            ForEach(library.albums) { album in
-                                AlbumCell(
-                                    album: album,
-                                    displayContext: .album,
-                                    onTapGesture: {
-                                        coordinator.push(.album(album))
-                                    }
-                                )
-                            }
-
-                            LibrarySummaryFooter(
-                                count: library.albums.count,
-                                unitSingular: String(LibraryItem.albums.rawValue.dropLast()),
-                                unitPlural: LibraryItem.albums.rawValue,
-                                duration: importManagingVM.tracksDuration(library.albums.flatMap(\.tracks)),
-                                size: importManagingVM.tracksSize(library.albums.flatMap(\.tracks))
+        Group {
+            if let library = importManagingVM.library, library.albums.isNotEmpty {
+                ScrollView(showsIndicators: false) {
+                    LazyVStack(spacing: 0) {
+                        ForEach(library.albums) { album in
+                            AlbumCell(
+                                album: album,
+                                displayContext: .album,
+                                onTapGesture: {
+                                    coordinator.push(.album(album))
+                                }
                             )
                         }
+
+                        LibrarySummaryFooter(
+                            count: library.albums.count,
+                            unitSingular: String(LibraryItem.albums.rawValue.dropLast()),
+                            unitPlural: LibraryItem.albums.rawValue,
+                            duration: importManagingVM.tracksDuration(library.albums.flatMap(\.tracks)),
+                            size: importManagingVM.tracksSize(library.albums.flatMap(\.tracks))
+                        )
                     }
-                    .bottomContentMargin(
-                        10,
-                        0,
-                        isPlayerVisible: playerVM.isPlayerVisible,
-                        isPlaying: playerVM.isPlaying,
-                        isTabBarVisible: rootTabsVM.isTabBarVisible
-                    )
-                } else {
-                    LibraryEmptyStateView(item: LibraryItem.albums)
                 }
+                .bottomContentMargin(
+                    10,
+                    0,
+                    isPlayerVisible: playerVM.isPlayerVisible,
+                    isPlaying: playerVM.isPlaying,
+                    isTabBarVisible: rootTabsVM.isTabBarVisible
+                )
+            } else {
+                LibraryEmptyStateView(item: LibraryItem.albums)
             }
-            .customNavigationTitle(LibraryItem.albums.rawValue.capitalized)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
+        .libraryMenuNavigationTitle(LibraryItem.albums.rawValue.capitalized)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
     // MARK: - Properties. Private

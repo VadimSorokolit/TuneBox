@@ -31,7 +31,12 @@ struct ImportsView: View {
                 )
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .frame(
+            maxWidth: .infinity,
+            maxHeight: .infinity,
+            alignment: .top
+        )
+//        .hiddenLibraryNavigationChrome()
         .background(.gray.opacity(0.025))
         .bottomContentMargin(
             10,
@@ -426,7 +431,10 @@ struct ImportsView: View {
                     coordinator.push(.artists)
 
                 case .library(.tracks):
-                    coordinator.push(.tracks(.library))
+                    coordinator.push(
+                        .tracks(.library),
+                        animated: false
+                    )
 
                 case .library(.playlists):
                     coordinator.push(.playlists)

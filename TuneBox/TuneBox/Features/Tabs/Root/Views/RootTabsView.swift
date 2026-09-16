@@ -143,7 +143,6 @@ struct RootTabsView: View {
             }
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
-        .navigationBarBackButtonHidden(true)
         .sheet(isPresented: $isExpandedPlayerPresented) {
             ExpandedPlayerView()
         }

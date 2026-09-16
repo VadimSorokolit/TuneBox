@@ -26,4 +26,24 @@ extension View {
             }
     }
 
+    func libraryMenuNavigationTitle(_ title: String) -> some View {
+        navigationTitle(title)
+            .toolbarTitleDisplayMode(.inline)
+    }
+
+    func hiddenLibraryNavigationChrome() -> some View {
+        navigationTitle("Library")
+            .toolbarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("Library")
+                        .font(.headline)
+                        .opacity(0)
+                        .offset(y: -82)
+                }
+                .sharedBackgroundVisibility(.hidden)
+            }
+            .toolbarBackgroundVisibility(.hidden, for: .navigationBar)
+    }
+
 }
