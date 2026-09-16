@@ -196,9 +196,15 @@ struct RootTabsView: View {
 
                 case .importFiles:
                     NavigationStack(path: coordinator.pathBinding) {
-                        ImportsView()
+                        Color.clear
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .toolbar(.hidden, for: .navigationBar)
+                            .navigationBarBackButtonHidden(true)
                             .navigationDestination(for: AppRoute.self) { route in
                                 switch route {
+                                    case .importHome:
+                                        ImportsView()
+
                                     case .album(let album):
                                         AlbumDetailsView(album: album)
 

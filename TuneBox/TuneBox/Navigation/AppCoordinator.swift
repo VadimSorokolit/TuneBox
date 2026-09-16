@@ -38,7 +38,7 @@ final class AppCoordinator {
 
     // MARK: - Navigation
 
-    private(set) var path: [AppRoute] = []
+    private(set) var path: [AppRoute] = [.importHome]
 
     // MARK: - Presentation
 
@@ -52,7 +52,7 @@ final class AppCoordinator {
     }
 
     var canPop: Bool {
-        !self.path.isEmpty
+        self.path.count > 1
     }
 
     var stackDepth: Int {
@@ -81,6 +81,7 @@ final class AppCoordinator {
 
         if root == .main {
             self.selectedTab = .default
+            self.path = [.importHome]
         }
     }
 
@@ -92,7 +93,7 @@ final class AppCoordinator {
     ) {
         self.perform(animated: animated) {
             self.root = route
-            self.path.removeAll()
+            self.path = route == .main ? [.importHome] : []
             self.presentedSheet = nil
             self.presentedFullScreen = nil
 
@@ -179,13 +180,13 @@ final class AppCoordinator {
     }
 
     func popToRoot(animated: Bool = true) {
-        guard self.canPop else { return }
+        guard self.path != [.importHome] else { return }
 
         self.perform(animated: animated) {
-            self.path.removeAll()
+            self.path = [.importHome]
         }
 
-        self.log(.popToRoot, root)
+        self.log(.popToRoot, .importHome)
     }
 
     func pop(
@@ -241,9 +242,14 @@ final class AppCoordinator {
     // MARK: - NavigationStack sync
 
     func syncPath(_ newPath: [AppRoute]) {
-        guard path != newPath else { return }
+        var path = newPath
+        if path.isEmpty || path.first != .importHome {
+            path = [.importHome] + path.filter { $0 != .importHome }
+        }
 
-        self.path = newPath
+        guard self.path != path else { return }
+
+        self.path = path
         self.log(.syncPath, currentRoute, note: "depth=\(path.count)")
     }
 
@@ -295,7 +301,8 @@ private extension AppCoordinator {
     func canPush(_ route: AppRoute) -> Bool {
         if route == .launch
             || route == .onboarding
-            || route == .main {
+            || route == .main
+            || route == .importHome {
 
             Self.logger.warning("Use setRoot instead of push")
 

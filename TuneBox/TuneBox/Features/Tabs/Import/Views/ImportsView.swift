@@ -36,7 +36,7 @@ struct ImportsView: View {
             maxHeight: .infinity,
             alignment: .top
         )
-//        .hiddenLibraryNavigationChrome()
+        .importHomeNavigationChrome()
         .background(.gray.opacity(0.025))
         .bottomContentMargin(
             10,
