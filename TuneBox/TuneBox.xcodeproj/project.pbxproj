@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		5B061DB1305971EA005C6603 /* SettingsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B061DB0305971E9005C6603 /* SettingsRow.swift */; };
 		5B061DB330597400005C6603 /* TabHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B061DB230597400005C6603 /* TabHeaderView.swift */; };
+		5B4D22932FF8C202004B8356 /* HeaderGlassButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4D22922FF8C201004B8356 /* HeaderGlassButton.swift */; };
 		5B0BC2A330051A8300E8F2A5 /* ImportTracksViewV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0BC2A230051A7100E8F2A5 /* ImportTracksViewV1.swift */; };
 		5B0BC2AA3005481C00E8F2A5 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5B0BC2A8300539BC00E8F2A5 /* Settings.bundle */; };
 		5B0BC2AC300659F800E8F2A5 /* ImportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0BC2AB300659EA00E8F2A5 /* ImportViewModel.swift */; };
@@ -55,7 +56,6 @@
 		5B2CF4612FBC7C6B00C5BA4C /* TransferDownloadObserverTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2CF4602FBC7C6900C5BA4C /* TransferDownloadObserverTokens.swift */; };
 		5B2CF4672FBD100100C5BA4D /* DownloadResumeStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2CF4682FBD100000C5BA4D /* DownloadResumeStorage.swift */; };
 		5B3D227D2FF53A55004B8356 /* View+frame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3D227C2FF53A54004B8356 /* View+frame.swift */; };
-		5B4D22912FF8C102004B8356 /* View+headerGlassButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4D22902FF8C101004B8356 /* View+headerGlassButton.swift */; };
 		5B3FEB3D2FB4539C00DC1562 /* TransferViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB3C2FB4539A00DC1562 /* TransferViewModel.swift */; };
 		5B3FEB432FB4545200DC1562 /* BrowseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB422FB4544B00DC1562 /* BrowseView.swift */; };
 		5B3FEB472FB4548600DC1562 /* DownloadsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FEB462FB4547E00DC1562 /* DownloadsView.swift */; };
@@ -239,6 +239,7 @@
 /* Begin PBXFileReference section */
 		5B061DB0305971E9005C6603 /* SettingsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRow.swift; sourceTree = "<group>"; };
 		5B061DB230597400005C6603 /* TabHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabHeaderView.swift; sourceTree = "<group>"; };
+		5B4D22922FF8C201004B8356 /* HeaderGlassButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderGlassButton.swift; sourceTree = "<group>"; };
 		5B0BC2A230051A7100E8F2A5 /* ImportTracksViewV1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportTracksViewV1.swift; sourceTree = "<group>"; };
 		5B0BC2A8300539BC00E8F2A5 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		5B0BC2AB300659EA00E8F2A5 /* ImportViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportViewModel.swift; sourceTree = "<group>"; };
@@ -284,7 +285,6 @@
 		5B2CF4602FBC7C6900C5BA4C /* TransferDownloadObserverTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferDownloadObserverTokens.swift; sourceTree = "<group>"; };
 		5B2CF4682FBD100000C5BA4D /* DownloadResumeStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadResumeStorage.swift; sourceTree = "<group>"; };
 		5B3D227C2FF53A54004B8356 /* View+frame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+frame.swift"; sourceTree = "<group>"; };
-		5B4D22902FF8C101004B8356 /* View+headerGlassButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+headerGlassButton.swift"; sourceTree = "<group>"; };
 		5B3FEB3C2FB4539A00DC1562 /* TransferViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferViewModel.swift; sourceTree = "<group>"; };
 		5B3FEB422FB4544B00DC1562 /* BrowseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseView.swift; sourceTree = "<group>"; };
 		5B3FEB462FB4547E00DC1562 /* DownloadsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsView.swift; sourceTree = "<group>"; };
@@ -589,6 +589,7 @@
 				5BECD77B3010E0740028FC67 /* LibrarySummaryFooter.swift */,
 				5BA1F0002FE1000000503BA2 /* PaginationFooterView.swift */,
 				5B1875C52FD06EBC00D8A042 /* SearchBarView.swift */,
+				5B4D22922FF8C201004B8356 /* HeaderGlassButton.swift */,
 				5B061DB230597400005C6603 /* TabHeaderView.swift */,
 				5B1875C82FD084CA00D8A042 /* SegmentedChipControl.swift */,
 				5B992F5130090FE200276008 /* SegmentedControl.swift */,
@@ -824,7 +825,6 @@
 				5BF3AEFF3041A48A008193AC /* View+customNavigationTitle.swift */,
 				5B6B8CD42FED1DEC00C23D3E /* View+dismissKeyboardOnTap.swift */,
 				5B3D227C2FF53A54004B8356 /* View+frame.swift */,
-				5B4D22902FF8C101004B8356 /* View+headerGlassButton.swift */,
 				5BB4B42830543E4200AB949F /* View+leadingTapArea.swift */,
 				5B6B8CD62FED326700C23D3E /* View+sectionTracksTitle.swift */,
 				5B992F53300913E700276008 /* View+segmentTransition.swift */,
@@ -1627,7 +1627,6 @@
 				5B0BC2B230068A4A00E8F2A5 /* CentralSpinnerModifier.swift in Sources */,
 				5B0BC2A330051A8300E8F2A5 /* ImportTracksViewV1.swift in Sources */,
 				5B3D227D2FF53A55004B8356 /* View+frame.swift in Sources */,
-				5B4D22912FF8C102004B8356 /* View+headerGlassButton.swift in Sources */,
 				5B0BC2D53007FFA800E8F2A5 /* Int+formattedFileSize.swift in Sources */,
 				5B8382912FC495F9003625CD /* PlayerViewModel.swift in Sources */,
 				5B0BC2C33007905C00E8F2A5 /* FolderDisplayable.swift in Sources */,
@@ -1745,6 +1744,7 @@
 				5B88609E2FAE184C0056BE9A /* GlobalConstants.swift in Sources */,
 				5B1875C62FD06EBD00D8A042 /* SearchBarView.swift in Sources */,
 				5B061DB330597400005C6603 /* TabHeaderView.swift in Sources */,
+				5B4D22932FF8C202004B8356 /* HeaderGlassButton.swift in Sources */,
 				5BEC058D30487B4E00BFC3FA /* PlaybackPCMMonitoring.swift in Sources */,
 				5B40F405302DFC240025693E /* CoverViewModel.swift in Sources */,
 				5BF3AF003041A48B008193AC /* View+customNavigationTitle.swift in Sources */,

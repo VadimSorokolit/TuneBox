@@ -90,9 +90,7 @@ struct BrowseView: View {
                     })
                     .disabled(transferManagingVM.inProgressPausedTracksCount == .zero)
                 } label: {
-                    Image(systemName: "xmark.circle")
-                        .symbolRenderingMode(.hierarchical)
-                        .font(.system(size: 30, weight: .ultraLight))
+                    HeaderGlassButton(systemName: "xmark")
                 }
                 .disabled(
                     transferManagingVM.inProgressActiveTracksCount == .zero
@@ -101,7 +99,7 @@ struct BrowseView: View {
                 .opacity(
                     transferManagingVM.inProgressActiveTracksCount == .zero
                     && transferManagingVM.inProgressPausedTracksCount == .zero
-                    ? 0.5
+                    ? 0.2
                     : 1
                 )
             }
@@ -157,11 +155,12 @@ struct BrowseView: View {
                 }
             }
             .padding(.top, 10)
-            .bottomContentMargin(0,
-                                 0,
-                                 isPlayerVisible: playerVM.isPlayerVisible,
-                                 isPlaying: playerVM.isPlaying,
-                                 isTabBarVisible: rootTabsVM.isTabBarVisible
+            .bottomContentMargin(
+                0,
+                0,
+                isPlayerVisible: playerVM.isPlayerVisible,
+                isPlaying: playerVM.isPlaying,
+                isTabBarVisible: rootTabsVM.isTabBarVisible
             )
             .refreshable {
                 await transferManagingVM.refreshBrowse()

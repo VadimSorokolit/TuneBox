@@ -123,8 +123,7 @@ struct ImportsView: View {
                     Button(action: {
                         importManagingVM.finishEditSections()
                         }, label: {
-                            Image(systemName: "checkmark")
-                                .headerGlassButton()
+                            HeaderGlassButton(systemName: "checkmark")
                         }
                     )
                 } else {
@@ -149,8 +148,7 @@ struct ImportsView: View {
                             Label("License", systemImage: "checkmark.seal.fill")
                         })
                     } label: {
-                        Image(systemName: "ellipsis")
-                            .headerGlassButton()
+                        HeaderGlassButton(systemName: "ellipsis")
                     }
                     .disabled(isMenuButtonDisabled)
                     .opacity(isMenuButtonDisabled ? 0 : 1)

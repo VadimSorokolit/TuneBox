@@ -112,8 +112,7 @@ struct DownloadsView: View {
                             .tag(TracksType.downloaded)
                     }
                 } label: {
-                    Image(systemName: "line.3.horizontal.decrease")
-                        .headerGlassButton()
+                    HeaderGlassButton(systemName: "line.3.horizontal.decrease")
                 }
             }
         }
