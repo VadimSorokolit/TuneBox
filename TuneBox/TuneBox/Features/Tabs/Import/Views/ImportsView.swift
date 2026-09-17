@@ -124,10 +124,7 @@ struct ImportsView: View {
                         importManagingVM.finishEditSections()
                         }, label: {
                             Image(systemName: "checkmark")
-                                .font(.system(size: imageFontSize, weight: .medium))
-                                .foregroundStyle(Color.black.opacity(foregroundOpacity))
-                                .frame(size: imageSize)
-                                .glassEffect(in: .circle)
+                                .headerGlassButton()
                         }
                     )
                 } else {
@@ -153,24 +150,16 @@ struct ImportsView: View {
                         })
                     } label: {
                         Image(systemName: "ellipsis")
-                        .font(.system(size: imageFontSize, weight: .medium))
-                        .foregroundStyle(Color.black.opacity(foregroundOpacity))
-                        .frame(size: imageSize)
-                        .glassEffect(in: .circle)
+                            .headerGlassButton()
                     }
                     .disabled(isMenuButtonDisabled)
                     .opacity(isMenuButtonDisabled ? 0 : 1)
                 }
             }
-            .padding(.horizontal, horizontalPadding)
+            .padding(.horizontal, GlobalConstants.Screen.horizontalInset)
         }
 
-        // MARK: - Propertis. Private
-
-        private let imageFontSize: CGFloat = 20
-        private let imageSize: CGFloat = 44
-        private let horizontalPadding: CGFloat = 26
-        private let foregroundOpacity: Double = 0.6
+        // MARK: - Properties. Private
 
         private var isMenuButtonDisabled: Bool {
             importManagingVM.hasLibrary.isFalse

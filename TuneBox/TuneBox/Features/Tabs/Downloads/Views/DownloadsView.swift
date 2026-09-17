@@ -113,10 +113,7 @@ struct DownloadsView: View {
                     }
                 } label: {
                     Image(systemName: "line.3.horizontal.decrease")
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundStyle(Color.black.opacity(0.6))
-                        .frame(size: 44)
-                        .glassEffect(in: .circle)
+                        .headerGlassButton()
                 }
             }
         }

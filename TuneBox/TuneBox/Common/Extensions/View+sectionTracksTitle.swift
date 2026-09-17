@@ -17,7 +17,7 @@ extension View {
         foregroundStyle: Color = Color(.label),
         topPadding: CGFloat = 10,
         bottomPadding: CGFloat = 10,
-        horizontalPadding: CGFloat = 26,
+        horizontalPadding: CGFloat = GlobalConstants.Screen.horizontalInset,
         hasSeparator: Bool = false
     ) -> some View {
         VStack(spacing: 6) {

@@ -35,7 +35,7 @@ struct TabHeaderView<Trailing: View>: View {
 
             trailing
         }
-        .padding(.horizontal, horizontalPadding)
+        .padding(.horizontal, GlobalConstants.Screen.horizontalInset)
     }
 
     // MARK: - Properties. Private
@@ -43,7 +43,6 @@ struct TabHeaderView<Trailing: View>: View {
     @Environment(\.themeManager) private var theme
 
     private let trailing: Trailing
-    private let horizontalPadding: CGFloat = 26
 }
 
 extension TabHeaderView where Trailing == EmptyView {

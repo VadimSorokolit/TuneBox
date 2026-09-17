@@ -51,7 +51,7 @@ struct PlaylistCell: View {
                 .fill(Color.gray.opacity(0.2))
                 .frame(height: 1)
                 .padding(.leading, 60)
-                .padding(.trailing, 26)
+                .padding(.trailing, GlobalConstants.Screen.horizontalInset)
         }
         .padding(.top, 5)
         .frame(maxWidth: .infinity)

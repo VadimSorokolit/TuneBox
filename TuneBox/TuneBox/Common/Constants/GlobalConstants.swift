@@ -20,6 +20,16 @@ enum GlobalConstants {
     enum Screen {
         static let regularWidth: CGFloat = 393
         static let defaultHeight: CGFloat = 60
+        static let horizontalInset: CGFloat = 26
+    }
+
+    enum HeaderButton {
+        static let size: CGFloat = 44
+        static let fontSize: CGFloat = 20
+        static let foregroundOpacity: Double = 0.6
+
+        static let font: Font = .system(size: fontSize, weight: .medium)
+        static let foregroundStyle = Color.black.opacity(foregroundOpacity)
     }
 
     enum CompactPlayer {

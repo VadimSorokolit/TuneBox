@@ -52,7 +52,7 @@ struct NumberedTrackCell: View {
                     .font(.system(size: 14, weight: .light))
                     .foregroundStyle(.gray)
             }
-            .padding(.horizontal, 26)
+            .padding(.horizontal, GlobalConstants.Screen.horizontalInset)
             .padding(.vertical, 2)
 
             Rectangle()
@@ -62,7 +62,7 @@ struct NumberedTrackCell: View {
                 )
                 .frame(height: 1)
                 .padding(.leading, 65)
-                .padding(.trailing, 26)
+                .padding(.trailing, GlobalConstants.Screen.horizontalInset)
         }
         .padding(.top, 14)
         .frame(maxWidth: .infinity)

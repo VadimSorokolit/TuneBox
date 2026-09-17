@@ -178,13 +178,13 @@ struct LibraryMenuCell: View {
                 }
             }
             .frame(maxWidth: .infinity)
-            .padding(.horizontal, 26)
+            .padding(.horizontal, GlobalConstants.Screen.horizontalInset)
 
             Rectangle()
                 .fill(Color.gray.opacity(0.2))
                 .frame(height: 1)
                 .padding(.leading, 58)
-                .padding(.trailing, 26)
+                .padding(.trailing, GlobalConstants.Screen.horizontalInset)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }

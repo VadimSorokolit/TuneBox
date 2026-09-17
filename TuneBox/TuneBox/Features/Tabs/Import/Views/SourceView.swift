@@ -194,7 +194,7 @@ struct SourceView: View {
                         .font(.system(size: 13, weight: .medium))
                 }
             }
-            .padding(.horizontal, 26)
+            .padding(.horizontal, GlobalConstants.Screen.horizontalInset)
 
             Rectangle()
                 .fill(hidesSeparator
@@ -203,7 +203,7 @@ struct SourceView: View {
                 )
                 .frame(height: 1)
                 .padding(.leading, 58)
-                .padding(.trailing, 26)
+                .padding(.trailing, GlobalConstants.Screen.horizontalInset)
         }
         .padding(.top, 15)
         .frame(maxWidth: .infinity)
