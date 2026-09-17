@@ -416,7 +416,9 @@ struct CompactPlayerView: View {
                 )
                 .onChange(of: isSeekDisabled) { _, disabled in
                     guard disabled, isPressed else { return }
-                    endPress()
+                    holdTask?.cancel()
+                    holdTask = nil
+                    didEnterHold = true
                 }
                 .onDisappear {
                     endPress()
@@ -436,10 +438,14 @@ struct CompactPlayerView: View {
         // MARK: - Private. Methods
 
         private func beginPress() {
+            guard isPressed.isFalse else { return }
             guard holdTask == nil else { return }
 
             isPressed = true
             didEnterHold = false
+            if isSeekDisabled.isFalse {
+                onSeekHoldChanged(true, direction)
+            }
             holdTask = Task { @MainActor in
                 do {
                     try await Task.sleep(nanoseconds: holdDelayNanoseconds)
@@ -448,12 +454,12 @@ struct CompactPlayerView: View {
                 }
 
                 guard !Task.isCancelled else { return }
+                didEnterHold = true
                 guard isSeekDisabled.isFalse else { return }
 
-                didEnterHold = true
-                onSeekHoldChanged(true, direction)
-
                 while !Task.isCancelled {
+                    guard isSeekDisabled.isFalse else { return }
+
                     onSeek(direction * holdStepSeconds)
                     do {
                         try await Task.sleep(nanoseconds: holdTickNanoseconds)
@@ -472,11 +478,10 @@ struct CompactPlayerView: View {
 
             guard wasPressed else { return }
 
-            if wasHolding {
-                onSeekHoldChanged(false, direction)
-            } else {
-                onSkip()
-            }
+            onSeekHoldChanged(false, direction)
+
+            guard wasHolding.isFalse else { return }
+            onSkip()
         }
 
         private func cancelHold() {
@@ -547,13 +552,13 @@ struct CompactPlayerView: View {
                     set: onRepeatModeChange
                 )
             ) {
-                Text("Repeat One")
-                    .tag(RepeatMode.one)
+                Text("No Repeat").tag(RepeatMode.off)
 
                 Text("Repeat All")
                     .tag(RepeatMode.all)
 
-                Text("No Repeat").tag(RepeatMode.off)
+                Text("Repeat One")
+                    .tag(RepeatMode.one)
             }
 
             Divider()

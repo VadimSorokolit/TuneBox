@@ -58,6 +58,7 @@ final class AudioService: NSObject, AudioServicing {
         self.ignoreAutomaticResumeUntil = .distantPast
         self.allowEnginePlaybackRestore()
 
+        self.silenceOutput()
         self.detachEqualizerTap(resetSpectrum: isNewTrack)
         self.stopProgressTimer()
         self.currentTrackId = trackId
@@ -79,7 +80,6 @@ final class AudioService: NSObject, AudioServicing {
             }
 
             self.silenceOutput()
-            self.applyVolume()
             self.attachSpectrumIfNeeded()
             self.unfreezeSpectrumAfterRestore()
             self.isPausedDueToRouteChange = false
@@ -88,6 +88,7 @@ final class AudioService: NSObject, AudioServicing {
             self.startProgressTimer()
             self.refreshFormatInfo(for: url)
             self.refreshNowPlayingElapsed()
+            self.scheduleUnmute()
         } catch {
             AppLogger.audio.error("Failed to play audio: \(error.localizedDescription)")
             self.notifyStateChange(false)
@@ -107,6 +108,7 @@ final class AudioService: NSObject, AudioServicing {
             self.captureProgress()
         }
 
+        self.silenceOutput()
         _ = self.player.pause()
         self.equalizerService.setPlaybackActive(false)
         self.stopProgressTimer()
@@ -120,9 +122,11 @@ final class AudioService: NSObject, AudioServicing {
         self.allowEnginePlaybackRestore()
         self.endSeekScrubbingIfNeeded()
         self.activateAudioSession()
+        self.silenceOutput()
 
         if self.player.isPlaying {
             self.restoreProgressIfNeeded()
+            self.scheduleUnmute()
             return
         }
 
@@ -134,6 +138,7 @@ final class AudioService: NSObject, AudioServicing {
             self.notifyStateChange(true)
             self.refreshNowPlayingElapsed()
             self.restoreProgressIfNeeded()
+            self.scheduleUnmute()
             return
         }
 
@@ -166,8 +171,11 @@ final class AudioService: NSObject, AudioServicing {
     func restartCurrentTrack() {
         guard let url = self.currentURL, let trackId = self.currentTrackId else { return }
 
+        self.silenceOutput()
+
         if self.player.seek(position: 0) {
             self.notifyProgress(0)
+            self.scheduleUnmute()
 
             if self.player.isPlaying {
                 self.refreshNowPlayingElapsed()
@@ -230,11 +238,10 @@ final class AudioService: NSObject, AudioServicing {
         guard self.isSeekScrubbing != isScrubbing else { return }
 
         if isScrubbing {
+            self.silenceOutput()
             self.wasPlayingBeforeScrub = self.player.isPlaying
             self.isSeekScrubbing = true
             self.equalizerService.holdUpdates()
-            self.pauseForSeekScrubbingIfNeeded()
-            self.applyVolume()
             return
         }
 
@@ -368,6 +375,8 @@ final class AudioService: NSObject, AudioServicing {
     private var routeWatchTimer: Timer?
     private var lastOutputRouteSignature = ""
     private var isAudioSessionActive = false
+    private var unmuteWorkItem: DispatchWorkItem?
+    private var outputSilenceGeneration = 0
     private let audioSessionQueue = DispatchQueue(
         label: "com.tunebox.audio-session",
         qos: .userInitiated
@@ -380,6 +389,7 @@ final class AudioService: NSObject, AudioServicing {
     private static let progressRestoreRetryCount = 24
     private static let progressRestoreMaxRounds = 3
     private static let restoreUnmuteDelay: TimeInterval = 0.08
+    private static let skipUnmuteDelay: TimeInterval = 0.12
     private static let userPlaybackRouteGrace: TimeInterval = 1.0
     private static let automaticResumeIgnoreDuration: TimeInterval = 1.5
     private static let progressCaptureFloor: TimeInterval = 0.05
@@ -522,9 +532,31 @@ final class AudioService: NSObject, AudioServicing {
     }
 
     private func silenceOutput() {
+        self.outputSilenceGeneration += 1
+        self.unmuteWorkItem?.cancel()
+        self.unmuteWorkItem = nil
         self.player.modifyProcessingGraph { engine in
             engine.mainMixerNode.outputVolume = 0
         }
+    }
+
+    private func scheduleUnmute() {
+        self.unmuteWorkItem?.cancel()
+
+        let generation = self.outputSilenceGeneration
+        let work = DispatchWorkItem { [weak self] in
+            guard let self else { return }
+            guard generation == self.outputSilenceGeneration else { return }
+            guard self.isSeekScrubbing.isFalse, self.isRestoringPlayback.isFalse else { return }
+            guard self.player.isPlaying else { return }
+            self.applyVolume()
+        }
+
+        self.unmuteWorkItem = work
+        DispatchQueue.main.asyncAfter(
+            deadline: .now() + Self.skipUnmuteDelay,
+            execute: work
+        )
     }
 
     private func attachSpectrumIfNeeded() {
@@ -957,14 +989,6 @@ final class AudioService: NSObject, AudioServicing {
         self.player.modifyProcessingGraph { engine in
             engine.mainMixerNode.outputVolume = volume
         }
-    }
-
-    private func pauseForSeekScrubbingIfNeeded() {
-        guard self.player.isPlaying else { return }
-
-        _ = self.player.pause()
-        self.equalizerService.setPlaybackActive(false)
-        self.stopProgressTimer()
     }
 
     private func endSeekScrubbingIfNeeded() {

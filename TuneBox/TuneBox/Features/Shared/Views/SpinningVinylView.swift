@@ -12,6 +12,8 @@ struct SpinningVinylView: View, Equatable {
 
     // MARK: - Properties. Public
 
+    @State private var coverImage: UIImage?
+
     let track: TrackEntity
     let isPlaying: Bool
     let isLoading: Bool
@@ -82,6 +84,7 @@ struct SpinningVinylView: View, Equatable {
         ZStack {
             VinylIdlePlate(
                 track: track,
+                coverImage: coverImage,
                 isLoading: isLoading,
                 vinylSize: vinylSize,
                 coverSize: coverSize,
@@ -93,21 +96,20 @@ struct SpinningVinylView: View, Equatable {
 
             VinylSpinningDisc(
                 track: track,
+                coverImage: coverImage,
                 isLoading: isLoading,
                 isSpinning: shouldSpin,
+                ignoresSpinGate: isSeekScrubbing || isTapSpinning,
                 spinDirection: spinDirection,
                 spinSpeed: spinSpeed,
                 revolutionDuration: revolutionDuration,
+                visibleSize: visibleSize,
                 vinylSize: vinylSize,
                 coverSize: coverSize,
                 holeSize: holeSize
             )
             .equatable()
             .frame(size: vinylSize)
-            .mask {
-                Circle()
-                    .frame(size: visibleSize)
-            }
         }
         .frame(size: vinylSize)
         .contentShape(Circle())
@@ -115,6 +117,10 @@ struct SpinningVinylView: View, Equatable {
             onTap?()
         }
         .transaction { $0.animation = nil }
+        .task(id: track.imagePath) {
+            self.coverImage = nil
+            self.coverImage = await CoverImageLoader.image(for: track.imagePath)
+        }
     }
 
     // MARK: - Properties. Private
@@ -133,6 +139,7 @@ struct SpinningVinylView: View, Equatable {
 private struct VinylIdlePlate: View, Equatable {
 
     let track: TrackEntity
+    let coverImage: UIImage?
     let isLoading: Bool
     let vinylSize: CGFloat
     let coverSize: CGFloat
@@ -141,6 +148,7 @@ private struct VinylIdlePlate: View, Equatable {
     static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.track.id == rhs.track.id
             && lhs.track.imagePath == rhs.track.imagePath
+            && lhs.coverImage === rhs.coverImage
             && lhs.isLoading == rhs.isLoading
             && lhs.vinylSize == rhs.vinylSize
             && lhs.coverSize == rhs.coverSize
@@ -150,6 +158,7 @@ private struct VinylIdlePlate: View, Equatable {
     var body: some View {
         VinylPlateView(
             track: track,
+            coverImage: coverImage,
             isLoading: isLoading,
             vinylImageSize: vinylSize,
             coverImageSize: coverSize,
@@ -164,11 +173,14 @@ private struct VinylIdlePlate: View, Equatable {
 private struct VinylSpinningDisc: View, Equatable {
 
     let track: TrackEntity
+    let coverImage: UIImage?
     let isLoading: Bool
     let isSpinning: Bool
+    let ignoresSpinGate: Bool
     let spinDirection: Double
     let spinSpeed: Double
     let revolutionDuration: TimeInterval
+    let visibleSize: CGFloat
     let vinylSize: CGFloat
     let coverSize: CGFloat
     let holeSize: CGFloat
@@ -176,11 +188,14 @@ private struct VinylSpinningDisc: View, Equatable {
     static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.track.id == rhs.track.id
             && lhs.track.imagePath == rhs.track.imagePath
+            && lhs.coverImage === rhs.coverImage
             && lhs.isLoading == rhs.isLoading
             && lhs.isSpinning == rhs.isSpinning
+            && lhs.ignoresSpinGate == rhs.ignoresSpinGate
             && lhs.spinDirection == rhs.spinDirection
             && lhs.spinSpeed == rhs.spinSpeed
             && lhs.revolutionDuration == rhs.revolutionDuration
+            && lhs.visibleSize == rhs.visibleSize
             && lhs.vinylSize == rhs.vinylSize
             && lhs.coverSize == rhs.coverSize
             && lhs.holeSize == rhs.holeSize
@@ -189,14 +204,17 @@ private struct VinylSpinningDisc: View, Equatable {
     var body: some View {
         VinylSpinHost(
             isSpinning: isSpinning,
+            ignoresSpinGate: ignoresSpinGate,
             direction: spinDirection,
             speed: spinSpeed,
             revolutionDuration: revolutionDuration,
+            visibleSize: visibleSize,
             size: vinylSize,
             contentKey: self.contentKey
         ) {
             VinylPlateView(
                 track: track,
+                coverImage: coverImage,
                 isLoading: isLoading,
                 vinylImageSize: vinylSize,
                 coverImageSize: coverSize,
@@ -207,7 +225,7 @@ private struct VinylSpinningDisc: View, Equatable {
     }
 
     private var contentKey: String {
-        "\(track.id)|\(track.imagePath ?? "")|\(isLoading)|\(vinylSize)|\(coverSize)|\(holeSize)"
+        "\(track.id)|\(track.imagePath ?? "")|\(coverImage != nil)|\(isLoading)|\(vinylSize)|\(coverSize)|\(holeSize)"
     }
 }
 
@@ -221,9 +239,11 @@ private struct VinylSpinHost<Content: View>: UIViewRepresentable {
     // MARK: - Properties. Public
 
     var isSpinning: Bool
+    var ignoresSpinGate: Bool
     var direction: Double
     var speed: Double
     var revolutionDuration: TimeInterval
+    var visibleSize: CGFloat
     var size: CGFloat
     var contentKey: String
     @ViewBuilder var content: () -> Content
@@ -233,9 +253,11 @@ private struct VinylSpinHost<Content: View>: UIViewRepresentable {
     func makeUIView(context: Context) -> VinylSpinContainer {
         let view = VinylSpinContainer()
         view.vinylSize = self.size
+        view.visibleDiameter = self.visibleSize
         view.setContent(self.content(), identity: self.contentKey)
         view.applySpin(
             isSpinning: self.isSpinning,
+            ignoresSpinGate: self.ignoresSpinGate,
             direction: self.direction,
             speed: self.speed,
             duration: self.revolutionDuration
@@ -245,9 +267,11 @@ private struct VinylSpinHost<Content: View>: UIViewRepresentable {
 
     func updateUIView(_ uiView: VinylSpinContainer, context: Context) {
         uiView.vinylSize = self.size
+        uiView.visibleDiameter = self.visibleSize
         uiView.setContent(self.content(), identity: self.contentKey)
         uiView.applySpin(
             isSpinning: self.isSpinning,
+            ignoresSpinGate: self.ignoresSpinGate,
             direction: self.direction,
             speed: self.speed,
             duration: self.revolutionDuration
@@ -266,7 +290,15 @@ private final class VinylSpinContainer: UIView {
             guard self.vinylSize != oldValue else { return }
             self.invalidateIntrinsicContentSize()
             self.applyCircleMask()
+            self.updateShrinkMask()
             self.renderPlateIfNeeded()
+        }
+    }
+
+    var visibleDiameter: CGFloat = 0 {
+        didSet {
+            guard self.visibleDiameter != oldValue else { return }
+            self.updateShrinkMask()
         }
     }
 
@@ -286,6 +318,9 @@ private final class VinylSpinContainer: UIView {
         self.spinHost.translatesAutoresizingMaskIntoConstraints = false
         self.spinHost.clipsToBounds = true
         self.addSubview(self.spinHost)
+
+        self.shrinkMask.fillColor = UIColor.white.cgColor
+        self.layer.mask = self.shrinkMask
 
         self.plateView.contentMode = .scaleAspectFit
         self.plateView.backgroundColor = .clear
@@ -344,6 +379,7 @@ private final class VinylSpinContainer: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         self.applyCircleMask()
+        self.updateShrinkMask()
         self.updateRasterizationScale()
 
         if self.plateView.image == nil {
@@ -365,20 +401,24 @@ private final class VinylSpinContainer: UIView {
 
     func applySpin(
         isSpinning: Bool,
+        ignoresSpinGate: Bool,
         direction: Double,
         speed: Double,
         duration: TimeInterval
     ) {
         self.lastRequestedSpinning = isSpinning && speed != 0 && duration > 0
-        self.lastDirection = direction
-        self.lastSpeed = speed
-        self.lastDuration = duration
+        self.lastIgnoresSpinGate = ignoresSpinGate
 
-        if VinylSpinGate.isAllowed {
+        let gateOK = VinylSpinGate.isAllowed || ignoresSpinGate
+
+        if gateOK {
             self.suppressSpinUntilStopped = false
         } else if self.lastRequestedSpinning {
             self.suppressSpinUntilStopped = true
             self.lastSpinning = false
+            self.lastDirection = direction
+            self.lastSpeed = speed
+            self.lastDuration = duration
             _ = self.haltSpinAnimation()
             return
         }
@@ -386,6 +426,9 @@ private final class VinylSpinContainer: UIView {
         if self.suppressSpinUntilStopped {
             if self.lastRequestedSpinning {
                 self.lastSpinning = false
+                self.lastDirection = direction
+                self.lastSpeed = speed
+                self.lastDuration = duration
                 _ = self.haltSpinAnimation()
                 return
             }
@@ -393,8 +436,15 @@ private final class VinylSpinContainer: UIView {
             self.suppressSpinUntilStopped = false
         }
 
-        let spinning = self.lastRequestedSpinning && VinylSpinGate.isAllowed
+        let spinning = self.lastRequestedSpinning && gateOK
         let sameParams = self.lastSpinning == spinning
+            && self.lastDirection == direction
+            && self.lastSpeed == speed
+            && self.lastDuration == duration
+
+        self.lastDirection = direction
+        self.lastSpeed = speed
+        self.lastDuration = duration
 
         guard sameParams.isFalse else { return }
 
@@ -409,10 +459,12 @@ private final class VinylSpinContainer: UIView {
 
     private func startSpinIfRequested() {
         self.suppressSpinUntilStopped = false
-        guard self.lastRequestedSpinning, VinylSpinGate.isAllowed else { return }
+        guard self.lastRequestedSpinning else { return }
+        guard VinylSpinGate.isAllowed || self.lastIgnoresSpinGate else { return }
 
         self.applySpin(
             isSpinning: true,
+            ignoresSpinGate: self.lastIgnoresSpinGate,
             direction: self.lastDirection,
             speed: self.lastSpeed,
             duration: self.lastDuration
@@ -439,6 +491,7 @@ private final class VinylSpinContainer: UIView {
     @objc
     private func handleSpinGateTick() {
         guard VinylSpinGate.isAllowed.isFalse else { return }
+        guard self.lastIgnoresSpinGate.isFalse else { return }
         self.stopSpinImmediately()
     }
 
@@ -490,6 +543,7 @@ private final class VinylSpinContainer: UIView {
 
     private let spinHost = UIView()
     private let plateView = UIImageView()
+    private let shrinkMask = CAShapeLayer()
     private var pendingPlate: AnyView?
     private var contentIdentity: String?
     private var routePauseObserver: NSObjectProtocol?
@@ -497,6 +551,7 @@ private final class VinylSpinContainer: UIView {
     private var displayLink: CADisplayLink?
     private var suppressSpinUntilStopped = false
     private var lastRequestedSpinning = false
+    private var lastIgnoresSpinGate = false
     private var lastSpinning = false
     private var lastDirection: Double = 1
     private var lastSpeed: Double = 1
@@ -510,8 +565,23 @@ private final class VinylSpinContainer: UIView {
     private func applyCircleMask() {
         let side = min(self.bounds.width, self.bounds.height)
         let radius = (side > 0 ? side : self.vinylSize) / 2
-        self.layer.cornerRadius = radius
+        guard self.spinHost.layer.cornerRadius != radius else { return }
         self.spinHost.layer.cornerRadius = radius
+    }
+
+    private func updateShrinkMask() {
+        let boundsSize = self.bounds.width > 0 ? self.bounds.width : self.vinylSize
+        guard boundsSize > 0 else { return }
+
+        let diameter = min(max(self.visibleDiameter > 0 ? self.visibleDiameter : boundsSize, 0), boundsSize)
+        let origin = (boundsSize - diameter) / 2
+        let rect = CGRect(x: origin, y: origin, width: diameter, height: diameter)
+
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        self.shrinkMask.frame = CGRect(origin: .zero, size: CGSize(width: boundsSize, height: boundsSize))
+        self.shrinkMask.path = CGPath(ellipseIn: rect, transform: nil)
+        CATransaction.commit()
     }
 
     private func updateRasterizationScale() {

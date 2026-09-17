@@ -13,6 +13,7 @@ struct CoverView: View {
     // MARK: - Properties. Public
 
     let coverPath: String?
+    let image: UIImage?
     let size: CGFloat
     let cornerRadius: CGFloat
     let placeholderOpacity: Double
@@ -22,12 +23,14 @@ struct CoverView: View {
 
     init(
         coverPath: String?,
+        image: UIImage? = nil,
         size: CGFloat,
         cornerRadius: CGFloat,
         placeholderOpacity: Double = 0.2,
         onTap: (() -> Void)? = nil
     ) {
         self.coverPath = coverPath
+        self.image = image
         self.size = size
         self.cornerRadius = cornerRadius
         self.placeholderOpacity = placeholderOpacity
@@ -54,9 +57,11 @@ struct CoverView: View {
 
     @ViewBuilder
     private var content: some View {
-        if isRemoteURL(coverPath),
-           let path = coverPath,
-           let url = URL(string: path) {
+        if let image {
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFill()
+        } else if let url = self.remoteURL(from: coverPath) {
             WebImage(url: url) { image in
                 image
                     .resizable()
@@ -94,9 +99,14 @@ struct CoverView: View {
 
     // MARK: - Methods. Private
 
-    private func isRemoteURL(_ path: String?) -> Bool {
-        guard let path else { return false }
+    private func remoteURL(from path: String?) -> URL? {
+        guard let path, path.isNotEmpty else { return nil }
 
-        return path.hasPrefix("http://") || path.hasPrefix("https://")
+        let normalized = path.replacingOccurrences(of: "\\/", with: "/")
+        guard normalized.hasPrefix("http://") || normalized.hasPrefix("https://") else {
+            return nil
+        }
+
+        return URL(string: normalized)
     }
 }

@@ -12,6 +12,7 @@ struct VinylPlateView: View {
     // MARK: - Properties. Public
 
     let track: TrackEntity
+    let coverImage: UIImage?
     let isLoading: Bool
     let vinylImageSize: CGFloat
     let coverImageSize: CGFloat
@@ -23,6 +24,7 @@ struct VinylPlateView: View {
 
     init(
         track: TrackEntity,
+        coverImage: UIImage? = nil,
         isLoading: Bool,
         vinylImageSize: CGFloat,
         coverImageSize: CGFloat,
@@ -31,6 +33,7 @@ struct VinylPlateView: View {
         onTap: (() -> Void)? = nil
     ) {
         self.track = track
+        self.coverImage = coverImage
         self.isLoading = isLoading
         self.vinylImageSize = vinylImageSize
         self.coverImageSize = coverImageSize
@@ -50,6 +53,7 @@ struct VinylPlateView: View {
 
             CoverView(
                 coverPath: track.imagePath,
+                image: coverImage,
                 size: coverImageSize,
                 cornerRadius: coverImageSize / 2,
                 placeholderOpacity: 1.0

@@ -34,11 +34,34 @@ enum CoverImageLoader {
     private static var currentLoad: Task<Void, Never>?
     private static var currentOperation: (any SDWebImageOperation)?
 
+    static func image(for path: String?) async -> UIImage? {
+        guard let url = self.imageURL(for: path) else { return nil }
+
+        if url.isFileURL {
+            return await Task.detached(priority: .userInitiated) {
+                UIImage(contentsOfFile: url.path)
+            }.value
+        }
+
+        return await withCheckedContinuation { continuation in
+            SDWebImageManager.shared.loadImage(
+                with: url,
+                options: [.highPriority, .retryFailed],
+                progress: nil
+            ) { image, _, _, _, finished, _ in
+                guard finished else { return }
+                continuation.resume(returning: image)
+            }
+        }
+    }
+
     private static func imageURL(for path: String?) -> URL? {
         guard let path, path.isNotEmpty else { return nil }
 
-        if path.hasPrefix("http://") || path.hasPrefix("https://") {
-            return URL(string: path)
+        let normalized = path.replacingOccurrences(of: "\\/", with: "/")
+
+        if normalized.hasPrefix("http://") || normalized.hasPrefix("https://") {
+            return URL(string: normalized)
         }
 
         return AudioMetadataService.coverURL(for: path)

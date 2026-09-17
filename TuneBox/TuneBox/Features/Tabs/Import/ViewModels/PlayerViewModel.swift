@@ -690,11 +690,12 @@ final class PlayerViewModel: PlayerManaging {
 
         if reachedEnd {
             self.progress = 1
-        } else if reachedStart {
+        } else {
             self.progress = 0
         }
 
-        self.setSeekScrubbing(false)
+        self.cancelVinylTapSpin()
+        self.vinylSpinSpeed = 0
     }
 
     private func handleTrackFinished() {
