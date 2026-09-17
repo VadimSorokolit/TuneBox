@@ -169,7 +169,7 @@ struct ImportsView: View {
 
         private let imageFontSize: CGFloat = 20
         private let imageSize: CGFloat = 44
-        private let horizontalPadding: CGFloat = 20
+        private let horizontalPadding: CGFloat = 26
         private let foregroundOpacity: Double = 0.6
 
         private var isMenuButtonDisabled: Bool {

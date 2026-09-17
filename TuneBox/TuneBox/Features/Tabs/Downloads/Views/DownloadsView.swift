@@ -98,31 +98,25 @@ struct DownloadsView: View {
         var body: some View {
             TabHeaderView(title: "Library") {
                 Menu {
-                    Button(action: {
-                        transferManagingVM.setType(.active)
-                    }, label: {
-                        Label(
-                            "Active Downloads",
-                            systemImage: transferManagingVM.selectedTracksType == .active
-                            ? "checkmark"
-                            : ""
+                    Picker(
+                        "Library",
+                        selection: Binding(
+                            get: { transferManagingVM.selectedTracksType },
+                            set: { transferManagingVM.setType($0) }
                         )
-                    })
+                    ) {
+                        Text("Active Downloads")
+                            .tag(TracksType.active)
 
-                    Button(action: {
-                        transferManagingVM.setType(.downloaded)
-                    }, label: {
-                        Label(
-                            "Downloaded",
-                            systemImage: transferManagingVM.selectedTracksType == .downloaded
-                            ? "checkmark"
-                            : ""
-                        )
-                    })
+                        Text("Downloaded")
+                            .tag(TracksType.downloaded)
+                    }
                 } label: {
-                    Image(systemName: "line.3.horizontal.decrease.circle")
-                        .font(.system(size: 26))
-                        .foregroundStyle(theme.tokens.browseHeaderText)
+                    Image(systemName: "line.3.horizontal.decrease")
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundStyle(Color.black.opacity(0.6))
+                        .frame(size: 44)
+                        .glassEffect(in: .circle)
                 }
             }
         }
