@@ -511,7 +511,9 @@ struct CompactPlayerView: View {
         // MARK: - Body
 
         var body: some View {
-            Button(action: onPlayPauseTap) {
+            Menu {
+                menuContent
+            } label: {
                 Color.clear
                     .frame(width: imageSize)
                     .frame(maxHeight: .infinity)
@@ -522,16 +524,11 @@ struct CompactPlayerView: View {
                             .frame(size: imageSize)
                     }
                     .contentShape(Rectangle())
+            } primaryAction: {
+                onPlayPauseTap()
             }
             .buttonStyle(PressCircleGlassButtonStyle())
-            .contextMenu {
-                menuContent
-            } preview: {
-                Image(systemName: isPlaying ? "pause" : "play")
-                    .foregroundStyle(.tint)
-                    .font(.title3)
-                    .frame(size: imageSize)
-            }
+            .menuIndicator(.hidden)
             .overlay {
                 Text(repeatMode == .one ? "•" : repeatMode == .all ? "••" : "")
                     .foregroundStyle(.blue)

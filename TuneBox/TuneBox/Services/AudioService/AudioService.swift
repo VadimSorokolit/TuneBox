@@ -367,6 +367,11 @@ final class AudioService: NSObject, AudioServicing {
     private var outputWasExternalAtInterruptionBegan = false
     private var routeWatchTimer: Timer?
     private var lastOutputRouteSignature = ""
+    private var isAudioSessionActive = false
+    private let audioSessionQueue = DispatchQueue(
+        label: "com.tunebox.audio-session",
+        qos: .userInitiated
+    )
 
     private static let progressInterval: TimeInterval = 0.1
     private static let endThreshold: TimeInterval = 0.05
@@ -456,13 +461,7 @@ final class AudioService: NSObject, AudioServicing {
     }
 
     private func configureAudioSession() {
-        do {
-            let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playback, mode: .default)
-            try session.setActive(true)
-        } catch {
-            AppLogger.audio.error("Failed to configure audio session: \(error.localizedDescription)")
-        }
+        self.activateAudioSession(forceCategory: true)
     }
 
     private func playDSD(url: URL) throws {
@@ -878,11 +877,50 @@ final class AudioService: NSObject, AudioServicing {
         )
     }
 
-    private func activateAudioSession() {
+    private func activateAudioSession(forceCategory: Bool = false) {
+        self.audioSessionQueue.async { [weak self] in
+            self?.performAudioSessionActivation(forceCategory: forceCategory)
+        }
+    }
+
+    private func performAudioSessionActivation(forceCategory: Bool) {
+        let session = AVAudioSession.sharedInstance()
+        let needsCategory = forceCategory
+            || session.category != .playback
+            || session.mode != .default
+
+        if needsCategory, forceCategory || self.isAudioSessionActive.isFalse {
+            do {
+                try session.setCategory(.playback, mode: .default)
+            } catch {
+                AppLogger.audio.error(
+                    "Failed to configure audio session: \(error.localizedDescription)"
+                )
+            }
+        }
+
+        guard self.isAudioSessionActive.isFalse else { return }
+
+        if #available(iOS 27.0, *) {
+            session.activate(options: []) { [weak self] success, error in
+                if let error {
+                    AppLogger.audio.error(
+                        "Failed to activate audio session: \(error.localizedDescription)"
+                    )
+                }
+
+                self?.runOnMain {
+                    self?.isAudioSessionActive = success
+                }
+            }
+            return
+        }
+
         do {
-            let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playback, mode: .default)
             try session.setActive(true)
+            self.runOnMain {
+                self.isAudioSessionActive = true
+            }
         } catch {
             AppLogger.audio.error(
                 "Failed to activate audio session: \(error.localizedDescription)"
@@ -1199,6 +1237,8 @@ final class AudioService: NSObject, AudioServicing {
 
         switch type {
             case .began:
+                self.isAudioSessionActive = false
+
                 if self.isPausedDueToRouteChange {
                     self.wasPlayingBeforeInterruption = false
                     self.needsEngineRebuild = true
@@ -1265,7 +1305,8 @@ final class AudioService: NSObject, AudioServicing {
     private func handleMediaServicesReset(_ notification: Notification) {
         self.pauseEngineImmediately()
         self.runOnMain {
-            self.activateAudioSession()
+            self.isAudioSessionActive = false
+            self.activateAudioSession(forceCategory: true)
             self.publishPausedForRouteChange()
         }
     }
