@@ -18,7 +18,7 @@ enum BottomLayout {
         base
         - adjustment
         + (isPlayerVisible
-           ? GlobalConstants.CompactPlayer.height(isPlaying: isPlaying)
+           ? GlobalConstants.CompactPlayer.height
            : 0
         )
         + (isTabBarVisible

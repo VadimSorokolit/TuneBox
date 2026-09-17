@@ -33,7 +33,7 @@ struct CompactPlayerView: View {
 
     var body: some View {
         if let track {
-            ZStack(alignment: .trailing) {
+            ZStack(alignment: .topTrailing) {
                 VStack(spacing: 0) {
                     MarqueeText(
                         text: track.songName,
@@ -100,24 +100,15 @@ struct CompactPlayerView: View {
 
                         outputRouteLabel
                     }
-                    .frame(height: 10)
+                    .frame(height: isPlaying ? 10 : 0)
                     .padding(.horizontal, 24)
                     .padding(.top, 5)
-                    .frame(
-                        height: isPlaying ? 15 : 0,
-                        alignment: .top
-                    )
                     .opacity(isPlaying ? 1 : 0)
-                    .scaleEffect(
-                        x: 1,
-                        y: isPlaying ? 1 : 0,
-                        anchor: .top
-                    )
                     .clipped()
                     .allowsHitTesting(false)
                 }
                 .padding(.top, 5)
-                .padding(.bottom, isPlaying ? 10 : 5)
+                .padding(.bottom, 10)
 
                 PlaybackControls(
                     progress: progress,
@@ -134,9 +125,9 @@ struct CompactPlayerView: View {
                     onShuffleToggle: onShuffleToggle
                 )
                 .padding(.trailing, Layout.horizontalPadding)
-                .frame(maxHeight: .infinity)
+                .frame(height: GlobalConstants.CompactPlayer.height)
             }
-            .frame(height: Layout.playerHeight(isPlaying: isPlaying))
+            .frame(height: GlobalConstants.CompactPlayer.height, alignment: .top)
             .glassEffect(
                 in: RoundedRectangle(
                     cornerRadius: 30,
@@ -149,6 +140,13 @@ struct CompactPlayerView: View {
                     style: .continuous
                 )
             )
+            .mask(alignment: .top) {
+                RoundedRectangle(
+                    cornerRadius: 30,
+                    style: .continuous
+                )
+                .frame(height: Layout.playerHeight(isPlaying: isPlaying))
+            }
             .shadow(
                 color: .black.opacity(0.18),
                 radius: 12,

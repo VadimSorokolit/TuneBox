@@ -34,7 +34,7 @@ enum GlobalConstants {
 
     enum CompactPlayer {
         static let height: CGFloat = 101
-        static let pausedHeight: CGFloat = 81
+        static let pausedHeight: CGFloat = 91
         static let bottomPadding: CGFloat = 20
 
         static func height(isPlaying: Bool) -> CGFloat {

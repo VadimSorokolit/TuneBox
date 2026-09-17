@@ -81,7 +81,7 @@ final class RootTabsViewModel: RootTabsManaging {
         base
             + (self.isTabBarVisible ? self.tabBarHeight : 0)
             + (isPlayerVisible
-               ? GlobalConstants.CompactPlayer.height(isPlaying: isPlaying)
+               ? GlobalConstants.CompactPlayer.height
                : 0
             )
     }

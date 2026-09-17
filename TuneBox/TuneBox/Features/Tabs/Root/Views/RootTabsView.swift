@@ -156,8 +156,15 @@ struct RootTabsView: View {
         .onChange(of: settingsVM.isPaywallPresented) { _, presented in
             isPaywallPresented = presented
         }
-        .animation(.easeInOut(duration: 0.25), value: isExpandedPlayerPresented)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+        .animation(
+            .easeInOut(duration: 0.25),
+            value: isExpandedPlayerPresented
+        )
+        .frame(
+            maxWidth: .infinity,
+            maxHeight: .infinity,
+            alignment: .bottom
+        )
         .onAppear {
             restoreSelectedTab()
             playerVM.restoreLastPlaybackSession()
