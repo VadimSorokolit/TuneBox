@@ -134,7 +134,7 @@ final class AudioService: NSObject, AudioServicing {
         self.ignoreAutomaticResumeUntil = .distantPast
         self.allowEnginePlaybackRestore()
         self.endSeekScrubbingIfNeeded()
-        self.activateAudioSession()
+        self.activateAudioSession(forceCategory: true)
         self.silenceOutput()
 
         if self.player.isPlaying {
@@ -401,9 +401,9 @@ final class AudioService: NSObject, AudioServicing {
     private static let progressRestoreRetryInterval: TimeInterval = 0.05
     private static let progressRestoreRetryCount = 24
     private static let progressRestoreMaxRounds = 3
-    private static let restoreUnmuteDelay: TimeInterval = 0.08
     private static let skipUnmuteDelay: TimeInterval = 0.12
-    private static let userPlaybackRouteGrace: TimeInterval = 1.0
+    private static let externalUnmuteDelay: TimeInterval = 0.28
+    private static let userPlaybackRouteGrace: TimeInterval = 2.5
     private static let automaticResumeIgnoreDuration: TimeInterval = 1.5
     private static let progressCaptureFloor: TimeInterval = 0.05
     private static let routeWatchInterval: TimeInterval = 0.03
@@ -440,11 +440,7 @@ final class AudioService: NSObject, AudioServicing {
         let center = MPRemoteCommandCenter.shared()
         center.playCommand.addTarget { [weak self] _ in
             guard let self else { return .commandFailed }
-            guard self.shouldIgnoreAutomaticResume().isFalse else {
-                return .success
-            }
-
-            self.resume()
+            self.handleRemotePlay()
             return .success
         }
         center.pauseCommand.addTarget { [weak self] _ in
@@ -453,16 +449,12 @@ final class AudioService: NSObject, AudioServicing {
         }
         center.togglePlayPauseCommand.addTarget { [weak self] _ in
             guard let self else { return .commandFailed }
-            if self.player.isPlaying {
+            if self.player.isPlaying, self.stateChangeSubject.value {
                 self.pause()
                 return .success
             }
 
-            guard self.shouldIgnoreAutomaticResume().isFalse else {
-                return .success
-            }
-
-            self.resume()
+            self.handleRemotePlay()
             return .success
         }
         center.changePlaybackPositionCommand.addTarget { [weak self] event in
@@ -557,6 +549,7 @@ final class AudioService: NSObject, AudioServicing {
         self.unmuteWorkItem?.cancel()
 
         let generation = self.outputSilenceGeneration
+        let delay = self.hasExternalOutput ? Self.externalUnmuteDelay : Self.skipUnmuteDelay
         let work = DispatchWorkItem { [weak self] in
             guard let self else { return }
             guard generation == self.outputSilenceGeneration else { return }
@@ -567,7 +560,7 @@ final class AudioService: NSObject, AudioServicing {
 
         self.unmuteWorkItem = work
         DispatchQueue.main.asyncAfter(
-            deadline: .now() + Self.skipUnmuteDelay,
+            deadline: .now() + delay,
             execute: work
         )
     }
@@ -844,20 +837,16 @@ final class AudioService: NSObject, AudioServicing {
 
         self.attachSpectrumIfNeeded()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + Self.restoreUnmuteDelay) { [weak self] in
-            guard let self, self.isRestoringPlayback else { return }
+        self.isRestoringPlayback = false
+        self.scheduleUnmute()
+        self.unfreezeSpectrumAfterRestore()
 
-            self.isRestoringPlayback = false
-            self.applyVolume()
-            self.unfreezeSpectrumAfterRestore()
-
-            let progress = self.restoreTargetProgress
-            if progress > 0, progress < 1 {
-                self.savedProgress = progress
-                self.progressSubject.send(progress)
-            }
-            self.refreshNowPlayingElapsed()
+        let progress = self.restoreTargetProgress
+        if progress > 0, progress < 1 {
+            self.savedProgress = progress
+            self.progressSubject.send(progress)
         }
+        self.refreshNowPlayingElapsed()
     }
 
     private func freezeSpectrumForRestore() {
@@ -1105,6 +1094,10 @@ final class AudioService: NSObject, AudioServicing {
 
         guard signature != self.lastOutputRouteSignature else { return }
         self.lastOutputRouteSignature = signature
+        self.checkHeadphonesConnection(
+            outputs: AVAudioSession.sharedInstance().currentRoute.outputs
+        )
+        guard self.hasExternalOutput.isFalse else { return }
         self.pauseForRouteChange()
     }
 
@@ -1142,17 +1135,14 @@ final class AudioService: NSObject, AudioServicing {
         reason: AVAudioSession.RouteChangeReason
     ) -> Bool {
         switch reason {
-            case .oldDeviceUnavailable, .newDeviceAvailable:
+            case .oldDeviceUnavailable:
                 return true
 
             case .routeConfigurationChange:
                 let previous = notification.userInfo?[AVAudioSessionRouteChangePreviousRouteKey]
                     as? AVAudioSessionRouteDescription
                 let hadExternal = previous?.outputs.contains { self.isExternalOutput($0.portType) } ?? false
-                let hasExternal = AVAudioSession.sharedInstance().currentRoute.outputs
-                    .contains { self.isExternalOutput($0.portType) }
-
-                return hadExternal != hasExternal
+                return hadExternal && self.hasExternalOutput.isFalse
 
             default:
                 return false
@@ -1161,6 +1151,15 @@ final class AudioService: NSObject, AudioServicing {
 
     private func shouldIgnoreAutomaticResume() -> Bool {
         self.isPausedDueToRouteChange || Date() < self.ignoreAutomaticResumeUntil
+    }
+
+    private func handleRemotePlay() {
+        self.resume()
+    }
+
+    private var hasExternalOutput: Bool {
+        AVAudioSession.sharedInstance().currentRoute.outputs
+            .contains { self.isExternalOutput($0.portType) }
     }
 
     private var shouldIgnoreRoutePause: Bool {
@@ -1293,10 +1292,10 @@ final class AudioService: NSObject, AudioServicing {
                 }
 
             case .ended:
-                let hasExternal = AVAudioSession.sharedInstance().currentRoute.outputs
-                    .contains { self.isExternalOutput($0.portType) }
+                let hasExternal = self.hasExternalOutput
 
-                if self.outputWasExternalAtInterruptionBegan != hasExternal {
+                if self.outputWasExternalAtInterruptionBegan, hasExternal.isFalse,
+                   self.shouldIgnoreRoutePause.isFalse {
                     self.wasPlayingBeforeInterruption = false
                     self.pauseForRouteChange()
                     return
@@ -1410,7 +1409,8 @@ extension AudioService: AudioPlayer.Delegate {
     func audioPlayer(_ audioPlayer: AudioPlayer, playbackStateChanged playbackState: AudioPlayer.PlaybackState) {
         switch playbackState {
             case .playing:
-                if self.isPausedDueToRouteChange || self.shouldIgnoreAutomaticResume() {
+                if self.shouldIgnoreRoutePause.isFalse,
+                   (self.isPausedDueToRouteChange || self.shouldIgnoreAutomaticResume()) {
                     self.pauseEngineImmediately()
                     self.runOnMain {
                         self.publishPausedForRouteChange()
@@ -1457,23 +1457,14 @@ extension AudioService: AudioPlayer.Delegate {
             outputs: AVAudioSession.sharedInstance().currentRoute.outputs
         )
 
-        if self.isPausedDueToRouteChange {
-            self.pauseEngineImmediately()
-            self.runOnMain {
-                self.pauseForRouteChange()
-            }
-            return
-        }
-
         if Date() < self.ignoreRoutePauseUntil || self.isRestoringPlayback {
             self.runOnMain {
                 self.attachSpectrumIfNeeded()
-                self.applyVolume()
             }
             return
         }
 
-        if hadExternal != hasExternal {
+        if hasExternal.isFalse, self.isPausedDueToRouteChange || hadExternal {
             self.pauseEngineImmediately()
             self.runOnMain {
                 self.pauseForRouteChange()
