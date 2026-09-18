@@ -139,6 +139,7 @@ struct ExpandedPlayerView: View {
                     centers: playerVM.spectrumBandCenters,
                     isActive: playerVM.track != nil
                 )
+                .id(track.id)
                 .frame(height: 140)
                 .padding(.bottom, 2)
 

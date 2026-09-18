@@ -405,13 +405,23 @@ final class PlayerViewModel: PlayerManaging {
     }
 
     func playNext() {
+        if self.repeatMode == .one {
+            self.restartCurrentTrackPlayback()
+            return
+        }
+
         self.advance(direction: .next, autoplay: self.isPlaying)
     }
 
     func playPrevious() {
+        if self.repeatMode == .one {
+            self.restartCurrentTrackPlayback()
+            return
+        }
+
         self.ensureShuffleOrderIfNeeded()
 
-        if self.playbackElapsedTime > Self.restartThreshold {
+        if self.playbackElapsedTime <= Self.restartThreshold {
             self.restartCurrentTrackPlayback()
             return
         }
@@ -511,6 +521,16 @@ final class PlayerViewModel: PlayerManaging {
     }
 
     private var isAtFirstTrack: Bool {
+        self.isAtQueueEdge(offset: 0)
+    }
+
+    private var isAtLastTrack: Bool {
+        let tracks = self.playOrder
+        guard tracks.isNotEmpty else { return true }
+        return self.isAtQueueEdge(offset: tracks.count - 1)
+    }
+
+    private func isAtQueueEdge(offset: Int) -> Bool {
         let tracks = self.playOrder
         guard
             let current = self.track,
@@ -519,7 +539,7 @@ final class PlayerViewModel: PlayerManaging {
             return true
         }
 
-        return index == 0
+        return index == offset
     }
 
     private var playbackElapsedTime: TimeInterval {
@@ -540,6 +560,11 @@ final class PlayerViewModel: PlayerManaging {
         self.clearSeekScrubbing()
         self.audioService.seek(to: 0)
         self.progress = 0
+
+        if self.isPlaying.isFalse {
+            self.equalizerService.reset()
+        }
+
         self.persistPlaybackSession()
     }
 
@@ -703,18 +728,20 @@ final class PlayerViewModel: PlayerManaging {
             case .one:
                 self.audioService.restartCurrentTrack()
 
-            case .all, .off:
+            case .all:
                 self.advance(direction: .next)
+
+            case .off:
+                if self.isAtLastTrack {
+                    self.returnToTrackStartAndPause()
+                } else {
+                    self.advance(direction: .next)
+                }
         }
     }
 
     private func advance(direction: PlaybackDirection, autoplay: Bool = true) {
         self.ensureShuffleOrderIfNeeded()
-
-        if self.repeatMode == .one {
-            self.audioService.restartCurrentTrack()
-            return
-        }
 
         let tracks = self.playOrder
         guard tracks.isNotEmpty else { return }
@@ -740,17 +767,10 @@ final class PlayerViewModel: PlayerManaging {
             return
         }
 
-        switch self.repeatMode {
-            case .all:
-                let wrapped = direction == .next ? 0 : tracks.count - 1
-                self.play(tracks[wrapped], autoplay: autoplay)
+        guard self.repeatMode == .all else { return }
 
-            case .off:
-                self.returnToTrackStartAndPause()
-
-            case .one:
-                self.audioService.restartCurrentTrack()
-        }
+        let wrapped = direction == .next ? 0 : tracks.count - 1
+        self.play(tracks[wrapped], autoplay: autoplay)
     }
 
     private func returnToTrackStartAndPause() {
@@ -774,17 +794,16 @@ final class PlayerViewModel: PlayerManaging {
     private func play(_ track: TrackEntity, autoplay: Bool = true) {
         if autoplay {
             VinylSpinGate.allow()
+        } else {
+            self.equalizerService.reset()
+        }
+
+        if self.track?.id != track.id, self.pendingRestoreProgress == nil {
+            self.progress = 0
         }
 
         self.start(track, using: { trackId, url, _ in
-            if autoplay {
-                self.audioService.play(trackId: trackId, url: url, loop: false)
-            } else {
-                self.audioService.setSeekScrubbing(true)
-                self.audioService.play(trackId: trackId, url: url, loop: false)
-                self.audioService.pause()
-                self.audioService.setSeekScrubbing(false)
-            }
+            self.audioService.play(trackId: trackId, url: url, loop: false, autoplay: autoplay)
         }, reportPlayStart: autoplay)
     }
 

@@ -44,7 +44,7 @@ final class AudioService: NSObject, AudioServicing {
 
     // MARK: - Methods. Public
 
-    func play(trackId: String, url: URL, loop: Bool = false) {
+    func play(trackId: String, url: URL, loop: Bool = false, autoplay: Bool = true) {
         AppLogger.audio.info("AudioService PLAY: \(trackId)")
 
         let isNewTrack = self.currentTrackId != trackId
@@ -56,10 +56,14 @@ final class AudioService: NSObject, AudioServicing {
 
         self.isPausedDueToRouteChange = false
         self.ignoreAutomaticResumeUntil = .distantPast
-        self.allowEnginePlaybackRestore()
+        if autoplay {
+            self.allowEnginePlaybackRestore()
+        } else {
+            self.forbidEnginePlaybackRestore()
+        }
 
         self.silenceOutput()
-        self.detachEqualizerTap(resetSpectrum: isNewTrack)
+        self.detachEqualizerTap(resetSpectrum: isNewTrack || autoplay.isFalse)
         self.stopProgressTimer()
         self.currentTrackId = trackId
         self.currentURL = url
@@ -80,15 +84,24 @@ final class AudioService: NSObject, AudioServicing {
             }
 
             self.silenceOutput()
-            self.attachSpectrumIfNeeded()
-            self.unfreezeSpectrumAfterRestore()
-            self.isPausedDueToRouteChange = false
-            self.ignoreAutomaticResumeUntil = .distantPast
-            self.notifyStateChange(true)
-            self.startProgressTimer()
-            self.refreshFormatInfo(for: url)
-            self.refreshNowPlayingElapsed()
-            self.scheduleUnmute()
+
+            if autoplay {
+                self.attachSpectrumIfNeeded()
+                self.unfreezeSpectrumAfterRestore()
+                self.isPausedDueToRouteChange = false
+                self.ignoreAutomaticResumeUntil = .distantPast
+                self.notifyStateChange(true)
+                self.startProgressTimer()
+                self.refreshFormatInfo(for: url)
+                self.refreshNowPlayingElapsed()
+                self.scheduleUnmute()
+            } else {
+                _ = self.player.pause()
+                self.equalizerService.reset()
+                self.notifyStateChange(false)
+                self.refreshFormatInfo(for: url)
+                self.refreshNowPlayingElapsed()
+            }
         } catch {
             AppLogger.audio.error("Failed to play audio: \(error.localizedDescription)")
             self.notifyStateChange(false)

@@ -60,7 +60,7 @@ final class EqualizerService: EqualizerServicing {
     }
 
     func reset() {
-        self.setProcessEnabled(true)
+        self.processGate.invalidate()
         self.analyzer.reset()
         self.isPlaybackActive = false
         self.isHolding = false

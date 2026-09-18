@@ -47,7 +47,7 @@ protocol AudioServicing: AnyObject {
     var progressSubject: PassthroughSubject<Double, Never> { get }
     var formatInfoSubject: CurrentValueSubject<(source: String, output: String), Never> { get }
 
-    func play(trackId: String, url: URL, loop: Bool)
+    func play(trackId: String, url: URL, loop: Bool, autoplay: Bool)
     func pause()
     func resume()
     func stop()
