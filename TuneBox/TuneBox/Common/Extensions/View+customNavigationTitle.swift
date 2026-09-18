@@ -48,12 +48,13 @@ private struct ImportHomeNavigationLock: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: Host, context: Context) {
-        uiViewController.lock()
+        uiViewController.syncToVisibility()
     }
 
     final class Host: UIViewController {
 
         private var isHomeVisible = false
+        private var isLeavingHome = false
         private var displayLink: CADisplayLink?
         private var scrubUntil: CFTimeInterval = 0
 
@@ -69,19 +70,18 @@ private struct ImportHomeNavigationLock: UIViewControllerRepresentable {
 
         override func viewWillAppear(_ animated: Bool) {
             super.viewWillAppear(animated)
+            isLeavingHome = false
             isHomeVisible = true
-            lock()
-            startScrubbing()
             transitionCoordinator?.animate(alongsideTransition: { [weak self] _ in
-                self?.lock()
+                self?.lockIfHomeIsTop()
             }, completion: { [weak self] context in
                 guard let self else { return }
                 if context.isCancelled {
+                    self.isLeavingHome = true
                     self.isHomeVisible = false
-                    self.stopScrubbing()
-                    self.setBackChromeHidden(false)
+                    self.unlock()
                 } else {
-                    self.lock()
+                    self.lockIfHomeIsTop()
                     self.startScrubbing()
                 }
             })
@@ -89,26 +89,38 @@ private struct ImportHomeNavigationLock: UIViewControllerRepresentable {
 
         override func viewDidAppear(_ animated: Bool) {
             super.viewDidAppear(animated)
+            isLeavingHome = false
             isHomeVisible = true
-            lock()
+            lockIfHomeIsTop()
             startScrubbing()
         }
 
         override func viewDidLayoutSubviews() {
             super.viewDidLayoutSubviews()
-            guard isHomeVisible else { return }
-            lock()
+            lockIfHomeIsTop()
         }
 
         override func viewWillDisappear(_ animated: Bool) {
             super.viewWillDisappear(animated)
+            isLeavingHome = true
             isHomeVisible = false
-            stopScrubbing()
-            navigationController?.interactivePopGestureRecognizer?.isEnabled = true
-            setBackChromeHidden(false)
+            unlock()
+        }
+
+        func syncToVisibility() {
+            if isLeavingHome || isHomeTheTopItem.isFalse {
+                isHomeVisible = false
+                unlock()
+                return
+            }
+
+            isHomeVisible = true
+            lockIfHomeIsTop()
         }
 
         private func startScrubbing() {
+            guard isLeavingHome.isFalse, isHomeVisible, isHomeTheTopItem else { return }
+
             scrubUntil = CACurrentMediaTime() + 0.55
             guard displayLink == nil else { return }
 
@@ -123,16 +135,26 @@ private struct ImportHomeNavigationLock: UIViewControllerRepresentable {
         }
 
         @objc private func scrubFrame() {
-            lock()
+            lockIfHomeIsTop()
             guard CACurrentMediaTime() >= scrubUntil else { return }
             stopScrubbing()
         }
 
-        func lock() {
+        private func lockIfHomeIsTop() {
+            guard isLeavingHome.isFalse, isHomeVisible, isHomeTheTopItem else { return }
+
             navigationController?.interactivePopGestureRecognizer?.isEnabled = false
             navigationItem.hidesBackButton = true
             nearestNavigationItem?.hidesBackButton = true
             setBackChromeHidden(true)
+        }
+
+        private func unlock() {
+            stopScrubbing()
+            navigationController?.interactivePopGestureRecognizer?.isEnabled = true
+            navigationItem.hidesBackButton = false
+            nearestNavigationItem?.hidesBackButton = false
+            setBackChromeHidden(false)
         }
 
         private func setBackChromeHidden(_ hidden: Bool) {
@@ -142,10 +164,16 @@ private struct ImportHomeNavigationLock: UIViewControllerRepresentable {
 
         private func applyBackChromeHidden(_ hidden: Bool, in view: UIView) {
             if isLeftoverBackChrome(view) {
-                view.layer.removeAllAnimations()
-                view.layer.sublayers?.forEach { $0.removeAllAnimations() }
+                // Kill leftover glass only while hiding on Home.
+                // Restoring must keep the incoming back-button animation intact,
+                // otherwise the chevron never draws and the tap does not pop.
+                if hidden {
+                    view.layer.removeAllAnimations()
+                    view.layer.sublayers?.forEach { $0.removeAllAnimations() }
+                }
                 view.isHidden = hidden
                 view.alpha = hidden ? 0 : 1
+                view.isUserInteractionEnabled = !hidden
             }
 
             view.subviews.forEach { applyBackChromeHidden(hidden, in: $0) }
@@ -164,6 +192,26 @@ private struct ImportHomeNavigationLock: UIViewControllerRepresentable {
             // Home has no bar buttons. Hide compact leftover platters even
             // while they are mid-transition, but keep full-width bar chrome.
             return view.bounds.width < 160
+        }
+
+        private var isHomeTheTopItem: Bool {
+            guard let navigationController else { return false }
+
+            if let homeItem = nearestNavigationItem,
+               let topItem = navigationController.topViewController?.navigationItem,
+               homeItem === topItem {
+                return true
+            }
+
+            var current: UIViewController? = self
+            while let controller = current {
+                if controller === navigationController.topViewController {
+                    return true
+                }
+                current = controller.parent
+            }
+
+            return false
         }
 
         private var nearestNavigationItem: UINavigationItem? {
