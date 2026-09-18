@@ -45,7 +45,7 @@ struct CompactPlayerView: View {
                     .allowsHitTesting(false)
 
                     ZStack(alignment: .bottom) {
-                        HStack(spacing: Layout.rowSpacing) {
+                        HStack(alignment: .center, spacing: Layout.rowSpacing) {
                             SpinningVinylView(
                                 track: track,
                                 isPlaying: isPlaying,
@@ -74,16 +74,21 @@ struct CompactPlayerView: View {
                             Text(track.artistName)
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
-                                .lineLimit(1)
-                                .frame(maxWidth: 120, alignment: .leading)
+                                .lineLimit(3)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .frame(
+                                    width: 110,
+                                    height: Layout.vinylSize,
+                                    alignment: .leading
+                                )
                                 .padding(.horizontal, 8)
-                                .padding(.vertical, 14)
                                 .allowsHitTesting(false)
 
                             Spacer()
                         }
                         .padding(.horizontal, Layout.horizontalPadding)
                         .frame(maxWidth: .infinity)
+                        .frame(height: Layout.vinylSize)
 
                         ProgressBar(
                             progress: progress
@@ -780,7 +785,7 @@ struct CompactPlayerView: View {
             image: "https://usercontent.jamendo.com/?type=album&id=24&width=300&trackid=168",
             songName: "Believer Very Very Very Very Very Very Very Very Long Title For Marquee Preview",
             duration: 200,
-            artistName: "Imagine Dragons Dragons",
+            artistName: "Imagine Dragons Dragons Imagine Dragons Dragons Imagine Dragons Dragons Imagine Dragons Dragons",
             albumName: "Evolve",
             releaseDate: "2017-02-01",
             download: nil,
