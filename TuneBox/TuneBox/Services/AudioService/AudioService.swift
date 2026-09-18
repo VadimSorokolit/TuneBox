@@ -1410,7 +1410,7 @@ extension AudioService: AudioPlayer.Delegate {
         switch playbackState {
             case .playing:
                 if self.shouldIgnoreRoutePause.isFalse,
-                   (self.isPausedDueToRouteChange || self.shouldIgnoreAutomaticResume()) {
+                   self.isPausedDueToRouteChange || self.shouldIgnoreAutomaticResume() {
                     self.pauseEngineImmediately()
                     self.runOnMain {
                         self.publishPausedForRouteChange()

@@ -104,15 +104,11 @@ struct PaywallView: View {
         }
 
         private var appIcon: some View {
-            ZStack {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(theme.tokens.accent)
-                    .frame(width: 44, height: 44)
-
-                Image(systemName: "music.note")
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundStyle(.white)
-            }
+            Image(.appIcon)
+                .resizable()
+                .scaledToFit()
+                .cornerRadius(14)
+                .frame(size: 50)
         }
 
         private func monthlySubscriptionSubtitle(for product: Product) -> String {
