@@ -104,7 +104,7 @@ struct PaywallView: View {
         }
 
         private var appIcon: some View {
-            Image(.appIcon)
+            Image(.paywall)
                 .resizable()
                 .scaledToFit()
                 .cornerRadius(14)
