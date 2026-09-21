@@ -117,6 +117,7 @@ final class AudioService: NSObject, AudioServicing {
     }
 
     func pause(captureProgress: Bool) {
+        self.isRestartingCurrentTrack = false
         self.endSeekScrubbingIfNeeded()
         self.forbidEnginePlaybackRestore()
 
@@ -189,6 +190,7 @@ final class AudioService: NSObject, AudioServicing {
         self.forbidEnginePlaybackRestore()
         self.needsEngineRebuild = false
         self.isPinnedToStart = false
+        self.isRestartingCurrentTrack = false
         self.clearSavedProgress()
         self.cancelPendingProgressRestore()
         self.cancelRestore()
@@ -200,26 +202,9 @@ final class AudioService: NSObject, AudioServicing {
     func restartCurrentTrack() {
         guard let url = self.currentURL, let trackId = self.currentTrackId else { return }
 
-        self.silenceOutput()
-
-        if self.player.seek(position: 0) {
-            self.notifyProgress(0)
-            self.scheduleUnmute()
-
-            if self.player.isPlaying {
-                self.refreshNowPlayingElapsed()
-                return
-            }
-
-            if self.player.resume() {
-                self.notifyStateChange(true)
-                self.startProgressTimer()
-                self.refreshNowPlayingElapsed()
-                return
-            }
-        }
-
+        self.isRestartingCurrentTrack = true
         self.pinPlaybackToStart()
+        self.notifyProgress(0)
         self.play(trackId: trackId, url: url, loop: self.shouldLoop)
     }
 
@@ -396,6 +381,7 @@ final class AudioService: NSObject, AudioServicing {
     private var savedProgress: Double = 0
     private var savedProgressTrackId: String?
     private var isPinnedToStart = false
+    private var isRestartingCurrentTrack = false
     private var progressRestoreGeneration = 0
     private var storedVolume: Float = 1.0
     private let spectrumHoldDuration: TimeInterval = 0.3
@@ -681,6 +667,7 @@ final class AudioService: NSObject, AudioServicing {
         if self.isPinnedToStart {
             if self.shouldReleaseStartPin(currentTime: self.player.currentTime) {
                 self.isPinnedToStart = false
+                self.isRestartingCurrentTrack = false
             } else {
                 self.clearSavedProgress()
                 DispatchQueue.main.async {
@@ -1501,6 +1488,7 @@ extension AudioService: AudioPlayer.Delegate {
 
             case .paused, .stopped:
                 guard self.isRestoringPlayback.isFalse else { return }
+                guard self.isRestartingCurrentTrack.isFalse else { return }
                 self.notifyStateChange(false)
                 self.stopProgressTimer()
 
@@ -1547,6 +1535,8 @@ extension AudioService: AudioPlayer.Delegate {
     }
 
     func audioPlayerEndOfAudio(_ audioPlayer: AudioPlayer) {
+        guard self.isRestartingCurrentTrack.isFalse else { return }
+
         AppLogger.audio.info("AudioService END: \(self.currentTrackId ?? "nil")")
         self.onTrackFinished?()
     }

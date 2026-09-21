@@ -584,11 +584,19 @@ final class PlayerViewModel: PlayerManaging {
     }
 
     private func restartCurrentTrackPlayback() {
-        self.resetPlaybackPosition()
+        self.clearSeekScrubbing()
+        self.pendingRestoreProgress = nil
+        self.pendingRestoreTrackId = nil
+        self.progress = 0
 
-        if self.isPlaying.isFalse {
+        if self.isPlaying {
+            self.audioService.restartCurrentTrack()
+        } else {
+            self.audioService.seek(to: 0)
             self.equalizerService.reset()
         }
+
+        self.persistPlaybackSession()
     }
 
     private func startVinylTapSpin(direction: Double) {
