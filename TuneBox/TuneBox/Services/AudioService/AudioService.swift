@@ -49,9 +49,7 @@ final class AudioService: NSObject, AudioServicing {
 
         let isNewTrack = self.currentTrackId != trackId
         if isNewTrack {
-            self.savedProgress = 0
-            self.cancelPendingProgressRestore()
-            self.cancelRestore()
+            self.pinPlaybackToStart()
         }
 
         self.isPausedDueToRouteChange = false
@@ -84,6 +82,11 @@ final class AudioService: NSObject, AudioServicing {
             }
 
             self.silenceOutput()
+
+            if isNewTrack {
+                self.pinPlaybackToStart()
+                _ = self.player.seek(position: 0)
+            }
 
             if autoplay {
                 self.attachSpectrumIfNeeded()
@@ -138,7 +141,11 @@ final class AudioService: NSObject, AudioServicing {
         self.silenceOutput()
 
         if self.player.isPlaying {
-            self.restoreProgressIfNeeded()
+            if self.isPinnedToStart {
+                _ = self.player.seek(position: 0)
+            } else {
+                self.restoreProgressIfNeeded()
+            }
             self.scheduleUnmute()
             return
         }
@@ -150,9 +157,17 @@ final class AudioService: NSObject, AudioServicing {
             self.isPausedDueToRouteChange = false
             self.notifyStateChange(true)
             self.refreshNowPlayingElapsed()
-            self.restoreProgressIfNeeded()
-            self.scheduleUnmute()
-            return
+            if self.isPinnedToStart {
+                if self.player.seek(position: 0) {
+                    self.notifyProgress(0)
+                    self.scheduleUnmute()
+                    return
+                }
+            } else {
+                self.restoreProgressIfNeeded()
+                self.scheduleUnmute()
+                return
+            }
         }
 
         _ = self.restoreCurrentTrack()
@@ -173,7 +188,8 @@ final class AudioService: NSObject, AudioServicing {
         self.ignoreAutomaticResumeUntil = .distantPast
         self.forbidEnginePlaybackRestore()
         self.needsEngineRebuild = false
-        self.savedProgress = 0
+        self.isPinnedToStart = false
+        self.clearSavedProgress()
         self.cancelPendingProgressRestore()
         self.cancelRestore()
         self.notifyStateChange(false)
@@ -203,7 +219,7 @@ final class AudioService: NSObject, AudioServicing {
             }
         }
 
-        self.savedProgress = 0
+        self.pinPlaybackToStart()
         self.play(trackId: trackId, url: url, loop: self.shouldLoop)
     }
 
@@ -267,7 +283,17 @@ final class AudioService: NSObject, AudioServicing {
     }
 
     func seek(to progress: Double) {
-        guard self.duration > 0 else { return }
+        let clamped = min(max(progress, 0), 1)
+        if clamped <= 0 {
+            self.pinPlaybackToStart()
+        } else {
+            self.isPinnedToStart = false
+        }
+
+        guard self.duration > 0 else {
+            self.notifyProgress(clamped)
+            return
+        }
 
         if self.isSeekScrubbing {
             self.equalizerService.holdUpdates()
@@ -275,28 +301,32 @@ final class AudioService: NSObject, AudioServicing {
             self.equalizerService.holdUpdatesTemporarily(for: self.spectrumHoldDuration)
         }
 
-        let clamped = min(max(progress, 0), 1)
-        _ = self.player.seek(position: clamped)
+        guard self.player.seek(position: clamped) else {
+            self.notifyProgress(clamped)
+            return
+        }
+
         self.notifyProgress(clamped)
         self.refreshNowPlayingElapsed()
     }
 
     func seekToStartAndPause() {
+        self.pinPlaybackToStart()
+
         if self.player.seek(position: 0) {
-            self.pause()
+            self.pause(captureProgress: false)
             self.notifyProgress(0)
             return
         }
 
         guard let url = self.currentURL, let trackId = self.currentTrackId else {
-            self.pause()
+            self.pause(captureProgress: false)
             self.notifyProgress(0)
             return
         }
 
-        self.play(trackId: trackId, url: url, loop: self.shouldLoop)
+        self.play(trackId: trackId, url: url, loop: self.shouldLoop, autoplay: false)
         _ = self.player.seek(position: 0)
-        self.pause()
         self.notifyProgress(0)
     }
 
@@ -364,6 +394,8 @@ final class AudioService: NSObject, AudioServicing {
     private let equalizerTap = PlaybackPCMMonitor()
     private var progressTimer: Timer?
     private var savedProgress: Double = 0
+    private var savedProgressTrackId: String?
+    private var isPinnedToStart = false
     private var progressRestoreGeneration = 0
     private var storedVolume: Float = 1.0
     private let spectrumHoldDuration: TimeInterval = 0.3
@@ -646,8 +678,22 @@ final class AudioService: NSObject, AudioServicing {
             return
         }
 
-        if clamped > 0 || self.player.currentTime != nil {
-            self.savedProgress = clamped
+        if self.isPinnedToStart {
+            if self.shouldReleaseStartPin(currentTime: self.player.currentTime) {
+                self.isPinnedToStart = false
+            } else {
+                self.clearSavedProgress()
+                DispatchQueue.main.async {
+                    self.progressSubject.send(0)
+                }
+                return
+            }
+        }
+
+        if clamped <= 0 {
+            self.clearSavedProgress()
+        } else {
+            self.storeSavedProgress(clamped)
         }
 
         DispatchQueue.main.async {
@@ -656,6 +702,7 @@ final class AudioService: NSObject, AudioServicing {
     }
 
     private func captureProgress() {
+        guard self.isPinnedToStart.isFalse else { return }
         guard let currentTime = self.player.currentTime, self.duration > 0 else {
             return
         }
@@ -666,7 +713,31 @@ final class AudioService: NSObject, AudioServicing {
             return
         }
 
-        self.savedProgress = min(max(currentTime / self.duration, 0), 1)
+        self.storeSavedProgress(min(max(currentTime / self.duration, 0), 1))
+    }
+
+    private func shouldReleaseStartPin(currentTime: TimeInterval?) -> Bool {
+        guard self.player.isPlaying else { return false }
+
+        let time = currentTime ?? 0
+        return time > Self.progressCaptureFloor && time < 1.5
+    }
+
+    private func pinPlaybackToStart() {
+        self.clearSavedProgress()
+        self.cancelPendingProgressRestore()
+        self.cancelRestore()
+        self.isPinnedToStart = true
+    }
+
+    private func storeSavedProgress(_ progress: Double) {
+        self.savedProgress = progress
+        self.savedProgressTrackId = self.currentTrackId
+    }
+
+    private func clearSavedProgress() {
+        self.savedProgress = 0
+        self.savedProgressTrackId = nil
     }
 
     private func cancelPendingProgressRestore() {
@@ -679,7 +750,7 @@ final class AudioService: NSObject, AudioServicing {
             return false
         }
 
-        let progressToRestore = self.savedProgress
+        let progressToRestore = self.isPinnedToStart ? 0 : self.savedProgress
         AppLogger.audio.info(
             "Restoring playback at progress \(progressToRestore) for \(trackId)"
         )
@@ -691,6 +762,8 @@ final class AudioService: NSObject, AudioServicing {
 
     private func restoreProgressIfNeeded() {
         guard self.isRestoringPlayback.isFalse else { return }
+        guard self.isPinnedToStart.isFalse else { return }
+        guard self.savedProgressTrackId == self.currentTrackId else { return }
         guard self.savedProgress > 0, self.savedProgress < 1, self.duration > 0 else {
             return
         }
@@ -813,6 +886,7 @@ final class AudioService: NSObject, AudioServicing {
         guard self.isRestoringPlayback || self.isSpectrumFrozenForRestore else { return }
 
         self.isRestoringPlayback = false
+        self.restoreTargetProgress = 0
         self.unfreezeSpectrumAfterRestore()
     }
 
@@ -843,7 +917,7 @@ final class AudioService: NSObject, AudioServicing {
 
         let progress = self.restoreTargetProgress
         if progress > 0, progress < 1 {
-            self.savedProgress = progress
+            self.storeSavedProgress(progress)
             self.progressSubject.send(progress)
         }
         self.refreshNowPlayingElapsed()

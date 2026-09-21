@@ -54,9 +54,15 @@ final class PlayerViewModel: PlayerManaging {
             return self.playbackTime(for: self.progress)
         }
 
-        let currentTime = self.audioService.currentTime
-        if currentTime > 0 {
-            return currentTime
+        if self.progress <= 0 {
+            return 0
+        }
+
+        if self.isPlaying {
+            let currentTime = self.audioService.currentTime
+            if currentTime > 0 {
+                return currentTime
+            }
         }
 
         return self.playbackTime(for: self.progress)
@@ -99,6 +105,11 @@ final class PlayerViewModel: PlayerManaging {
             .sink { [weak self] value in
                 guard let self else { return }
                 guard self.isSeekScrubbing.isFalse else { return }
+                // After next/previous the engine can briefly report the old
+                // position. Don't let that overwrite a reset-to-zero.
+                if self.progress <= 0, value > 0, self.isPlaying.isFalse {
+                    return
+                }
 
                 self.progress = value
                 self.stopSeekScrubbingIfNeeded(at: value)
@@ -233,6 +244,7 @@ final class PlayerViewModel: PlayerManaging {
         self.isPlaying = false
         self.playbackOrigin = snapshot.origin
         self.pendingRestoreProgress = self.isPlayableOnDisk(track) ? self.progress : nil
+        self.pendingRestoreTrackId = self.pendingRestoreProgress != nil ? track.id : nil
         self.needsNavigationPathRebuild = true
         self.playbackNavigationPath = Self.rebuildPath(
             from: snapshot.origin,
@@ -360,6 +372,7 @@ final class PlayerViewModel: PlayerManaging {
         self.playbackNavigationPath = []
         self.playbackOrigin = nil
         self.pendingRestoreProgress = nil
+        self.pendingRestoreTrackId = nil
         self.needsNavigationPathRebuild = false
         self.clearPersistedPlaybackSession()
     }
@@ -482,6 +495,7 @@ final class PlayerViewModel: PlayerManaging {
     private var shuffleOrder: [String]?
     private var playbackOrigin: PlaybackOriginSnapshot?
     private var pendingRestoreProgress: Double?
+    private var pendingRestoreTrackId: String?
     private var lastPersistedProgressAt: Date?
     private var needsNavigationPathRebuild = false
     private var vinylTapSpinTask: Task<Void, Never>?
@@ -543,6 +557,10 @@ final class PlayerViewModel: PlayerManaging {
     }
 
     private var playbackElapsedTime: TimeInterval {
+        if self.progress <= 0 {
+            return 0
+        }
+
         let currentTime = self.audioService.currentTime
 
         if currentTime > 0 {
@@ -556,16 +574,21 @@ final class PlayerViewModel: PlayerManaging {
         return Double(duration) * self.progress
     }
 
-    private func restartCurrentTrackPlayback() {
+    private func resetPlaybackPosition() {
         self.clearSeekScrubbing()
-        self.audioService.seek(to: 0)
+        self.pendingRestoreProgress = nil
+        self.pendingRestoreTrackId = nil
         self.progress = 0
+        self.audioService.seek(to: 0)
+        self.persistPlaybackSession()
+    }
+
+    private func restartCurrentTrackPlayback() {
+        self.resetPlaybackPosition()
 
         if self.isPlaying.isFalse {
             self.equalizerService.reset()
         }
-
-        self.persistPlaybackSession()
     }
 
     private func startVinylTapSpin(direction: Double) {
@@ -763,6 +786,7 @@ final class PlayerViewModel: PlayerManaging {
         }
 
         if tracks.indices.contains(candidate) {
+            self.progress = 0
             self.play(tracks[candidate], autoplay: autoplay)
             return
         }
@@ -770,15 +794,14 @@ final class PlayerViewModel: PlayerManaging {
         guard self.repeatMode == .all else { return }
 
         let wrapped = direction == .next ? 0 : tracks.count - 1
+        self.progress = 0
         self.play(tracks[wrapped], autoplay: autoplay)
     }
 
     private func returnToTrackStartAndPause() {
-        self.clearSeekScrubbing()
+        self.resetPlaybackPosition()
         self.audioService.seekToStartAndPause()
-        self.progress = 0
         self.isPlaying = false
-        self.persistPlaybackSession()
     }
 
     private func applyPlayingState(_ playing: Bool) {
@@ -885,12 +908,20 @@ final class PlayerViewModel: PlayerManaging {
 
     private func applyPendingRestoreSeekIfNeeded() {
         guard let pending = self.pendingRestoreProgress else { return }
+        let restoreTrackId = self.pendingRestoreTrackId
         self.pendingRestoreProgress = nil
+        self.pendingRestoreTrackId = nil
         guard pending > 0, pending < 1 else { return }
 
         // Let SFB finish opening the decoder before seeking.
         DispatchQueue.main.async { [weak self] in
-            self?.audioService.seek(to: pending)
+            guard let self else { return }
+            // Don't apply a session restore seek to a different track the user
+            // already switched to while this callback was pending.
+            guard restoreTrackId == nil || self.track?.id == restoreTrackId else { return }
+            // User already skipped/rewound to the start.
+            guard self.progress > 0 else { return }
+            self.audioService.seek(to: pending)
         }
     }
 
