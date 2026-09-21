@@ -13,13 +13,7 @@ struct ImportsView: View {
     // MARK: - Main Body
 
     var body: some View {
-        VStack(spacing: 20) {
-            HeaderView(
-                isFileImporterPresented: $isFileImporterPresented,
-                importManagingVM: importManagingVM,
-                settingsVM: settingsVM
-            )
-
+        Group {
             if importManagingVM.hasLibrary {
                 ContentView(
                     sourceIDToDelete: $sourceIDToDelete,
@@ -37,6 +31,16 @@ struct ImportsView: View {
             alignment: .top
         )
         .importHomeNavigationChrome()
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                HeaderView(
+                    isFileImporterPresented: $isFileImporterPresented,
+                    importManagingVM: importManagingVM,
+                    settingsVM: settingsVM
+                )
+            }
+            .sharedBackgroundVisibility(.hidden)
+        }
         .background(.gray.opacity(0.025))
         .bottomContentMargin(
             10,
@@ -116,45 +120,41 @@ struct ImportsView: View {
         // MARK: - Body
 
         var body: some View {
-            HStack {
-                Spacer()
-
-                if importManagingVM.isEditSectionModeEnabled {
+            if importManagingVM.isEditSectionModeEnabled {
+                Button(action: {
+                    importManagingVM.finishEditSections()
+                }, label: {
+                    HeaderGlassButton(systemName: "checkmark")
+                })
+                .buttonStyle(.plain)
+            } else {
+                Menu {
                     Button(action: {
-                        importManagingVM.finishEditSections()
+                            isFileImporterPresented = true
                         }, label: {
-                            HeaderGlassButton(systemName: "checkmark")
+                            Label("Add Folder", systemImage: "plus")
                         }
                     )
-                } else {
-                    Menu {
-                        Button(action: {
-                                isFileImporterPresented = true
-                            }, label: {
-                                Label("Add Folder", systemImage: "plus")
-                            }
-                        )
 
-                        Button(action: {
-                            importManagingVM.beginEditSections()
-                            }, label: {
-                                Label("Edit Sections", systemImage: "slider.horizontal.3")
-                            }
-                        )
-
-                        Button(action: {
-                            settingsVM.presentPaywall()
+                    Button(action: {
+                        importManagingVM.beginEditSections()
                         }, label: {
-                            Label("License", systemImage: "checkmark.seal.fill")
-                        })
-                    } label: {
-                        HeaderGlassButton(systemName: "ellipsis")
-                    }
-                    .disabled(isMenuButtonDisabled)
-                    .opacity(isMenuButtonDisabled ? 0 : 1)
+                            Label("Edit Sections", systemImage: "slider.horizontal.3")
+                        }
+                    )
+
+                    Button(action: {
+                        settingsVM.presentPaywall()
+                    }, label: {
+                        Label("License", systemImage: "checkmark.seal.fill")
+                    })
+                } label: {
+                    HeaderGlassButton(systemName: "ellipsis")
                 }
+                .buttonStyle(.plain)
+                .disabled(isMenuButtonDisabled)
+                .opacity(isMenuButtonDisabled ? 0 : 1)
             }
-            .padding(.horizontal, GlobalConstants.Screen.horizontalInset)
         }
 
         // MARK: - Properties. Private

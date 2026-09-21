@@ -9,7 +9,11 @@ import SwiftUI
 
 struct HeaderGlassButton: View {
 
+    // MARK: - Properties. Public
+
     let systemName: String
+
+    // MARK: - Main Body
 
     var body: some View {
         Image(systemName: systemName)

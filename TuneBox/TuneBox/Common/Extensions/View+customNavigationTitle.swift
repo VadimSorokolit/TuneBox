@@ -34,6 +34,7 @@ extension View {
 
     func importHomeNavigationChrome() -> some View {
         navigationBarBackButtonHidden(true)
+            .toolbarTitleDisplayMode(.inline)
             .background {
                 ImportHomeNavigationLock()
             }
@@ -108,20 +109,18 @@ private struct ImportHomeNavigationLock: UIViewControllerRepresentable {
         }
 
         func syncToVisibility() {
-            if isLeavingHome || isHomeTheTopItem.isFalse {
-                isHomeVisible = false
+            if isLeavingHome {
                 unlock()
                 return
             }
 
-            isHomeVisible = true
             lockIfHomeIsTop()
         }
 
         private func startScrubbing() {
             guard isLeavingHome.isFalse, isHomeVisible, isHomeTheTopItem else { return }
 
-            scrubUntil = CACurrentMediaTime() + 0.55
+            scrubUntil = CACurrentMediaTime() + 1.0
             guard displayLink == nil else { return }
 
             let link = CADisplayLink(target: self, selector: #selector(scrubFrame))
@@ -145,7 +144,11 @@ private struct ImportHomeNavigationLock: UIViewControllerRepresentable {
 
             navigationController?.interactivePopGestureRecognizer?.isEnabled = false
             navigationItem.hidesBackButton = true
+            navigationItem.title = nil
+            navigationItem.largeTitleDisplayMode = .never
             nearestNavigationItem?.hidesBackButton = true
+            nearestNavigationItem?.title = nil
+            nearestNavigationItem?.largeTitleDisplayMode = .never
             setBackChromeHidden(true)
         }
 
@@ -163,7 +166,7 @@ private struct ImportHomeNavigationLock: UIViewControllerRepresentable {
         }
 
         private func applyBackChromeHidden(_ hidden: Bool, in view: UIView) {
-            if isLeftoverBackChrome(view) {
+            if isLeftoverHomeChrome(view) {
                 // Kill leftover glass only while hiding on Home.
                 // Restoring must keep the incoming back-button animation intact,
                 // otherwise the chevron never draws and the tap does not pop.
@@ -179,8 +182,16 @@ private struct ImportHomeNavigationLock: UIViewControllerRepresentable {
             view.subviews.forEach { applyBackChromeHidden(hidden, in: $0) }
         }
 
-        private func isLeftoverBackChrome(_ view: UIView) -> Bool {
+        private func isLeftoverHomeChrome(_ view: UIView) -> Bool {
             let name = NSStringFromClass(type(of: view))
+            let isTitleChrome =
+                name.contains("TitleControl")
+                || name.contains("NavigationBarTitle")
+
+            if isTitleChrome {
+                return true
+            }
+
             let isButtonChrome =
                 name.contains("PlatterGlass")
                 || name.contains("BarPlatter")
@@ -188,10 +199,13 @@ private struct ImportHomeNavigationLock: UIViewControllerRepresentable {
                 || name.contains("UIButtonBarButton")
 
             guard isButtonChrome else { return false }
+            guard view.bounds.width < 160 else { return false }
+            guard let bar = navigationController?.navigationBar else { return false }
 
-            // Home has no bar buttons. Hide compact leftover platters even
-            // while they are mid-transition, but keep full-width bar chrome.
-            return view.bounds.width < 160
+            // Only hide leftover leading back chrome. The trailing menu
+            // lives in the same bar and must stay visible.
+            let frame = view.convert(view.bounds, to: bar)
+            return frame.maxX < bar.bounds.midX
         }
 
         private var isHomeTheTopItem: Bool {
