@@ -32,83 +32,86 @@ struct TracksView: View {
                     Text("\(LibraryItem.tracks.rawValue.capitalized) you add to your library will appear here.")
                 }
             } else {
-                List {
-                    ForEach(importManagingVM.sectionedTracks(from: tracks)) { section in
-                        Section {
-                            sectionTracksTitle(
-                                section.letter,
-                                font: .system(size: 15, weight: .medium),
-                                foregroundStyle: .gray,
-                                topPadding: 20,
-                                bottomPadding: 8,
-                                horizontalPadding: GlobalConstants.Cell.defaultPadding,
-                                hasSeparator: false
-                            )
-                            .listRowInsets(EdgeInsets())
-
-                            ForEach(Array(section.tracks.enumerated()), id: \.element.id) { index, track in
-                                let row = section.tracks.playbackRow(at: index, currentTrack: playerVM.track)
-
-                                TrackCoverCell(
-                                    track: track,
-                                    isPlaying: row.isPlaying,
-                                    hidesSeparator: row.hidesSeparator,
-                                    onTapGesture: {
-                                        playerVM.handlePlayAction(
-                                            for: track,
-                                            in: playbackQueue,
-                                            navigationPath: coordinator.path
-                                        )
-                                    }
+                ScrollViewReader { proxy in
+                    List {
+                        ForEach(importManagingVM.sectionedTracks(from: tracks)) { section in
+                            Section {
+                                sectionTracksTitle(
+                                    section.letter,
+                                    font: .system(size: 15, weight: .medium),
+                                    foregroundStyle: .gray,
+                                    topPadding: 20,
+                                    bottomPadding: 8,
+                                    horizontalPadding: GlobalConstants.Cell.defaultPadding,
+                                    hasSeparator: false
                                 )
-                                .id(track.id)
+                                .listRowInsets(EdgeInsets())
+
+                                ForEach(Array(section.tracks.enumerated()), id: \.element.id) { index, track in
+                                    let row = section.tracks.playbackRow(at: index, currentTrack: playerVM.track)
+
+                                    TrackCoverCell(
+                                        track: track,
+                                        isPlaying: row.isPlaying,
+                                        hidesSeparator: row.hidesSeparator,
+                                        onTapGesture: {
+                                            playerVM.handlePlayAction(
+                                                for: track,
+                                                in: playbackQueue,
+                                                navigationPath: coordinator.path
+                                            )
+                                        }
+                                    )
+                                    .id(track.id)
+                                    .listRowInsets(EdgeInsets())
+                                    .listRowBackground(Color.clear)
+                                    .listRowSeparator(.hidden)
+                                }
+                            }
+                            .sectionIndexLabel(section.letter)
+                            .listSectionSeparator(.hidden)
+                        }
+
+                        Section {
+                            LibrarySummaryFooter(
+                                count: tracks.count,
+                                unitSingular: "track",
+                                unitPlural: "tracks",
+                                duration: importManagingVM.tracksDuration(tracks),
+                                size: importManagingVM.tracksSize(tracks)
+                            )
+                            .frame(maxWidth: .infinity)
+                            .listRowInsets(EdgeInsets())
+                            .listRowBackground(Color.clear)
+                        }
+                        .listSectionSeparator(.hidden)
+
+                        Section {
+                            Color.clear
+                                .frame(
+                                    height: BottomLayout.inset(
+                                        isPlayerVisible: playerVM.isPlayerVisible,
+                                        isPlaying: playerVM.isPlaying,
+                                        isTabBarVisible: rootTabsVM.isTabBarVisible
+                                    )
+                                )
+                                .animation(.easeInOut(duration: 0.35), value: playerVM.isPlaying)
                                 .listRowInsets(EdgeInsets())
                                 .listRowBackground(Color.clear)
                                 .listRowSeparator(.hidden)
-                            }
                         }
-                        .sectionIndexLabel(section.letter)
                         .listSectionSeparator(.hidden)
                     }
-
-                    Section {
-                        LibrarySummaryFooter(
-                            count: tracks.count,
-                            unitSingular: "track",
-                            unitPlural: "tracks",
-                            duration: importManagingVM.tracksDuration(tracks),
-                            size: importManagingVM.tracksSize(tracks)
-                        )
-                        .frame(maxWidth: .infinity)
-                        .listRowInsets(EdgeInsets())
-                        .listRowBackground(Color.clear)
+                    .listStyle(.plain)
+                    .environment(\.defaultMinListRowHeight, 1)
+                    .task(id: navigationTitle) {
+                        await Task.yield()
+                        scrollToPlayingTrack(proxy: proxy)
                     }
-                    .listSectionSeparator(.hidden)
-
-                    Section {
-                        Color.clear
-                            .frame(
-                                height: BottomLayout.inset(
-                                    isPlayerVisible: playerVM.isPlayerVisible,
-                                    isPlaying: playerVM.isPlaying,
-                                    isTabBarVisible: rootTabsVM.isTabBarVisible
-                                )
-                            )
-                            .animation(.easeInOut(duration: 0.35), value: playerVM.isPlaying)
-                            .listRowInsets(EdgeInsets())
-                            .listRowBackground(Color.clear)
-                            .listRowSeparator(.hidden)
+                    .onChange(of: playerVM.scrollToCurrentTrackRequest) { _, _ in
+                        scrollToPlayingTrack(proxy: proxy)
                     }
-                    .listSectionSeparator(.hidden)
                 }
-                .listStyle(.plain)
-                .environment(\.defaultMinListRowHeight, 1)
-                .scrollToCurrentTrackOnAppear(
-                    id: playerVM.track?.id,
-                    in: tracks,
-                    trigger: navigationTitle,
-                    animatedRequest: playerVM.scrollToCurrentTrackRequest
-                )
             }
         }
         .customNavigationTitle(navigationTitle)
@@ -145,5 +148,18 @@ struct TracksView: View {
 
     private var playbackQueue: [TrackEntity] {
         importManagingVM.sortedTracksAlphabetically(tracks)
+    }
+
+    private func scrollToPlayingTrack(proxy: ScrollViewProxy) {
+        guard let trackID = playerVM.track?.id,
+              tracks.contains(where: { $0.id == trackID }) else {
+            return
+        }
+
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) {
+            proxy.scrollTo(trackID, anchor: .center)
+        }
     }
 }

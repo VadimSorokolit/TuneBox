@@ -418,10 +418,7 @@ struct ImportsView: View {
                     coordinator.push(.artists)
 
                 case .library(.tracks):
-                    coordinator.push(
-                        .tracks(.library),
-                        animated: false
-                    )
+                    coordinator.push(.tracks(.library))
 
                 case .library(.playlists):
                     coordinator.push(.playlists)
