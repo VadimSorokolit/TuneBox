@@ -18,6 +18,32 @@ struct TrackMetadata {
     let artwork: Data?
 }
 
+private enum MetadataKeys {
+    static let artist = [
+        "artist",
+        "albumartist",
+        "album artist",
+        "artist name",
+        "performer"
+    ]
+
+    static let title = ["title"]
+
+    static let album = ["album"]
+
+    static let date = [
+        "date",
+        "year",
+        "originaldate"
+    ]
+
+    static let trackNumber = [
+        "tracknumber",
+        "trck",
+        "track"
+    ]
+}
+
 final class AudioMetadataService: AudioMetadataServicing {
 
     // MARK: - Methods. Public
@@ -34,29 +60,26 @@ final class AudioMetadataService: AudioMetadataServicing {
 
         let title = Self.cleanMetadataValue(
             metadata.title
-            ?? Self.additionalValue(for: ["TITLE"], in: additional)
+            ?? Self.additionalValue(for: MetadataKeys.title, in: additional)
         )
 
         let artist = Self.cleanMetadataValue(
             metadata.artist?.first
-            ?? metadata.albumArtist?.first
-            ?? Self.additionalValue(
-                for: ["ARTIST", "ALBUMARTIST", "ALBUM ARTIST", "PERFORMER"],
-                in: additional
-            )
+        ) ?? Self.cleanMetadataValue(
+            metadata.albumArtist?.first
+        ) ?? Self.cleanMetadataValue(
+            Self.additionalValue(for: MetadataKeys.artist, in: additional)
         )
 
         let album = Self.cleanMetadataValue(
             metadata.albumTitle
-            ?? Self.additionalValue(for: ["ALBUM"], in: additional)
+            ?? Self.additionalValue(for: MetadataKeys.album, in: additional)
         )
 
         let date = Self.cleanMetadataValue(
             metadata.releaseDate
             ?? Self.additionalValue(
-                for: ["DATE", "YEAR", "ORIGINALDATE"],
-                in: additional
-            )
+                for: MetadataKeys.date, in: additional)
         )
 
         return TrackMetadata(
@@ -150,7 +173,10 @@ final class AudioMetadataService: AudioMetadataServicing {
         }
 
         guard let raw = additionalValue(
-            for: ["TRACKNUMBER", "TRCK", "TRACK"],
+            for: [
+                "TRACKNUMBER",
+                "TRCK", "TRACK"
+            ],
             in: additional
         ) else {
             return nil
