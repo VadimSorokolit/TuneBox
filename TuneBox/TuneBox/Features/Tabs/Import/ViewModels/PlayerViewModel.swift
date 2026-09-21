@@ -421,7 +421,7 @@ final class PlayerViewModel: PlayerManaging {
 
         self.ensureShuffleOrderIfNeeded()
 
-        if self.playbackElapsedTime <= Self.restartThreshold {
+        if self.playbackElapsedTime > Self.restartThreshold {
             self.restartCurrentTrackPlayback()
             return
         }
