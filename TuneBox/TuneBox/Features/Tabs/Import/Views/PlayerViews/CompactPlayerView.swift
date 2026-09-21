@@ -90,11 +90,11 @@ struct CompactPlayerView: View {
                         .frame(maxWidth: .infinity)
                         .frame(height: Layout.vinylSize)
 
-                        ProgressBar(
-                            progress: progress
-                        )
-                        .opacity(progress > 0 ? 1 : 0)
-                        .allowsHitTesting(false)
+//                        ProgressBar(
+//                            progress: progress
+//                        )
+//                        .opacity(progress > 0 ? 1 : 0)
+//                        .allowsHitTesting(false)
                     }
                     .frame(maxWidth: .infinity)
 
@@ -107,7 +107,7 @@ struct CompactPlayerView: View {
                     }
                     .frame(height: isPlaying ? 10 : 0)
                     .padding(.horizontal, 24)
-                    .padding(.top, 5)
+                    .padding(.top, 10)
                     .opacity(isPlaying ? 1 : 0)
                     .clipped()
                     .allowsHitTesting(false)
@@ -132,7 +132,10 @@ struct CompactPlayerView: View {
                 .padding(.trailing, Layout.horizontalPadding)
                 .frame(height: GlobalConstants.CompactPlayer.height)
             }
-            .frame(height: GlobalConstants.CompactPlayer.height, alignment: .top)
+            .frame(
+                height: GlobalConstants.CompactPlayer.height,
+                alignment: .top
+            )
             .glassEffect(
                 in: RoundedRectangle(
                     cornerRadius: 30,
@@ -540,11 +543,17 @@ struct CompactPlayerView: View {
             .buttonStyle(PressCircleGlassButtonStyle())
             .menuIndicator(.hidden)
             .overlay {
-                Text(repeatMode == .one ? "•" : repeatMode == .all ? "••" : "")
-                    .foregroundStyle(.blue)
-                    .font(.system(size: 16))
-                    .offset(y: imageSize / 2 + 2)
-                    .allowsHitTesting(false)
+                Text(
+                    repeatMode == .one
+                    ? "•"
+                    : repeatMode == .all
+                    ? "••"
+                    : ""
+                )
+                .foregroundStyle(.blue)
+                .font(.system(size: 16))
+                .offset(y: imageSize / 2)
+                .allowsHitTesting(false)
             }
         }
 
@@ -590,7 +599,8 @@ struct CompactPlayerView: View {
             ZStack {
                 GeometryReader { geo in
                     Capsule()
-                        .fill(.orange).opacity(0)
+                        .fill(.orange)
+                        .opacity(0)
                         .frame(
                             width: geo.size.width * min(max(progress, 0), 1),
                             height: 3
