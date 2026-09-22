@@ -43,10 +43,9 @@ final class EqualizerService: EqualizerServicing {
     // MARK: - Methods. Public
 
     nonisolated func process(_ buffer: AVAudioPCMBuffer) {
-        guard self.processGate.isEnabled else { return }
+        guard let generation = self.processGate.generationIfEnabled() else { return }
 
-        let generation = self.processGate.generation
-        self.analyzer.enqueue(buffer) { [weak self] result in
+        self.analyzer.enqueue(buffer, generation: generation) { [weak self] result in
             Task { @MainActor [weak self] in
                 guard let self, generation == self.processGate.generation else { return }
                 self.publish(decibels: result)
@@ -55,13 +54,11 @@ final class EqualizerService: EqualizerServicing {
     }
 
     nonisolated func stopProcessing() {
-        self.processGate.invalidate()
-        self.analyzer.resetInputBuffers()
+        self.invalidateProcessing()
     }
 
     func reset() {
-        self.processGate.invalidate()
-        self.analyzer.reset()
+        self.invalidateProcessing()
         self.isPlaybackActive = false
         self.isHolding = false
         self.holdGeneration += 1
@@ -152,8 +149,7 @@ final class EqualizerService: EqualizerServicing {
             && zip(self.decibels, values).allSatisfy { $1 <= $0 + 0.5 }
 
         if droppedOut {
-            self.processGate.invalidate()
-            self.analyzer.resetInputBuffers()
+            self.invalidateProcessing()
 
             if self.didReportDropout.isFalse {
                 self.didReportDropout = true
@@ -181,6 +177,11 @@ final class EqualizerService: EqualizerServicing {
     private func setProcessEnabled(_ enabled: Bool) {
         self.processGate.setEnabled(enabled)
     }
+
+    private nonisolated func invalidateProcessing() {
+        self.processGate.invalidate()
+        self.analyzer.reset(accepting: self.processGate.generation)
+    }
 }
 
 nonisolated private final class SpectrumProcessGate: @unchecked Sendable {
@@ -194,6 +195,13 @@ nonisolated private final class SpectrumProcessGate: @unchecked Sendable {
     nonisolated var generation: UInt64 {
         self.lock.lock()
         defer { self.lock.unlock() }
+        return self.generationValue
+    }
+
+    nonisolated func generationIfEnabled() -> UInt64? {
+        self.lock.lock()
+        defer { self.lock.unlock() }
+        guard self.isEnabledFlag else { return nil }
         return self.generationValue
     }
 

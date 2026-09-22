@@ -24,9 +24,21 @@ nonisolated final class SpectrumAnalyzer: SpectrumAnalyzing, @unchecked Sendable
         2_500, 3_150, 4_000, 5_000, 6_300, 8_000, 10_000, 12_500, 16_000
     ]
 
-    func enqueue(_ buffer: AVAudioPCMBuffer, onResult: @escaping ([Float]) -> Void) {
+    func enqueue(
+        _ buffer: AVAudioPCMBuffer,
+        generation: UInt64,
+        onResult: @escaping ([Float]) -> Void
+    ) {
         let frames = Self.channelFrames(from: buffer)
         guard !frames.left.isEmpty else { return }
+
+        self.lock.lock()
+        guard generation == self.acceptedGeneration else {
+            self.lock.unlock()
+            return
+        }
+        let epoch = self.epoch
+        self.lock.unlock()
 
         let rate = Float(buffer.format.sampleRate)
         let stereo = frames.right != nil
@@ -35,6 +47,11 @@ nonisolated final class SpectrumAnalyzer: SpectrumAnalyzing, @unchecked Sendable
             guard let self else { return }
 
             self.lock.lock()
+            guard generation == self.acceptedGeneration, epoch == self.epoch else {
+                self.lock.unlock()
+                return
+            }
+
             if abs(self.sampleRate - rate) > 1 {
                 self.leftoverLeft.removeAll(keepingCapacity: true)
                 self.leftoverRight.removeAll(keepingCapacity: true)
@@ -50,6 +67,8 @@ nonisolated final class SpectrumAnalyzer: SpectrumAnalyzing, @unchecked Sendable
 
             var latest: [Float]?
             while self.leftoverLeft.count >= Self.fftSize {
+                guard generation == self.acceptedGeneration, epoch == self.epoch else { break }
+
                 let left = Array(self.leftoverLeft.prefix(Self.fftSize))
                 self.leftoverLeft.removeFirst(min(Self.hopSize, self.leftoverLeft.count))
 
@@ -59,12 +78,17 @@ nonisolated final class SpectrumAnalyzer: SpectrumAnalyzing, @unchecked Sendable
                     self.leftoverRight.removeFirst(min(Self.hopSize, self.leftoverRight.count))
                 }
 
+                let sampleRate = self.sampleRate
                 self.lock.unlock()
-                latest = self.analyze(left: left, right: right)
+                let measured = self.measure(left: left, right: right, sampleRate: sampleRate)
                 self.lock.lock()
+
+                guard generation == self.acceptedGeneration, epoch == self.epoch else { break }
+                latest = self.smooth(measured, sampleRate: sampleRate)
             }
+
             var shouldPublish = false
-            if latest != nil {
+            if latest != nil, generation == self.acceptedGeneration, epoch == self.epoch {
                 if self.framesToSkip > 0 {
                     self.framesToSkip -= 1
                 } else {
@@ -79,8 +103,10 @@ nonisolated final class SpectrumAnalyzer: SpectrumAnalyzing, @unchecked Sendable
         }
     }
 
-    func reset() {
+    func reset(accepting generation: UInt64) {
         self.lock.lock()
+        self.acceptedGeneration = generation
+        self.epoch &+= 1
         self.leftoverLeft.removeAll(keepingCapacity: true)
         self.leftoverRight.removeAll(keepingCapacity: true)
         self.framesToSkip = 0
@@ -90,6 +116,7 @@ nonisolated final class SpectrumAnalyzer: SpectrumAnalyzing, @unchecked Sendable
 
     func resetInputBuffers() {
         self.lock.lock()
+        self.epoch &+= 1
         self.leftoverLeft.removeAll(keepingCapacity: true)
         self.leftoverRight.removeAll(keepingCapacity: true)
         self.framesToSkip = 3
@@ -138,6 +165,8 @@ nonisolated final class SpectrumAnalyzer: SpectrumAnalyzing, @unchecked Sendable
     private var envelopeDB: [Float]
     private var sampleRate: Float = 44_100
     private var framesToSkip = 0
+    private var acceptedGeneration: UInt64 = 0
+    private var epoch: UInt64 = 0
     private var log2n = vDSP_Length(log2(Float(fftSize)))
 
     // MARK: - Methods. Private
@@ -148,7 +177,7 @@ nonisolated final class SpectrumAnalyzer: SpectrumAnalyzing, @unchecked Sendable
         samples.removeFirst(samples.count - maxCount)
     }
 
-    private func analyze(left: [Float], right: [Float]?) -> [Float] {
+    private func measure(left: [Float], right: [Float]?, sampleRate: Float) -> [Float] {
         self.prepareIfNeeded()
 
         guard left.count >= Self.fftSize, self.fftSetup != nil else {
@@ -172,7 +201,7 @@ nonisolated final class SpectrumAnalyzer: SpectrumAnalyzing, @unchecked Sendable
             )
         }
 
-        return self.thirdOctaveBands(from: self.leftPower)
+        return self.rawBands(from: self.leftPower, sampleRate: sampleRate)
     }
 
     private func prepareIfNeeded() {
@@ -248,12 +277,11 @@ nonisolated final class SpectrumAnalyzer: SpectrumAnalyzing, @unchecked Sendable
         power[0] = 0
     }
 
-    private func thirdOctaveBands(from power: [Float]) -> [Float] {
-        let binHz = self.sampleRate / Float(Self.fftSize)
-        let nyquist = self.sampleRate / 2
+    private func rawBands(from power: [Float], sampleRate: Float) -> [Float] {
+        let binHz = sampleRate / Float(Self.fftSize)
+        let nyquist = sampleRate / 2
         let halfBandwidthRatio = pow(2 as Float, 1 / 6)
         var result = [Float](repeating: Self.floorDB, count: Self.bandCount)
-        let deltaTime = Float(Self.hopSize) / max(self.sampleRate, 1)
 
         for (index, center) in Self.thirdOctaveCenters.enumerated() {
             guard center < nyquist else { continue }
@@ -264,7 +292,18 @@ nonisolated final class SpectrumAnalyzer: SpectrumAnalyzing, @unchecked Sendable
                 toHz: min(nyquist, center * halfBandwidthRatio),
                 binHz: binHz
             )
-            let decibels = Self.powerToDecibels(energy)
+            result[index] = Self.powerToDecibels(energy)
+        }
+
+        return result
+    }
+
+    private func smooth(_ raw: [Float], sampleRate: Float) -> [Float] {
+        var result = [Float](repeating: Self.floorDB, count: Self.bandCount)
+        let deltaTime = Float(Self.hopSize) / max(sampleRate, 1)
+
+        for index in raw.indices {
+            let decibels = raw[index]
             let previous = self.envelopeDB[index]
             let coefficient = decibels > previous
                 ? Self.ballisticCoefficient(timeConstant: self.attackTime, deltaTime: deltaTime)

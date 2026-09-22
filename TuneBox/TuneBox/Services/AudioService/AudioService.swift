@@ -48,6 +48,7 @@ final class AudioService: NSObject, AudioServicing {
         AppLogger.audio.info("AudioService PLAY: \(trackId)")
 
         let isNewTrack = self.currentTrackId != trackId
+        let isRestart = self.isRestartingCurrentTrack
         if isNewTrack {
             self.pinPlaybackToStart()
         }
@@ -61,7 +62,7 @@ final class AudioService: NSObject, AudioServicing {
         }
 
         self.silenceOutput()
-        self.detachEqualizerTap(resetSpectrum: isNewTrack || autoplay.isFalse)
+        self.detachEqualizerTap(resetSpectrum: isNewTrack || autoplay.isFalse || isRestart)
         self.stopProgressTimer()
         self.currentTrackId = trackId
         self.currentURL = url
