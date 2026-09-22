@@ -5,6 +5,7 @@
 //  Created by Vadim Sorokolit on 15.07.2026.
 //
 
+import UIKit
 import SwiftUI
 import SDWebImageSwiftUI
 
@@ -77,8 +78,13 @@ struct CoverView: View {
                 .resizable()
                 .scaledToFill()
         } else {
-            Image(systemName: "square.stack")
-                .font(.system(size: size * 0.4))
+            // UIImage-backed SF Symbol survives VinylSpinHost's drawHierarchy
+            // snapshot. SwiftUI Image(systemName:) often becomes the system
+            // "broken image" glyph (yellow square + red ban) in that bitmap.
+            Image(uiImage: Self.stackPlaceholderImage(pointSize: size * 0.4))
+                .resizable()
+                .scaledToFit()
+                .frame(size: size * 0.4)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background {
                     RoundedRectangle(cornerRadius: cornerRadius)
@@ -95,6 +101,16 @@ struct CoverView: View {
             .foregroundStyle(.secondary)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.gray.opacity(0.1))
+    }
+
+    private static func stackPlaceholderImage(pointSize: CGFloat) -> UIImage {
+        let config = UIImage.SymbolConfiguration(pointSize: pointSize, weight: .regular)
+
+        return UIImage(
+            systemName: "square.stack",
+            withConfiguration: config
+        )
+        ?? UIImage()
     }
 
     // MARK: - Methods. Private
