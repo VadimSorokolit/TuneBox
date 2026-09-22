@@ -1,5 +1,5 @@
 //
-//  Optional+Extensions.swift
+//  Optional+extensions.swift
 //  TuneBox
 //
 //  Created by Vadim Sorokolit on 24.08.2026.

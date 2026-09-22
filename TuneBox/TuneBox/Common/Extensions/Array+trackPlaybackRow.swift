@@ -1,5 +1,5 @@
 //
-//  Array+TrackPlaybackRow.swift
+//  Array+trackPlaybackRow.swift
 //  TuneBox
 //
 //  Created by Vadim Sorokolit on 07.09.2026.

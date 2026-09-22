@@ -55,7 +55,7 @@ enum CoverImageLoader {
         }
     }
 
-    private static func imageURL(for path: String?) -> URL? {
+    static func imageURL(for path: String?) -> URL? {
         guard let path, path.isNotEmpty else { return nil }
 
         let normalized = path.replacingOccurrences(of: "\\/", with: "/")
@@ -64,7 +64,7 @@ enum CoverImageLoader {
             return URL(string: normalized)
         }
 
-        return AudioMetadataService.coverURL(for: path)
+        return AudioMetadataService.coverURL(for: normalized)
     }
 
     private static func loadLocalImage(from url: URL, generation: Int) {

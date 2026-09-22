@@ -1,5 +1,5 @@
 //
-//  MoyaProvider+Async.swift
+//  MoyaProvider+async.swift
 //  TuneBox
 //
 //  Created by Vadim Sorokolit on 07.05.2026.

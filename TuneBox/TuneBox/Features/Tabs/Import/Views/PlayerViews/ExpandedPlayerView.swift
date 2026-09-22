@@ -90,6 +90,7 @@ struct ExpandedPlayerView: View {
                     BlurredCoverBackground(coverPath: track.imagePath)
                         .animation(.easeInOut(duration: 0.4), value: track.id)
                 }
+                .presentationCornerRadius(0)
             } else {
                 ContentUnavailableView(
                     "No Track",
@@ -372,27 +373,21 @@ struct ExpandedPlayerView: View {
                 ZStack {
                     Color(.systemBackground)
 
-                    WebImage(url: coverURL) { image in
+                    WebImage(url: CoverImageLoader.imageURL(for: coverPath)) { image in
                         image
                             .resizable()
                             .scaledToFill()
                     } placeholder: {
                         Color.clear
                     }
-                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .frame(
+                        width: geometry.size.width,
+                        height: geometry.size.height
+                    )
                     .clipped()
                     .blur(radius: 48)
-                    .scaleEffect(1.12)
 
-                    LinearGradient(
-                        colors: [
-                            Color.black.opacity(0.2),
-                            Color.black.opacity(0.45),
-                            Color.black.opacity(0.65)
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
+                    LinearGradient.blackScrim
 
                     Rectangle()
                         .fill(.ultraThinMaterial)
@@ -401,20 +396,6 @@ struct ExpandedPlayerView: View {
             }
             .ignoresSafeArea()
             .allowsHitTesting(false)
-        }
-
-        // MARK: - Properties. Private
-
-        private var coverURL: URL? {
-            guard let coverPath, coverPath.isEmpty == false else {
-                return nil
-            }
-
-            if coverPath.hasPrefix("http://") || coverPath.hasPrefix("https://") {
-                return URL(string: coverPath)
-            }
-
-            return AudioMetadataService.coverURL(for: coverPath)
         }
     }
 
