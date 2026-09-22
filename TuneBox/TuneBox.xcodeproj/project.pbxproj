@@ -83,6 +83,9 @@
 		5B586CCC2FACB61500BCEAD2 /* TracksResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CCB2FACB61400BCEAD2 /* TracksResponse.swift */; };
 		5B600F2C30626D4A00B83729 /* ShapeStyle+gradients.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B600F2B30626D4800B83729 /* ShapeStyle+gradients.swift */; };
 		5B600F2E30626DF600B83729 /* ShapeStyle+solid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B600F2D30626DF500B83729 /* ShapeStyle+solid.swift */; };
+		5B600F3130631FC100B83729 /* SheetHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B600F3030631FC000B83729 /* SheetHost.swift */; };
+		5B600F3330631FC900B83729 /* Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B600F3230631FC800B83729 /* Coordinator.swift */; };
+		5B600F3530631FCE00B83729 /* Presenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B600F3430631FCC00B83729 /* Presenter.swift */; };
 		5B601ECD302B0D05005D7548 /* AlbumCoversView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B601ECC302B0CF2005D7548 /* AlbumCoversView.swift */; };
 		5B601ED0302B1688005D7548 /* CoverCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B601ECF302B1687005D7548 /* CoverCell.swift */; };
 		5B601ED2302B2001005D7548 /* CoverPagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B601ED1302B2001005D7548 /* CoverPagerView.swift */; };
@@ -311,6 +314,9 @@
 		5B586CCB2FACB61400BCEAD2 /* TracksResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TracksResponse.swift; sourceTree = "<group>"; };
 		5B600F2B30626D4800B83729 /* ShapeStyle+gradients.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShapeStyle+gradients.swift"; sourceTree = "<group>"; };
 		5B600F2D30626DF500B83729 /* ShapeStyle+solid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShapeStyle+solid.swift"; sourceTree = "<group>"; };
+		5B600F3030631FC000B83729 /* SheetHost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetHost.swift; sourceTree = "<group>"; };
+		5B600F3230631FC800B83729 /* Coordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coordinator.swift; sourceTree = "<group>"; };
+		5B600F3430631FCC00B83729 /* Presenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Presenter.swift; sourceTree = "<group>"; };
 		5B601ECC302B0CF2005D7548 /* AlbumCoversView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumCoversView.swift; sourceTree = "<group>"; };
 		5B601ECF302B1687005D7548 /* CoverCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoverCell.swift; sourceTree = "<group>"; };
 		5B601ED1302B2001005D7548 /* CoverPagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoverPagerView.swift; sourceTree = "<group>"; };
@@ -592,7 +598,7 @@
 			children = (
 				5B84A1C0305E4A0100C0DE03 /* CoverImageLoader.swift */,
 				5B0BC2CE3007DF7100E8F2A5 /* CoverView.swift */,
-				5BE1C0013052000100BC9C3C /* СustomSheet.swift */,
+				5B600F2F30631FB700B83729 /* СustomSheet */,
 				5BA581912FD7055B00B498D7 /* EmptyTrackCell.swift */,
 				5B4D22922FF8C201004B8356 /* HeaderGlassButton.swift */,
 				5BA581952FD8603400B498D7 /* HighlightedText.swift */,
@@ -842,6 +848,17 @@
 				5B992F53300913E700276008 /* View+segmentTransition.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		5B600F2F30631FB700B83729 /* СustomSheet */ = {
+			isa = PBXGroup;
+			children = (
+				5B600F3430631FCC00B83729 /* Presenter.swift */,
+				5B600F3230631FC800B83729 /* Coordinator.swift */,
+				5B600F3030631FC000B83729 /* SheetHost.swift */,
+				5BE1C0013052000100BC9C3C /* СustomSheet.swift */,
+			);
+			path = "СustomSheet";
 			sourceTree = "<group>";
 		};
 		5B601ECE302B166D005D7548 /* Cover */ = {
@@ -1626,6 +1643,7 @@
 				5BD0DAF72FBF6BA000268A48 /* AudioServiceV1.swift in Sources */,
 				5B3FEB472FB4548600DC1562 /* DownloadsView.swift in Sources */,
 				5B3FEB432FB4545200DC1562 /* BrowseView.swift in Sources */,
+				5B600F3130631FC100B83729 /* SheetHost.swift in Sources */,
 				5BFCA8452FCEE252009C6AD9 /* TransferPrioritizable+mergePriority.swift in Sources */,
 				5BC5EED33038470B001A16A9 /* NetworkMonitoring.swift in Sources */,
 				5BA581942FD70BC300B498D7 /* EmptyGenreCell.swift in Sources */,
@@ -1652,7 +1670,9 @@
 				5BB3012A3026020200A2AA47 /* PlaybackSessionSnapshot.swift in Sources */,
 				5B586CBA2FAC842200BCEAD2 /* Resolver+Injection.swift in Sources */,
 				5B92B909304562EE00E9FB5D /* PurchaseServicing.swift in Sources */,
+				5B600F3530631FCE00B83729 /* Presenter.swift in Sources */,
 				5BB4B42930543E4300AB949F /* View+leadingTapArea.swift in Sources */,
+				5B600F3330631FC900B83729 /* Coordinator.swift in Sources */,
 				5B2CF4612FBC7C6B00C5BA4C /* TransferDownloadObserverTokens.swift in Sources */,
 				5B0BC2B03006638700E8F2A5 /* ImportsView.swift in Sources */,
 				5BEC05923049864E00BFC3FA /* SpectrumAnalyzing.swift in Sources */,

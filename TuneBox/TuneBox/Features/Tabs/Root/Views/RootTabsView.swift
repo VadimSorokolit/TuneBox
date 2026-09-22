@@ -146,7 +146,11 @@ struct RootTabsView: View {
         .background {
             СustomSheet(
                 isPresented: $isExpandedPlayerPresented) {
-                ExpandedPlayerView()
+                ExpandedPlayerView(
+                    onClose: {
+                        isExpandedPlayerPresented = false
+                    }
+                )
             }
         }
         .sheet(isPresented: $isPaywallPresented) {

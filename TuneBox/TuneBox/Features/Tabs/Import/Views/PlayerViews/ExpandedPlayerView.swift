@@ -11,12 +11,15 @@ import SDWebImageSwiftUI
 
 struct ExpandedPlayerView: View {
 
+    var onClose: () -> Void = {}
+
     // MARK: - Main Body
 
     var body: some View {
         ExpandedPlayerContent(
             playerVM: playerVM,
             coverVM: coverVM,
+            onClose: onClose
         )
     }
 
@@ -33,6 +36,7 @@ struct ExpandedPlayerView: View {
 
         let playerVM: PlayerManaging
         let coverVM: CoverManaging
+        let onClose: () -> Void
 
         // MARK: - Body
 
@@ -101,8 +105,6 @@ struct ExpandedPlayerView: View {
 
         // MARK: - Properties .Private
 
-        @Environment(\.dismiss) private var dismiss
-
         private static let titleColor = Color.white.mix(with: .primary, by: 0.12)
         private static let subtitleColor = Color.white.mix(with: .secondary, by: 0.25)
         private static let chromeColor = Color.white.mix(with: .primary, by: 0.18)
@@ -113,7 +115,7 @@ struct ExpandedPlayerView: View {
                 Spacer()
 
                 Button {
-                    dismiss()
+                    onClose()
                 } label: {
                     Image(systemName: "chevron.compact.down")
                         .font(.title3.weight(.semibold))
