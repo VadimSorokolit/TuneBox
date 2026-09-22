@@ -90,7 +90,6 @@ struct ExpandedPlayerView: View {
                     BlurredCoverBackground(coverPath: track.imagePath)
                         .animation(.easeInOut(duration: 0.4), value: track.id)
                 }
-                .presentationCornerRadius(0)
             } else {
                 ContentUnavailableView(
                     "No Track",

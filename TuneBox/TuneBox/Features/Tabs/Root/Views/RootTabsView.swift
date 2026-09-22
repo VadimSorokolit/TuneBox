@@ -143,8 +143,11 @@ struct RootTabsView: View {
             }
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
-        .sheet(isPresented: $isExpandedPlayerPresented) {
-            ExpandedPlayerView()
+        .background {
+            СustomSheet(
+                isPresented: $isExpandedPlayerPresented) {
+                ExpandedPlayerView()
+            }
         }
         .sheet(isPresented: $isPaywallPresented) {
             PaywallView()
