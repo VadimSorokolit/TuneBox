@@ -63,6 +63,7 @@ final class EqualizerService: EqualizerServicing {
         self.isHolding = false
         self.holdGeneration += 1
         self.ignoreQuietUntil = .distantPast
+        self.clearDropoutWatch()
         self.resetPublishedValues()
     }
 
@@ -70,13 +71,13 @@ final class EqualizerService: EqualizerServicing {
         self.isPlaybackActive = isActive
 
         if isActive.isFalse {
-            self.didReportDropout = false
+            self.clearDropoutWatch()
             self.setProcessEnabled(false)
             self.analyzer.resetInputBuffers()
             return
         }
 
-        self.didReportDropout = false
+        self.clearDropoutWatch()
 
         self.analyzer.seedEnvelope(self.decibels)
         self.analyzer.resetInputBuffers()
@@ -96,6 +97,7 @@ final class EqualizerService: EqualizerServicing {
         self.isHolding = false
         self.analyzer.seedEnvelope(self.decibels)
         self.analyzer.resetInputBuffers()
+        self.clearDropoutWatch()
         self.setProcessEnabled(true)
         self.ignoreQuietUntil = Date().addingTimeInterval(0.15)
     }
@@ -112,6 +114,7 @@ final class EqualizerService: EqualizerServicing {
             self.isHolding = false
             self.analyzer.seedEnvelope(self.decibels)
             self.analyzer.resetInputBuffers()
+            self.clearDropoutWatch()
             self.setProcessEnabled(true)
             self.ignoreQuietUntil = Date().addingTimeInterval(0.15)
         }
@@ -121,6 +124,8 @@ final class EqualizerService: EqualizerServicing {
 
     private static let bandCount = SpectrumAnalyzer.bandCount
     private static let bandCenters = SpectrumAnalyzer.thirdOctaveCenters
+    /// About half a second of true silence at a 2048-frame hop.
+    private static let dropoutSilentFrames = 12
 
     private let analyzer = SpectrumAnalyzer()
     nonisolated private let processGate = SpectrumProcessGate()
@@ -128,6 +133,7 @@ final class EqualizerService: EqualizerServicing {
     private var isHolding = false
     private var holdGeneration = 0
     private var ignoreQuietUntil = Date.distantPast
+    private var silentFrameCount = 0
     private var didReportDropout = false
 
     // MARK: - Methods. Private
@@ -143,24 +149,28 @@ final class EqualizerService: EqualizerServicing {
             return
         }
 
-        let previousMaximum = self.decibels.max() ?? SpectrumAnalyzer.floorDB
-        let droppedOut = previousMaximum > SpectrumAnalyzer.floorDB + 8
-            && previousMaximum - maximum >= 8
-            && zip(self.decibels, values).allSatisfy { $1 <= $0 + 0.5 }
+        self.decibels = values
+        self.bands = values.map { Self.normalized(decibels: $0) }
+        self.noteSilence(maximum <= SpectrumAnalyzer.floorDB + 1)
+    }
 
-        if droppedOut {
-            self.invalidateProcessing()
-
-            if self.didReportDropout.isFalse {
-                self.didReportDropout = true
-                NotificationCenter.default.post(name: .playbackOutputDropoutDetected, object: nil)
-            }
-
+    private func noteSilence(_ isSilent: Bool) {
+        guard isSilent else {
+            self.silentFrameCount = 0
+            self.didReportDropout = false
             return
         }
 
-        self.decibels = values
-        self.bands = values.map { Self.normalized(decibels: $0) }
+        self.silentFrameCount += 1
+        guard self.silentFrameCount >= Self.dropoutSilentFrames, self.didReportDropout.isFalse else { return }
+
+        self.didReportDropout = true
+        NotificationCenter.default.post(name: .playbackOutputDropoutDetected, object: nil)
+    }
+
+    private func clearDropoutWatch() {
+        self.silentFrameCount = 0
+        self.didReportDropout = false
     }
 
     private func resetPublishedValues() {
