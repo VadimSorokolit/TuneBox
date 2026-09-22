@@ -237,7 +237,7 @@ struct ExpandedPlayerView: View {
                 anchor: .center
             )
             .opacity(playerVM.isPlaying ? 1 : 0)
-            .animation(.easeInOut(duration: 0.35), value: playerVM.isPlaying)
+            .playbackAnimation(playerVM.isPlaying)
         }
 
         private func formatClock(_ seconds: TimeInterval) -> String {
