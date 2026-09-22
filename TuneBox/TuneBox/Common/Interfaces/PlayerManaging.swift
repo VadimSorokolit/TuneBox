@@ -38,6 +38,7 @@ protocol PlayerManaging: AnyObject, Sendable {
     func resetPlayback()
     func stopAudioPreservingSession()
     func clearPlaybackIfAffected(byRemovedSourceID sourceID: UUID, isAPISource: Bool)
+    func appendDownloadedTracks(_ tracks: [TrackEntity])
     func isPlaying(_ track: TrackEntity) -> Bool
     func seek(by deltaSeconds: TimeInterval)
     func seek(to progress: Double)

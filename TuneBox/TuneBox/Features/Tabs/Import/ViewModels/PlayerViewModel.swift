@@ -413,6 +413,24 @@ final class PlayerViewModel: PlayerManaging {
         }
     }
 
+    func appendDownloadedTracks(_ tracks: [TrackEntity]) {
+        guard case .downloads = self.playbackOrigin else { return }
+        guard let currentTracks = self.playlist?.tracks, currentTracks.isNotEmpty else { return }
+
+        let existing = Set(currentTracks.map(\.id))
+        let added = tracks.filter { existing.contains($0.id) == false }
+        guard added.isNotEmpty else { return }
+
+        self.playlist = PlaylistEntity(title: "Queue", tracks: currentTracks + added)
+
+        if self.isShuffleEnabled, var order = self.shuffleOrder {
+            order.append(contentsOf: added.map(\.id))
+            self.shuffleOrder = order
+        }
+
+        self.persistPlaybackSession()
+    }
+
     func isPlaying(_ track: TrackEntity) -> Bool {
         self.track?.id == track.id && self.isPlaying
     }

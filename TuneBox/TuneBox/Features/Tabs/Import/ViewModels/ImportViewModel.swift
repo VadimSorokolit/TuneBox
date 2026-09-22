@@ -170,6 +170,9 @@ final class ImportViewModel: ImportManaging {
 
             self.syncDownloadsSource(hasTracks: downloaded.isNotEmpty)
             self.ensureSections()
+            self.playerViewModel.appendDownloadedTracks(
+                self.sortedTracksAlphabetically(downloaded)
+            )
         } catch {
             self.handleError(error)
         }
@@ -823,7 +826,18 @@ final class ImportViewModel: ImportManaging {
 
     private func syncDownloadsSource(hasTracks: Bool) {
         if hasTracks {
-            if self.sources.first(where: { $0.kind == .api }) != nil {
+            if let index = self.sources.firstIndex(where: { $0.kind == .api }) {
+                let existing = self.sources[index]
+                guard existing.title != Keys.downloadsSourceTitle else { return }
+
+                self.sources[index] = ImportSource(
+                    id: existing.id,
+                    kind: .api,
+                    title: Keys.downloadsSourceTitle,
+                    bookmarkData: nil
+                )
+                self.saveSources()
+                self.ensureSections()
                 return
             }
 
@@ -833,9 +847,15 @@ final class ImportViewModel: ImportManaging {
                 title: Keys.downloadsSourceTitle,
                 bookmarkData: nil
             )
-            self.addOrUpdateSource(source)
+            self.sources.append(source)
+            self.selectedSourceIDs.insert(source.id)
+            self.saveSelectedSourceIDs()
+            self.saveSources()
+            self.ensureSections()
         } else {
             let removedIDs = Set(sources.filter { $0.kind == .api }.map(\.id))
+            guard removedIDs.isEmpty.isFalse else { return }
+
             self.sources.removeAll { $0.kind == .api }
             self.selectedSourceIDs.subtract(removedIDs)
             self.saveSelectedSourceIDs()
@@ -1153,7 +1173,9 @@ final class ImportViewModel: ImportManaging {
     }
 
     private func addOrUpdateSource(_ source: ImportSource) {
-        if let index = self.sources.firstIndex(where: { $0.title == source.title }) {
+        if let index = self.sources.firstIndex(where: {
+            $0.kind == source.kind && $0.title == source.title
+        }) {
             self.sources[index] = source
         } else {
             self.sources.append(source)
