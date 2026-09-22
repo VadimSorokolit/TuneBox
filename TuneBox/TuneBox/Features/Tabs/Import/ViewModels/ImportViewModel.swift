@@ -225,7 +225,7 @@ final class ImportViewModel: ImportManaging {
         }
         defer { rootURL.stopAccessingSecurityScopedResource() }
 
-        let currentURL = path.map { rootURL.appendingPathComponent($0) } ?? rootURL
+        let currentURL = path.map { rootURL.appending(path: $0) } ?? rootURL
 
         do {
             let urls = try FileManager.default.contentsOfDirectory(
@@ -392,7 +392,7 @@ final class ImportViewModel: ImportManaging {
         }
         defer { rootURL.stopAccessingSecurityScopedResource() }
 
-        let trackURL = rootURL.appendingPathComponent(relativePath)
+        let trackURL = rootURL.appending(path: relativePath)
         let folderToScan = trackURL.deletingLastPathComponent()
 
         guard let enumerator = FileManager.default.enumerator(
@@ -459,12 +459,43 @@ final class ImportViewModel: ImportManaging {
         )
     }
 
-    func track(for url: URL) -> TrackEntity? {
+    func track(for url: URL, sourceID: ImportSource.ID?) -> TrackEntity? {
+        let candidates: [TrackEntity]
+
+        if let sourceID {
+            candidates = self.tracks(for: sourceID)
+        } else {
+            candidates = self.library?.tracks ?? []
+        }
+
+        let filePath = url.standardizedFileURL.path
+            .precomposedStringWithCanonicalMapping
+
+        let pathMatches = candidates.filter { track in
+            guard
+                let relative = track.originalRelativePath?
+                    .precomposedStringWithCanonicalMapping,
+                relative.isEmpty == false
+            else {
+                return false
+            }
+
+            let relativePath = relative.replacingOccurrences(of: "\\", with: "/")
+            return filePath == relativePath
+                || filePath.hasSuffix("/" + relativePath)
+        }
+
+        if let exact = pathMatches.max(by: {
+            ($0.originalRelativePath?.count ?? 0) < ($1.originalRelativePath?.count ?? 0)
+        }) {
+            return exact
+        }
+
         let fileBase = self.normalize(url.deletingPathExtension().lastPathComponent)
         let fileCompact = self.compact(fileBase)
         guard fileBase.isEmpty == false else { return nil }
 
-        return self.library?.tracks.first { track in
+        return candidates.first { track in
             let title = self.normalize(track.songName)
             let artist = self.normalize(track.artistName)
             let artistTitle = [artist, title].filter { !$0.isEmpty }.joined(separator: " - ")

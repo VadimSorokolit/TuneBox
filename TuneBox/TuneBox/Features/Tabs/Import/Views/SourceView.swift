@@ -24,7 +24,7 @@ struct SourceView: View {
                     let appearance = items.playbackRow(
                         at: index,
                         currentTrack: playerVM.track,
-                        trackFor: importManagingVM.track(for:)
+                        trackFor: { importManagingVM.track(for: $0, sourceID: sourceID) }
                     )
 
                     row(for: item, appearance: appearance)
@@ -83,7 +83,7 @@ struct SourceView: View {
     private var folderPlaybackQueue: [TrackEntity] {
         items.compactMap { item in
             guard item.kind == .track else { return nil }
-            return importManagingVM.track(for: item.url)
+            return importManagingVM.track(for: item.url, sourceID: sourceID)
         }
     }
 
@@ -91,7 +91,7 @@ struct SourceView: View {
 
     private func scrollIdentity(for item: SourceFolderItem) -> String {
         if item.kind == .track,
-           let track = importManagingVM.track(for: item.url) {
+           let track = importManagingVM.track(for: item.url, sourceID: sourceID) {
             return track.id
         }
 
@@ -124,7 +124,7 @@ struct SourceView: View {
                     isPlaying: appearance.isPlaying,
                     hidesSeparator: appearance.hidesSeparator,
                     onTapGesture: {
-                        guard let track = importManagingVM.track(for: item.url) else {
+                        guard let track = importManagingVM.track(for: item.url, sourceID: sourceID) else {
                             return
                         }
                         playerVM.handlePlayAction(

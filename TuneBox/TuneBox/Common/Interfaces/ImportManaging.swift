@@ -28,7 +28,7 @@ protocol ImportManaging: LoadStateManaging {
     func artistCoverPaths(for album: MusicLibrary.Album) -> [String]
     func applyCover(_ sourcePath: String, to album: MusicLibrary.Album) async
     func applyCover(_ data: Data, to album: MusicLibrary.Album) async
-    func track(for url: URL) -> TrackEntity?
+    func track(for url: URL, sourceID: ImportSource.ID?) -> TrackEntity?
     func tracks(for sourceID: ImportSource.ID) -> [TrackEntity]
     func tracksSize(_ tracks: [TrackEntity]) -> Int
     func sourceTracksSummary(for sourceID: ImportSource.ID) -> (count: Int, duration: Int, size: Int)
@@ -49,6 +49,10 @@ extension ImportManaging {
 
     func libraryTracks(onlyAPI: Bool = false) -> [TrackEntity] {
         libraryTracks(onlyAPI: onlyAPI)
+    }
+
+    func track(for url: URL) -> TrackEntity? {
+        track(for: url, sourceID: nil)
     }
 
 }
