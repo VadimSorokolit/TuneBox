@@ -163,7 +163,7 @@ struct CompactPlayerView: View {
             .overlay {
                 tapZones
             }
-            .animation(.easeInOut(duration: 0.35), value: isPlaying)
+            .animation(.snappy(duration: 0.2), value: isPlaying)
             .task(id: "\(track.id)-\(coverVM.isConnected)") {
                 guard coverVM.isConnected else { return }
                 guard track.imagePath == nil else { return }
