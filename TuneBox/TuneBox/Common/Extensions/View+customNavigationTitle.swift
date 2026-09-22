@@ -56,6 +56,10 @@ private struct ImportHomeNavigationLock: UIViewControllerRepresentable {
 
         private var isHomeVisible = false
         private var isLeavingHome = false
+        private var isInteractivePopUnderway = false
+        private var didHideBackButton = false
+        private var didHideChrome = false
+        private var hiddenChrome: [ChromeRef] = []
         private var displayLink: CADisplayLink?
         private var scrubUntil: CFTimeInterval = 0
 
@@ -71,12 +75,20 @@ private struct ImportHomeNavigationLock: UIViewControllerRepresentable {
 
         override func viewWillAppear(_ animated: Bool) {
             super.viewWillAppear(animated)
+            // An edge swipe pops back onto Home while the screen above is still
+            // showing its back button. Hiding chrome in that window strips the
+            // chevron and leaves the button untappable after the swipe cancels.
+            let coordinator = transitionCoordinator
+            isInteractivePopUnderway = coordinator?.isInteractive == true
+                || coordinator?.initiallyInteractive == true
             isLeavingHome = false
             isHomeVisible = true
+
             transitionCoordinator?.animate(alongsideTransition: { [weak self] _ in
                 self?.lockIfHomeIsTop()
             }, completion: { [weak self] context in
                 guard let self else { return }
+                self.isInteractivePopUnderway = false
                 if context.isCancelled {
                     self.isLeavingHome = true
                     self.isHomeVisible = false
@@ -90,6 +102,8 @@ private struct ImportHomeNavigationLock: UIViewControllerRepresentable {
 
         override func viewDidAppear(_ animated: Bool) {
             super.viewDidAppear(animated)
+            guard isEdgeSwipeActive.isFalse else { return }
+
             isLeavingHome = false
             isHomeVisible = true
             lockIfHomeIsTop()
@@ -103,6 +117,7 @@ private struct ImportHomeNavigationLock: UIViewControllerRepresentable {
 
         override func viewWillDisappear(_ animated: Bool) {
             super.viewWillDisappear(animated)
+            isInteractivePopUnderway = false
             isLeavingHome = true
             isHomeVisible = false
             unlock()
@@ -118,7 +133,7 @@ private struct ImportHomeNavigationLock: UIViewControllerRepresentable {
         }
 
         private func startScrubbing() {
-            guard isLeavingHome.isFalse, isHomeVisible, isHomeTheTopItem else { return }
+            guard isEdgeSwipeActive.isFalse, isLeavingHome.isFalse, isHomeVisible, isHomeTheTopItem else { return }
 
             scrubUntil = CACurrentMediaTime() + 1.0
             guard displayLink == nil else { return }
@@ -140,6 +155,10 @@ private struct ImportHomeNavigationLock: UIViewControllerRepresentable {
         }
 
         private func lockIfHomeIsTop() {
+            if isEdgeSwipeActive {
+                return
+            }
+
             guard isLeavingHome.isFalse, isHomeVisible, isHomeTheTopItem else { return }
 
             navigationController?.interactivePopGestureRecognizer?.isEnabled = false
@@ -149,37 +168,79 @@ private struct ImportHomeNavigationLock: UIViewControllerRepresentable {
             nearestNavigationItem?.hidesBackButton = true
             nearestNavigationItem?.title = nil
             nearestNavigationItem?.largeTitleDisplayMode = .never
+            didHideBackButton = true
             setBackChromeHidden(true)
         }
 
         private func unlock() {
             stopScrubbing()
+
+            // A cancelled edge swipe still owns the back button. Toggling
+            // hidesBackButton or alpha here drops the chevron and kills the tap.
+            guard isEdgeSwipeActive.isFalse else { return }
+
             navigationController?.interactivePopGestureRecognizer?.isEnabled = true
-            navigationItem.hidesBackButton = false
-            nearestNavigationItem?.hidesBackButton = false
-            setBackChromeHidden(false)
+
+            if didHideBackButton {
+                didHideBackButton = false
+                navigationItem.hidesBackButton = false
+                nearestNavigationItem?.hidesBackButton = false
+            }
+
+            guard didHideChrome else { return }
+            restoreHiddenChrome()
+        }
+
+        private var isEdgeSwipeActive: Bool {
+            if isInteractivePopUnderway { return true }
+
+            switch navigationController?.interactivePopGestureRecognizer?.state {
+                case .began, .changed:
+                    return true
+                default:
+                    return false
+            }
         }
 
         private func setBackChromeHidden(_ hidden: Bool) {
-            guard let bar = navigationController?.navigationBar else { return }
-            applyBackChromeHidden(hidden, in: bar)
+            guard hidden, let bar = navigationController?.navigationBar else { return }
+
+            hiddenChrome.removeAll()
+            hideBackChrome(in: bar)
+            didHideChrome = hiddenChrome.isEmpty.isFalse
         }
 
-        private func applyBackChromeHidden(_ hidden: Bool, in view: UIView) {
+        private func restoreHiddenChrome() {
+            didHideChrome = false
+            hiddenChrome.forEach { ref in
+                guard let view = ref.view else { return }
+                view.isHidden = false
+                view.alpha = 1
+                view.isUserInteractionEnabled = true
+            }
+            hiddenChrome.removeAll()
+        }
+
+        private func hideBackChrome(in view: UIView) {
             if isLeftoverHomeChrome(view) {
-                // Kill leftover glass only while hiding on Home.
-                // Restoring must keep the incoming back-button animation intact,
-                // otherwise the chevron never draws and the tap does not pop.
-                if hidden {
-                    view.layer.removeAllAnimations()
-                    view.layer.sublayers?.forEach { $0.removeAllAnimations() }
-                }
-                view.isHidden = hidden
-                view.alpha = hidden ? 0 : 1
-                view.isUserInteractionEnabled = !hidden
+                // Kill leftover glass only while Home is settled on top.
+                view.layer.removeAllAnimations()
+                view.layer.sublayers?.forEach { $0.removeAllAnimations() }
+                view.isHidden = true
+                view.alpha = 0
+                view.isUserInteractionEnabled = false
+                hiddenChrome.append(ChromeRef(view))
             }
 
-            view.subviews.forEach { applyBackChromeHidden(hidden, in: $0) }
+            view.subviews.forEach { hideBackChrome(in: $0) }
+        }
+
+        private final class ChromeRef {
+            weak var view: UIView?
+
+            init(_ view: UIView) {
+                self.view = view
+            }
         }
 
         private func isLeftoverHomeChrome(_ view: UIView) -> Bool {
