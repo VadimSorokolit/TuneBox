@@ -212,3 +212,13 @@ struct SourceView: View {
         .onTapGesture(perform: onTapGesture)
     }
 }
+
+#Preview {
+    NavigationStack {
+        SourceView(
+            sourceID: UUID(),
+            path: nil
+        )
+        .environment(AppCoordinator(root: .main))
+    }
+}
