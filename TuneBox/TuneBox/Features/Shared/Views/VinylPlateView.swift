@@ -52,8 +52,8 @@ struct VinylPlateView: View {
                 .clipShape(Circle())
 
             CoverView(
-                coverPath: track.imagePath,
-                image: coverImage,
+                coverPath: isLoading ? nil : track.imagePath,
+                image: isLoading ? nil : coverImage,
                 size: coverImageSize,
                 cornerRadius: coverImageSize / 2,
                 placeholderOpacity: 1.0
@@ -72,13 +72,6 @@ struct VinylPlateView: View {
                     Circle()
                         .stroke(.gray, lineWidth: 1)
                 }
-
-            if isLoading {
-                SpinnerView(
-                    size: .regular,
-                    color: .gray
-                )
-            }
         }
         .frame(size: vinylImageSize)
         .rotationEffect(.degrees(rotation))

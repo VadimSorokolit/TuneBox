@@ -168,10 +168,12 @@ struct CompactPlayerView: View {
                 guard coverVM.isConnected else { return }
                 guard track.imagePath == nil else { return }
                 guard track.artistName.isNotEmpty, track.albumName.isNotEmpty else { return }
-                guard let data = await coverVM.fetchFrontCover(
+
+                let data = await coverVM.fetchFrontCover(
                     artist: track.artistName,
                     album: track.albumName
-                ) else { return }
+                )
+                guard let data else { return }
 
                 guard let album = importManagingVM.library?.albums.first(where: { album in
                     album.tracks.contains(where: { $0.id == track.id })

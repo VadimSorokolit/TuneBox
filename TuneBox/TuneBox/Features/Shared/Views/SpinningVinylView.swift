@@ -82,41 +82,52 @@ struct SpinningVinylView: View, Equatable {
 
     var body: some View {
         ZStack {
-            VinylIdlePlate(
-                track: track,
-                coverImage: coverImage,
-                isLoading: isLoading,
-                vinylSize: vinylSize,
-                coverSize: coverSize,
-                holeSize: holeSize
-            )
-            .equatable()
-            .allowsHitTesting(false)
-            .opacity(0.15)
+            Group {
+                VinylIdlePlate(
+                    track: track,
+                    coverImage: coverImage,
+                    isLoading: isLoading,
+                    vinylSize: vinylSize,
+                    coverSize: coverSize,
+                    holeSize: holeSize
+                )
+                .equatable()
+                .allowsHitTesting(false)
+                .opacity(0.15)
 
-            VinylSpinningDisc(
-                track: track,
-                coverImage: coverImage,
-                isLoading: isLoading,
-                isSpinning: shouldSpin,
-                ignoresSpinGate: isSeekScrubbing || isTapSpinning,
-                spinDirection: spinDirection,
-                spinSpeed: spinSpeed,
-                revolutionDuration: revolutionDuration,
-                visibleSize: visibleSize,
-                vinylSize: vinylSize,
-                coverSize: coverSize,
-                holeSize: holeSize
-            )
-            .equatable()
-            .frame(size: vinylSize)
+                VinylSpinningDisc(
+                    track: track,
+                    coverImage: coverImage,
+                    isLoading: isLoading,
+                    isSpinning: shouldSpin,
+                    ignoresSpinGate: isSeekScrubbing || isTapSpinning,
+                    spinDirection: spinDirection,
+                    spinSpeed: spinSpeed,
+                    revolutionDuration: revolutionDuration,
+                    visibleSize: visibleSize,
+                    vinylSize: vinylSize,
+                    coverSize: coverSize,
+                    holeSize: holeSize
+                )
+                .equatable()
+                .frame(size: vinylSize)
+            }
+            .transaction { $0.animation = nil }
+
+            if isLoading {
+                SpinnerView(
+                    size: vinylSize < 80
+                    ? .mini
+                    : .extraLarge,
+                    color: .white
+                )
+            }
         }
         .frame(size: vinylSize)
         .contentShape(Circle())
         .onTapGesture {
             onTap?()
         }
-        .transaction { $0.animation = nil }
         .task(id: track.imagePath) {
             self.coverImage = nil
             self.coverImage = await CoverImageLoader.image(for: track.imagePath)
@@ -660,7 +671,7 @@ private final class VinylSpinContainer: UIView {
             size: 5_242_880
         ),
         isPlaying: false,
-        isLoading: false,
+        isLoading: true,
         isSeekScrubbing: false,
         isTapSpinning: false,
         progress: 0.6,
