@@ -450,33 +450,23 @@ inline bool AudioPlayer::DecoderState::decodeAudio(AVAudioPCMBuffer *_Nonnull bu
         return false;
     }
 
-    const auto framesDecoded = decodeBuffer_.frameLength;
-    if (framesDecoded == 0) {
+    const auto sourceFrames = decodeBuffer_.frameLength;
+    if (sourceFrames == 0) {
         setFlags(Flags::decodingComplete);
-
-#if false
-        // Some formats may not know the exact number of frames in advance
-        // without processing the entire file, which is a potentially slow operation
-        frameLength_.store(mDecoder.framePosition, std::memory_order_release);
-#endif /* false */
-
         buffer.frameLength = 0;
         return true;
     }
 
-    this->framesDecoded_.fetch_add(framesDecoded, std::memory_order_acq_rel);
-
-    // Only PCM to PCM conversions are performed
+    // Only PCM to PCM conversions are performed. After a seek the converter is reset and the
+    // first output buffer can be shorter than the input without the file actually ending.
     if (![converter_ convertToBuffer:buffer fromBuffer:decodeBuffer_ error:error]) {
         return false;
     }
-#if DEBUG
-    assert(framesDecoded == buffer.frameLength);
-#endif /* DEBUG */
 
-    // If `buffer` is not full but -decodeIntoBuffer:frameLength:error: returned `YES`
-    // decoding is complete
-    if (buffer.frameLength != buffer.frameCapacity) {
+    this->framesDecoded_.fetch_add(buffer.frameLength, std::memory_order_acq_rel);
+
+    // A short read from the decoder means EOF. A short converter output does not.
+    if (sourceFrames != decodeBuffer_.frameCapacity) {
         setFlags(Flags::decodingComplete);
     }
 
@@ -1335,6 +1325,11 @@ void sfb::AudioPlayer::processDecoders(std::stop_token stoken) noexcept {
                 continue;
             }
 
+            // Drop audio queued before this seek, and ignore the rendered-frame events that
+            // still describe it. Applying them makes the player finish about a second early.
+            setFlags(Flags::drainRequired);
+            renderEpoch_.fetch_add(1, std::memory_order_release);
+
             if (const auto frame = decoderState->framesDecoded_.load(std::memory_order_acquire);
                 decodingEvents_.writeAll(DecodingEventCommand::seek, nextEventIdentificationNumber(),
                                          decoderState->sequenceNumber_, frame)) {
@@ -1727,6 +1722,7 @@ void sfb::AudioPlayer::submitDecodingErrorEvent(NSError *error) noexcept {
 
 OSStatus sfb::AudioPlayer::render(BOOL &isSilence, const AudioTimeStamp &timestamp, AVAudioFrameCount frameCount,
                                   AudioBufferList *outputData) noexcept {
+    const auto epochAtStart = renderEpoch_.load(std::memory_order_acquire);
     const auto flags = loadFlags();
 
     /// Sets the buffers in an AudioBufferList struct to zero.
@@ -1760,8 +1756,16 @@ OSStatus sfb::AudioPlayer::render(BOOL &isSilence, const AudioTimeStamp &timesta
                          frameCount);
         }
 #endif /* DEBUG */
+        if (renderEpoch_.load(std::memory_order_acquire) != epochAtStart ||
+            bits::is_set(loadFlags(), Flags::drainRequired)) {
+            zeroABL(outputData);
+            isSilence = YES;
+            return noErr;
+        }
+
         if (!renderingEvents_.writeAll(RenderingEventCommand::framesRendered, nextEventIdentificationNumber(),
-                                       timestamp.mHostTime, timestamp.mRateScalar, static_cast<uint32_t>(framesRead))) {
+                                       timestamp.mHostTime, timestamp.mRateScalar, static_cast<uint32_t>(framesRead),
+                                       epochAtStart)) {
             setFlags(Flags::renderEventDropped);
         }
     } else {
@@ -2063,9 +2067,14 @@ bool sfb::AudioPlayer::processFramesRenderedEvent() noexcept {
     double rateScalar;
     // The number of valid frames rendered
     uint32_t framesRendered;
-    if (!renderingEvents_.readAll(hostTime, rateScalar, framesRendered)) {
+    uint64_t renderEpoch = 0;
+    if (!renderingEvents_.readAll(hostTime, rateScalar, framesRendered, renderEpoch)) {
         os_log_error(log_, "Missing timestamp or frames rendered for frames rendered event");
         return false;
+    }
+
+    if (renderEpoch != renderEpoch_.load(std::memory_order_acquire)) {
+        return true;
     }
 
 #if DEBUG

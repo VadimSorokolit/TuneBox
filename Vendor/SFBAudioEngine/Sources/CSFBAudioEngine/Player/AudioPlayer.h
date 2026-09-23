@@ -100,6 +100,9 @@ class AudioPlayer final {
     std::atomic_uint flags_{0};
     static_assert(std::atomic_uint::is_always_lock_free, "Lock-free std::atomic_uint required");
 
+    /// Bumped on every seek. Rendered-frame events from the previous position are ignored.
+    std::atomic<uint64_t> renderEpoch_{0};
+
     /// When false, an output-device change leaves the player paused instead of restoring rendering
     std::atomic<bool> restoresPlaybackAfterEngineReset_{true};
 

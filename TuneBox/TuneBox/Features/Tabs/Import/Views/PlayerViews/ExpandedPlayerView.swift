@@ -38,6 +38,20 @@ struct ExpandedPlayerView: View {
         let coverVM: CoverManaging
         let onClose: () -> Void
 
+        // MARK: - Properties. Private
+
+        @State private var sliderValue = 0.0
+        @State private var isSliding = false
+        /// Blocks 1→0 sync on the same slider while the queue advances after release.
+        @State private var ignoreProgressSync = false
+
+        private var displayedSliderValue: Double {
+            if self.isSliding || self.ignoreProgressSync {
+                return self.sliderValue
+            }
+            return self.playerVM.progress
+        }
+
         // MARK: - Body
 
         var body: some View {
@@ -93,6 +107,17 @@ struct ExpandedPlayerView: View {
                 .background {
                     BlurredCoverBackground(coverPath: track.imagePath)
                         .animation(.easeInOut(duration: 0.4), value: track.id)
+                }
+                .onAppear {
+                    self.sliderValue = self.playerVM.progress
+                }
+                .onChange(of: track.id) { _, _ in
+                    self.ignoreProgressSync = false
+                    self.sliderValue = self.playerVM.progress
+                }
+                .onChange(of: playerVM.progress) { _, progress in
+                    guard self.isSliding.isFalse, self.ignoreProgressSync.isFalse else { return }
+                    self.sliderValue = progress
                 }
             } else {
                 ContentUnavailableView(
@@ -164,14 +189,38 @@ struct ExpandedPlayerView: View {
             VStack(spacing: 16) {
                 Slider(
                     value: Binding(
-                        get: { playerVM.progress },
-                        set: { playerVM.seek(to: $0) }
+                        get: { displayedSliderValue },
+                        set: { newValue in
+                            self.sliderValue = newValue
+                            guard self.isSliding else { return }
+                            self.playerVM.seek(to: newValue)
+                        }
                     ),
                     in: 0 ... 1
                 ) { editing in
-                    playerVM.setSeekScrubbing(editing, direction: 0)
+                    if editing {
+                        self.sliderValue = self.playerVM.progress
+                        self.isSliding = true
+                        self.ignoreProgressSync = false
+                    } else {
+                        // Playing + at end: don't let progress 1→0 redraw this slider instance.
+                        if self.sliderValue >= 1, self.playerVM.isPlaying {
+                            self.ignoreProgressSync = true
+                            Task { @MainActor in
+                                // repeat .one keeps the same track id — unfreeze shortly after.
+                                try? await Task.sleep(nanoseconds: 120_000_000)
+                                guard self.ignoreProgressSync else { return }
+                                self.ignoreProgressSync = false
+                                guard self.isSliding.isFalse else { return }
+                                self.sliderValue = self.playerVM.progress
+                            }
+                        }
+                        self.isSliding = false
+                    }
+                    self.playerVM.setSeekScrubbing(editing, direction: 0)
                 }
                 .tint(Self.accentColor)
+                .id(playerVM.track?.id)
 
                 HStack(spacing: 36) {
                     TrackSkipHoldButton(

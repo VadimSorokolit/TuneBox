@@ -206,6 +206,12 @@ final class PlayerViewModel: PlayerManaging {
     func togglePlayPause() {
         guard let track = self.track else { return }
         self.clearSeekScrubbing()
+
+        if self.playFromPausedTrackEnd() {
+            self.persistPlaybackSession()
+            return
+        }
+
         self.toggle(track)
         self.persistPlaybackSession()
     }
@@ -304,12 +310,13 @@ final class PlayerViewModel: PlayerManaging {
     }
 
     func seek(by deltaSeconds: TimeInterval) {
-        self.audioService.seek(by: deltaSeconds)
-
-        guard self.isSeekScrubbing.isFalse else {
+        // Hold-scrub can run after session restore before the engine has duration.
+        if self.isSeekScrubbing {
             self.applySeekHoldProgress(deltaSeconds: deltaSeconds)
             return
         }
+
+        self.audioService.seek(by: deltaSeconds)
 
         let direction = deltaSeconds >= 0 ? 1.0 : -1.0
         self.startVinylTapSpin(direction: direction)
@@ -324,6 +331,8 @@ final class PlayerViewModel: PlayerManaging {
             self.updateVinylScrubSpin(for: delta)
             self.lastSeekProgress = clamped
             self.progress = clamped
+            // Slider (and any scrub): finish-per-mode only if released at end while playing.
+            self.pendingFinishOnRelease = self.isPlaying && self.isAtTrackEnd
         }
 
         self.audioService.seek(to: clamped)
@@ -338,6 +347,7 @@ final class PlayerViewModel: PlayerManaging {
         if isScrubbing {
             if self.isSeekScrubbing.isFalse {
                 self.lastSeekProgress = self.progress
+                self.pendingFinishOnRelease = false
             }
 
             if direction == 0 {
@@ -347,12 +357,26 @@ final class PlayerViewModel: PlayerManaging {
                 self.vinylSpinSpeed = Self.vinylScrubSpinSpeed
             }
         } else {
+            let shouldFinishPerMode = self.pendingFinishOnRelease
+            self.pendingFinishOnRelease = false
             self.vinylSpinDirection = 1
             self.vinylSpinSpeed = 1
             self.lastSeekProgress = nil
+
+            self.audioService.setSeekScrubbing(false, direction: direction)
+            self.isSeekScrubbing = false
+
+            // Playing + released at end (hold or slider) → apply repeat mode.
+            // Defer so SwiftUI Slider can leave the drag gesture before progress jumps.
+            guard shouldFinishPerMode else { return }
+            Task { @MainActor in
+                await Task.yield()
+                self.handleTrackFinished()
+            }
+            return
         }
 
-        self.audioService.setSeekScrubbing(isScrubbing)
+        self.audioService.setSeekScrubbing(isScrubbing, direction: direction)
         self.isSeekScrubbing = isScrubbing
     }
 
@@ -524,7 +548,10 @@ final class PlayerViewModel: PlayerManaging {
     private var pendingScrubDirection: Double?
     @ObservationIgnored
     private var pendingScrubDirectionCount = 0
+    @ObservationIgnored
+    private var pendingFinishOnRelease = false
 
+    private static let trackEndSlop: TimeInterval = 0.05
     private static let restartThreshold: TimeInterval = 5
     private static let persistProgressInterval: TimeInterval = 5
     private static let vinylScrubSpinSpeed: Double = 2.5
@@ -608,13 +635,29 @@ final class PlayerViewModel: PlayerManaging {
         self.progress = 0
 
         if self.isPlaying {
-            self.audioService.restartCurrentTrack()
+            self.restartCurrentTrackFromBeginning(autoplay: true)
         } else {
             self.audioService.seek(to: 0)
             self.equalizerService.reset()
         }
 
         self.persistPlaybackSession()
+    }
+
+    /// Restarts the current track for repeat-one / play-from-end.
+    /// After a cold session restore the engine has no file yet — fall back to `play`.
+    private func restartCurrentTrackFromBeginning(autoplay: Bool) {
+        guard let track = self.track else { return }
+
+        self.pendingRestoreProgress = nil
+        self.pendingRestoreTrackId = nil
+        self.progress = 0
+
+        if self.audioService.restartCurrentTrack() {
+            return
+        }
+
+        self.play(track, autoplay: autoplay)
     }
 
     private func startVinylTapSpin(direction: Double) {
@@ -717,41 +760,48 @@ final class PlayerViewModel: PlayerManaging {
     }
 
     private func applyAudioProgress() {
-        let duration = self.audioService.duration
+        let duration = self.effectiveDuration
         guard duration > 0 else { return }
 
-        self.progress = min(max(self.audioService.currentTime / duration, 0), 1)
+        let currentTime = self.audioService.duration > 0
+            ? self.audioService.currentTime
+            : duration * self.progress
+        self.progress = min(max(currentTime / duration, 0), 1)
     }
 
     private func applySeekHoldProgress(deltaSeconds: TimeInterval) {
-        let duration = self.audioService.duration
-        if duration > 0 {
-            let newProgress = min(max(self.progress + (deltaSeconds / duration), 0), 1)
-            self.progress = newProgress
-            self.lastSeekProgress = newProgress
-            self.stopSeekScrubbingIfNeeded(at: newProgress)
-            return
-        }
+        let duration = self.effectiveDuration
+        guard duration > 0 else { return }
 
-        self.applyAudioProgress()
-        self.stopSeekScrubbingIfNeeded(at: self.progress)
+        let newProgress = min(max(self.progress + (deltaSeconds / duration), 0), 1)
+        self.progress = newProgress
+        self.lastSeekProgress = newProgress
+        // Sync scrub cursor even when the engine has not opened the file yet.
+        self.audioService.seek(to: newProgress)
+        self.stopSeekScrubbingIfNeeded(at: newProgress)
     }
 
-    private func playbackTime(for progress: Double) -> TimeInterval {
-        let duration = self.audioService.duration
-        if duration > 0 {
-            return duration * progress
+    private var effectiveDuration: TimeInterval {
+        let engineDuration = self.audioService.duration
+        if engineDuration > 0 {
+            return engineDuration
         }
 
-        guard let duration = self.track?.duration, duration > 0 else {
+        guard let trackDuration = self.track?.duration, trackDuration > 0 else {
             return 0
         }
 
-        return Double(duration) * progress
+        return TimeInterval(trackDuration)
+    }
+
+    private func playbackTime(for progress: Double) -> TimeInterval {
+        self.effectiveDuration * progress
     }
 
     private func clearSeekScrubbing() {
         guard self.isSeekScrubbing else { return }
+        // Aborting scrub (play/pause, reset, etc.) must not advance the queue.
+        self.pendingFinishOnRelease = false
         self.setSeekScrubbing(false)
     }
 
@@ -764,18 +814,45 @@ final class PlayerViewModel: PlayerManaging {
 
         if reachedEnd {
             self.progress = 1
+            // Defer mode handling until release. Paused never advances.
+            self.pendingFinishOnRelease = self.isPlaying
         } else {
             self.progress = 0
+            self.pendingFinishOnRelease = false
         }
 
         self.cancelVinylTapSpin()
         self.vinylSpinSpeed = 0
     }
 
+    private func playFromPausedTrackEnd() -> Bool {
+        guard self.isPlaying.isFalse, self.isAtTrackEnd else { return false }
+
+        // No Repeat on the last track means the queue is already finished.
+        guard self.repeatMode != .off || self.isAtLastTrack.isFalse else { return true }
+
+        if self.repeatMode == .one {
+            // Must actually start playback (engine may be empty after cold restore).
+            self.restartCurrentTrackFromBeginning(autoplay: true)
+            return true
+        }
+
+        self.handleTrackFinished()
+        return true
+    }
+
+    private var isAtTrackEnd: Bool {
+        let duration = self.audioService.duration
+        guard duration > 0 else { return self.progress >= 1 }
+
+        let remaining = duration * (1 - min(max(self.progress, 0), 1))
+        return remaining <= Self.trackEndSlop
+    }
+
     private func handleTrackFinished() {
         switch self.repeatMode {
             case .one:
-                self.audioService.restartCurrentTrack()
+                self.restartCurrentTrackFromBeginning(autoplay: true)
 
             case .all:
                 self.advance(direction: .next)
@@ -933,11 +1010,14 @@ final class PlayerViewModel: PlayerManaging {
     }
 
     private func applyPendingRestoreSeekIfNeeded() {
-        guard let pending = self.pendingRestoreProgress else { return }
+        guard self.pendingRestoreProgress != nil else { return }
         let restoreTrackId = self.pendingRestoreTrackId
         self.pendingRestoreProgress = nil
         self.pendingRestoreTrackId = nil
-        guard pending > 0, pending < 1 else { return }
+
+        // Prefer current UI progress — user may have hold/scrubbed after restore.
+        let target = self.progress
+        guard target > 0, target < 1 else { return }
 
         // Let SFB finish opening the decoder before seeking.
         DispatchQueue.main.async { [weak self] in
@@ -947,7 +1027,7 @@ final class PlayerViewModel: PlayerManaging {
             guard restoreTrackId == nil || self.track?.id == restoreTrackId else { return }
             // User already skipped/rewound to the start.
             guard self.progress > 0 else { return }
-            self.audioService.seek(to: pending)
+            self.audioService.seek(to: self.progress)
         }
     }
 

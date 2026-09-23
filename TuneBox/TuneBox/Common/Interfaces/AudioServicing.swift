@@ -56,7 +56,7 @@ protocol AudioServicing: AnyObject {
     func seek(by deltaSeconds: TimeInterval)
     func seek(to progress: Double)
     func seekToStartAndPause()
-    func setSeekScrubbing(_ isScrubbing: Bool)
+    func setSeekScrubbing(_ isScrubbing: Bool, direction: Double)
     func refreshFormatInfo(for url: URL)
-    func restartCurrentTrack()
+    func restartCurrentTrack() -> Bool
 }

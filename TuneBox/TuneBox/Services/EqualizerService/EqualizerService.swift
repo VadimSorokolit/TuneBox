@@ -126,6 +126,10 @@ final class EqualizerService: EqualizerServicing {
     private static let bandCenters = SpectrumAnalyzer.thirdOctaveCenters
     /// About half a second of true silence at a 2048-frame hop.
     private static let dropoutSilentFrames = 12
+    /// A cable pull stays this loud in the recent peak. A fade has already fallen through it.
+    private static let audibleCutThreshold: Float = SpectrumAnalyzer.floorDB + 8
+    /// Slow enough that the 220 ms spectrum release still leaves a loud peak after a hard cut.
+    private static let peakDecayPerSecond: Float = 24
 
     private let analyzer = SpectrumAnalyzer()
     nonisolated private let processGate = SpectrumProcessGate()
@@ -135,6 +139,10 @@ final class EqualizerService: EqualizerServicing {
     private var ignoreQuietUntil = Date.distantPast
     private var silentFrameCount = 0
     private var didReportDropout = false
+    private var heldPeak = SpectrumAnalyzer.floorDB
+    private var heldPeakDate = Date.distantPast
+    private var peakAtSilenceStart = SpectrumAnalyzer.floorDB
+    private var didCaptureSilencePeak = false
 
     // MARK: - Methods. Private
 
@@ -151,15 +159,26 @@ final class EqualizerService: EqualizerServicing {
 
         self.decibels = values
         self.bands = values.map { Self.normalized(decibels: $0) }
-        self.noteSilence(maximum <= SpectrumAnalyzer.floorDB + 1)
+        self.noteSilence(isSilent: maximum <= SpectrumAnalyzer.floorDB + 1, level: maximum)
     }
 
-    private func noteSilence(_ isSilent: Bool) {
+    private func noteSilence(isSilent: Bool, level: Float) {
         guard isSilent else {
+            self.decayHeldPeak(toward: level)
             self.silentFrameCount = 0
             self.didReportDropout = false
+            self.didCaptureSilencePeak = false
             return
         }
+
+        if self.didCaptureSilencePeak.isFalse {
+            self.peakAtSilenceStart = self.heldPeak
+            self.didCaptureSilencePeak = true
+        }
+
+        // The spectrum release glides every ending down to the floor. A fade
+        // is already quiet when that happens; a pulled cable still has a loud peak.
+        guard self.peakAtSilenceStart >= Self.audibleCutThreshold else { return }
 
         self.silentFrameCount += 1
         guard self.silentFrameCount >= Self.dropoutSilentFrames, self.didReportDropout.isFalse else { return }
@@ -168,9 +187,21 @@ final class EqualizerService: EqualizerServicing {
         NotificationCenter.default.post(name: .playbackOutputDropoutDetected, object: nil)
     }
 
+    private func decayHeldPeak(toward level: Float) {
+        let now = Date()
+        let elapsed = now.timeIntervalSince(self.heldPeakDate)
+        let decayed = self.heldPeak - Float(elapsed) * Self.peakDecayPerSecond
+        self.heldPeak = max(level, decayed, SpectrumAnalyzer.floorDB)
+        self.heldPeakDate = now
+    }
+
     private func clearDropoutWatch() {
         self.silentFrameCount = 0
         self.didReportDropout = false
+        self.heldPeak = SpectrumAnalyzer.floorDB
+        self.heldPeakDate = .distantPast
+        self.peakAtSilenceStart = SpectrumAnalyzer.floorDB
+        self.didCaptureSilencePeak = false
     }
 
     private func resetPublishedValues() {

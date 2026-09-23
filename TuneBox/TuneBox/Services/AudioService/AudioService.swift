@@ -184,6 +184,8 @@ final class AudioService: NSObject, AudioServicing {
         self.isDoPPlayback = false
         self.shouldLoop = false
         self.isSeekScrubbing = false
+        self.scrubProgress = nil
+        self.scrubDirection = 0
         self.wasPlayingBeforeScrub = false
         self.wasPlayingBeforeInterruption = false
         self.isPausedDueToRouteChange = false
@@ -200,13 +202,15 @@ final class AudioService: NSObject, AudioServicing {
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
     }
 
-    func restartCurrentTrack() {
-        guard let url = self.currentURL, let trackId = self.currentTrackId else { return }
+    @discardableResult
+    func restartCurrentTrack() -> Bool {
+        guard let url = self.currentURL, let trackId = self.currentTrackId else { return false }
 
         self.isRestartingCurrentTrack = true
         self.pinPlaybackToStart()
         self.notifyProgress(0)
         self.play(trackId: trackId, url: url, loop: self.shouldLoop)
+        return true
     }
 
     func toggle(trackId: String, url: URL, loop: Bool = false) {
@@ -235,32 +239,47 @@ final class AudioService: NSObject, AudioServicing {
     func seek(by deltaSeconds: TimeInterval) {
         guard self.duration > 0 else { return }
 
-        if self.isSeekScrubbing.isFalse {
-            self.equalizerService.holdUpdatesTemporarily(for: self.spectrumHoldDuration)
+        if self.isSeekScrubbing {
+            let base = self.scrubProgress ?? self.progressValue
+            let next = min(max(base + (deltaSeconds / self.duration), 0), 1)
+            self.rememberScrubProgress(next)
+            return
         }
+
+        self.equalizerService.holdUpdatesTemporarily(for: self.spectrumHoldDuration)
+        self.ignoreDropoutUntil = Date().addingTimeInterval(Self.seekDropoutIgnoreDuration)
 
         if deltaSeconds >= 0 {
             _ = self.player.seek(forward: deltaSeconds)
         } else {
-            _ = player.seek(backward: abs(deltaSeconds))
+            _ = self.player.seek(backward: abs(deltaSeconds))
         }
 
         self.notifyProgress(self.clampedProgressValue(for: deltaSeconds))
         self.refreshNowPlayingElapsed()
     }
 
-    func setSeekScrubbing(_ isScrubbing: Bool) {
+    func setSeekScrubbing(_ isScrubbing: Bool, direction: Double = 0) {
         guard self.isSeekScrubbing != isScrubbing else { return }
 
         if isScrubbing {
             self.silenceOutput()
             self.wasPlayingBeforeScrub = self.player.isPlaying
             self.isSeekScrubbing = true
+            self.scrubDirection = direction
+            self.scrubProgress = nil
             self.equalizerService.holdUpdates()
             return
         }
 
-        self.endSeekScrubbingIfNeeded()
+        let progress = self.scrubProgress
+        let holdDirection = self.scrubDirection
+        self.scrubProgress = nil
+        self.scrubDirection = 0
+        if let progress {
+            self.commitSeek(to: progress)
+        }
+        self.endSeekScrubbingIfNeeded(at: progress, holdDirection: holdDirection)
     }
 
     func refreshFormatInfo(for url: URL) {
@@ -270,30 +289,14 @@ final class AudioService: NSObject, AudioServicing {
 
     func seek(to progress: Double) {
         let clamped = min(max(progress, 0), 1)
-        if clamped <= 0 {
-            self.pinPlaybackToStart()
-        } else {
-            self.isPinnedToStart = false
-        }
-
-        guard self.duration > 0 else {
-            self.notifyProgress(clamped)
-            return
-        }
 
         if self.isSeekScrubbing {
-            self.equalizerService.holdUpdates()
-        } else {
-            self.equalizerService.holdUpdatesTemporarily(for: self.spectrumHoldDuration)
-        }
-
-        guard self.player.seek(position: clamped) else {
-            self.notifyProgress(clamped)
+            self.rememberScrubProgress(clamped)
             return
         }
 
-        self.notifyProgress(clamped)
-        self.refreshNowPlayingElapsed()
+        self.equalizerService.holdUpdatesTemporarily(for: self.spectrumHoldDuration)
+        self.commitSeek(to: clamped)
     }
 
     func seekToStartAndPause() {
@@ -391,6 +394,8 @@ final class AudioService: NSObject, AudioServicing {
     private var shouldLoop = false
     private var isDoPPlayback = false
     private var isSeekScrubbing = false
+    private var scrubProgress: Double?
+    private var scrubDirection: Double = 0
     private var wasPlayingBeforeScrub = false
     private var wasPlayingBeforeInterruption = false
     private var isRestoringPlayback = false
@@ -400,6 +405,7 @@ final class AudioService: NSObject, AudioServicing {
     private var restoreSeekRounds = 0
     private var isPausedDueToRouteChange = false
     private var ignoreRoutePauseUntil = Date.distantPast
+    private var ignoreDropoutUntil = Date.distantPast
     private var ignoreAutomaticResumeUntil = Date.distantPast
     private var engineRestoreGeneration = 0
     private var headphonesConnected = false
@@ -426,6 +432,9 @@ final class AudioService: NSObject, AudioServicing {
     private static let automaticResumeIgnoreDuration: TimeInterval = 1.5
     private static let progressCaptureFloor: TimeInterval = 0.05
     private static let routeWatchInterval: TimeInterval = 0.03
+    /// A fade-out is silence on purpose. The dropout watch must not pause over it.
+    private static let endingSilenceWindow: TimeInterval = 3
+    private static let seekDropoutIgnoreDuration: TimeInterval = 1.5
 
     private var progressValue: Double {
         guard self.duration > 0 else { return 0 }
@@ -1055,9 +1064,51 @@ final class AudioService: NSObject, AudioServicing {
         }
     }
 
-    private func endSeekScrubbingIfNeeded() {
+    private func rememberScrubProgress(_ progress: Double) {
+        if progress <= 0 {
+            self.pinPlaybackToStart()
+        } else {
+            self.isPinnedToStart = false
+        }
+
+        self.scrubProgress = progress
+        self.notifyProgress(progress)
+    }
+
+    private func commitSeek(to progress: Double) {
+        let clamped = min(max(progress, 0), 1)
+        if clamped <= 0 {
+            self.pinPlaybackToStart()
+        } else {
+            self.isPinnedToStart = false
+        }
+
+        guard self.duration > 0 else {
+            self.notifyProgress(clamped)
+            return
+        }
+
+        self.ignoreDropoutUntil = Date().addingTimeInterval(Self.seekDropoutIgnoreDuration)
+
+        guard self.player.seek(position: clamped) else {
+            self.notifyProgress(clamped)
+            return
+        }
+
+        self.notifyProgress(clamped)
+        self.refreshNowPlayingElapsed()
+    }
+
+    private func endSeekScrubbingIfNeeded(at scrubProgress: Double? = nil, holdDirection _: Double = 0) {
         let shouldResume = self.wasPlayingBeforeScrub
         let wasScrubbing = self.isSeekScrubbing
+        let endedAtTrackEnd: Bool = {
+            if let scrubProgress {
+                guard self.duration > 0 else { return scrubProgress >= 1 }
+                return (self.duration * (1 - scrubProgress)) <= Self.endThreshold
+            }
+            return self.isNearEnd
+        }()
 
         self.isSeekScrubbing = false
         self.wasPlayingBeforeScrub = false
@@ -1067,6 +1118,21 @@ final class AudioService: NSObject, AudioServicing {
         }
 
         self.applyVolume()
+
+        // Scrub (hold or slider) reached the end: park here.
+        // PlayerViewModel applies repeat mode on release when it was playing.
+        if endedAtTrackEnd {
+            if self.player.isPlaying {
+                _ = self.player.pause()
+            }
+            self.equalizerService.setPlaybackActive(false)
+            self.stopProgressTimer()
+            if shouldResume.isFalse {
+                self.notifyStateChange(false)
+            }
+            self.refreshNowPlayingElapsed()
+            return
+        }
 
         guard wasScrubbing || shouldResume else { return }
         guard shouldResume, self.player.isPlaying.isFalse else { return }
@@ -1165,13 +1231,32 @@ final class AudioService: NSObject, AudioServicing {
 
     @objc
     private func handleOutputDropout(_ notification: Notification) {
-        guard self.currentTrackId != nil else { return }
-        guard Date() >= self.ignoreRoutePauseUntil, self.isRestoringPlayback.isFalse else { return }
-        guard self.isPausedDueToRouteChange.isFalse else { return }
-
         self.runOnMain {
-            self.pauseForRouteChange()
+            self.pauseForDropoutIfNeeded()
         }
+    }
+
+    private func pauseForDropoutIfNeeded() {
+        guard self.shouldPauseForOutputDropout else { return }
+        self.pauseForRouteChange()
+    }
+
+    private var shouldPauseForOutputDropout: Bool {
+        guard self.currentTrackId != nil else { return false }
+        guard Date() >= self.ignoreRoutePauseUntil, self.isRestoringPlayback.isFalse else { return false }
+        guard Date() >= self.ignoreDropoutUntil else { return false }
+        guard self.isPausedDueToRouteChange.isFalse else { return false }
+        guard self.isSeekScrubbing.isFalse else { return false }
+        // Fades and the tail of the file are silence. Pausing there
+        // stops the track before it actually finishes.
+        guard self.isTrackEnding.isFalse else { return false }
+        return true
+    }
+
+    private var isTrackEnding: Bool {
+        guard self.duration > 0 else { return false }
+        let window = min(Self.endingSilenceWindow, self.duration)
+        return (self.duration - self.currentTime) <= window
     }
 
     private func allowEnginePlaybackRestore() {
@@ -1537,6 +1622,8 @@ extension AudioService: AudioPlayer.Delegate {
 
     func audioPlayerEndOfAudio(_ audioPlayer: AudioPlayer) {
         guard self.isRestartingCurrentTrack.isFalse else { return }
+        // Hold scrub owns end-of-track; don't advance while scrubbing.
+        guard self.isSeekScrubbing.isFalse else { return }
 
         AppLogger.audio.info("AudioService END: \(self.currentTrackId ?? "nil")")
         self.onTrackFinished?()
