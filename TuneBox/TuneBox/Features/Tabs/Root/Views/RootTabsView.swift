@@ -15,23 +15,19 @@ private enum Constants {
 
     enum Icons {
         enum Browse {
-            static let inactive = "magnifyingglass.circle"
-            static let active = "magnifyingglass.circle.fill"
+            static let asset = "TabSearch"
         }
 
         enum Downloads {
-            static let inactive = "arrow.down.circle"
-            static let active = "arrow.down.circle.fill"
+            static let asset = "TabDownload"
         }
 
         enum ImportFiles {
-            static let inactive = "folder.circle"
-            static let active = "folder.circle.fill"
+            static let asset = "TabMusic"
         }
 
         enum Settings {
-            static let inactive = "gear.circle"
-            static let active = "gear.circle.fill"
+            static let asset = "TabSettings"
         }
     }
 }
@@ -51,35 +47,19 @@ enum CustomTab: String, Hashable, Identifiable, CaseIterable {
 
     var id: Self { self }
 
-    var iconInactive: String {
+    var iconAsset: String {
         switch self {
             case .browse:
-                Constants.Icons.Browse.inactive
+                Constants.Icons.Browse.asset
 
             case .downloads:
-                Constants.Icons.Downloads.inactive
+                Constants.Icons.Downloads.asset
 
             case .importFiles:
-                Constants.Icons.ImportFiles.inactive
+                Constants.Icons.ImportFiles.asset
 
             case .settings:
-                Constants.Icons.Settings.inactive
-        }
-    }
-
-    var iconActive: String {
-        switch self {
-            case .browse:
-                Constants.Icons.Browse.active
-
-            case .downloads:
-                Constants.Icons.Downloads.active
-
-            case .importFiles:
-                Constants.Icons.ImportFiles.active
-
-            case .settings:
-                Constants.Icons.Settings.active
+                Constants.Icons.Settings.asset
         }
     }
 }
@@ -196,6 +176,7 @@ struct RootTabsView: View {
     @Injected private var settingsVM: SettingsManaging
     @Environment(\.themeManager) private var theme
     @Environment(AppCoordinator.self) private var coordinator
+    @Namespace private var tabBarNamespace
     @State private var isPaywallPresented: Bool = false
     @State private var isExpandedPlayerPresented: Bool = false
 
@@ -258,30 +239,28 @@ struct RootTabsView: View {
     }
 
     private var tabBar: some View {
-        ZStack(alignment: .top) {
-            HStack(spacing: 10) {
+        GlassEffectContainer {
+            HStack(spacing: 0) {
                 ForEach(rootTabsVM.visibleTabs) { tab in
                     TabItemView(
                         tab: tab,
                         isSelected: coordinator.selectedTab == tab,
                         activeColor: theme.tokens.tabIconActive,
                         inactiveColor: theme.tokens.tabIconInactive,
+                        glassNamespace: tabBarNamespace,
                         onTap: {
                             coordinator.switchToTab(tab)
                         }
                     )
                 }
             }
+            .padding(.horizontal, 6)
+            .frame(height: rootTabsVM.tabBarHeight)
+            .glassEffect(in: .capsule)
         }
-        .padding(.horizontal, 6)
-        .frame(height: rootTabsVM.tabBarHeight)
-        .background(tabBarBackground)
-    }
-
-    private var tabBarBackground: some View {
-        Rectangle()
-            .foregroundStyle(theme.tokens.tabBarBackground)
-            .ignoresSafeArea(edges: .bottom)
+        .padding(.horizontal, 12)
+        .padding(.bottom, 20)
+        .ignoresSafeArea(.container, edges: .bottom)
     }
 
     // MARK: - Private. Methods
@@ -335,6 +314,7 @@ struct RootTabsView: View {
         fileprivate let isSelected: Bool
         fileprivate let activeColor: Color
         fileprivate let inactiveColor: Color
+        fileprivate let glassNamespace: Namespace.ID
         fileprivate let onTap: () -> Void
 
         // MARK: - Main Body
@@ -342,52 +322,75 @@ struct RootTabsView: View {
         var body: some View {
             Button(
                 action: {
-                    withAnimation(.spring(response: 0.28, dampingFraction: 0.78)) {
+                    withAnimation(.spring(response: 0.32, dampingFraction: 0.72)) {
                         onTap()
                     }
                 },
                 label: {
-                    Image(systemName: isSelected ? tab.iconActive : tab.iconInactive)
-                        .font(.system(size: 30, weight: .ultraLight))
-                        .symbolRenderingMode(.hierarchical)
-                        .foregroundStyle(isSelected ? activeColor : inactiveColor)
-                        .frame(
-                            width: isSelected ? iconWidth + 5 : iconWidth,
-                            height: isSelected ? iconWidth + 5 : iconWidth
-                        )
-                        .animation(.spring(response: 0.28, dampingFraction: 0.78), value: isSelected)
-                        .frame(maxWidth: .infinity)
+                    ZStack {
+                        if isSelected {
+                            Capsule()
+                                .fill(.clear)
+                                .frame(width: selectionWidth, height: selectionHeight)
+                                .glassEffect(
+                                    .regular.tint(Color.white.opacity(0.35)).interactive(),
+                                    in: .capsule
+                                )
+                                .glassEffectID("selectedTabPill", in: glassNamespace)
+                        }
+
+                        Image(tab.iconAsset)
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 24, height: 24)
+                            .foregroundStyle(isSelected ? activeColor : inactiveColor)
+                            .scaleEffect(isSelected ? 1.14 : 1.0)
+                            .offset(y: isSelected ? -1 : 0)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: iconHitHeight)
+                    .contentShape(Rectangle())
                 }
             )
-            .offset(y: 10)
             .buttonStyle(.plain)
+            .animation(.spring(response: 0.32, dampingFraction: 0.72), value: isSelected)
         }
 
         // MARK: - Properties. Private
 
-        private let iconWidth: CGFloat = 54
+        private let iconHitHeight: CGFloat = 44
+        private let selectionWidth: CGFloat = 52
+        private let selectionHeight: CGFloat = 40
     }
 }
 
 #Preview("Tab Bar Only") {
+    @Previewable @Namespace var previewNamespace
     typealias TabItem = RootTabsView.TabItemView
 
     return ZStack(alignment: .bottom) {
         Color.gray.opacity(0.3)
             .ignoresSafeArea()
 
-        HStack(spacing: 10) {
-            ForEach(CustomTab.allCases) { tab in
-                TabItem(
-                    tab: tab,
-                    isSelected: tab == .default,
-                    activeColor: Color(hex: 0x6B5CFF),
-                    inactiveColor: Color.white.opacity(0.45)
-                ) {}
+        GlassEffectContainer {
+            HStack(spacing: 0) {
+                ForEach(CustomTab.allCases) { tab in
+                    TabItem(
+                        tab: tab,
+                        isSelected: tab == .default,
+                        activeColor: Color(hex: 0x6B5CFF),
+                        inactiveColor: Color.white.opacity(0.45),
+                        glassNamespace: previewNamespace
+                    ) {}
+                }
             }
+            .padding(.horizontal, 6)
+            .frame(height: 60)
+            .glassEffect(in: .capsule)
         }
-        .padding(.horizontal, 6)
-        .frame(height: 60)
-        .background(.black)
+        .padding(.horizontal, 12)
+        .padding(.bottom, 4)
+        .ignoresSafeArea(.container, edges: .bottom)
     }
 }
