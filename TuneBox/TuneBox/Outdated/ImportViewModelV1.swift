@@ -106,12 +106,8 @@ final class ImportViewModelV1: ImportManagingV1 {
     func startObservingTracksChanges() {
         self.tracksObservationTask?.cancel()
 
-        self.tracksObservationTask = Task { [weak self] in
-            guard let self else { return }
-
-            self.syncSystemPlaylist()
-
-            self.transferViewModel.onTracksChanged = { [weak self] in
+        if self.tracksChangedObserverID == nil {
+            self.tracksChangedObserverID = self.transferViewModel.addTracksChangedObserver { [weak self] in
                 guard let self else { return }
 
                 Task {
@@ -119,12 +115,20 @@ final class ImportViewModelV1: ImportManagingV1 {
                 }
             }
         }
+
+        self.tracksObservationTask = Task { [weak self] in
+            self?.syncSystemPlaylist()
+        }
     }
 
     func stopObservingTracksChanges() {
         self.tracksObservationTask?.cancel()
         self.tracksObservationTask = nil
-        self.transferViewModel.onTracksChanged = nil
+
+        if let observerID = self.tracksChangedObserverID {
+            self.transferViewModel.removeTracksChangedObserver(observerID)
+            self.tracksChangedObserverID = nil
+        }
     }
 
     func createSelectedPlaylists() async {
@@ -293,6 +297,7 @@ final class ImportViewModelV1: ImportManagingV1 {
     @ObservationIgnored
     private var persistenceService: PersistenceServicing
     private var tracksObservationTask: Task<Void, Never>?
+    private var tracksChangedObserverID: UUID?
     private let supportedPlaylistExtensions: Set<PlaylistExtension> = [.m3u, .m3u8]
     private let supportedTrackExtensions: Set<AudioFileExtension> = [.mp3, .wav, .flac]
 

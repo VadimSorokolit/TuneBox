@@ -64,10 +64,10 @@ enum FileStorageState: String, Hashable, TransferPrioritizable {
             case .none:
                 return 0
 
-            case .exists:
+            case .removed:
                 return 1
 
-            case .removed:
+            case .exists:
                 return 2
         }
     }

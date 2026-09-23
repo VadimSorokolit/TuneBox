@@ -181,12 +181,8 @@ final class ImportViewModel: ImportManaging {
     func startObservingTracksChanges() {
         self.tracksObservationTask?.cancel()
 
-        self.tracksObservationTask = Task { [weak self] in
-            guard let self else { return }
-
-            await self.refreshLibrary()
-
-            self.transferViewModel.onTracksChanged = { [weak self] in
+        if self.tracksChangedObserverID == nil {
+            self.tracksChangedObserverID = self.transferViewModel.addTracksChangedObserver { [weak self] in
                 guard let self else { return }
 
                 Task {
@@ -194,12 +190,20 @@ final class ImportViewModel: ImportManaging {
                 }
             }
         }
+
+        self.tracksObservationTask = Task { [weak self] in
+            await self?.refreshLibrary()
+        }
     }
 
     func stopObservingTracksChanges() {
         self.tracksObservationTask?.cancel()
         self.tracksObservationTask = nil
-        self.transferViewModel.onTracksChanged = nil
+
+        if let observerID = self.tracksChangedObserverID {
+            self.transferViewModel.removeTracksChangedObserver(observerID)
+            self.tracksChangedObserverID = nil
+        }
     }
 
     func fetchfolderItems(sourceID: ImportSource.ID, path: String?) async -> [SourceFolderItem]? {
@@ -745,6 +749,7 @@ final class ImportViewModel: ImportManaging {
     @ObservationIgnored
     private var crashlytics: CrashlyticsServicing
     private var tracksObservationTask: Task<Void, Never>?
+    private var tracksChangedObserverID: UUID?
     private let supportedPlaylistExtensions: Set<PlaylistExtension> = [.m3u, .m3u8]
     private let supportedImageExtensions: Set<ImageFileExtension> = [.jpg, .jpeg, .png, .webp, .heic]
     private let supportedTrackExtensions: Set<AudioFileExtension> = [

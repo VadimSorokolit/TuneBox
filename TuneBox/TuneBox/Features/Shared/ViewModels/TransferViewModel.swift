@@ -71,7 +71,8 @@ protocol TransferManaging: AnyObject, Sendable,
     func restoreDownloadsOnForeground() async
     func handleDownloadAction(for track: TrackEntity) async
     func deleteDownloadedTrack(track: TrackEntity)
-    var onTracksChanged: (() -> Void)? { get set }
+    func addTracksChangedObserver(_ observer: @escaping () -> Void) -> UUID
+    func removeTracksChangedObserver(_ id: UUID)
 }
 
 @MainActor
@@ -102,7 +103,7 @@ final class TransferViewModel: TransferManaging {
     private(set) var reachedSearchTracksEnd = false
     var selectedGenre: Genre = .all
     @ObservationIgnored
-    var onTracksChanged: (() -> Void)?
+    private var tracksChangedObservers: [UUID: () -> Void] = [:]
 
     var inProgressActiveTracksCount: Int {
         self.inProgressTrackIDs.count
@@ -635,6 +636,16 @@ final class TransferViewModel: TransferManaging {
         }
     }
 
+    func addTracksChangedObserver(_ observer: @escaping () -> Void) -> UUID {
+        let id = UUID()
+        self.tracksChangedObservers[id] = observer
+        return id
+    }
+
+    func removeTracksChangedObserver(_ id: UUID) {
+        self.tracksChangedObservers.removeValue(forKey: id)
+    }
+
     func setSimultaneouslyLoadingLimit(_ limit: Int) {
         self.simultaneouslyLoadingCount = limit
 
@@ -713,7 +724,7 @@ final class TransferViewModel: TransferManaging {
             self.handleError(error)
         }
 
-        self.onTracksChanged?()
+        self.notifyTracksChanged()
     }
 
     // MARK: - Initializer
@@ -1017,6 +1028,14 @@ final class TransferViewModel: TransferManaging {
     private func updateTracks(withID trackID: String, _ update: (TrackEntity) -> Void) {
         var visited = Set<ObjectIdentifier>()
 
+        // Always mutate the SwiftData canonical row first — browse lists may not
+        // contain the track (e.g. after clearing search), so list-only updates miss persistence.
+        if let canonical = self.fetchCanonicalTrack(id: trackID) {
+            update(canonical)
+            visited.insert(ObjectIdentifier(canonical))
+            self.replaceWithCanonical(canonical)
+        }
+
         for track in self.allTracks where track.id == trackID {
             let identifier = ObjectIdentifier(track)
 
@@ -1048,7 +1067,13 @@ final class TransferViewModel: TransferManaging {
             }
         }
 
-        self.onTracksChanged?()
+        self.notifyTracksChanged()
+    }
+
+    private func notifyTracksChanged() {
+        for observer in self.tracksChangedObservers.values {
+            observer()
+        }
     }
 
     private func delete(_ tracks: [TrackEntity]) {
@@ -1296,7 +1321,7 @@ final class TransferViewModel: TransferManaging {
             listedTrack.downloadingSize = displayedBytes
         }
 
-        self.onTracksChanged?()
+        self.notifyTracksChanged()
 
         guard track.downloadState == .downloading else {
             return
@@ -1324,6 +1349,7 @@ final class TransferViewModel: TransferManaging {
             fileState: .exists,
             downloadingSize: track.size ?? .zero
         )
+        self.persistDownloadSession(force: true)
         self.analytics.log(.downloadComplete)
 
         Task { @MainActor [weak self] in
@@ -1420,7 +1446,7 @@ final class TransferViewModel: TransferManaging {
             }
         }
 
-        self.onTracksChanged?()
+        self.notifyTracksChanged()
     }
 
     private func clearDownloadState() {

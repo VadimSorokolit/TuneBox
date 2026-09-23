@@ -93,10 +93,8 @@ class DownloadsViewModel: DownloadsPresenting {
     func startObservingTracksChanges() {
         self.tracksObservationTask?.cancel()
 
-        self.tracksObservationTask = Task { [weak self] in
-            guard let self else { return }
-
-            self.transferViewModel.onTracksChanged = { [weak self] in
+        if self.tracksChangedObserverID == nil {
+            self.tracksChangedObserverID = self.transferViewModel.addTracksChangedObserver { [weak self] in
                 guard let self else { return }
 
                 Task {
@@ -104,12 +102,22 @@ class DownloadsViewModel: DownloadsPresenting {
                 }
             }
         }
+
+        self.tracksObservationTask = Task { [weak self] in
+            guard let self else { return }
+
+            await self.fetchTracksSectionBy(self.selectedTracksType)
+        }
     }
 
     func stopObservingTracksChanges() {
         self.tracksObservationTask?.cancel()
         self.tracksObservationTask = nil
-        self.transferViewModel.onTracksChanged = nil
+
+        if let observerID = self.tracksChangedObserverID {
+            self.transferViewModel.removeTracksChangedObserver(observerID)
+            self.tracksChangedObserverID = nil
+        }
     }
 
     func clearSearchState() {
@@ -130,6 +138,7 @@ class DownloadsViewModel: DownloadsPresenting {
     @ObservationIgnored
     private var transferViewModel: TransferManaging
     private var tracksObservationTask: Task<Void, Never>?
+    private var tracksChangedObserverID: UUID?
     private let minimumSearchLength: Int = 2
     private var resentsTrackLimit: Int = RecentTracksLimit.small.rawValue
 
