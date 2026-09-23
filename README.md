@@ -20,16 +20,20 @@ and automatically add album covers from the [MusicBrainz API](https://musicbrain
 * UI Framework - **SwiftUI**
 * Architecture - **MVVM**
 * Networking - **Moya**
+* Network Monitoring — `NWPathMonitor`
+* Downloads — URLSession background transfers with resume support
 * Async Programming - **Structured Concurrency** `(async/await)`
 * Persistence - **SwiftData**
+* Error Handling - **CustomAlerts**
 * Dependency Injection - **Resolver**
-* Resources – **SDWebImage**
+* Image Loading – **SDWebImage**
 * Audio Playback - **SFBAudioEngine**
 * Media Controls - **MediaPlayer / MPRemoteCommandCenter**
 * Analytics & Crash Reporting - **Firebase Analytics / Firebase Crashlytics**
 * In-App Purchases - **StoreKit 2**
 * Dependency Management - **Swift Package Manager**
 * Linting - **SwiftLint**
+* CI/CD — **GitHub Actions**
 * Unit Testing - **Swift Testing**
 
 ## For Run:
