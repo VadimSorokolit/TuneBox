@@ -449,11 +449,25 @@ final class ImportViewModel: ImportManaging {
                 let url = try AudioMetadataService.save(data, trackID: coverID)
                 track.imagePath = url.lastPathComponent
             }
+
             try self.persistenceService.save()
             await self.refreshLibrary()
+            self.syncNowPlayingArtworkIfNeeded(for: album)
         } catch {
             self.handleError(error)
         }
+    }
+
+    private func syncNowPlayingArtworkIfNeeded(for album: MusicLibrary.Album) {
+        guard
+            let playing = self.playerViewModel.track,
+            let path = album.tracks.first(where: { $0.id == playing.id })?.imagePath
+        else {
+            return
+        }
+
+        playing.imagePath = path
+        CoverImageLoader.applyNowPlayingArtwork(from: path)
     }
 
     func sourceTracksSummary(for sourceID: ImportSource.ID) -> (count: Int, duration: Int, size: Int) {
