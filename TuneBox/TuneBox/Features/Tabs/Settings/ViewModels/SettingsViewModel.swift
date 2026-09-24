@@ -126,7 +126,9 @@ final class SettingsViewModel: SettingsManaging {
         URL(string: Constants.termsOfUseURL)!
     }
 
-    var privacyPolicyURL: URL? { nil }
+    var privacyPolicyURL: URL? {
+        URL(string: Constants.privacyPolicyURL)
+    }
 
     func submitFeedback(
         rating: Int,
@@ -166,6 +168,8 @@ final class SettingsViewModel: SettingsManaging {
         static let fallbackVersion = "1.0"
         static let termsOfUseURL =
             "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
+        static let privacyPolicyURL =
+            "https://sites.google.com/view/tunebox-privacy-policy/privacy"
     }
 
     @ObservationIgnored
