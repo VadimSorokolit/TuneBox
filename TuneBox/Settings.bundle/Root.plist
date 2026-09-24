@@ -14,7 +14,7 @@
 			<key>Type</key>
 			<string>PSMultiValueSpecifier</string>
 			<key>Title</key>
-			<string>Tabs Mode</string>
+			<string>Visible Tabs</string>
 			<key>Key</key>
 			<string>tabsMode</string>
 			<key>DefaultValue</key>

@@ -80,11 +80,11 @@ struct SettingsView: View {
                         .disabled(rootTabsVM.tabsMode == .import)
 
                         SettingsRow(
-                            title: "Tabs Mode",
+                            title: "Visible Tabs",
                             trailingText: rootTabsVM.tabsMode.title
                         ) {
                             Picker(
-                                "Tabs Mode",
+                                "Visible Tabs",
                                 selection: Binding(
                                     get: { rootTabsVM.tabsMode },
                                     set: { rootTabsVM.setTabsMode($0) }

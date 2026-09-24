@@ -146,10 +146,10 @@ struct SettingsRow<MenuContent: View>: View {
         )
 
         SettingsRow(
-            title: "Tabs Mode",
+            title: "Visible Tabs",
             trailingText: "All Tabs"
         ) {
-            Picker("Tabs Mode", selection: .constant("All Tabs")) {
+            Picker("Visible Tabs", selection: .constant("All Tabs")) {
                 Text("All Tabs").tag("All Tabs")
                 Text("Import").tag("Import")
             }
