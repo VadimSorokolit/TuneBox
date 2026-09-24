@@ -32,9 +32,21 @@ private enum Constants {
     }
 }
 
-enum TabsMode: String {
+enum TabsMode: String, CaseIterable, Identifiable {
     case allTabs
     case `import`
+
+    var id: Self { self }
+
+    var title: String {
+        switch self {
+            case .allTabs:
+                "All Tabs"
+
+            case .import:
+                "Import"
+        }
+    }
 }
 
 enum CustomTab: String, Hashable, Identifiable, CaseIterable {
@@ -46,6 +58,22 @@ enum CustomTab: String, Hashable, Identifiable, CaseIterable {
     static let `default`: Self = .importFiles
 
     var id: Self { self }
+
+    var title: String {
+        switch self {
+            case .importFiles:
+                "Import"
+
+            case .browse:
+                "Discover"
+
+            case .downloads:
+                "Library"
+
+            case .settings:
+                "Settings"
+        }
+    }
 
     var iconAsset: String {
         switch self {

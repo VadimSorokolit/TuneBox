@@ -11,11 +11,14 @@ import CoreGraphics
 @MainActor
 protocol RootTabsManaging: AnyObject {
     var tabsMode: TabsMode { get }
+    var defaultTab: CustomTab { get }
     var visibleTabs: [CustomTab] { get }
     var isTabBarVisible: Bool { get }
     var tabBarHeight: CGFloat { get }
     var playerHeight: CGFloat { get }
 
+    func setTabsMode(_ mode: TabsMode)
+    func setDefaultTab(_ tab: CustomTab)
     func reloadTabsMode()
     func rememberSelectedTab(_ tab: CustomTab)
     func restoreSelectedTab() -> CustomTab

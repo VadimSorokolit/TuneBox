@@ -15,6 +15,7 @@ final class RootTabsViewModel: RootTabsManaging {
     // MARK: - Properties. Public
 
     private(set) var tabsMode: TabsMode = .allTabs
+    private(set) var defaultTab: CustomTab = .default
 
     var visibleTabs: [CustomTab] {
         switch self.tabsMode {
@@ -38,10 +39,31 @@ final class RootTabsViewModel: RootTabsManaging {
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
         self.tabsMode = Self.readTabsMode(from: userDefaults)
+        self.defaultTab = Self.readDefaultTab(from: userDefaults)
         self.observeUserDefaultsChanges()
     }
 
     // MARK: - Methods. Public
+
+    func setTabsMode(_ mode: TabsMode) {
+        guard self.tabsMode != mode else { return }
+
+        self.userDefaults.set(mode.rawValue, forKey: Constants.Keys.tabsMode)
+        self.tabsMode = mode
+
+        if mode == .import {
+            self.setDefaultTab(.importFiles)
+        }
+    }
+
+    func setDefaultTab(_ tab: CustomTab) {
+        let resolved = self.visibleTabs.contains(tab) ? tab : .default
+
+        guard self.defaultTab != resolved else { return }
+
+        self.userDefaults.set(resolved.rawValue, forKey: Constants.Keys.defaultTab)
+        self.defaultTab = resolved
+    }
 
     func reloadTabsMode() {
         let mode = Self.readTabsMode(from: self.userDefaults)
@@ -62,18 +84,16 @@ final class RootTabsViewModel: RootTabsManaging {
 
     func restoreSelectedTab() -> CustomTab {
         self.reloadTabsMode()
+        self.defaultTab = Self.readDefaultTab(from: self.userDefaults)
 
         switch self.tabsMode {
             case .import:
                 return .importFiles
 
             case .allTabs:
-                let raw = self.userDefaults.string(
-                    forKey: Constants.Keys.lastSelectedTab
-                )
-                let restored = CustomTab(rawValue: raw ?? "") ?? .default
-
-                return self.visibleTabs.contains(restored) ? restored : .default
+                return self.visibleTabs.contains(self.defaultTab)
+                    ? self.defaultTab
+                    : .default
         }
     }
 
@@ -91,6 +111,7 @@ final class RootTabsViewModel: RootTabsManaging {
     private enum Constants {
         enum Keys {
             static let tabsMode = "tabsMode"
+            static let defaultTab = "defaultTab"
             static let lastSelectedTab = "lastSelectedTab"
         }
     }
@@ -113,6 +134,7 @@ final class RootTabsViewModel: RootTabsManaging {
 
             MainActor.assumeIsolated {
                 self.reloadTabsMode()
+                self.defaultTab = Self.readDefaultTab(from: self.userDefaults)
             }
         }
     }
@@ -121,5 +143,20 @@ final class RootTabsViewModel: RootTabsManaging {
         let raw = defaults.string(forKey: Constants.Keys.tabsMode) ?? TabsMode.allTabs.rawValue
 
         return TabsMode(rawValue: raw) ?? .allTabs
+    }
+
+    private static func readDefaultTab(from defaults: UserDefaults) -> CustomTab {
+        if let raw = defaults.string(forKey: Constants.Keys.defaultTab),
+           let tab = CustomTab(rawValue: raw) {
+            return tab
+        }
+
+        // Migrate from previous last-selected key when present.
+        if let raw = defaults.string(forKey: Constants.Keys.lastSelectedTab),
+           let tab = CustomTab(rawValue: raw) {
+            return tab
+        }
+
+        return .default
     }
 }

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SettingsRow: View {
+struct SettingsRow<MenuContent: View>: View {
 
     // MARK: - Properties. Public
 
@@ -15,14 +15,68 @@ struct SettingsRow: View {
     var subtitle: String?
     var value: String?
     var trailingText: String?
-    var showsChevron: Bool = true
+    var systemImage = "chevron.right"
+    var showsSystemImage: Bool = true
     var isDisabled: Bool = false
     var action: (() -> Void)?
+    @ViewBuilder var menuContent: () -> MenuContent
+
+    // MARK: - Initializers
+
+    init(
+        title: String,
+        subtitle: String? = nil,
+        value: String? = nil,
+        trailingText: String? = nil,
+        systemImage: String = "chevron.right",
+        showsSystemImage: Bool = true,
+        isDisabled: Bool = false,
+        action: (() -> Void)? = nil
+    ) where MenuContent == EmptyView {
+        self.title = title
+        self.subtitle = subtitle
+        self.value = value
+        self.trailingText = trailingText
+        self.systemImage = systemImage
+        self.showsSystemImage = showsSystemImage
+        self.isDisabled = isDisabled
+        self.action = action
+        self.menuContent = { EmptyView() }
+        self.hasMenu = false
+    }
+
+    init(
+        title: String,
+        subtitle: String? = nil,
+        trailingText: String,
+        systemImage: String = "chevron.up.chevron.down",
+        isDisabled: Bool = false,
+        @ViewBuilder menuContent: @escaping () -> MenuContent
+    ) {
+        self.title = title
+        self.subtitle = subtitle
+        self.value = nil
+        self.trailingText = trailingText
+        self.systemImage = systemImage
+        self.showsSystemImage = true
+        self.isDisabled = isDisabled
+        self.action = nil
+        self.menuContent = menuContent
+        self.hasMenu = true
+    }
 
     // MARK: - Main Body
 
     var body: some View {
-        if let action {
+        if hasMenu {
+            Menu {
+                menuContent()
+            } label: {
+                rowContent
+            }
+            .tint(.primary)
+            .disabled(isDisabled)
+        } else if let action {
             Button(action: action) {
                 rowContent
             }
@@ -34,6 +88,8 @@ struct SettingsRow: View {
     }
 
     // MARK: - Properties. Private
+
+    private let hasMenu: Bool
 
     private var rowContent: some View {
         HStack(spacing: 8) {
@@ -61,21 +117,21 @@ struct SettingsRow: View {
                 }
             }
 
-            if showsChevron {
-                HStack(spacing: trailingText?.isNotEmpty == true
-                       ? 4
-                       :0) {
+            if showsSystemImage {
+                HStack(spacing: trailingText?.isNotEmpty == true ? 4 : 0) {
                     if let trailingText, trailingText.isNotEmpty {
                         Text(trailingText)
                             .foregroundStyle(.secondary)
                     }
 
-                    Image(systemName: "chevron.right")
+                    Image(systemName: systemImage)
                         .font(.footnote.weight(.semibold))
                         .foregroundStyle(.secondary)
                 }
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(Rectangle())
     }
 }
 
@@ -86,7 +142,17 @@ struct SettingsRow: View {
         SettingsRow(
             title: "Version",
             value: "1.0",
-            showsChevron: false
+            showsSystemImage: false
         )
+
+        SettingsRow(
+            title: "Tabs Mode",
+            trailingText: "All Tabs"
+        ) {
+            Picker("Tabs Mode", selection: .constant("All Tabs")) {
+                Text("All Tabs").tag("All Tabs")
+                Text("Import").tag("Import")
+            }
+        }
     }
 }
