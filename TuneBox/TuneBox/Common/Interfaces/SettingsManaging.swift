@@ -31,6 +31,12 @@ protocol SettingsManaging: LoadStateManaging {
     func dismissPaywall()
     func openTerms()
     func openPrivacy()
+    func submitFeedback(
+        rating: Int,
+        ratingLabel: String,
+        emoji: String,
+        comment: String
+    ) async throws
 
     #if DEBUG
     var localTrialStatus: LocalTrialStatus? { get }

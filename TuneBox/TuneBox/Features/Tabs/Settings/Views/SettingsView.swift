@@ -23,7 +23,7 @@ struct SettingsView: View {
             )
         }
         .sheet(isPresented: $isFeedbackPresented) {
-            FeedbackSheetView {
+            FeedbackSheetView(settingsVM: settingsVM) {
                 isFeedbackPresented = false
             }
         }

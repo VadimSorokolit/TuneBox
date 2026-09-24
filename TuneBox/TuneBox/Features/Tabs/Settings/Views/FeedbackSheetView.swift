@@ -6,12 +6,12 @@
 //
 
 import SwiftUI
-import UIKit
 
 struct FeedbackSheetView: View {
 
     // MARK: - Properties. Public
 
+    let settingsVM: SettingsManaging
     var onClose: () -> Void
 
     // MARK: - Main Body
@@ -89,7 +89,6 @@ struct FeedbackSheetView: View {
     }
 
     private enum Constants {
-        static let formURL = URL(string: "https://formspree.io/f/xqpabrba")!
         static let selectedScale: CGFloat = 1.18
         static let ringLineWidth: CGFloat = 1.5
         static let ratingEmojiSize: CGFloat = 42
@@ -228,37 +227,13 @@ struct FeedbackSheetView: View {
         isSubmitting = true
         defer { isSubmitting = false }
 
-        var request = URLRequest(url: Constants.formURL)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-
-        let payload: [String: String] = [
-            "rating": String(selectedRating.rawValue),
-            "ratingLabel": selectedRating.label,
-            "emoji": selectedRating.emoji,
-            "comment": comment.trimmingCharacters(in: .whitespacesAndNewlines),
-            "model": UIDevice.current.model,
-            "systemName": UIDevice.current.systemName,
-            "systemVersion": UIDevice.current.systemVersion,
-            "appVersion": Bundle.main.object(
-                forInfoDictionaryKey: "CFBundleShortVersionString"
-            ) as? String ?? "",
-            "build": Bundle.main.object(
-                forInfoDictionaryKey: "CFBundleVersion"
-            ) as? String ?? ""
-        ]
-
         do {
-            request.httpBody = try JSONEncoder().encode(payload)
-            let (_, response) = try await URLSession.shared.data(for: request)
-
-            guard let http = response as? HTTPURLResponse,
-                  (200 ... 299).contains(http.statusCode) else {
-                errorMessage = "Couldn't send feedback. Try again."
-                return
-            }
-
+            try await settingsVM.submitFeedback(
+                rating: selectedRating.rawValue,
+                ratingLabel: selectedRating.label,
+                emoji: selectedRating.emoji,
+                comment: comment
+            )
             didSubmit = true
             try? await Task.sleep(for: Constants.successDisplayDuration)
             onClose()
@@ -271,6 +246,6 @@ struct FeedbackSheetView: View {
 #Preview {
     Text("Preview")
         .sheet(isPresented: .constant(true)) {
-            FeedbackSheetView(onClose: {})
+            FeedbackSheetView(settingsVM: SettingsViewModel(), onClose: {})
         }
 }

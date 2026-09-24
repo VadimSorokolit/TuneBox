@@ -32,6 +32,11 @@ extension Resolver: @retroactive ResolverRegistering {
             CrashlyticsService() as CrashlyticsServicing
         }
         .scope(.application)
+
+        self.register {
+            FeedbackService() as FeedbackServicing
+        }
+        .scope(.application)
     }
 
     private static func registerAudioService() {

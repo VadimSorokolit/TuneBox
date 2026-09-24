@@ -126,6 +126,20 @@ final class SettingsViewModel: SettingsManaging {
 
     func openPrivacy() {}
 
+    func submitFeedback(
+        rating: Int,
+        ratingLabel: String,
+        emoji: String,
+        comment: String
+    ) async throws {
+        try await self.feedbackService.submit(
+            rating: rating,
+            ratingLabel: ratingLabel,
+            emoji: emoji,
+            comment: comment
+        )
+    }
+
     #if DEBUG
 
     var localTrialStatus: LocalTrialStatus? {
@@ -161,6 +175,9 @@ final class SettingsViewModel: SettingsManaging {
 
     @ObservationIgnored
     @Injected private var crashlytics: CrashlyticsServicing
+
+    @ObservationIgnored
+    @Injected private var feedbackService: FeedbackServicing
 
     // MARK: - Methods. Private
 
