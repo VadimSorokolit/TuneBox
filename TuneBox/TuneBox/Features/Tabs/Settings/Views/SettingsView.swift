@@ -18,8 +18,14 @@ struct SettingsView: View {
 
             SectionsView(
                 settingsVM: settingsVM,
-                rootTabsVM: rootTabsVM
+                rootTabsVM: rootTabsVM,
+                isFeedbackPresented: $isFeedbackPresented
             )
+        }
+        .sheet(isPresented: $isFeedbackPresented) {
+            FeedbackSheetView {
+                isFeedbackPresented = false
+            }
         }
     }
 
@@ -27,6 +33,7 @@ struct SettingsView: View {
 
     @Injected private var settingsVM: SettingsManaging
     @Injected private var rootTabsVM: RootTabsManaging
+    @State private var isFeedbackPresented = false
 
     // MARK: - Objects. Private
 
@@ -45,6 +52,7 @@ struct SettingsView: View {
 
         let settingsVM: SettingsManaging
         let rootTabsVM: RootTabsManaging
+        @Binding var isFeedbackPresented: Bool
 
         // MARK: - Body
 
@@ -91,6 +99,10 @@ struct SettingsView: View {
                     }
 
                     Section(header: Text("About")) {
+                        SettingsRow(title: "Share Feedback") {
+                            isFeedbackPresented = true
+                        }
+
                         SettingsRow(title: "Privacy Policy") {
                             settingsVM.openPrivacy()
                         }

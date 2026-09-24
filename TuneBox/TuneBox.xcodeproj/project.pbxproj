@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		5B061DB1305971EA005C6603 /* SettingsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B061DB0305971E9005C6603 /* SettingsRow.swift */; };
+		2DA46654455947728780C57D /* FeedbackSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19949104DF2B4E41B13E58D0 /* FeedbackSheetView.swift */; };
 		5B061DB330597400005C6603 /* TabHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B061DB230597400005C6603 /* TabHeaderView.swift */; };
 		5B0BC2A330051A8300E8F2A5 /* ImportTracksViewV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0BC2A230051A7100E8F2A5 /* ImportTracksViewV1.swift */; };
 		5B0BC2AA3005481C00E8F2A5 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5B0BC2A8300539BC00E8F2A5 /* Settings.bundle */; };
@@ -245,6 +246,7 @@
 
 /* Begin PBXFileReference section */
 		5B061DB0305971E9005C6603 /* SettingsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRow.swift; sourceTree = "<group>"; };
+		19949104DF2B4E41B13E58D0 /* FeedbackSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackSheetView.swift; sourceTree = "<group>"; };
 		5B061DB230597400005C6603 /* TabHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabHeaderView.swift; sourceTree = "<group>"; };
 		5B0BC2A230051A7100E8F2A5 /* ImportTracksViewV1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportTracksViewV1.swift; sourceTree = "<group>"; };
 		5B0BC2A8300539BC00E8F2A5 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
@@ -731,6 +733,7 @@
 		5B3FEB4B2FB454BE00DC1562 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				19949104DF2B4E41B13E58D0 /* FeedbackSheetView.swift */,
 				5B061DB0305971E9005C6603 /* SettingsRow.swift */,
 				5B3FEB4C2FB454C400DC1562 /* SettingsView.swift */,
 			);
@@ -1737,6 +1740,7 @@
 				5BC8D9022FFE966B00742822 /* AppCoordinator.swift in Sources */,
 				5B47627E2FAB49B00069E41A /* AppLogger.swift in Sources */,
 				5B061DB1305971EA005C6603 /* SettingsRow.swift in Sources */,
+				2DA46654455947728780C57D /* FeedbackSheetView.swift in Sources */,
 				5BA581892FD6A2B800B498D7 /* SettingsViewModel.swift in Sources */,
 				5B0BC2B73006AF7F00E8F2A5 /* MusicLibrary.swift in Sources */,
 				5BFCA83C2FCED7BF009C6AD9 /* Font+family.swift in Sources */,
