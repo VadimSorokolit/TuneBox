@@ -225,16 +225,17 @@ final class TransferViewModel: TransferManaging {
                 return
             }
 
+            // Empty page still means end-of-list (e.g. total tracks is a multiple of limit).
+            if newTracks.count < self.limit {
+                self.reachedPopularTracksEnd = true
+            }
+
             guard newTracks.isNotEmpty else {
                 return
             }
 
             self.mergeTracks(newTracks, for: .popular)
             self.offsetPopular += newTracks.count
-
-            if newTracks.count < self.limit {
-                self.reachedPopularTracksEnd = true
-            }
         }
     }
 
@@ -308,12 +309,13 @@ final class TransferViewModel: TransferManaging {
                 return
             }
 
-            guard newTracks.isNotEmpty else {
-                return
-            }
-
+            // Empty page still means end-of-list (e.g. total tracks is a multiple of limit).
             if newTracks.count < self.limit {
                 self.reachedGenreTracksEnd = true
+            }
+
+            guard newTracks.isNotEmpty else {
+                return
             }
         }
     }
