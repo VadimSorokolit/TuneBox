@@ -215,10 +215,14 @@ final class TransferViewModel: TransferManaging {
                 self.popularLoadTask = nil
             }
 
-            let newTracks = await self.loadPopularTracks(offset: self.offsetPopular)
+            let newTracks: [TrackEntity]
 
-            if newTracks.count < self.limit {
-                self.reachedPopularTracksEnd = true
+            do {
+                newTracks = try await self.loadPopularTracks(offset: self.offsetPopular)
+            } catch is CancellationError {
+                return
+            } catch {
+                return
             }
 
             guard newTracks.isNotEmpty else {
@@ -227,6 +231,10 @@ final class TransferViewModel: TransferManaging {
 
             self.mergeTracks(newTracks, for: .popular)
             self.offsetPopular += newTracks.count
+
+            if newTracks.count < self.limit {
+                self.reachedPopularTracksEnd = true
+            }
         }
     }
 
@@ -286,11 +294,23 @@ final class TransferViewModel: TransferManaging {
                 self.genreLoadTask = nil
             }
 
-            let newTracks = await self.loadTracksBy(
-                genre: apiGenre,
-                offset: self.offsetGenre,
-                appendToGenreTracks: true
-            )
+            let newTracks: [TrackEntity]
+
+            do {
+                newTracks = try await self.loadTracksBy(
+                    genre: apiGenre,
+                    offset: self.offsetGenre,
+                    appendToGenreTracks: true
+                )
+            } catch is CancellationError {
+                return
+            } catch {
+                return
+            }
+
+            guard newTracks.isNotEmpty else {
+                return
+            }
 
             if newTracks.count < self.limit {
                 self.reachedGenreTracksEnd = true
@@ -302,6 +322,9 @@ final class TransferViewModel: TransferManaging {
         self.isRefreshing = true
 
         defer { self.isRefreshing = false }
+
+        self.cancelPopularLoadTask()
+        self.cancelGenreLoadTask()
 
         async let popular = self.loadFirstPopular()
         async let genre = self.loadFirstBy(genre: self.selectedGenre == .all ? nil : self.selectedGenre)
@@ -839,8 +862,13 @@ final class TransferViewModel: TransferManaging {
     private func loadPopularInitialTracks() async throws {
         let offsetZero: Int = .zero
 
-        let loadedTracks = await self.loadPopularTracks(offset: offsetZero)
+        let loadedTracks = try await self.loadPopularTracks(offset: offsetZero)
         try Task.checkCancellation()
+
+        // Keep previously shown tracks if the refresh/network call came back empty.
+        guard loadedTracks.isNotEmpty || self.tracks(for: .popular).isEmpty else {
+            return
+        }
 
         self.offsetPopular = offsetZero
 
@@ -853,12 +881,17 @@ final class TransferViewModel: TransferManaging {
     private func loadGenreInitialTracks(genre: Genre) async throws {
         let offsetZero: Int = .zero
 
-        let loadedTracks = await self.loadTracksBy(
+        let loadedTracks = try await self.loadTracksBy(
             genre: self.apiGenre(for: genre),
             offset: offsetZero,
             appendToGenreTracks: false
         )
         try Task.checkCancellation()
+
+        // Keep previously shown tracks if the refresh/network call came back empty.
+        guard loadedTracks.isNotEmpty || self.tracks(for: .genre).isEmpty else {
+            return
+        }
 
         self.offsetGenre = offsetZero
 
@@ -881,7 +914,7 @@ final class TransferViewModel: TransferManaging {
         await self.processDownloadQueue()
     }
 
-    private func loadPopularTracks(offset: Int) async -> [TrackEntity] {
+    private func loadPopularTracks(offset: Int) async throws -> [TrackEntity] {
         do {
             let dtos = try await self.jamendoService.getPopularTracks(
                 limit: self.limit,
@@ -896,6 +929,10 @@ final class TransferViewModel: TransferManaging {
 
             return self.upsertAndResolve(entities)
         } catch {
+            if self.isCancellation(error) {
+                throw CancellationError()
+            }
+
             self.handleError(error)
 
             return []
@@ -906,7 +943,7 @@ final class TransferViewModel: TransferManaging {
         genre: Genre?,
         offset: Int,
         appendToGenreTracks: Bool
-    ) async -> [TrackEntity] {
+    ) async throws -> [TrackEntity] {
         do {
             let dtos = try await self.jamendoService.getTracksByGenre(
                 genre: genre?.displayName,
@@ -935,9 +972,25 @@ final class TransferViewModel: TransferManaging {
 
             return resolved
         } catch {
+            if self.isCancellation(error) {
+                throw CancellationError()
+            }
+
             self.handleError(error)
             return []
         }
+    }
+
+    private func isCancellation(_ error: Error) -> Bool {
+        if error is CancellationError {
+            return true
+        }
+
+        if let urlError = error as? URLError, urlError.code == .cancelled {
+            return true
+        }
+
+        return Task.isCancelled
     }
 
     @discardableResult
