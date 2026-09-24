@@ -29,8 +29,8 @@ protocol SettingsManaging: LoadStateManaging {
     func restorePurchase()
     func presentPaywall()
     func dismissPaywall()
-    func openTerms()
-    func openPrivacy()
+    var termsOfUseURL: URL { get }
+    var privacyPolicyURL: URL? { get }
     func submitFeedback(
         rating: Int,
         ratingLabel: String,

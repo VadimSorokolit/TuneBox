@@ -122,9 +122,11 @@ final class SettingsViewModel: SettingsManaging {
         self.isPaywallPresented = false
     }
 
-    func openTerms() {}
+    var termsOfUseURL: URL {
+        URL(string: Constants.termsOfUseURL)!
+    }
 
-    func openPrivacy() {}
+    var privacyPolicyURL: URL? { nil }
 
     func submitFeedback(
         rating: Int,
@@ -162,6 +164,8 @@ final class SettingsViewModel: SettingsManaging {
 
     private enum Constants {
         static let fallbackVersion = "1.0"
+        static let termsOfUseURL =
+            "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
     }
 
     @ObservationIgnored

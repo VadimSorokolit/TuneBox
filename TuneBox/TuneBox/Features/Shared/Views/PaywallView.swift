@@ -58,6 +58,7 @@ struct PaywallView: View {
 
         @Environment(\.themeManager) private var theme
         @Environment(\.dismiss) private var dismiss
+        @Environment(\.openURL) private var openURL
         @State private var purchasingProductID: String?
         @State private var isEligibleForStoreIntro = false
 
@@ -253,14 +254,18 @@ struct PaywallView: View {
                 Spacer()
 
                 footerButton(
-                    action: settingsVM.openTerms,
+                    action: { openURL(settingsVM.termsOfUseURL) },
                     title: "Terms"
                 )
 
                 Spacer()
 
                 footerButton(
-                    action: settingsVM.openPrivacy,
+                    action: {
+                        if let url = settingsVM.privacyPolicyURL {
+                            openURL(url)
+                        }
+                    },
                     title: "Privacy"
                 )
             }

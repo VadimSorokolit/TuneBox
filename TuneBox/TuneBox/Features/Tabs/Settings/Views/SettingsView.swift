@@ -53,6 +53,7 @@ struct SettingsView: View {
         let settingsVM: SettingsManaging
         let rootTabsVM: RootTabsManaging
         @Binding var isFeedbackPresented: Bool
+        @Environment(\.openURL) private var openURL
 
         // MARK: - Body
 
@@ -85,11 +86,13 @@ struct SettingsView: View {
                         }
 
                         SettingsRow(title: "Privacy Policy") {
-                            settingsVM.openPrivacy()
+                            if let url = settingsVM.privacyPolicyURL {
+                                openURL(url)
+                            }
                         }
 
                         SettingsRow(title: "Terms of Use") {
-                            settingsVM.openTerms()
+                            openURL(settingsVM.termsOfUseURL)
                         }
 
                         SettingsRow(
