@@ -25,6 +25,10 @@ enum BottomLayout {
            ? GlobalConstants.Screen.defaultHeight
            : GlobalConstants.CompactPlayer.bottomPadding
         )
+        + (GlobalConstants.Device.isPad && isPlayerVisible
+           ? GlobalConstants.CompactPlayer.bottomPadding
+           : 0
+        )
     }
 }
 

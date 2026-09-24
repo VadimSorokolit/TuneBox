@@ -12,6 +12,12 @@ enum GlobalConstants {
     static let bytesInGigabyte: Double = 1e9
     static let downloadedFilePrefix = "track"
 
+    enum Device {
+        static var isPad: Bool {
+            UIDevice.current.model.contains("iPad")
+        }
+    }
+
     enum API {
         static let fallbackBaseURL = "google.com"
         static let invalidURLMessage = "Invalid baseURL:"

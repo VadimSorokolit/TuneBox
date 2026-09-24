@@ -32,8 +32,9 @@ struct FeedbackSheetView: View {
         .presentationDragIndicator(.visible)
         .task {
             guard !didSubmit else { return }
-            // Defer one run-loop so the TextField is in the hierarchy,
-            // then focus immediately — keyboard rises with the sheet as one motion.
+            // Phone only: autofocus so keyboard rises with the sheet
+            // On iPad simultaneous sheet + keyboard animation freezes
+            guard !GlobalConstants.Device.isPad else { return }
             await Task.yield()
             isCommentFocused = true
         }

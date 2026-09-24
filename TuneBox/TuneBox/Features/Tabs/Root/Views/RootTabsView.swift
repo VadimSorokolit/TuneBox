@@ -267,9 +267,7 @@ struct RootTabsView: View {
     }
 
     private var tabBar: some View {
-        let isPad = UIDevice.current.model.hasPrefix("iPad")
-
-        return GlassEffectContainer {
+        GlassEffectContainer {
             HStack(spacing: 0) {
                 ForEach(rootTabsVM.visibleTabs) { tab in
                     TabItemView(
@@ -289,7 +287,7 @@ struct RootTabsView: View {
             .glassEffect(in: .capsule)
         }
         .padding(.horizontal, 12)
-        .padding(.bottom, isPad ? -5 : 20)
+        .padding(.bottom, GlobalConstants.Device.isPad ? -5 : 20)
         .ignoresSafeArea(.container, edges: .bottom)
     }
 
