@@ -28,12 +28,20 @@ struct FeedbackSheetView: View {
         }
         .padding(20)
         .animation(.easeInOut(duration: 0.25), value: didSubmit)
-        .presentationDetents([.medium])
+        .presentationDetents([.large])
         .presentationDragIndicator(.visible)
+        .task {
+            guard !didSubmit else { return }
+            // Defer one run-loop so the TextField is in the hierarchy,
+            // then focus immediately — keyboard rises with the sheet as one motion.
+            await Task.yield()
+            isCommentFocused = true
+        }
     }
 
     // MARK: - Properties. Private
 
+    @FocusState private var isCommentFocused: Bool
     @State private var selectedRating: Satisfaction = .neutral
     @State private var comment = ""
     @State private var isSubmitting = false
@@ -112,6 +120,7 @@ struct FeedbackSheetView: View {
                 text: $comment,
                 axis: .vertical
             )
+            .focused($isCommentFocused)
             .lineLimit(4 ... 8)
             .padding(12)
             .font(.system(size: 20))
@@ -235,6 +244,7 @@ struct FeedbackSheetView: View {
                 comment: comment
             )
             didSubmit = true
+            isCommentFocused = false
             try? await Task.sleep(for: Constants.successDisplayDuration)
             onClose()
         } catch {
