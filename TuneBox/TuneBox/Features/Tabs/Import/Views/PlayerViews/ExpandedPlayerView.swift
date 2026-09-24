@@ -93,6 +93,8 @@ struct ExpandedPlayerView: View {
                                 .lineLimit(1)
                                 .shadow(color: .black.opacity(0.5), radius: 1.5, y: 1)
                         }
+                        .opacity(playerVM.isPlaying ? 1 : 0.45)
+                        .animation(.easeInOut(duration: 0.35), value: playerVM.isPlaying)
                         .padding(.horizontal, 24)
 
                         visualizerSection(for: track)
