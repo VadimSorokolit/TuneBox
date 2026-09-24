@@ -95,16 +95,7 @@ struct FeedbackSheetView: View {
         static let ratingEmojiSize: CGFloat = 42
         static let ratingButtonSize: CGFloat = 52
         static let successDisplayDuration: Duration = .milliseconds(1500)
-    }
-
-    private var commentPlaceholder: String {
-        switch selectedRating {
-            case .veryUnhappy, .unhappy, .neutral:
-                "What made you not satisfied?"
-
-            case .happy, .veryHappy:
-                "What did you like?"
-        }
+        static let commentPlaceholder = "Write your feedback"
     }
 
     private var formContent: some View {
@@ -118,7 +109,7 @@ struct FeedbackSheetView: View {
             ratingRow
 
             TextField(
-                commentPlaceholder,
+                Constants.commentPlaceholder,
                 text: $comment,
                 axis: .vertical
             )

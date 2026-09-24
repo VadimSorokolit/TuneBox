@@ -62,44 +62,25 @@ struct SettingsView: View {
                     Section(header: Text("Appearance")) {
                         SettingsRow(
                             title: "Default Tab",
-                            trailingText: rootTabsVM.defaultTab.title
-                        ) {
-                            Picker(
-                                "Default Tab",
-                                selection: Binding(
-                                    get: { rootTabsVM.defaultTab },
-                                    set: { rootTabsVM.setDefaultTab($0) }
-                                )
-                            ) {
-                                ForEach(rootTabsVM.visibleTabs) { tab in
-                                    Text(tab.title)
-                                        .tag(tab)
-                                }
-                            }
-                        }
-                        .disabled(rootTabsVM.tabsMode == .import)
+                            trailingText: defaultTab.title,
+                            isDisabled: tabsMode == .import,
+                            selection: defaultTabBinding,
+                            options: defaultTabOptions.map { ($0, $0.title) }
+                        )
 
                         SettingsRow(
                             title: "Visible Tabs",
-                            trailingText: rootTabsVM.tabsMode.title
-                        ) {
-                            Picker(
-                                "Visible Tabs",
-                                selection: Binding(
-                                    get: { rootTabsVM.tabsMode },
-                                    set: { rootTabsVM.setTabsMode($0) }
-                                )
-                            ) {
-                                ForEach(TabsMode.allCases) { mode in
-                                    Text(mode.title)
-                                        .tag(mode)
-                                }
-                            }
-                        }
+                            trailingText: tabsMode.title,
+                            selection: tabsModeBinding,
+                            options: TabsMode.allCases.map { ($0, $0.title) }
+                        )
                     }
 
                     Section(header: Text("About")) {
-                        SettingsRow(title: "Share Feedback") {
+                        SettingsRow(
+                            title: "Share Feedback",
+                            systemImage: "square.and.pencil"
+                        ) {
                             isFeedbackPresented = true
                         }
 
@@ -121,6 +102,54 @@ struct SettingsView: View {
                 .listSectionSpacing(.compact)
             }
             .padding(.top, 10)
+            .onAppear {
+                tabsMode = rootTabsVM.tabsMode
+                defaultTab = rootTabsVM.defaultTab
+            }
+        }
+
+        // MARK: - Properties. Private
+
+        @State private var tabsMode: TabsMode = .allTabs
+        @State private var defaultTab: CustomTab = .default
+
+        private var defaultTabOptions: [CustomTab] {
+            switch tabsMode {
+                case .allTabs:
+                    CustomTab.allCases
+
+                case .import:
+                    [.importFiles]
+            }
+        }
+
+        private var tabsModeBinding: Binding<TabsMode> {
+            Binding(
+                get: { tabsMode },
+                set: { mode in
+                    var transaction = Transaction()
+                    transaction.disablesAnimations = true
+                    withTransaction(transaction) {
+                        tabsMode = mode
+                        rootTabsVM.setTabsMode(mode)
+                        defaultTab = rootTabsVM.defaultTab
+                    }
+                }
+            )
+        }
+
+        private var defaultTabBinding: Binding<CustomTab> {
+            Binding(
+                get: { defaultTab },
+                set: { tab in
+                    var transaction = Transaction()
+                    transaction.disablesAnimations = true
+                    withTransaction(transaction) {
+                        rootTabsVM.setDefaultTab(tab)
+                        defaultTab = rootTabsVM.defaultTab
+                    }
+                }
+            )
         }
     }
 }
