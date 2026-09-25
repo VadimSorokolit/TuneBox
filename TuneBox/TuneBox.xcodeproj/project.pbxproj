@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		2DA46654455947728780C57D /* FeedbackSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19949104DF2B4E41B13E58D0 /* FeedbackSheetView.swift */; };
-		A1F0B001306548050027AFB1 /* FeedbackServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F0B002306548050027AFB2 /* FeedbackServicing.swift */; };
-		A1F0B003306548050027AFB3 /* FeedbackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F0B004306548050027AFB4 /* FeedbackService.swift */; };
 		5B061DB1305971EA005C6603 /* SettingsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B061DB0305971E9005C6603 /* SettingsRow.swift */; };
 		5B061DB330597400005C6603 /* TabHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B061DB230597400005C6603 /* TabHeaderView.swift */; };
 		5B0BC2A330051A8300E8F2A5 /* ImportTracksViewV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0BC2A230051A7100E8F2A5 /* ImportTracksViewV1.swift */; };
@@ -214,6 +212,8 @@
 		5BFCA8452FCEE252009C6AD9 /* TransferPrioritizable+mergePriority.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA8442FCEE251009C6AD9 /* TransferPrioritizable+mergePriority.swift */; };
 		5BFCA8492FCEE470009C6AD9 /* Launch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA8482FCEE46F009C6AD9 /* Launch.swift */; };
 		5BFCA84D2FCEE5D4009C6AD9 /* Onboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFCA84C2FCEE5D3009C6AD9 /* Onboarding.swift */; };
+		A1F0B001306548050027AFB1 /* FeedbackServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F0B002306548050027AFB2 /* FeedbackServicing.swift */; };
+		A1F0B003306548050027AFB3 /* FeedbackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F0B004306548050027AFB4 /* FeedbackService.swift */; };
 		C403EB9385FB43DFBFD3CD50 /* SpinningVinylView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96095791DA314523A802F6CC /* SpinningVinylView.swift */; };
 /* End PBXBuildFile section */
 
@@ -249,8 +249,6 @@
 
 /* Begin PBXFileReference section */
 		19949104DF2B4E41B13E58D0 /* FeedbackSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackSheetView.swift; sourceTree = "<group>"; };
-		A1F0B002306548050027AFB2 /* FeedbackServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackServicing.swift; sourceTree = "<group>"; };
-		A1F0B004306548050027AFB4 /* FeedbackService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackService.swift; sourceTree = "<group>"; };
 		5B061DB0305971E9005C6603 /* SettingsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRow.swift; sourceTree = "<group>"; };
 		5B061DB230597400005C6603 /* TabHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabHeaderView.swift; sourceTree = "<group>"; };
 		5B0BC2A230051A7100E8F2A5 /* ImportTracksViewV1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportTracksViewV1.swift; sourceTree = "<group>"; };
@@ -452,6 +450,8 @@
 		5BFCA8482FCEE46F009C6AD9 /* Launch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Launch.swift; sourceTree = "<group>"; };
 		5BFCA84C2FCEE5D3009C6AD9 /* Onboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding.swift; sourceTree = "<group>"; };
 		96095791DA314523A802F6CC /* SpinningVinylView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinningVinylView.swift; sourceTree = "<group>"; };
+		A1F0B002306548050027AFB2 /* FeedbackServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackServicing.swift; sourceTree = "<group>"; };
+		A1F0B004306548050027AFB4 /* FeedbackService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -600,14 +600,6 @@
 				A1F0B005306548050027AFB5 /* Feedback */,
 			);
 			path = Firebase;
-			sourceTree = "<group>";
-		};
-		A1F0B005306548050027AFB5 /* Feedback */ = {
-			isa = PBXGroup;
-			children = (
-				A1F0B004306548050027AFB4 /* FeedbackService.swift */,
-			);
-			path = Feedback;
 			sourceTree = "<group>";
 		};
 		5B1875C72FD0842400D8A042 /* Views */ = {
@@ -1434,6 +1426,14 @@
 				5BFCA8482FCEE46F009C6AD9 /* Launch.swift */,
 			);
 			path = Launch;
+			sourceTree = "<group>";
+		};
+		A1F0B005306548050027AFB5 /* Feedback */ = {
+			isa = PBXGroup;
+			children = (
+				A1F0B004306548050027AFB4 /* FeedbackService.swift */,
+			);
+			path = Feedback;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

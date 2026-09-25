@@ -7,6 +7,7 @@
 
 import FirebaseFirestore
 import Foundation
+import UIKit
 
 final class FeedbackService: FeedbackServicing {
 
@@ -26,6 +27,11 @@ final class FeedbackService: FeedbackServicing {
         let build = Bundle.main.object(
             forInfoDictionaryKey: "CFBundleVersion"
         ) as? String ?? ""
+        let languageCode = Locale.current.language.languageCode?.identifier ?? ""
+        let preferredLanguage = Locale.preferredLanguages.first ?? ""
+        let deviceRegionCode = Locale.current.region?.identifier ?? ""
+        let timeZoneIdentifier = TimeZone.current.identifier
+        let deviceModel = Self.deviceModelIdentifier
 
         let firestoreData: [String: Any] = [
             "rating": rating,
@@ -36,6 +42,11 @@ final class FeedbackService: FeedbackServicing {
             "systemVersion": systemVersion,
             "appVersion": appVersion,
             "build": build,
+            "languageCode": languageCode,
+            "preferredLanguage": preferredLanguage,
+            "deviceRegionCode": deviceRegionCode,
+            "timeZone": timeZoneIdentifier,
+            "deviceModel": deviceModel,
             "createdAt": FieldValue.serverTimestamp()
         ]
 
@@ -53,6 +64,13 @@ final class FeedbackService: FeedbackServicing {
         App
         - Version: \(appVersion) (\(build))
         - System: \(Constants.systemName) \(systemVersion)
+        - Device: \(displayOrDash(deviceModel))
+
+        Locale
+        - Language: \(displayOrDash(languageCode))
+        - Preferred Language: \(displayOrDash(preferredLanguage))
+        - Device Region: \(displayOrDash(deviceRegionCode))
+        - Time Zone: \(displayOrDash(timeZoneIdentifier))
         """
 
         await sendWeb3FormsEmail(
@@ -80,6 +98,21 @@ final class FeedbackService: FeedbackServicing {
         } catch {
             // Intentionally ignored — Firestore already saved the feedback.
         }
+    }
+
+    private func displayOrDash(_ value: String) -> String {
+        value.isEmpty ? "—" : value
+    }
+
+    private static var deviceModelIdentifier: String {
+        var systemInfo = utsname()
+        uname(&systemInfo)
+        let identifier = withUnsafePointer(to: &systemInfo.machine) { pointer in
+            pointer.withMemoryRebound(to: CChar.self, capacity: 1) { machine in
+                String(validatingUTF8: machine)
+            }
+        }
+        return identifier ?? UIDevice.current.model
     }
 
     private enum Constants {
