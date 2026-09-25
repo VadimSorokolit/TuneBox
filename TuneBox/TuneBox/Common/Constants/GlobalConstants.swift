@@ -25,6 +25,7 @@ enum GlobalConstants {
 
     enum Screen {
         static let regularWidth: CGFloat = 393
+        static let seHeight: CGFloat = 667
         static let defaultHeight: CGFloat = 60
         static let horizontalInset: CGFloat = 26
     }

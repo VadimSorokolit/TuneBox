@@ -11,8 +11,10 @@ struct DismissKeyboardOnTapModifier: ViewModifier {
     @FocusState.Binding var isFocused: Bool
 
     func body(content: Content) -> some View {
-        content.onTapGesture {
-            isFocused = false
-        }
+        content.simultaneousGesture(
+            TapGesture().onEnded {
+                isFocused = false
+            }
+        )
     }
 }

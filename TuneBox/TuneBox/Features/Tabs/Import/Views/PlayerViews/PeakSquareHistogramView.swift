@@ -14,6 +14,7 @@ struct PeakSquareHistogramView: View {
     let bands: [Float]
     var bandCount: Int
     let centers: [Float]
+    let isLargeScreen: Bool
     var isActive: Bool
 
     // MARK: - Main Body
@@ -25,7 +26,8 @@ struct PeakSquareHistogramView: View {
                 columnCount: bandCount,
                 totalWidth: geometry.size.width,
                 columnSpacing: columnSpacing,
-                maxStackHeight: maxStackHeight
+                maxStackHeight: maxStackHeight,
+                isLargeScreen: isLargeScreen
             )
 
             HStack(alignment: .bottom, spacing: columnSpacing) {
@@ -91,13 +93,16 @@ struct PeakSquareHistogramView: View {
         let columnWidth: CGFloat
         let dotSize: CGFloat
         let stackHeight: CGFloat
+        let isLargeScreen: Bool
 
         init(
             columnCount: Int,
             totalWidth: CGFloat,
             columnSpacing: CGFloat,
-            maxStackHeight: Int
+            maxStackHeight: Int,
+            isLargeScreen: Bool
         ) {
+            self.isLargeScreen = isLargeScreen
             guard columnCount > 0 else {
                 self.columnWidth = 0
                 self.dotSize = 0
@@ -108,7 +113,12 @@ struct PeakSquareHistogramView: View {
             let spacingTotal = columnSpacing * CGFloat(max(0, columnCount - 1))
             let columnsWidth = max(0, totalWidth - spacingTotal)
             self.columnWidth = max(3, columnsWidth / CGFloat(columnCount))
-            self.dotSize = min(columnWidth * 0.72, 8)
+            self.dotSize = min(
+                columnWidth * 0.72,
+                isLargeScreen
+                ? 8
+                : 6
+            )
             self.stackHeight = CGFloat(maxStackHeight) * dotSize
                 + CGFloat(max(0, maxStackHeight - 1)) * 2
         }

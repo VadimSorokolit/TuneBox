@@ -92,7 +92,8 @@ struct TracksView: View {
                                     height: BottomLayout.inset(
                                         isPlayerVisible: playerVM.isPlayerVisible,
                                         isPlaying: playerVM.isPlaying,
-                                        isTabBarVisible: rootTabsVM.isTabBarVisible
+                                        isTabBarVisible: rootTabsVM.isTabBarVisible,
+                                        screenHeight: screenHeight
                                     )
                                 )
                                 .animation(.easeInOut(duration: 0.35), value: playerVM.isPlaying)
@@ -128,6 +129,7 @@ struct TracksView: View {
 
     // MARK: - Properties. Private
 
+    @Environment(\.screenHeight) private var screenHeight
     @Environment(AppCoordinator.self) private var coordinator
     @Injected private var rootTabsVM: RootTabsManaging
     @Injected private var importManagingVM: ImportManaging

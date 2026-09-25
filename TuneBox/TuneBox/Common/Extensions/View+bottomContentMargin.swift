@@ -8,12 +8,15 @@
 import SwiftUI
 
 enum BottomLayout {
+    static let seExtraInset: CGFloat = 16
+
     static func inset(
         base: CGFloat = 10,
         adjustment: CGFloat = 0,
         isPlayerVisible: Bool,
         isPlaying: Bool,
-        isTabBarVisible: Bool
+        isTabBarVisible: Bool,
+        screenHeight: CGFloat = .infinity
     ) -> CGFloat {
         base
         - adjustment
@@ -29,6 +32,10 @@ enum BottomLayout {
            ? GlobalConstants.CompactPlayer.bottomPadding
            : 0
         )
+        + (screenHeight > GlobalConstants.Screen.seHeight
+           ? 0
+           : seExtraInset
+        )
     }
 }
 
@@ -41,9 +48,8 @@ extension View {
         isPlaying: Bool,
         isTabBarVisible: Bool
     ) -> some View {
-        contentMargins(
-            .bottom,
-            BottomLayout.inset(
+        modifier(
+            BottomContentMarginModifier(
                 base: base,
                 adjustment: adjustment,
                 isPlayerVisible: isPlayerVisible,
@@ -51,7 +57,34 @@ extension View {
                 isTabBarVisible: isTabBarVisible
             )
         )
-        .animation(.easeInOut(duration: 0.35), value: isPlaying)
+    }
+
+}
+
+private struct BottomContentMarginModifier: ViewModifier {
+
+    @Environment(\.screenHeight) private var screenHeight
+
+    let base: CGFloat
+    let adjustment: CGFloat
+    let isPlayerVisible: Bool
+    let isPlaying: Bool
+    let isTabBarVisible: Bool
+
+    func body(content: Content) -> some View {
+        content
+            .contentMargins(
+                .bottom,
+                BottomLayout.inset(
+                    base: base,
+                    adjustment: adjustment,
+                    isPlayerVisible: isPlayerVisible,
+                    isPlaying: isPlaying,
+                    isTabBarVisible: isTabBarVisible,
+                    screenHeight: screenHeight
+                )
+            )
+            .animation(.easeInOut(duration: 0.35), value: isPlaying)
     }
 
 }

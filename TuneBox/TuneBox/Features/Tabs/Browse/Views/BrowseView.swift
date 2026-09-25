@@ -316,7 +316,6 @@ struct BrowseView: View {
                         sectionTracksTitle(section.title)
                     }
                 )
-                .padding(.top, -3)
             }
         }
     }

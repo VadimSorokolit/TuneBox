@@ -14,6 +14,7 @@ struct TuneBoxApp: App {
     @Environment(\.scenePhase) private var scenePhase
     @State private var themeManager = ThemeManager()
     @State private var coordinator = AppCoordinator(root: .main)
+    @State private var screenHeight: CGFloat = 0
     @Injected private var viewModel: TransferManaging
     @Injected private var playerViewModel: PlayerManaging
     @Injected private var settingsVM: SettingsManaging
@@ -22,8 +23,14 @@ struct TuneBoxApp: App {
         WindowGroup {
             RootTabsView()
                 .environment(\.themeManager, themeManager)
+                .environment(\.screenHeight, screenHeight)
                 .applyTheme(themeManager)
                 .environment(coordinator)
+                .onGeometryChange(for: CGFloat.self) { proxy in
+                    proxy.size.height
+                } action: { _, height in
+                    screenHeight = height
+                }
                 .task {
                     await settingsVM.start()
                 }

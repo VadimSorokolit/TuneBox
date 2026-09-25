@@ -143,6 +143,11 @@ struct RootTabsView: View {
                     ? rootTabsVM.tabBarHeight
                     : GlobalConstants.CompactPlayer.bottomPadding
                 )
+                .offset(
+                    y: screenHeight > GlobalConstants.Screen.seHeight
+                    ? 0
+                    : -18
+                )
                 .animation(.easeInOut(duration: 0.35), value: playerVM.isPlaying)
             }
 
@@ -155,6 +160,7 @@ struct RootTabsView: View {
             СustomSheet(
                 isPresented: $isExpandedPlayerPresented) {
                 ExpandedPlayerView(
+                    screenHeight: screenHeight,
                     onClose: {
                         isExpandedPlayerPresented = false
                     }
@@ -197,6 +203,7 @@ struct RootTabsView: View {
 
     // MARK: - Properties. Private
 
+    @Environment(\.screenHeight) private var screenHeight
     @Injected private var rootTabsVM: RootTabsManaging
     @Injected private var playerVM: PlayerManaging
     @Injected private var importManagingVM: ImportManaging
@@ -287,8 +294,13 @@ struct RootTabsView: View {
             .glassEffect(in: .capsule)
         }
         .padding(.horizontal, 12)
-        .padding(.bottom, GlobalConstants.Device.isPad ? -5 : 20)
-        .ignoresSafeArea(.container, edges: .bottom)
+        .offset(
+            y: GlobalConstants.Device.isPad
+            ? 5
+            : screenHeight > GlobalConstants.Screen.seHeight
+            ? 10
+            : -10
+        )
     }
 
     // MARK: - Private. Methods

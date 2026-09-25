@@ -11,16 +11,21 @@ import SDWebImageSwiftUI
 
 struct ExpandedPlayerView: View {
 
+    let screenHeight: CGFloat
     var onClose: () -> Void = {}
 
     // MARK: - Main Body
 
     var body: some View {
         ExpandedPlayerContent(
+            isLargeScreen: isLargeScreen,
             playerVM: playerVM,
             coverVM: coverVM,
             onClose: onClose
         )
+        .onAppear {
+            print(isLargeScreen)
+        }
     }
 
     // MARK: - Properties. Private
@@ -28,12 +33,19 @@ struct ExpandedPlayerView: View {
     @Injected private var playerVM: PlayerManaging
     @Injected private var coverVM: CoverManaging
 
+    private var isLargeScreen: Bool {
+        let value = screenHeight > GlobalConstants.Screen.seHeight
+
+        return value
+    }
+
     // MARK: - Objects. Private
 
     private struct ExpandedPlayerContent: View {
 
         // MARK: - Properties. Public
 
+        let isLargeScreen: Bool
         let playerVM: PlayerManaging
         let coverVM: CoverManaging
         let onClose: () -> Void
@@ -46,80 +58,96 @@ struct ExpandedPlayerView: View {
         @State private var ignoreProgressSync = false
 
         private var displayedSliderValue: Double {
-            if self.isSliding || self.ignoreProgressSync {
-                return self.sliderValue
+            if isSliding || ignoreProgressSync {
+                return sliderValue
             }
-            return self.playerVM.progress
+            return playerVM.progress
         }
 
         // MARK: - Body
 
         var body: some View {
             if let track = playerVM.track {
-                ScrollView {
-                    VStack(spacing: 24) {
-                        header
+                VStack(
+                    spacing: isLargeScreen
+                    ? 24
+                    : 12
+                ) {
+                    header
 
-                        SpinningVinylView(
-                            track: track,
-                            isPlaying: playerVM.isPlaying,
-                            isLoading: coverVM.isLoading,
-                            isSeekScrubbing: playerVM.isSeekScrubbing,
-                            isTapSpinning: playerVM.isVinylTapSpinning,
-                            progress: playerVM.progress,
-                            revolutionDuration: playerVM.vinylRevolutionDuration,
-                            spinDirection: playerVM.vinylSpinDirection,
-                            spinSpeed: playerVM.vinylSpinSpeed,
-                            vinylSize: 240,
-                            coverSize: 96,
-                            holeSize: 8
-                        )
-                        .equatable()
-                        .transaction { $0.animation = nil }
-                        .padding(.top, 8)
-                        .shadow(color: .black.opacity(0.35), radius: 24, y: 12)
+                    SpinningVinylView(
+                        track: track,
+                        isPlaying: playerVM.isPlaying,
+                        isLoading: coverVM.isLoading,
+                        isSeekScrubbing: playerVM.isSeekScrubbing,
+                        isTapSpinning: playerVM.isVinylTapSpinning,
+                        progress: playerVM.progress,
+                        revolutionDuration: playerVM.vinylRevolutionDuration,
+                        spinDirection: playerVM.vinylSpinDirection,
+                        spinSpeed: playerVM.vinylSpinSpeed,
+                        vinylSize: isLargeScreen
+                        ? 240
+                        : 200,
+                        coverSize: isLargeScreen
+                        ? 96
+                        : 80,
+                        holeSize: 8
+                    )
+                    .equatable()
+                    .transaction { $0.animation = nil }
+                    .padding(.top, 8)
+                    .shadow(color: .black.opacity(0.35), radius: 24, y: 12)
 
-                        VStack(spacing: 6) {
-                            Text(track.songName)
-                                .font(.title2.weight(.semibold))
-                                .multilineTextAlignment(.center)
-                                .lineLimit(2)
-                                .foregroundStyle(Self.titleColor)
-                                .shadow(color: .black.opacity(0.55), radius: 2, y: 1)
+                    VStack(spacing: 6) {
+                        Text(track.songName)
+                            .font(.title2.weight(.semibold))
+                            .multilineTextAlignment(.center)
+                            .lineLimit(2)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .frame(maxWidth: .infinity)
+                            .foregroundStyle(titleColor)
+                            .shadow(color: .black.opacity(0.55), radius: 2, y: 1)
 
-                            Text(track.artistName)
-                                .font(.subheadline)
-                                .foregroundStyle(Self.subtitleColor)
-                                .lineLimit(1)
-                                .shadow(color: .black.opacity(0.5), radius: 1.5, y: 1)
-                        }
-                        .opacity(playerVM.isPlaying ? 1 : 0.45)
-                        .animation(.easeInOut(duration: 0.35), value: playerVM.isPlaying)
-                        .padding(.horizontal, 24)
-
-                        visualizerSection(for: track)
-
-                        playbackSection
-
-                        formatSection
+                        Text(track.artistName)
+                            .font(.subheadline)
+                            .multilineTextAlignment(.center)
+                            .lineLimit(2)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .frame(maxWidth: .infinity)
+                            .foregroundStyle(subtitleColor)
+                            .shadow(color: .black.opacity(0.5), radius: 1.5, y: 1)
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 32)
+                    .opacity(playerVM.isPlaying ? 1 : 0.45)
+                    .animation(.easeInOut(duration: 0.35), value: playerVM.isPlaying)
+                    .padding(.horizontal, 24)
+
+                    visualizerSection(for: track)
+
+                    playbackSection
+
+                    formatSection
                 }
+                .padding(.horizontal, 20)
+                .padding(.bottom, 32)
+                .frame(
+                    maxWidth: .infinity,
+                    maxHeight: .infinity,
+                    alignment: .top
+                )
                 .background {
                     BlurredCoverBackground(coverPath: track.imagePath)
                         .animation(.easeInOut(duration: 0.4), value: track.id)
                 }
                 .onAppear {
-                    self.sliderValue = self.playerVM.progress
+                    sliderValue = playerVM.progress
                 }
                 .onChange(of: track.id) { _, _ in
-                    self.ignoreProgressSync = false
-                    self.sliderValue = self.playerVM.progress
+                    ignoreProgressSync = false
+                    sliderValue = playerVM.progress
                 }
                 .onChange(of: playerVM.progress) { _, progress in
-                    guard self.isSliding.isFalse, self.ignoreProgressSync.isFalse else { return }
-                    self.sliderValue = progress
+                    guard isSliding.isFalse, ignoreProgressSync.isFalse else { return }
+                    sliderValue = progress
                 }
             } else {
                 ContentUnavailableView(
@@ -132,10 +160,10 @@ struct ExpandedPlayerView: View {
 
         // MARK: - Properties .Private
 
-        private static let titleColor = Color.white.mix(with: .primary, by: 0.12)
-        private static let subtitleColor = Color.white.mix(with: .secondary, by: 0.25)
-        private static let chromeColor = Color.white.mix(with: .primary, by: 0.18)
-        private static let accentColor = Color.orange.mix(with: .white, by: 0.35)
+        private let titleColor = Color.white.mix(with: .primary, by: 0.12)
+        private let subtitleColor = Color.white.mix(with: .secondary, by: 0.25)
+        private let chromeColor = Color.white.mix(with: .primary, by: 0.18)
+        private let accentColor = Color.orange.mix(with: .white, by: 0.35)
 
         private var header: some View {
             HStack {
@@ -146,7 +174,7 @@ struct ExpandedPlayerView: View {
                 } label: {
                     Image(systemName: "chevron.compact.down")
                         .font(.title3.weight(.semibold))
-                        .foregroundStyle(Self.chromeColor)
+                        .foregroundStyle(chromeColor)
                         .shadow(color: .black.opacity(0.45), radius: 1.5, y: 1)
                         .frame(width: 44, height: 28)
                         .contentShape(Rectangle())
@@ -155,7 +183,12 @@ struct ExpandedPlayerView: View {
 
                 Spacer()
             }
-            .padding(.top, 8)
+            .padding(
+                .top,
+                    isLargeScreen
+                    ? 8
+                    : 20
+            )
         }
 
         private func visualizerSection(for track: TrackEntity) -> some View {
@@ -166,6 +199,7 @@ struct ExpandedPlayerView: View {
                     bands: playerVM.spectrumBands,
                     bandCount: playerVM.spectrumBandCount,
                     centers: playerVM.spectrumBandCenters,
+                    isLargeScreen: isLargeScreen,
                     isActive: playerVM.track != nil
                 )
                 .id(track.id)
@@ -182,9 +216,14 @@ struct ExpandedPlayerView: View {
                     }
                 }
                 .font(.caption.monospacedDigit())
-                .foregroundStyle(Self.subtitleColor)
+                .foregroundStyle(subtitleColor)
                 .shadow(color: .black.opacity(0.45), radius: 1.5, y: 1)
             }
+            .offset(
+                y: isLargeScreen
+                ? 0
+                : -30
+            )
         }
 
         private var playbackSection: some View {
@@ -193,35 +232,36 @@ struct ExpandedPlayerView: View {
                     value: Binding(
                         get: { displayedSliderValue },
                         set: { newValue in
-                            self.sliderValue = newValue
-                            guard self.isSliding else { return }
-                            self.playerVM.seek(to: newValue)
+                            sliderValue = newValue
+                            guard isSliding else { return }
+                            playerVM.seek(to: newValue)
                         }
                     ),
                     in: 0 ... 1
                 ) { editing in
                     if editing {
-                        self.sliderValue = self.playerVM.progress
-                        self.isSliding = true
-                        self.ignoreProgressSync = false
+                        sliderValue = playerVM.progress
+                        isSliding = true
+                        ignoreProgressSync = false
                     } else {
                         // Playing + at end: don't let progress 1→0 redraw this slider instance.
-                        if self.sliderValue >= 1, self.playerVM.isPlaying {
-                            self.ignoreProgressSync = true
+                        if sliderValue >= 1, playerVM.isPlaying {
+                            ignoreProgressSync = true
+
                             Task { @MainActor in
                                 // repeat .one keeps the same track id — unfreeze shortly after.
                                 try? await Task.sleep(nanoseconds: 120_000_000)
-                                guard self.ignoreProgressSync else { return }
-                                self.ignoreProgressSync = false
-                                guard self.isSliding.isFalse else { return }
-                                self.sliderValue = self.playerVM.progress
+                                guard ignoreProgressSync else { return }
+                                ignoreProgressSync = false
+                                guard isSliding.isFalse else { return }
+                                sliderValue = playerVM.progress
                             }
                         }
-                        self.isSliding = false
+                        isSliding = false
                     }
-                    self.playerVM.setSeekScrubbing(editing, direction: 0)
+                    playerVM.setSeekScrubbing(editing, direction: 0)
                 }
-                .tint(Self.accentColor)
+                .tint(accentColor)
                 .id(playerVM.track?.id)
 
                 HStack(spacing: 36) {
@@ -264,10 +304,15 @@ struct ExpandedPlayerView: View {
                         }
                     )
                 }
-                .foregroundStyle(Self.chromeColor)
+                .foregroundStyle(chromeColor)
                 .shadow(color: .black.opacity(0.45), radius: 2, y: 1)
                 .buttonStyle(.plain)
             }
+            .offset(
+                y: isLargeScreen
+                ? 0
+                : -30
+            )
         }
 
         private var formatSection: some View {
@@ -280,7 +325,7 @@ struct ExpandedPlayerView: View {
                     .multilineTextAlignment(.trailing)
             }
             .font(.caption2)
-            .foregroundStyle(Self.subtitleColor)
+            .foregroundStyle(subtitleColor)
             .shadow(color: .black.opacity(0.45), radius: 1.5, y: 1)
             .frame(height: 15)
             .scaleEffect(
@@ -290,6 +335,11 @@ struct ExpandedPlayerView: View {
             )
             .opacity(playerVM.isPlaying ? 1 : 0)
             .playbackAnimation(playerVM.isPlaying)
+            .offset(
+                y: isLargeScreen
+                ? 0
+                : -30
+            )
         }
 
         private func formatClock(_ seconds: TimeInterval) -> String {
@@ -450,9 +500,8 @@ struct ExpandedPlayerView: View {
             .allowsHitTesting(false)
         }
     }
-
 }
 
 #Preview {
-    ExpandedPlayerView()
+    ExpandedPlayerView(screenHeight: 852)
 }

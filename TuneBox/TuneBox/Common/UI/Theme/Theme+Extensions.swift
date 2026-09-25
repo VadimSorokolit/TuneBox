@@ -68,4 +68,6 @@ extension EnvironmentValues {
         set { self[ThemeManagerKey.self] = newValue }
     }
 
+    @Entry var screenHeight: CGFloat = 0
+
 }

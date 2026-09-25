@@ -93,7 +93,12 @@ struct SettingsRow: View {
                     .opacity(isDisabled ? 0.45 : 1)
                     .compositingGroup()
             }
-            .frame(maxWidth: .infinity, minHeight: 44)
+            .frame(
+                maxWidth: .infinity,
+                minHeight: screenHeight > GlobalConstants.Screen.seHeight
+                ? 44
+                : 34
+            )
             .contentShape(Rectangle())
             // Match leading title inset with trailing icon inset.
             .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
@@ -113,6 +118,8 @@ struct SettingsRow: View {
     }
 
     // MARK: - Properties. Private
+
+    @Environment(\.screenHeight) private var screenHeight
 
     private let menu: UIMenu?
 
