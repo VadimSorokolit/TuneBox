@@ -26,10 +26,12 @@ struct FeedbackSheetView: View {
                     .transition(.opacity)
             }
         }
+        .padding(.horizontal, 20)
         .padding(20)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .animation(.easeInOut(duration: 0.25), value: didSubmit)
         .presentationDetents([.large])
-        .presentationDragIndicator(.visible)
+        .presentationDragIndicator(.hidden)
         .task {
             guard !didSubmit else { return }
             // Phone only: autofocus so keyboard rises with the sheet

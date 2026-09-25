@@ -29,6 +29,7 @@ struct TuneBoxApp: App {
                 .onGeometryChange(for: CGFloat.self) { proxy in
                     proxy.size.height
                 } action: { _, height in
+                    if screenHeight > 0 { return }
                     screenHeight = height
                 }
                 .task {
