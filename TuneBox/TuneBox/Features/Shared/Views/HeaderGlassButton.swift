@@ -21,11 +21,20 @@ struct HeaderGlassButton: View {
             .foregroundStyle(GlobalConstants.HeaderButton.foregroundStyle)
             .frame(size: GlobalConstants.HeaderButton.size)
             .contentShape(Circle())
-            .glassEffect(in: .circle)
+    }
+
+}
+
+extension View {
+
+    func headerGlassChrome() -> some View {
+        buttonStyle(.plain)
+            .glassEffect(.regular.interactive(), in: .circle)
     }
 
 }
 
 #Preview {
     HeaderGlassButton(systemName: "ellipsis")
+        .headerGlassChrome()
 }

@@ -38,6 +38,7 @@ struct DownloadsView: View {
                 transferManagingVM: transferManagingVM,
                 playerVM: playerVM
             )
+            .dismissKeyboardOnTap(focused: $isSearchFieldFocused)
         }
         .frame(maxWidth: .infinity,
                maxHeight: .infinity,
@@ -61,7 +62,6 @@ struct DownloadsView: View {
 
             await transferManagingVM.handleSearchQuery(searchQuery)
         }
-        .dismissKeyboardOnTap(focused: $isSearchFieldFocused)
     }
 
     // MARK: - Properties. Private
@@ -114,6 +114,7 @@ struct DownloadsView: View {
                 } label: {
                     HeaderGlassButton(systemName: "line.3.horizontal.decrease")
                 }
+                .headerGlassChrome()
             }
         }
     }

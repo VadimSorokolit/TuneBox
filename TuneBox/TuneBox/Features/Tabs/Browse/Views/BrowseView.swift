@@ -33,6 +33,7 @@ struct BrowseView: View {
                 transferManagingVM: transferManagingVM,
                 playerVM: playerVM,
             )
+            .dismissKeyboardOnTap(focused: $isSearchFieldFocused)
         }
         .frame(maxWidth: .infinity,
                maxHeight: .infinity,
@@ -50,7 +51,6 @@ struct BrowseView: View {
 
             handleSearchStateBy(query: searchQuery)
         }
-        .dismissKeyboardOnTap(focused: $isSearchFieldFocused)
         .modifier(CentralSpinnerModifier(isVisible: transferManagingVM.shouldShowCentralSpinner))
     }
 
@@ -92,6 +92,7 @@ struct BrowseView: View {
                 } label: {
                     HeaderGlassButton(systemName: "xmark")
                 }
+                .headerGlassChrome()
                 .disabled(
                     transferManagingVM.inProgressActiveTracksCount == .zero
                     && transferManagingVM.inProgressPausedTracksCount == .zero

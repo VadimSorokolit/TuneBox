@@ -126,7 +126,7 @@ struct ImportsView: View {
                 }, label: {
                     HeaderGlassButton(systemName: "checkmark")
                 })
-                .buttonStyle(.plain)
+                .headerGlassChrome()
             } else {
                 Menu {
                     Button(action: {
@@ -151,7 +151,7 @@ struct ImportsView: View {
                 } label: {
                     HeaderGlassButton(systemName: "ellipsis")
                 }
-                .buttonStyle(.plain)
+                .headerGlassChrome()
                 .disabled(isMenuButtonDisabled)
                 .opacity(isMenuButtonDisabled ? 0 : 1)
             }
