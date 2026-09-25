@@ -13,16 +13,26 @@ struct ImportsView: View {
     // MARK: - Main Body
 
     var body: some View {
-        Group {
-            if importManagingVM.hasLibrary {
-                ContentView(
-                    sourceIDToDelete: $sourceIDToDelete,
-                    importManagingVM: importManagingVM
+        VStack(spacing: 0) {
+            TabHeaderView(title: "Import") {
+                HeaderView(
+                    isFileImporterPresented: $isFileImporterPresented,
+                    importManagingVM: importManagingVM,
+                    settingsVM: settingsVM
                 )
-            } else {
-                EmptyContentView(
-                    isFileImporterPresented: $isFileImporterPresented
-                )
+            }
+
+            Group {
+                if importManagingVM.hasLibrary {
+                    ContentView(
+                        sourceIDToDelete: $sourceIDToDelete,
+                        importManagingVM: importManagingVM
+                    )
+                } else {
+                    EmptyContentView(
+                        isFileImporterPresented: $isFileImporterPresented
+                    )
+                }
             }
         }
         .frame(
@@ -31,16 +41,6 @@ struct ImportsView: View {
             alignment: .top
         )
         .importHomeNavigationChrome()
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                HeaderView(
-                    isFileImporterPresented: $isFileImporterPresented,
-                    importManagingVM: importManagingVM,
-                    settingsVM: settingsVM
-                )
-            }
-            .sharedBackgroundVisibility(.hidden)
-        }
         .background(.gray.opacity(0.025))
         .bottomContentMargin(
             10,
