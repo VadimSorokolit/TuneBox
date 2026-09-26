@@ -40,7 +40,10 @@ struct ImportsView: View {
             maxHeight: .infinity,
             alignment: .top
         )
-        .importHomeNavigationChrome()
+        // Hide only while Home is top. Keeping it always-hidden breaks child
+        // back buttons; leaving it always-visible pushes TabHeaderView down.
+        .toolbar(isImportHomeTop ? .hidden : .visible, for: .navigationBar)
+        .importHomeNavigationChrome(isHomeTop: isImportHomeTop)
         .background(.gray.opacity(0.025))
         .bottomContentMargin(
             10,
@@ -99,6 +102,7 @@ struct ImportsView: View {
 
     // MARK: - Properties. Private
 
+    @Environment(AppCoordinator.self) private var coordinator
     @Injected private var rootTabsVM: RootTabsManaging
     @Injected private var importManagingVM: ImportManaging
     @Injected private var playerVM: PlayerManaging
@@ -106,6 +110,10 @@ struct ImportsView: View {
     @State private var sourceIDToDelete: ImportSource.ID?
     @State private var isFileImporterPresented: Bool = false
     @State private var isErrorPresented = false
+
+    private var isImportHomeTop: Bool {
+        coordinator.canPop.isFalse
+    }
 
     // MARK: - Objects. Private
 
