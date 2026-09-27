@@ -31,6 +31,7 @@ and automatically add album covers from the [MusicBrainz API](https://musicbrain
 * Media Controls - **MediaPlayer / MPRemoteCommandCenter**
 * Analytics & Crash Reporting - **Firebase Analytics / Firebase Crashlytics**
 * In-App Purchases - **StoreKit 2**
+* Localization:** `Localizable.strings` (en, de, es, fr, it, pl, uk)
 * Dependency Management - **Swift Package Manager**
 * Linting - **SwiftLint**
 * CI/CD — **GitHub Actions**
