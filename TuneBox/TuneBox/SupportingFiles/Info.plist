@@ -4,6 +4,8 @@
 <dict>
 	<key>JAMENDO_CLIENT_ID</key>
 	<string>$(JAMENDO_CLIENT_ID)</string>
+	<key>WEB3FORMS_ACCESS_KEY</key>
+	<string>$(WEB3FORMS_ACCESS_KEY)</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>JetBrainsMono-ExtraBold.ttf</string>
@@ -27,8 +29,6 @@
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>
-		<string>fetch</string>
-		<string>processing</string>
 		<string>audio</string>
 	</array>
 </dict>

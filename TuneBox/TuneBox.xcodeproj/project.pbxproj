@@ -119,6 +119,7 @@
 		5B84C01C2FAB353200ACE75A /* CustomAlerts in Frameworks */ = {isa = PBXBuildFile; productRef = 5B84C01B2FAB353200ACE75A /* CustomAlerts */; };
 		5B84C0252FAB368D00ACE75A /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 5B84C0242FAB367B00ACE75A /* .swiftlint.yml */; };
 		5B8787913059A6CB00A9BBFA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B8787903059A6CB00A9BBFA /* GoogleService-Info.plist */; };
+		5BC0FFEE306A100100ABCD02 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 5BC0FFEE306A100100ABCD01 /* PrivacyInfo.xcprivacy */; };
 		5B88609E2FAE184C0056BE9A /* GlobalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B88609D2FAE18450056BE9A /* GlobalConstants.swift */; };
 		5B8860A52FB1CF910056BE9A /* NotificationNames+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8860A42FB1CF900056BE9A /* NotificationNames+Extension.swift */; };
 		5B899F782FCF13A8002D3232 /* RootTabsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B899F772FCF13A8002D3232 /* RootTabsView.swift */; };
@@ -351,6 +352,7 @@
 		5B84A1C0305E4A0100C0DE03 /* CoverImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoverImageLoader.swift; sourceTree = "<group>"; };
 		5B84C0242FAB367B00ACE75A /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		5B8787903059A6CB00A9BBFA /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		5BC0FFEE306A100100ABCD01 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		5B88609D2FAE18450056BE9A /* GlobalConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalConstants.swift; sourceTree = "<group>"; };
 		5B8860A42FB1CF900056BE9A /* NotificationNames+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationNames+Extension.swift"; sourceTree = "<group>"; };
 		5B899F772FCF13A8002D3232 /* RootTabsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabsView.swift; sourceTree = "<group>"; };
@@ -1285,6 +1287,7 @@
 			children = (
 				5BB9A56D2FC8AF45000B8127 /* Config.xcconfig */,
 				5BD579AB2FAB27A000503BA2 /* Info.plist */,
+				5BC0FFEE306A100100ABCD01 /* PrivacyInfo.xcprivacy */,
 			);
 			path = SupportingFiles;
 			sourceTree = "<group>";
@@ -1588,6 +1591,7 @@
 				5BFCA81D2FCED45F009C6AD9 /* JetBrainsMono-ExtraLight.ttf in Resources */,
 				5B92B905304556D700E9FB5D /* TuneBoxConfiguration.storekit in Resources */,
 				5B8787913059A6CB00A9BBFA /* GoogleService-Info.plist in Resources */,
+				5BC0FFEE306A100100ABCD02 /* PrivacyInfo.xcprivacy in Resources */,
 				5BFCA8232FCED45F009C6AD9 /* JetBrainsMono-SemiBold.ttf in Resources */,
 				5BFCA8342FCED5BF009C6AD9 /* SpaceGrotesk-Bold.otf in Resources */,
 				5BFCA8352FCED5BF009C6AD9 /* SpaceGrotesk-Light.otf in Resources */,
@@ -1997,7 +2001,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TuneBox/SupportingFiles/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = TuneBox;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -2040,7 +2044,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TuneBox/SupportingFiles/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = TuneBox;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

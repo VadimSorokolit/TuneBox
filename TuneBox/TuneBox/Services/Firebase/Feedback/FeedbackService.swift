@@ -80,13 +80,17 @@ final class FeedbackService: FeedbackServicing {
     }
 
     private func sendWeb3FormsEmail(message: String, subject: String) async {
+        guard let accessKey = Constants.web3FormsAccessKey, !accessKey.isEmpty else {
+            return
+        }
+
         var request = URLRequest(url: Constants.web3FormsURL)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
 
         let payload: [String: String] = [
-            "access_key": Constants.web3FormsAccessKey,
+            "access_key": accessKey,
             "subject": subject,
             "from_name": "TuneBox",
             "message": message
@@ -117,8 +121,14 @@ final class FeedbackService: FeedbackServicing {
 
     private enum Constants {
         static let collectionName = "feedback"
+        static let web3FormsAccessKeyInfoKey = "WEB3FORMS_ACCESS_KEY"
         static let web3FormsURL = URL(string: "https://api.web3forms.com/submit")!
-        static let web3FormsAccessKey = "e998a93d-d45f-43fe-a017-22dde305a47a"
+
+        static var web3FormsAccessKey: String? {
+            Bundle.main.object(
+                forInfoDictionaryKey: web3FormsAccessKeyInfoKey
+            ) as? String
+        }
 
         static var systemName: String {
             #if os(iOS)
