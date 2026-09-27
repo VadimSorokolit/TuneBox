@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		2DA46654455947728780C57D /* FeedbackSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19949104DF2B4E41B13E58D0 /* FeedbackSheetView.swift */; };
+		4FF48325D7974D7C95DC4CF7 /* SleepTimerSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9455E58ACE5D4FBC8D75F35E /* SleepTimerSheetView.swift */; };
+		7B4DC60811F84CCFABA821B4 /* AboutSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98A73FBF89C14738BEC012F4 /* AboutSettingsView.swift */; };
 		5B061DB1305971EA005C6603 /* SettingsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B061DB0305971E9005C6603 /* SettingsRow.swift */; };
 		5B061DB330597400005C6603 /* TabHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B061DB230597400005C6603 /* TabHeaderView.swift */; };
 		5B0BC2A330051A8300E8F2A5 /* ImportTracksViewV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0BC2A230051A7100E8F2A5 /* ImportTracksViewV1.swift */; };
@@ -251,6 +253,8 @@
 
 /* Begin PBXFileReference section */
 		19949104DF2B4E41B13E58D0 /* FeedbackSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackSheetView.swift; sourceTree = "<group>"; };
+		9455E58ACE5D4FBC8D75F35E /* SleepTimerSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepTimerSheetView.swift; sourceTree = "<group>"; };
+		98A73FBF89C14738BEC012F4 /* AboutSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutSettingsView.swift; sourceTree = "<group>"; };
 		5B061DB0305971E9005C6603 /* SettingsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRow.swift; sourceTree = "<group>"; };
 		5B061DB230597400005C6603 /* TabHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabHeaderView.swift; sourceTree = "<group>"; };
 		5B0BC2A230051A7100E8F2A5 /* ImportTracksViewV1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportTracksViewV1.swift; sourceTree = "<group>"; };
@@ -745,6 +749,8 @@
 			isa = PBXGroup;
 			children = (
 				19949104DF2B4E41B13E58D0 /* FeedbackSheetView.swift */,
+				98A73FBF89C14738BEC012F4 /* AboutSettingsView.swift */,
+				9455E58ACE5D4FBC8D75F35E /* SleepTimerSheetView.swift */,
 				5B061DB0305971E9005C6603 /* SettingsRow.swift */,
 				5B3FEB4C2FB454C400DC1562 /* SettingsView.swift */,
 			);
@@ -1765,6 +1771,8 @@
 				5B47627E2FAB49B00069E41A /* AppLogger.swift in Sources */,
 				5B061DB1305971EA005C6603 /* SettingsRow.swift in Sources */,
 				2DA46654455947728780C57D /* FeedbackSheetView.swift in Sources */,
+				4FF48325D7974D7C95DC4CF7 /* SleepTimerSheetView.swift in Sources */,
+				7B4DC60811F84CCFABA821B4 /* AboutSettingsView.swift in Sources */,
 				A1F0B001306548050027AFB1 /* FeedbackServicing.swift in Sources */,
 				A1F0B003306548050027AFB3 /* FeedbackService.swift in Sources */,
 				5BA581892FD6A2B800B498D7 /* SettingsViewModel.swift in Sources */,

@@ -9,6 +9,8 @@ import Foundation
 import Observation
 import StoreKit
 import Resolver
+import UIKit
+import LinkPresentation
 
 @MainActor
 @Observable
@@ -23,6 +25,8 @@ final class SettingsViewModel: SettingsManaging {
     private(set) var products: [Product] = []
     private(set) var isLoading = false
     private(set) var error: String?
+    private(set) var isSleepTimerActive = false
+    private(set) var sleepTimerTrailingText = "Off"
 
     var paywallHeaderTitle: String {
         self.purchasedProductIDs.isNotEmpty
@@ -130,6 +134,60 @@ final class SettingsViewModel: SettingsManaging {
         URL(string: Constants.privacyPolicyURL)
     }
 
+    var shareActivityItems: [Any] {
+        [AppShareItem(
+            title: Constants.shareAppTitle,
+            message: Constants.shareAppMessage,
+            image: UIImage(named: Constants.shareAppImageName)
+        )]
+    }
+
+    func startSleepTimer(hours: Int, minutes: Int) {
+        let duration = TimeInterval((hours * 60) + minutes) * 60
+        guard duration > 0 else { return }
+
+        self.cancelSleepTimer()
+
+        let endDate = Date().addingTimeInterval(duration)
+        self.sleepTimerEndDate = endDate
+        self.isSleepTimerActive = true
+        self.sleepTimerTrailingText = Self.formattedRemaining(
+            endDate.timeIntervalSinceNow
+        )
+
+        let fireTimer = Timer(
+            timeInterval: duration,
+            repeats: false
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.fireSleepTimer()
+            }
+        }
+        RunLoop.main.add(fireTimer, forMode: .common)
+        self.sleepTimer = fireTimer
+
+        let tickTimer = Timer(
+            timeInterval: 1,
+            repeats: true
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.refreshSleepTimerDisplay()
+            }
+        }
+        RunLoop.main.add(tickTimer, forMode: .common)
+        self.sleepTimerDisplayTimer = tickTimer
+    }
+
+    func cancelSleepTimer() {
+        self.sleepTimer?.invalidate()
+        self.sleepTimer = nil
+        self.sleepTimerDisplayTimer?.invalidate()
+        self.sleepTimerDisplayTimer = nil
+        self.sleepTimerEndDate = nil
+        self.isSleepTimerActive = false
+        self.sleepTimerTrailingText = "Off"
+    }
+
     func submitFeedback(
         rating: Int,
         ratingLabel: String,
@@ -170,6 +228,10 @@ final class SettingsViewModel: SettingsManaging {
             "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
         static let privacyPolicyURL =
             "https://sites.google.com/view/tunebox-privacy-policy/privacy"
+        static let shareAppTitle = "TuneBox"
+        static let shareAppMessage =
+            "Check out TuneBox — an offline music player for iPhone."
+        static let shareAppImageName = "Paywall"
     }
 
     @ObservationIgnored
@@ -186,6 +248,18 @@ final class SettingsViewModel: SettingsManaging {
 
     @ObservationIgnored
     @Injected private var feedbackService: FeedbackServicing
+
+    @ObservationIgnored
+    @Injected private var audioService: AudioServicing
+
+    @ObservationIgnored
+    private var sleepTimer: Timer?
+
+    @ObservationIgnored
+    private var sleepTimerDisplayTimer: Timer?
+
+    @ObservationIgnored
+    private var sleepTimerEndDate: Date?
 
     // MARK: - Methods. Private
 
@@ -209,5 +283,88 @@ final class SettingsViewModel: SettingsManaging {
         self.error = self.purchaseService.error
         self.hasPremium = self.entitlementService.hasPremium
         self.paywallStatusMessage = self.entitlementService.paywallStatusMessage
+    }
+
+    private func refreshSleepTimerDisplay() {
+        guard let endDate = self.sleepTimerEndDate else {
+            self.sleepTimerTrailingText = "Off"
+            self.isSleepTimerActive = false
+            return
+        }
+
+        let remaining = endDate.timeIntervalSinceNow
+        guard remaining > 0 else {
+            self.fireSleepTimer()
+            return
+        }
+
+        self.sleepTimerTrailingText = Self.formattedRemaining(remaining)
+    }
+
+    private func fireSleepTimer() {
+        self.cancelSleepTimer()
+        self.audioService.stop()
+        exit(0)
+    }
+
+    private static func formattedRemaining(_ interval: TimeInterval) -> String {
+        let totalSeconds = max(0, Int(interval.rounded(.up)))
+        let hours = totalSeconds / 3600
+        let minutes = (totalSeconds % 3600) / 60
+        let seconds = totalSeconds % 60
+
+        if hours > 0 {
+            return String(format: "%d:%02d:%02d", hours, minutes, seconds)
+        }
+
+        return String(format: "%d:%02d", minutes, seconds)
+    }
+}
+
+// MARK: - AppShareItem
+
+private final class AppShareItem: NSObject, UIActivityItemSource {
+
+    // MARK: - Properties. Private
+
+    private let title: String
+    private let message: String
+    private let image: UIImage?
+
+    // MARK: - Initializer
+
+    init(title: String, message: String, image: UIImage?) {
+        self.title = title
+        self.message = message
+        self.image = image
+    }
+
+    // MARK: - Methods. Public
+
+    func activityViewControllerPlaceholderItem(
+        _ activityViewController: UIActivityViewController
+    ) -> Any {
+        message
+    }
+
+    func activityViewController(
+        _ activityViewController: UIActivityViewController,
+        itemForActivityType activityType: UIActivity.ActivityType?
+    ) -> Any? {
+        message
+    }
+
+    func activityViewControllerLinkMetadata(
+        _ activityViewController: UIActivityViewController
+    ) -> LPLinkMetadata? {
+        let metadata = LPLinkMetadata()
+        metadata.originalURL = URL(fileURLWithPath: title)
+
+        if let image {
+            metadata.iconProvider = NSItemProvider(object: image)
+            metadata.imageProvider = NSItemProvider(object: image)
+        }
+
+        return metadata
     }
 }
