@@ -239,7 +239,7 @@ struct ImportsView: View {
                                     sectionTracksTitle(
                                         section.kind.rawValue.capitalized,
                                         font: .system(size: 14, weight: .bold),
-                                        background: GlobalConstants.AppColor.defaultBackground,
+                                        background: .clear,
                                         foregroundStyle: .gray,
                                         topPadding: 20,
                                         bottomPadding: 0

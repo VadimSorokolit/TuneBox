@@ -93,6 +93,13 @@ struct SettingsView: View {
                 Form {
                     Section(header: Text("Appearance")) {
                         SettingsRow(
+                            title: "Theme",
+                            trailingText: themeManager.preset.displayName,
+                            selection: themeBinding,
+                            options: ThemePreset.allCases.map { ($0, $0.displayName) }
+                        )
+
+                        SettingsRow(
                             title: "Default Tab",
                             trailingText: defaultTab.title,
                             isDisabled: tabsMode == .import,
@@ -135,8 +142,16 @@ struct SettingsView: View {
 
         // MARK: - Properties. Private
 
+        @Environment(\.themeManager) private var themeManager
         @State private var tabsMode: TabsMode = .allTabs
         @State private var defaultTab: CustomTab = .default
+
+        private var themeBinding: Binding<ThemePreset> {
+            Binding(
+                get: { themeManager.preset },
+                set: { themeManager.setPreset($0) }
+            )
+        }
 
         private var defaultTabOptions: [CustomTab] {
             switch tabsMode {
