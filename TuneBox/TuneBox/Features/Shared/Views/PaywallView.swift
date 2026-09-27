@@ -37,6 +37,11 @@ struct PaywallView: View {
 
                 purchaseOptions
 
+                if showsSubscriptionDisclosure {
+                    subscriptionDisclosure
+                        .padding(.top, 20)
+                }
+
                 Spacer(minLength: 16)
 
                 footerButtons
@@ -68,6 +73,37 @@ struct PaywallView: View {
 
         private var monthlyProduct: Product? {
             settingsVM.products.first { $0.id == ProductID.monthly }
+        }
+
+        private var showsSubscriptionDisclosure: Bool {
+            monthlyProduct != nil
+                && settingsVM.hasMonthlyPurchase.isFalse
+                && settingsVM.hasLifetimePurchase.isFalse
+        }
+
+        private var subscriptionDisclosureText: String {
+            guard let monthlyProduct else { return "" }
+
+            let price = monthlyProduct.displayPrice
+            var text =
+                "TuneBox Monthly is an auto-renewable subscription. "
+                + "Payment will be charged to your Apple ID account at confirmation of purchase. "
+                + "Subscription automatically renews unless canceled at least 24 hours before the end of the current period. "
+                + "Your account will be charged \(price) for renewal within 24 hours prior to the end of the current period. "
+
+            if isEligibleForStoreIntro,
+               let offer = monthlyProduct.subscription?.introductoryOffer,
+               offer.paymentMode == .freeTrial {
+                let trialPeriod = Self.formattedSubscriptionPeriod(offer.period)
+                text +=
+                    "If you start with a free trial, \(price) will be charged when the \(trialPeriod) trial ends "
+                    + "unless you cancel at least 24 hours before it ends. "
+            }
+
+            text +=
+                "Manage or cancel anytime in Settings → Apple ID → Subscriptions."
+
+            return text
         }
 
         // MARK: - Subviews. Private
@@ -178,6 +214,15 @@ struct PaywallView: View {
                 }
             }
             .padding(.top, 28)
+        }
+
+        private var subscriptionDisclosure: some View {
+            Text(subscriptionDisclosureText)
+                .font(.satoshi.regular.size(11))
+                .foregroundStyle(theme.tokens.secondaryText.opacity(0.85))
+                .multilineTextAlignment(.leading)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
 
         private func purchaseRow(
