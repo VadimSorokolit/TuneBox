@@ -104,6 +104,10 @@ final class PurchaseService: PurchaseServicing {
         }
     }
 
+    func clearError() {
+        self.error = nil
+    }
+
     // MARK: - Properties. Private
 
     private let entitlementService: EntitlementServicing

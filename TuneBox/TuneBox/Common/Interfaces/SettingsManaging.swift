@@ -27,6 +27,7 @@ protocol SettingsManaging: LoadStateManaging {
     func refreshAccessState()
     func restorePurchases() async
     func restorePurchase()
+    func dismissError()
     func presentPaywall()
     func dismissPaywall()
     var termsOfUseURL: URL { get }

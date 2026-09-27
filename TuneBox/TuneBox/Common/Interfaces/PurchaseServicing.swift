@@ -17,4 +17,5 @@ protocol PurchaseServicing: LoadStateManaging {
     func preparePaywall() async
     func purchase(_ product: Product) async -> Bool
     func restorePurchases() async
+    func clearError()
 }

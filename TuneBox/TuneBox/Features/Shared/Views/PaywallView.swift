@@ -58,6 +58,16 @@ struct PaywallView: View {
             .task {
                 await settingsVM.preparePaywall()
             }
+            .onChange(of: settingsVM.error) { _, newValue in
+                isErrorPresented = newValue != nil
+            }
+            .alert(L10n.Common.error, isPresented: $isErrorPresented) {
+                Button(L10n.Common.okButton, role: .cancel) {
+                    settingsVM.dismissError()
+                }
+            } message: {
+                Text(settingsVM.error ?? "")
+            }
         }
 
         // MARK: - Properties. Private
@@ -66,6 +76,7 @@ struct PaywallView: View {
         @Environment(\.dismiss) private var dismiss
         @Environment(\.openURL) private var openURL
         @State private var purchasingProductID: String?
+        @State private var isErrorPresented = false
 
         private var isDarkAppearance: Bool {
             switch theme.preset {
@@ -234,10 +245,12 @@ struct PaywallView: View {
                     let didPurchase = await settingsVM.purchase(product)
                     purchasingProductID = nil
 
-                    guard didPurchase else { return }
-
-                    settingsVM.dismissPaywall()
-                    dismiss()
+                    if didPurchase {
+                        settingsVM.dismissPaywall()
+                        dismiss()
+                    } else if settingsVM.error != nil {
+                        isErrorPresented = true
+                    }
                 }
             }, label: {
                 Group {
@@ -261,7 +274,14 @@ struct PaywallView: View {
                 FooterCapsuleButton(
                     title: L10n.Paywall.restore,
                     foreground: theme.tokens.primaryText,
-                    action: settingsVM.restorePurchase
+                    action: {
+                        Task {
+                            await settingsVM.restorePurchases()
+                            if settingsVM.error != nil {
+                                isErrorPresented = true
+                            }
+                        }
+                    }
                 )
 
                 Spacer(minLength: 8)

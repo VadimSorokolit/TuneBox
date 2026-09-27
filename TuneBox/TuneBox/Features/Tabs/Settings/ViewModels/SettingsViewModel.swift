@@ -113,6 +113,11 @@ final class SettingsViewModel: SettingsManaging {
         }
     }
 
+    func dismissError() {
+        self.purchaseService.clearError()
+        self.error = nil
+    }
+
     func presentPaywall() {
         let wasPresented = self.isPaywallPresented
         self.isPaywallPresented = true
@@ -302,7 +307,6 @@ final class SettingsViewModel: SettingsManaging {
     private func fireSleepTimer() {
         self.cancelSleepTimer()
         self.audioService.stop()
-        exit(0)
     }
 
     private static func formattedRemaining(_ interval: TimeInterval) -> String {
