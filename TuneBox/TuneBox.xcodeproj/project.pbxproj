@@ -122,6 +122,7 @@
 		5B88609E2FAE184C0056BE9A /* GlobalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B88609D2FAE18450056BE9A /* GlobalConstants.swift */; };
 		5B8860A52FB1CF910056BE9A /* NotificationNames+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8860A42FB1CF900056BE9A /* NotificationNames+Extension.swift */; };
 		5B899F782FCF13A8002D3232 /* RootTabsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B899F772FCF13A8002D3232 /* RootTabsView.swift */; };
+		5B89C77A30694DA800BB3854 /* Genre+chipColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B89C77930694DA700BB3854 /* Genre+chipColor.swift */; };
 		5B92B905304556D700E9FB5D /* TuneBoxConfiguration.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 5B92B904304556D700E9FB5D /* TuneBoxConfiguration.storekit */; };
 		5B92B9073045626500E9FB5D /* EntitlementServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B9063045615C00E9FB5D /* EntitlementServicing.swift */; };
 		5B92B909304562EE00E9FB5D /* PurchaseServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92B908304562ED00E9FB5D /* PurchaseServicing.swift */; };
@@ -353,6 +354,7 @@
 		5B88609D2FAE18450056BE9A /* GlobalConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalConstants.swift; sourceTree = "<group>"; };
 		5B8860A42FB1CF900056BE9A /* NotificationNames+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationNames+Extension.swift"; sourceTree = "<group>"; };
 		5B899F772FCF13A8002D3232 /* RootTabsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabsView.swift; sourceTree = "<group>"; };
+		5B89C77930694DA700BB3854 /* Genre+chipColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Genre+chipColor.swift"; sourceTree = "<group>"; };
 		5B92B904304556D700E9FB5D /* TuneBoxConfiguration.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; name = TuneBoxConfiguration.storekit; path = ../TuneBoxConfiguration.storekit; sourceTree = "<group>"; };
 		5B92B9063045615C00E9FB5D /* EntitlementServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementServicing.swift; sourceTree = "<group>"; };
 		5B92B908304562ED00E9FB5D /* PurchaseServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseServicing.swift; sourceTree = "<group>"; };
@@ -839,6 +841,7 @@
 				5B0FD0C52FD2FD0500753D3A /* Collection+isNotEmpty.swift */,
 				5BFCA8392FCED71E009C6AD9 /* Color+hex.swift */,
 				5BFCA83B2FCED7BE009C6AD9 /* Font+family.swift */,
+				5B89C77930694DA700BB3854 /* Genre+chipColor.swift */,
 				5B0BC2D6300803A300E8F2A5 /* Int+formattedDuration.swift */,
 				5B0BC2D43007FFA700E8F2A5 /* Int+formattedFileSize.swift */,
 				5B586CC22FAC912400BCEAD2 /* MoyaProvider+async.swift */,
@@ -1761,6 +1764,7 @@
 				A1F0B001306548050027AFB1 /* FeedbackServicing.swift in Sources */,
 				A1F0B003306548050027AFB3 /* FeedbackService.swift in Sources */,
 				5BA581892FD6A2B800B498D7 /* SettingsViewModel.swift in Sources */,
+				5B89C77A30694DA800BB3854 /* Genre+chipColor.swift in Sources */,
 				5B0BC2B73006AF7F00E8F2A5 /* MusicLibrary.swift in Sources */,
 				5BFCA83C2FCED7BF009C6AD9 /* Font+family.swift in Sources */,
 				5B40F400302DE35A0025693E /* CoverServicing.swift in Sources */,

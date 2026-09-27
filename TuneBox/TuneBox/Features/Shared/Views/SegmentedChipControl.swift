@@ -12,7 +12,18 @@ enum SlideDirection {
     case backward
 }
 
-struct SegmentedChipControl<T: SegmentedItem & Hashable>: View {
+private enum SegmentedChipConstants {
+    static let edgeInset: CGFloat = 8
+    static let chipHeight: CGFloat = 36
+    static let rowHeight: CGFloat = 48
+}
+
+protocol ChipSegmentedItem: SegmentedItem {
+    var chipColor: Color { get }
+}
+
+struct SegmentedChipControl<T: ChipSegmentedItem>: View {
+
     private enum ScrollBoundary: Hashable {
         case leading
         case trailing
@@ -24,20 +35,17 @@ struct SegmentedChipControl<T: SegmentedItem & Hashable>: View {
     let items: [T]
 
     var body: some View {
-        var segmentedChipEdgeInset: CGFloat {
-            8
-        }
-
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     Color.clear
-                        .frame(width: segmentedChipEdgeInset)
+                        .frame(width: SegmentedChipConstants.edgeInset)
                         .id(ScrollBoundary.leading)
 
                     ForEach(items, id: \.self) { item in
                         ChipButton(
                             title: item.title,
+                            color: item.chipColor,
                             isSelected: selected == item
                         ) {
                             select(item)
@@ -46,13 +54,15 @@ struct SegmentedChipControl<T: SegmentedItem & Hashable>: View {
                     }
 
                     Color.clear
-                        .frame(width: segmentedChipEdgeInset)
+                        .frame(width: SegmentedChipConstants.edgeInset)
                         .id(ScrollBoundary.trailing)
                 }
+                .frame(height: SegmentedChipConstants.rowHeight)
             }
             .contentMargins(.zero, for: .scrollContent)
             .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
-            .frame(height: 32)
+            .scrollClipDisabled()
+            .frame(height: SegmentedChipConstants.rowHeight)
             .onAppear {
                 scrollToSelected(proxy: proxy, animated: false)
             }
@@ -96,33 +106,50 @@ struct SegmentedChipControl<T: SegmentedItem & Hashable>: View {
 }
 
 private struct ChipButton: View {
+
     let title: String
+    let color: Color
     let isSelected: Bool
     let action: () -> Void
 
     var body: some View {
-        Text(title)
-            .font(.satoshi.medium.size(12))
-            .foregroundStyle(isSelected ? .white : .primary)
-            .padding(.horizontal, 14)
-            .frame(height: 32)
-            .background {
-                Capsule()
-                    .fill(isSelected ? Color(hex: 0x5E9C76) : Color.yellow)
-            }
-            .overlay {
-                Capsule()
-                    .stroke(
-                        isSelected ? Color.clear : Color.gray.opacity(0.25),
-                        lineWidth: 0.8
-                    )
-            }
-            .contentShape(Capsule())
-            .onTapGesture(perform: action)
+        Button(action: action) {
+            Text(title)
+                .font(.satoshi.medium.size(12))
+                .foregroundStyle(isSelected ? Color.white : color)
+                .padding(.horizontal, 14)
+                .frame(height: SegmentedChipConstants.chipHeight)
+                .background {
+                    Capsule()
+                        .fill(isSelected ? color.opacity(0.35) : Color.clear)
+                        .glassEffect(
+                            isSelected
+                            ? .regular.tint(color.opacity(0.55)).interactive()
+                            : .regular.interactive(),
+                            in: .capsule
+                        )
+                }
+                .overlay {
+                    Capsule()
+                        .strokeBorder(
+                            isSelected ? color.opacity(0.55) : color.opacity(0.28),
+                            lineWidth: isSelected ? 1.2 : 0.8
+                        )
+                }
+                .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .shadow(
+            color: isSelected ? color.opacity(0.28) : .clear,
+            radius: isSelected ? 5 : 0,
+            y: isSelected ? 1 : 0
+        )
+        .animation(.easeInOut(duration: 0.22), value: isSelected)
     }
 }
 
 private struct PreviewWrapper: View {
+
     @State private var selected: Genre = .all
     @State private var direction: SlideDirection = .forward
 
@@ -143,13 +170,8 @@ private struct PreviewWrapper: View {
             .frame(maxWidth: .infinity, minHeight: 80)
             .animation(.easeInOut(duration: 0.25), value: selected)
         }
+        .padding(.vertical)
     }
-}
-
-extension Genre: SegmentedItem {
-
-    var title: String { displayName }
-
 }
 
 #Preview {
