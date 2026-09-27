@@ -14,8 +14,8 @@ enum SlideDirection {
 
 private enum SegmentedChipConstants {
     static let edgeInset: CGFloat = 8
-    static let chipHeight: CGFloat = 36
-    static let rowHeight: CGFloat = 48
+    static let chipHeight: CGFloat = 30
+    static let rowHeight: CGFloat = 32
 }
 
 protocol ChipSegmentedItem: SegmentedItem {
