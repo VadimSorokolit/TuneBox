@@ -127,12 +127,13 @@ final class AppCoordinator {
         }
 
         if animated {
-            withAnimation(
-                .spring(response: 0.28, dampingFraction: 0.78),
-                action
-            )
-        } else {
+            // Pill in RootTabsView owns its own spring. Avoid a global
+            // withAnimation here — it makes the whole tab bar jump.
             action()
+        } else {
+            var transaction = Transaction()
+            transaction.disablesAnimations = true
+            withTransaction(transaction, action)
         }
 
         self.log(.switchTab, self.root, note: String(describing: tab))

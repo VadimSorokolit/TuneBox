@@ -99,6 +99,8 @@ struct RootTabsView: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             content
+                // Keep tab screens still — only the glass pill should leap.
+                .animation(nil, value: coordinator.selectedTab)
 
             if playerVM.isPlayerVisible {
                 CompactPlayerView(
@@ -211,7 +213,6 @@ struct RootTabsView: View {
     @Injected private var settingsVM: SettingsManaging
     @Environment(\.themeManager) private var theme
     @Environment(AppCoordinator.self) private var coordinator
-    @Namespace private var tabBarNamespace
     @State private var isPaywallPresented: Bool = false
     @State private var isExpandedPlayerPresented: Bool = false
 
@@ -274,25 +275,64 @@ struct RootTabsView: View {
     }
 
     private var tabBar: some View {
-        GlassEffectContainer {
-            HStack(spacing: 0) {
-                ForEach(rootTabsVM.visibleTabs) { tab in
-                    TabItemView(
-                        tab: tab,
-                        isSelected: coordinator.selectedTab == tab,
-                        activeColor: theme.tokens.tabIconActive,
-                        inactiveColor: theme.tokens.tabIconInactive,
-                        glassNamespace: tabBarNamespace,
-                        onTap: {
-                            coordinator.switchToTab(tab)
-                        }
+        let tabs = rootTabsVM.visibleTabs
+        let selectedIndex = tabs.firstIndex(of: coordinator.selectedTab) ?? 0
+        let pillWidth: CGFloat = 64
+        let pillHeight: CGFloat = 44
+        let iconSize: CGFloat = 24
+        let horizontalInset: CGFloat = 8
+
+        return ZStack {
+            // Static track.
+            Capsule()
+                .fill(.clear)
+                .glassEffect(.regular.interactive(), in: .capsule)
+
+            // Selection glass — same layout width as the icon row.
+            GeometryReader { geo in
+                let count = max(tabs.count, 1)
+                let contentWidth = geo.size.width - horizontalInset * 2
+                let slotWidth = contentWidth / CGFloat(count)
+                let centerX = horizontalInset
+                    + slotWidth * (CGFloat(selectedIndex) + 0.5)
+
+                Capsule()
+                    .fill(.clear)
+                    .frame(width: pillWidth, height: pillHeight)
+                    .glassEffect(.regular.interactive(), in: .capsule)
+                    .position(x: centerX, y: geo.size.height / 2)
+                    .animation(
+                        .spring(response: 0.4, dampingFraction: 0.86),
+                        value: selectedIndex
                     )
+                    .allowsHitTesting(false)
+            }
+
+            HStack(spacing: 0) {
+                ForEach(Array(tabs.enumerated()), id: \.element.id) { index, tab in
+                    Button {
+                        coordinator.switchToTab(tab)
+                    } label: {
+                        Image(tab.iconAsset)
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: iconSize, height: iconSize)
+                            .foregroundStyle(
+                                index == selectedIndex
+                                ? theme.tokens.tabIconActive
+                                : theme.tokens.tabIconInactive
+                            )
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
                 }
             }
-            .padding(.horizontal, 6)
-            .frame(height: rootTabsVM.tabBarHeight)
-            .glassEffect(in: .capsule)
+            .padding(.horizontal, horizontalInset)
+            .animation(nil, value: selectedIndex)
         }
+        .frame(height: rootTabsVM.tabBarHeight)
         .padding(.horizontal, 12)
         .offset(
             y: GlobalConstants.Device.isPad
@@ -343,92 +383,69 @@ struct RootTabsView: View {
 
         return currentOrigin != nil && currentOrigin == targetOrigin
     }
-
-    // MARK: - Private. Object
-
-    fileprivate struct TabItemView: View {
-
-        // MARK: - Properties. Public
-
-        fileprivate let tab: CustomTab
-        fileprivate let isSelected: Bool
-        fileprivate let activeColor: Color
-        fileprivate let inactiveColor: Color
-        fileprivate let glassNamespace: Namespace.ID
-        fileprivate let onTap: () -> Void
-
-        // MARK: - Main Body
-
-        var body: some View {
-            Button(
-                action: {
-                    withAnimation(.spring(response: 0.32, dampingFraction: 0.72)) {
-                        onTap()
-                    }
-                },
-                label: {
-                    ZStack {
-                        if isSelected {
-                            Capsule()
-                                .fill(.clear)
-                                .frame(width: selectionWidth, height: selectionHeight)
-                                .glassEffect(
-                                    .regular.tint(Color.white.opacity(0.35)).interactive(),
-                                    in: .capsule
-                                )
-                                .glassEffectID("selectedTabPill", in: glassNamespace)
-                        }
-
-                        Image(tab.iconAsset)
-                            .renderingMode(.template)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 24, height: 24)
-                            .foregroundStyle(isSelected ? activeColor : inactiveColor)
-                            .scaleEffect(isSelected ? 1.14 : 1.0)
-                            .offset(y: isSelected ? -1 : 0)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .frame(height: iconHitHeight)
-                    .contentShape(Rectangle())
-                }
-            )
-            .buttonStyle(.plain)
-            .animation(.spring(response: 0.32, dampingFraction: 0.72), value: isSelected)
-        }
-
-        // MARK: - Properties. Private
-
-        private let iconHitHeight: CGFloat = 44
-        private let selectionWidth: CGFloat = 52
-        private let selectionHeight: CGFloat = 40
-    }
 }
 
 #Preview("Tab Bar Only") {
-    @Previewable @Namespace var previewNamespace
-    typealias TabItem = RootTabsView.TabItemView
+    @Previewable @State var selected = CustomTab.default
 
     return ZStack(alignment: .bottom) {
         Color.gray.opacity(0.3)
             .ignoresSafeArea()
 
-        GlassEffectContainer {
+        let tabs = CustomTab.allCases
+        let selectedIndex = tabs.firstIndex(of: selected) ?? 0
+        let pillWidth: CGFloat = 64
+        let pillHeight: CGFloat = 44
+        let horizontalInset: CGFloat = 8
+
+        ZStack {
+            Capsule()
+                .fill(.clear)
+                .glassEffect(.regular.interactive(), in: .capsule)
+
+            GeometryReader { geo in
+                let count = max(tabs.count, 1)
+                let contentWidth = geo.size.width - horizontalInset * 2
+                let slotWidth = contentWidth / CGFloat(count)
+                let centerX = horizontalInset
+                    + slotWidth * (CGFloat(selectedIndex) + 0.5)
+
+                Capsule()
+                    .fill(.clear)
+                    .frame(width: pillWidth, height: pillHeight)
+                    .glassEffect(.regular.interactive(), in: .capsule)
+                    .position(x: centerX, y: geo.size.height / 2)
+                    .animation(
+                        .spring(response: 0.4, dampingFraction: 0.86),
+                        value: selectedIndex
+                    )
+                    .allowsHitTesting(false)
+            }
+
             HStack(spacing: 0) {
-                ForEach(CustomTab.allCases) { tab in
-                    TabItem(
-                        tab: tab,
-                        isSelected: tab == .default,
-                        activeColor: Color(hex: 0x6B5CFF),
-                        inactiveColor: Color.white.opacity(0.45),
-                        glassNamespace: previewNamespace
-                    ) {}
+                ForEach(Array(tabs.enumerated()), id: \.element.id) { index, tab in
+                    Button {
+                        selected = tab
+                    } label: {
+                        Image(tab.iconAsset)
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 24, height: 24)
+                            .foregroundStyle(
+                                index == selectedIndex
+                                ? Color(hex: 0x007AFF)
+                                : Color.white.opacity(0.45)
+                            )
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
                 }
             }
-            .padding(.horizontal, 6)
-            .frame(height: 60)
-            .glassEffect(in: .capsule)
+            .padding(.horizontal, horizontalInset)
         }
+        .frame(height: 60)
         .padding(.horizontal, 12)
         .padding(.bottom, 4)
         .ignoresSafeArea(.container, edges: .bottom)
