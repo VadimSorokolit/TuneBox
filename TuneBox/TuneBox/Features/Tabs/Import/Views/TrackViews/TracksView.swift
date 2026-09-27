@@ -107,10 +107,13 @@ struct TracksView: View {
                     .environment(\.defaultMinListRowHeight, 1)
                     .task(id: navigationTitle) {
                         await Task.yield()
-                        scrollToPlayingTrack(proxy: proxy)
+                        scrollToPlayingTrack(proxy: proxy, animated: false)
                     }
                     .onChange(of: playerVM.scrollToCurrentTrackRequest) { _, _ in
-                        scrollToPlayingTrack(proxy: proxy)
+                        Task { @MainActor in
+                            await Task.yield()
+                            scrollToPlayingTrack(proxy: proxy, animated: true)
+                        }
                     }
                 }
             }
@@ -152,16 +155,56 @@ struct TracksView: View {
         importManagingVM.sortedTracksAlphabetically(tracks)
     }
 
-    private func scrollToPlayingTrack(proxy: ScrollViewProxy) {
+    private func scrollToPlayingTrack(proxy: ScrollViewProxy, animated: Bool) {
         guard let trackID = playerVM.track?.id,
               tracks.contains(where: { $0.id == trackID }) else {
             return
         }
 
-        var transaction = Transaction()
-        transaction.disablesAnimations = true
-        withTransaction(transaction) {
-            proxy.scrollTo(trackID, anchor: .center)
+        let orderedIDs = playbackQueue.map(\.id)
+        let anchor = Self.scrollAnchor(for: trackID, in: orderedIDs)
+        let action = {
+            proxy.scrollTo(trackID, anchor: anchor)
         }
+
+        if animated {
+            withAnimation(.easeInOut(duration: 0.4), action)
+        } else {
+            var transaction = Transaction()
+            transaction.disablesAnimations = true
+            withTransaction(transaction, action)
+        }
+    }
+
+    /// Keep first/last rows on a reachable edge so ease-in-out does not
+    /// rubber-band when `.center` is clamped by the list bounds.
+    private static func scrollAnchor(
+        for trackID: String,
+        in orderedTrackIDs: [String]
+    ) -> UnitPoint {
+        guard let index = orderedTrackIDs.firstIndex(of: trackID) else {
+            return .center
+        }
+
+        let lastIndex = orderedTrackIDs.count - 1
+        let distanceFromEnd = lastIndex - index
+
+        if index == 0 {
+            return .top
+        }
+
+        if distanceFromEnd == 0 {
+            return .bottom
+        }
+
+        if index == 1 {
+            return UnitPoint(x: 0.5, y: 0.3)
+        }
+
+        if distanceFromEnd <= 2 {
+            return UnitPoint(x: 0.5, y: 0.82)
+        }
+
+        return .center
     }
 }
