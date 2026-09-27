@@ -29,8 +29,8 @@ struct AlbumsView: View {
 
                         LibrarySummaryFooter(
                             count: library.albums.count,
-                            unitSingular: String(LibraryItem.albums.rawValue.dropLast()),
-                            unitPlural: LibraryItem.albums.rawValue,
+                            unitSingular: L10n.Library.unitAlbum,
+                            unitPlural: L10n.Library.unitAlbums,
                             duration: importManagingVM.tracksDuration(library.albums.flatMap(\.tracks)),
                             size: importManagingVM.tracksSize(library.albums.flatMap(\.tracks))
                         )
@@ -47,7 +47,7 @@ struct AlbumsView: View {
                 LibraryEmptyStateView(item: LibraryItem.albums)
             }
         }
-        .libraryMenuNavigationTitle(LibraryItem.albums.rawValue.capitalized)
+        .libraryMenuNavigationTitle(LibraryItem.albums.localizedTitle)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 

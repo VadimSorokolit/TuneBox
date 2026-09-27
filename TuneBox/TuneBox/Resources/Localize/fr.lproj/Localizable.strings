@@ -1,0 +1,199 @@
+/* Common */
+"common.error" = "Erreur";
+"common.ok" = "OK";
+"common.cancel" = "Annuler";
+"common.delete" = "Supprimer";
+"common.apply" = "Appliquer";
+"common.search_placeholder" = "Rechercher...";
+"common.duration.hms" = "%d h %d min %d s";
+"common.duration.ms" = "%d min %d s";
+
+/* Tabs */
+"tab.import" = "Import";
+"tab.discover" = "Découvrir";
+"tab.library" = "Bibliothèque";
+"tab.settings" = "Réglages";
+"tabs.mode.all" = "Tous les onglets";
+"tabs.mode.import" = "Import";
+
+/* Settings */
+"settings.title" = "Réglages";
+"settings.section.appearance" = "Apparence";
+"settings.section.playback" = "Lecture";
+"settings.section.about" = "À propos";
+"settings.theme" = "Thème";
+"settings.theme.system" = "Système";
+"settings.theme.light" = "Clair";
+"settings.theme.dark" = "Sombre";
+"settings.language" = "Langue";
+"settings.language.system" = "Système";
+"settings.default_tab" = "Onglet par défaut";
+"settings.visible_tabs" = "Onglets visibles";
+"settings.sleep_timer" = "Minuteur de veille";
+"settings.sleep_timer.off" = "Désactivé";
+"settings.sleep_timer.hint" = "L’app se fermera à la fin du minuteur";
+"settings.sleep_timer.hours" = "%d h";
+"settings.sleep_timer.minutes" = "%d min";
+"settings.sleep_timer.hours_label" = "Heures";
+"settings.sleep_timer.minutes_label" = "Minutes";
+"settings.sleep_timer.cancel" = "Annuler";
+"settings.sleep_timer.start" = "Démarrer";
+"settings.app_info" = "Infos de l’app";
+"settings.about.title" = "À propos";
+"settings.about.license" = "Licence";
+"settings.about.share_feedback" = "Envoyer un avis";
+"settings.about.share" = "Partager";
+"settings.about.privacy" = "Politique de confidentialité";
+"settings.about.terms" = "Conditions d’utilisation";
+"settings.about.version" = "Version";
+"settings.share.message" = "Découvre TuneBox — un lecteur de musique hors ligne pour iPhone.";
+
+/* Import */
+"import.section.library" = "Bibliothèque";
+"import.section.sources" = "Sources";
+"import.empty.title" = "Rien à afficher";
+"import.empty.message" = "Active des sections pour parcourir ta bibliothèque";
+"import.empty.edit_sections" = "Modifier les sections";
+"import.empty.no_tracks" = "Aucun titre";
+"import.empty.sources_message" = "Ta bibliothèque musicale apparaîtra ici\n une fois des dossiers ajoutés";
+"import.add_folder" = "Ajouter un dossier";
+"import.delete_folder.title" = "Supprimer le dossier ?";
+"import.delete_folder.message" = "Cette source sera retirée de ta bibliothèque, mais le fichier d’origine restera sur l’appareil.";
+"import.source.downloads" = "Téléchargements";
+
+/* Library */
+"library.item.albums" = "Albums";
+"library.item.artists" = "Artistes";
+"library.item.tracks" = "Titres";
+"library.item.playlists" = "Playlists";
+"library.unit.album" = "album";
+"library.unit.albums" = "albums";
+"library.unit.artist" = "artiste";
+"library.unit.artists" = "artistes";
+"library.unit.track" = "titre";
+"library.unit.tracks" = "titres";
+"library.unit.playlist" = "playlist";
+"library.unit.playlists" = "playlists";
+"library.unit.tracks_count" = "%d titres";
+"library.segment.albums" = "Albums";
+"library.segment.tracks" = "Titres";
+"library.empty.suffix" = "que tu ajoutes à ta bibliothèque apparaîtront ici.";
+"library.empty.tracks" = "%@ que tu ajoutes à ta bibliothèque apparaîtront ici.";
+"library.empty.playlists_prefix" = "Tes";
+"library.empty.playlists_suffix" = "apparaîtront ici.";
+"library.artist.not_found" = "Artiste introuvable";
+"library.artist.unavailable" = "L’artiste sélectionné est indisponible";
+"library.fallback.artist" = "Artiste inconnu";
+"library.fallback.album" = "Album inconnu";
+"library.covers.title" = "Pochettes";
+"library.covers.page" = "%d sur %d";
+"library.filter.active" = "Téléchargements actifs";
+"library.filter.downloaded" = "Téléchargés";
+"library.section.suffix.downloaded" = "(téléchargé)";
+"library.section.suffix.in_progress" = "(en cours)";
+"library.playlist.downloaded" = "Téléchargés";
+"library.playlist.new" = "Nouvelle playlist";
+
+/* Discover */
+"discover.menu.remove_active" = "Supprimer tous les titres actifs";
+"discover.menu.remove_paused" = "Supprimer tous les titres en pause";
+"discover.section.featured" = "À la une";
+"discover.section.popular" = "Populaires";
+"discover.section.search" = "Recherche";
+"discover.section.recents" = "Récents";
+"discover.section.all" = "Tous";
+"discover.section.imported" = "Importés";
+"discover.pagination.end" = "Plus de titres";
+
+/* Genre */
+"genre.all" = "Tous";
+"genre.pop" = "Pop";
+"genre.rock" = "Rock";
+"genre.jazz" = "Jazz";
+"genre.classic" = "Classique";
+"genre.electronic" = "Électro";
+
+/* Player */
+"player.empty.title" = "Aucun titre";
+"player.empty.message" = "Lance la lecture pour utiliser le lecteur étendu.";
+"player.repeat" = "Répéter";
+"player.repeat.off" = "Pas de répétition";
+"player.repeat.all" = "Tout répéter";
+"player.repeat.one" = "Répéter un titre";
+"player.shuffle" = "Aléatoire";
+"player.queue" = "File d’attente";
+"player.route.speaker" = "Haut-parleur";
+"player.format.audio" = "AUDIO";
+"player.format.bit" = "%d bits";
+"player.format.kbps" = "%d kbit/s";
+"player.format.khz" = "%d kHz";
+
+/* Track */
+"track.menu.edit_tags" = "Modifier les balises audio";
+"track.menu.delete_from_playlist" = "Supprimer de la playlist";
+"track.menu.delete_from_device" = "Supprimer de l’iPhone";
+"track.a11y.start_download" = "Démarrer le téléchargement";
+"track.a11y.cancel_download" = "Annuler le téléchargement";
+"track.a11y.pause_download" = "Mettre en pause le téléchargement";
+"track.a11y.resume_download" = "Reprendre le téléchargement";
+"track.a11y.delete" = "Supprimer le titre";
+"track.a11y.retry" = "Réessayer le téléchargement";
+
+/* Paywall */
+"paywall.status.unlock" = "Débloque l’accès complet à la lecture";
+"paywall.status.lifetime_active" = "Licence à vie active";
+"paywall.status.subscription_until" = "Ton abonnement est actif jusqu’au %@";
+"paywall.status.premium_active" = "Premium actif";
+"paywall.status.trial_ends" = "Ton essai se termine le %@";
+"paywall.status.trial_ended" = "Ton essai s’est terminé le %@";
+"paywall.header.lifetime" = "Offre à vie";
+"paywall.header.premium" = "TuneBox Premium";
+"paywall.header.purchase" = "Acheter TuneBox";
+"paywall.thanks" = "Merci de soutenir TuneBox !";
+"paywall.subtitle.unlock" = "Débloque toute la lecture.";
+"paywall.product.lifetime" = "Licence à vie";
+"paywall.product.monthly" = "Abonnement mensuel";
+"paywall.period.every_month" = "Chaque mois";
+"paywall.restore" = "Restaurer";
+"paywall.terms" = "Conditions";
+"paywall.privacy" = "Confidentialité";
+"paywall.disclosure.base" = "TuneBox Monthly est un abonnement à renouvellement automatique. Le paiement est facturé sur ton compte Apple ID à la confirmation de l’achat. L’abonnement se renouvelle automatiquement sauf résiliation au moins 24 heures avant la fin de la période en cours. Ton compte sera facturé %@ pour le renouvellement dans les 24 heures précédant la fin de la période.";
+"paywall.disclosure.manage" = "Gère ou annule à tout moment dans Réglages → Apple ID → Abonnements.";
+
+/* Feedback */
+"feedback.title" = "TON AVIS";
+"feedback.prompt" = "À quel point es-tu satisfait de TuneBox ?";
+"feedback.rating.very_unhappy" = "Très insatisfait";
+"feedback.rating.unhappy" = "Insatisfait";
+"feedback.rating.neutral" = "Neutre";
+"feedback.rating.happy" = "Satisfait";
+"feedback.rating.very_happy" = "Très satisfait";
+"feedback.placeholder" = "Écris ton avis";
+"feedback.send" = "Envoyer l’avis";
+"feedback.thanks" = "Merci !";
+"feedback.thanks_message" = "Ton avis aide à améliorer TuneBox.";
+"feedback.error.send" = "Impossible d’envoyer l’avis. Réessaie.";
+
+/* Errors */
+"error.api.no_internet" = "Pas de connexion Internet";
+"error.api.network" = "Erreur réseau : %@";
+"error.api.decoding" = "Erreur de décodage : %@";
+"error.api.encoding" = "Erreur d’encodage de la requête : %@";
+"error.api.server_code" = "Erreur serveur (code : %d)";
+"error.api.invalid_url" = "URL invalide";
+"error.api.not_found" = "Ressource demandée introuvable";
+"error.api.missing_content_length" = "En-tête Content-Length manquant";
+"error.api.invalid_content_length" = "Valeur Content-Length invalide";
+"error.api.unknown" = "Erreur inconnue";
+"error.api.server_unavailable" = "Serveur indisponible";
+"error.file.unavailable" = "Impossible de déterminer l’espace de stockage disponible.";
+"error.file.not_enough_space" = "Pas assez d’espace libre. Requis : %g Go, disponible : %g Go.";
+"error.storage.reserved_playlist" = "Le nom « Téléchargés » est réservé";
+"error.storage.playlist_exists" = "Une playlist portant ce nom existe déjà";
+"error.storage.not_enough_space" = "Pas assez d’espace libre sur l’appareil";
+"error.storage.reserved_policy" = "Le téléchargement enfreindrait la politique d’espace réservé (réservé : %@ Go)";
+"error.playlist.empty_title" = "Le titre de la playlist ne peut pas être vide";
+"error.playlist.same_title" = "La playlist a déjà ce titre";
+"error.source.network_unavailable" = "Dossier réseau indisponible. Vérifie la connexion et réessaie.";
+"error.source.access_denied" = "Impossible d’accéder à ce dossier";
+"error.source.bookmark_invalid" = "La référence du dossier enregistrée est invalide. Ajoute à nouveau le dossier.";

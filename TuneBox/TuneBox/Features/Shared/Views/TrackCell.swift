@@ -84,7 +84,7 @@ struct TrackCell: View {
                             Button(action: {
                                 onEditAudioTagsTap?()
                             }, label: {
-                                Label("Edit audio tags", systemImage: "pencil")
+                                Label(L10n.Track.editTags, systemImage: "pencil")
                             })
 
                             Button(
@@ -93,7 +93,7 @@ struct TrackCell: View {
                                     onDeleteFromPlaylistTap?()
                                 },
                                 label: {
-                                    Label("Delete from playlist", systemImage: "minus.circle")
+                                    Label(L10n.Track.deleteFromPlaylist, systemImage: "minus.circle")
                                 }
                             )
                         }
@@ -104,7 +104,7 @@ struct TrackCell: View {
                                 onDeleteFromDeviceTap()
                             },
                             label: {
-                                Label("Delete from iPhone", systemImage: "trash")
+                                Label(L10n.Track.deleteFromDevice, systemImage: "trash")
                             }
                         )
                     } label: {
@@ -191,22 +191,22 @@ struct TrackCell: View {
     private var accessibilityLabel: String {
         switch track.downloadState {
             case .idle:
-                "Start download track"
+                L10n.Track.a11yStartDownload
 
             case .queued:
-                "Cancel download"
+                L10n.Track.a11yCancelDownload
 
             case .downloading:
-                "Pause download"
+                L10n.Track.a11yPauseDownload
 
             case .paused:
-                "Resume download"
+                L10n.Track.a11yResumeDownload
 
             case .completed:
-                "Delete track"
+                L10n.Track.a11yDelete
 
             case .failed:
-                "Retry download"
+                L10n.Track.a11yRetry
         }
     }
 

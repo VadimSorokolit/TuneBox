@@ -18,7 +18,7 @@ struct SleepTimerSheetView: View {
 
     var body: some View {
         VStack(spacing: 24) {
-            Text("Sleep Timer")
+            Text(L10n.Settings.sleepTimer)
                 .font(.satoshi.bold.size(22))
                 .foregroundStyle(.primary)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -63,18 +63,18 @@ struct SleepTimerSheetView: View {
 
     private var pickerContent: some View {
         HStack(spacing: 0) {
-            Picker("Hours", selection: $hours) {
+            Picker(L10n.Settings.sleepTimerHoursLabel, selection: $hours) {
                 ForEach(0..<24, id: \.self) { value in
-                    Text("\(value) hr")
+                    Text(L10n.Settings.sleepTimerHours(value))
                         .tag(value)
                 }
             }
             .pickerStyle(.wheel)
             .frame(maxWidth: .infinity)
 
-            Picker("Minutes", selection: $minutes) {
+            Picker(L10n.Settings.sleepTimerMinutesLabel, selection: $minutes) {
                 ForEach(0..<60, id: \.self) { value in
-                    Text("\(value) min")
+                    Text(L10n.Settings.sleepTimerMinutes(value))
                         .tag(value)
                 }
             }
@@ -91,7 +91,7 @@ struct SleepTimerSheetView: View {
                 .foregroundStyle(.primary)
                 .monospacedDigit()
 
-            Text("App will close when the timer ends")
+            Text(L10n.Settings.sleepTimerHint)
                 .font(.satoshi.regular.size(14))
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -108,7 +108,7 @@ struct SleepTimerSheetView: View {
                 }
                 onClose()
             }, label: {
-                Text("Cancel")
+                Text(L10n.Settings.sleepTimerCancel)
                     .font(.satoshi.medium.size(16))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 14)
@@ -121,7 +121,7 @@ struct SleepTimerSheetView: View {
                     settingsVM.startSleepTimer(hours: hours, minutes: minutes)
                     onClose()
                 }, label: {
-                    Text("Start")
+                    Text(L10n.Settings.sleepTimerStart)
                         .font(.satoshi.medium.size(16))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)

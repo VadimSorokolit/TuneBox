@@ -79,8 +79,8 @@ struct AlbumDetailsView: View {
 
                         LibrarySummaryFooter(
                             count: orderedTracks.count,
-                            unitSingular: "track",
-                            unitPlural: "tracks",
+                            unitSingular: L10n.Library.unitTrack,
+                            unitPlural: L10n.Library.unitTracks,
                             duration: importManagingVM.tracksDuration(orderedTracks),
                             size: importManagingVM.tracksSize(orderedTracks)
                         )

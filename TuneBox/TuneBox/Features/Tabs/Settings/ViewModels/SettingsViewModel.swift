@@ -21,19 +21,19 @@ final class SettingsViewModel: SettingsManaging {
     private(set) var purchasedProductIDs = Set<String>()
     var isPaywallPresented = false
     private(set) var hasPremium: Bool = false
-    private(set) var paywallStatusMessage: String = "Unlock full playback access"
+    private(set) var paywallStatusMessage: String = L10n.Paywall.statusUnlock
     private(set) var products: [Product] = []
     private(set) var isLoading = false
     private(set) var error: String?
     private(set) var isSleepTimerActive = false
-    private(set) var sleepTimerTrailingText = "Off"
+    private(set) var sleepTimerTrailingText = L10n.Settings.sleepTimerOff
 
     var paywallHeaderTitle: String {
         self.purchasedProductIDs.isNotEmpty
         ? self.hasLifetimePurchase
-        ? "Lifetime Plan"
-        : "TuneBox Premium"
-        : "Purchase TuneBox"
+        ? L10n.Paywall.headerLifetime
+        : L10n.Paywall.headerPremium
+        : L10n.Paywall.headerPurchase
     }
 
     var hasLifetimePurchase: Bool {
@@ -137,7 +137,7 @@ final class SettingsViewModel: SettingsManaging {
     var shareActivityItems: [Any] {
         [AppShareItem(
             title: Constants.shareAppTitle,
-            message: Constants.shareAppMessage,
+            message: L10n.Settings.shareMessage,
             image: UIImage(named: Constants.shareAppImageName)
         )]
     }
@@ -185,7 +185,7 @@ final class SettingsViewModel: SettingsManaging {
         self.sleepTimerDisplayTimer = nil
         self.sleepTimerEndDate = nil
         self.isSleepTimerActive = false
-        self.sleepTimerTrailingText = "Off"
+        self.sleepTimerTrailingText = L10n.Settings.sleepTimerOff
     }
 
     func submitFeedback(
@@ -229,8 +229,6 @@ final class SettingsViewModel: SettingsManaging {
         static let privacyPolicyURL =
             "https://sites.google.com/view/tunebox-privacy-policy/privacy"
         static let shareAppTitle = "TuneBox"
-        static let shareAppMessage =
-            "Check out TuneBox — an offline music player for iPhone."
         static let shareAppImageName = "Paywall"
     }
 
@@ -287,7 +285,7 @@ final class SettingsViewModel: SettingsManaging {
 
     private func refreshSleepTimerDisplay() {
         guard let endDate = self.sleepTimerEndDate else {
-            self.sleepTimerTrailingText = "Off"
+            self.sleepTimerTrailingText = L10n.Settings.sleepTimerOff
             self.isSleepTimerActive = false
             return
         }

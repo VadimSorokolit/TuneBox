@@ -18,14 +18,18 @@ struct TuneBoxApp: App {
     @Injected private var viewModel: TransferManaging
     @Injected private var playerViewModel: PlayerManaging
     @Injected private var settingsVM: SettingsManaging
+    @Injected private var languageVM: LanguageManaging
 
     var body: some Scene {
         WindowGroup {
             RootTabsView()
                 .environment(\.themeManager, themeManager)
+                .environment(\.locale, languageVM.locale)
                 .environment(\.screenHeight, screenHeight)
                 .applyTheme(themeManager)
                 .environment(coordinator)
+                // Keep identity stable so the selected tab (e.g. Settings) is preserved.
+                .environment(\.languageRefreshID, languageVM.refreshID)
                 .onGeometryChange(for: CGFloat.self) { proxy in
                     proxy.size.height
                 } action: { _, height in

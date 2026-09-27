@@ -32,25 +32,25 @@ enum AppError: Error {
                 case .server(let message):
                     return message
                 case .noInternet:
-                    return "No internet connection"
+                    return L10n.Error.noInternet
                 case .network(let error):
-                    return "Network error: \(error.localizedDescription)"
+                    return L10n.Error.network(error.localizedDescription)
                 case .decoding(let error):
-                    return "Decoding error: \(error.localizedDescription)"
+                    return L10n.Error.decoding(error.localizedDescription)
                 case .requestEncoding(let error):
-                    return "Request encoding error: \(error.localizedDescription)"
+                    return L10n.Error.encoding(error.localizedDescription)
                 case .serverStatusCode(let code):
-                    return "Server error (code: \(code))"
+                    return L10n.Error.serverCode(code)
                 case .invalidURL:
-                    return "Invalid URL"
+                    return L10n.Error.invalidURL
                 case .notFound:
-                    return "Requested resource not found"
+                    return L10n.Error.notFound
                 case .missingContentLength:
-                    return "Missing Content-Length header"
+                    return L10n.Error.missingContentLength
                 case .invalidContentLength:
-                    return "Invalid Content-Length value"
+                    return L10n.Error.invalidContentLength
                 case .unknown:
-                    return "Unknown error"
+                    return L10n.Error.unknown
             }
         }
 
@@ -73,7 +73,7 @@ enum AppError: Error {
                                 return .notFound
 
                             case 500 ... 599:
-                                return .server("Server is unavailable")
+                                return .server(L10n.Error.serverUnavailable)
 
                             default:
                                 return .serverStatusCode(response.statusCode)
@@ -125,9 +125,9 @@ enum AppError: Error {
         var errorDescription: String? {
             switch self {
                 case .unavailable:
-                    return "Unable to determine available storage."
+                    return L10n.Error.fileUnavailable
                 case .notEnoughSpace(let requiredGB, let availableGB):
-                    return "Not enough free space. Required: \(requiredGB) GB, available: \(availableGB) GB."
+                    return L10n.Error.notEnoughSpace(required: requiredGB, available: availableGB)
             }
         }
     }
@@ -139,9 +139,9 @@ enum AppError: Error {
         var errorDescription: String? {
             switch self {
                 case .reservedPlaylistTitle:
-                    return "Name \"Downloaded\" is reserved"
+                    return L10n.Error.reservedPlaylist
                 case .playlistTitleAlreadyExists:
-                    return "Playlist with this name already exists"
+                    return L10n.Error.playlistExists
             }
         }
     }
@@ -153,10 +153,10 @@ enum AppError: Error {
         var errorDescription: String? {
             switch self {
                 case .emptyTitle:
-                    return "Playlist title cannot be empty"
+                    return L10n.Error.playlistEmptyTitle
 
                 case .sameTitle:
-                    return "The playlist already has this title"
+                    return L10n.Error.playlistSameTitle
             }
         }
     }
@@ -174,13 +174,13 @@ enum AppError: Error {
         var errorDescription: String? {
             switch self {
                 case .networkUnavailable:
-                    return "Network folder is unavailable. Check your connection and try again."
+                    return L10n.Error.sourceNetworkUnavailable
 
                 case .accessDenied:
-                    return "Cannot access this folder"
+                    return L10n.Error.sourceAccessDenied
 
                 case .bookmarkInvalid:
-                    return "Saved folder reference is invalid. Re-add the folder."
+                    return L10n.Error.sourceBookmarkInvalid
 
                 case .readFailed(let error):
                     return error.localizedDescription

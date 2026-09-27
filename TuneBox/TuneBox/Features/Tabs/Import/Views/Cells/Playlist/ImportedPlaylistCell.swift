@@ -22,7 +22,7 @@ struct ImportedPlaylistCell: View {
                         Text(playlist.title)
                             .font(.headline)
 
-                        Text("\(playlist.trackURLs.count) tracks")
+                        Text(L10n.Library.tracksCount(playlist.trackURLs.count))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }

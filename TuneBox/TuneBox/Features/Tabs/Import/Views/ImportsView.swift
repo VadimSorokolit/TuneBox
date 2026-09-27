@@ -14,7 +14,7 @@ struct ImportsView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            TabHeaderView(title: "Import") {
+            TabHeaderView(title: L10n.Tab.import) {
                 HeaderView(
                     isFileImporterPresented: $isFileImporterPresented,
                     importManagingVM: importManagingVM,
@@ -90,8 +90,8 @@ struct ImportsView: View {
                 }
             }
         )
-        .alert("Error", isPresented: $isErrorPresented) {
-            Button("OK", role: .cancel) {
+        .alert(L10n.Common.error, isPresented: $isErrorPresented) {
+            Button(L10n.Common.okButton, role: .cancel) {
                 importManagingVM.dismissError()
             }
         } message: {
@@ -140,21 +140,21 @@ struct ImportsView: View {
                     Button(action: {
                             isFileImporterPresented = true
                         }, label: {
-                            Label("Add Folder", systemImage: "plus")
+                            Label(L10n.Import.addFolder, systemImage: "plus")
                         }
                     )
 
                     Button(action: {
                         importManagingVM.beginEditSections()
                         }, label: {
-                            Label("Edit Sections", systemImage: "slider.horizontal.3")
+                            Label(L10n.Import.editSections, systemImage: "slider.horizontal.3")
                         }
                     )
 
                     Button(action: {
                         settingsVM.presentPaywall()
                     }, label: {
-                        Label("License", systemImage: "checkmark.seal.fill")
+                        Label(L10n.Settings.license, systemImage: "checkmark.seal.fill")
                     })
                 } label: {
                     HeaderGlassButton(systemName: "ellipsis")
@@ -182,9 +182,9 @@ struct ImportsView: View {
 
         var body: some View {
             ContentUnavailableView {
-                Label("No Tracks", systemImage: "music.note.list")
+                Label(L10n.Import.noTracks, systemImage: "music.note.list")
             } description: {
-                Text("Your music library will appear here\n once you add your some folders")
+                Text(L10n.Import.sourcesMessage)
             } actions: {
                 Button(
                     action: {
@@ -193,7 +193,7 @@ struct ImportsView: View {
                         HStack {
                             Image(systemName: "plus")
 
-                            Text("Add Folder")
+                            Text(L10n.Import.addFolder)
                         }
                         .foregroundStyle(.black.opacity(0.6))
                         .padding(10)
@@ -237,7 +237,7 @@ struct ImportsView: View {
                                     )
                                 } header: {
                                     sectionTracksTitle(
-                                        section.kind.rawValue.capitalized,
+                                        section.kind.localizedTitle,
                                         font: .system(size: 14, weight: .bold),
                                         background: .clear,
                                         foregroundStyle: .gray,
@@ -251,16 +251,16 @@ struct ImportsView: View {
                 }
             } else {
                 ContentUnavailableView {
-                    Text("Nothing to Show")
+                    Text(L10n.Import.emptyTitle)
                         .font(.system(size: 24, weight: .bold))
                 } description: {
-                    Text("Enable some sections to brows your library")
+                    Text(L10n.Import.emptyMessage)
                         .padding(.top, 10)
                 } actions: {
                     Button(action: {
                             importManagingVM.beginEditSections()
                         }, label: {
-                            Text("Edit Sections")
+                            Text(L10n.Import.editSections)
                                 .foregroundStyle(.black.opacity(0.6))
                                 .padding(10)
                                 .background(
@@ -322,12 +322,12 @@ struct ImportsView: View {
                     Button(role: .destructive) {
                         sourceIDToDelete = id
                     } label: {
-                        Label("Delete", systemImage: "trash")
+                        Label(L10n.Common.delete, systemImage: "trash")
                     }
                 }
             }
             .confirmationDialog(
-                "Delete Folder?",
+                L10n.Import.deleteFolderTitle,
                 isPresented: Binding(
                     get: {
                         if case .source(let id) = item {
@@ -339,7 +339,7 @@ struct ImportsView: View {
                 ),
                 titleVisibility: .visible
             ) {
-                Button("Delete", role: .destructive) {
+                Button(L10n.Common.delete, role: .destructive) {
                     if let id = sourceIDToDelete {
                         Task {
                             await importManagingVM.removeSource(id)
@@ -347,11 +347,11 @@ struct ImportsView: View {
                     }
                     sourceIDToDelete = nil
                 }
-                Button("Cancel", role: .cancel) {
+                Button(L10n.Common.cancel, role: .cancel) {
                     sourceIDToDelete = nil
                 }
             } message: {
-                Text("This source will be removed from your library, but the original file will remain on your device.")
+                Text(L10n.Import.deleteFolderMessage)
             }
         }
 
@@ -437,7 +437,7 @@ struct ImportsView: View {
 
                         switch source.kind {
                             case .api:
-                                coordinator.push(.tracks("Downloaded", .downloads))
+                                coordinator.push(.tracks(L10n.Library.filterDownloaded, .downloads))
 
                             case .local, .sync:
                                 if await importManagingVM.fetchfolderItems(
@@ -461,7 +461,7 @@ struct ImportsView: View {
         private func title(for item: ImportItem) -> String {
             switch item {
                 case .library(let libraryItem):
-                    return libraryItem.rawValue.capitalized
+                    return libraryItem.localizedTitle
 
                 case .source(let id):
                     return importManagingVM.source(for: id)?.title ?? ""

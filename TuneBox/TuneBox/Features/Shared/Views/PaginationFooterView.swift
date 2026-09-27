@@ -27,7 +27,7 @@ struct PaginationFooterView: View {
     private var endView: some View {
         switch style {
             case .list:
-                Text("No more tracks")
+                Text(L10n.Discover.paginationEnd)
                     .font(.satoshi.medium.size(13))
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
@@ -39,7 +39,7 @@ struct PaginationFooterView: View {
                     Image(systemName: "music.note.list")
                         .font(.system(size: 20, weight: .light))
 
-                    Text("No more tracks")
+                    Text(L10n.Discover.paginationEnd)
                         .font(.satoshi.medium.size(12))
                         .multilineTextAlignment(.center)
                 }

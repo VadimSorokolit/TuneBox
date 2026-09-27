@@ -18,6 +18,7 @@ extension Resolver: @retroactive ResolverRegistering {
         self.registerStorageService()
         self.registerPersistenceService()
         self.registerPurchaseServices()
+        self.registerLanguageService()
         self.registerAudioService()
         self.registerViewModels()
     }
@@ -66,6 +67,15 @@ extension Resolver: @retroactive ResolverRegistering {
                 PurchaseService(
                     entitlementService: self.resolve(EntitlementServicing.self)
                 ) as PurchaseServicing
+            }
+        }
+        .scope(.application)
+    }
+
+    private static func registerLanguageService() {
+        self.register {
+            MainActor.assumeIsolated {
+                LanguageService() as LanguageServicing
             }
         }
         .scope(.application)
@@ -179,6 +189,15 @@ extension Resolver: @retroactive ResolverRegistering {
         self.register {
             MainActor.assumeIsolated {
                 SettingsViewModel() as SettingsManaging
+            }
+        }
+        .scope(.application)
+
+        self.register {
+            MainActor.assumeIsolated {
+                LanguageViewModel(
+                    languageService: self.resolve(LanguageServicing.self)
+                ) as LanguageManaging
             }
         }
         .scope(.application)

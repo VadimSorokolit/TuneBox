@@ -28,8 +28,8 @@ struct PlaylistsView: View {
 
                         LibrarySummaryFooter(
                             count: library.playlists.count,
-                            unitSingular: String(LibraryItem.playlists.rawValue.dropLast()),
-                            unitPlural: LibraryItem.playlists.rawValue.capitalized,
+                            unitSingular: L10n.Library.unitPlaylist,
+                            unitPlural: L10n.Library.unitPlaylists,
                             duration: importManagingVM.tracksDuration(library.playlists.flatMap(\.tracks)),
                             size: importManagingVM.tracksSize(library.playlists.flatMap(\.tracks))
                         )
@@ -45,13 +45,13 @@ struct PlaylistsView: View {
             } else {
                 LibraryEmptyStateView(
                     item: LibraryItem.playlists,
-                    prefixText: "Your",
-                    suffixText: "will appear here.",
+                    prefixText: L10n.Library.emptyPlaylistsPrefix,
+                    suffixText: L10n.Library.emptyPlaylistsSuffix,
                     capitalizeItemText: false
                 )
             }
         }
-        .libraryMenuNavigationTitle(LibraryItem.playlists.rawValue.capitalized)
+        .libraryMenuNavigationTitle(LibraryItem.playlists.localizedTitle)
     }
 
     // MARK: - Properties. Private

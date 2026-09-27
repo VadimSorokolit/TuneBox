@@ -1353,26 +1353,26 @@ final class AudioService: NSObject, AudioServicing {
             let props = file.properties
 
             if let bits = props.bitDepth {
-                parts.append("\(bits) bit")
+                parts.append(L10n.Player.formatBit(bits))
             } else if let bitrate = props.bitrate, bitrate > 0 {
-                parts.append("\(Int(bitrate.rounded())) kbps")
+                parts.append(L10n.Player.formatKbps(Int(bitrate.rounded())))
             }
 
             if let rate = props.sampleRate {
-                parts.append("\(Int((rate / 1000).rounded())) kHz")
+                parts.append(L10n.Player.formatKhz(Int((rate / 1000).rounded())))
             }
         }
 
-        parts.append(format.isEmpty ? "AUDIO" : format)
+        parts.append(format.isEmpty ? L10n.Player.formatAudio : format)
         self.sourceFormatText = parts.joined(separator: " • ")
         self.publishFormatInfo()
     }
 
     private func updateOutputRoute() {
         let session = AVAudioSession.sharedInstance()
-        let name = session.currentRoute.outputs.first?.portName ?? "Speaker"
+        let name = session.currentRoute.outputs.first?.portName ?? L10n.Player.speaker
         let kHz = Int((session.sampleRate / 1000).rounded())
-        self.outputRouteText = "\(name) • \(kHz) kHz"
+        self.outputRouteText = "\(name) • \(L10n.Player.formatKhz(kHz))"
         self.publishFormatInfo()
     }
 

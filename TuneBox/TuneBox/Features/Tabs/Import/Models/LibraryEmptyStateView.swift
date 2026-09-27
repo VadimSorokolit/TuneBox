@@ -21,7 +21,7 @@ struct LibraryEmptyStateView: View {
     init(
         item: LibraryItem,
         prefixText: String = "",
-        suffixText: String = "you add to your library will appear here.",
+        suffixText: String = L10n.Library.emptySuffix,
         capitalizeItemText: Bool = true
     ) {
         self.item = item
@@ -49,8 +49,22 @@ struct LibraryEmptyStateView: View {
     private let imageSize: CGFloat = 30
 
     private var itemText: String {
-        capitalizeItem
-            ? item.rawValue.capitalized
-            : item.rawValue
+        if capitalizeItem {
+            return item.localizedTitle
+        }
+
+        switch item {
+            case .albums:
+                return L10n.Library.unitAlbums
+
+            case .artists:
+                return L10n.Library.unitArtists
+
+            case .tracks:
+                return L10n.Library.unitTracks
+
+            case .playlists:
+                return L10n.Library.unitPlaylists
+        }
     }
 }

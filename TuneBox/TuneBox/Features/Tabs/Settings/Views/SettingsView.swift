@@ -24,6 +24,7 @@ struct SettingsView: View {
 
                 SectionsView(
                     settingsVM: settingsVM,
+                    languageVM: languageVM,
                     rootTabsVM: rootTabsVM,
                     isSleepTimerPresented: $isSleepTimerPresented,
                     path: $path
@@ -60,6 +61,7 @@ struct SettingsView: View {
     // MARK: - Properties. Private
 
     @Injected private var settingsVM: SettingsManaging
+    @Injected private var languageVM: LanguageManaging
     @Injected private var rootTabsVM: RootTabsManaging
     @State private var path = [SettingsRoute]()
     @State private var isFeedbackPresented = false
@@ -73,7 +75,7 @@ struct SettingsView: View {
         // MARK: - Body
 
         var body: some View {
-            TabHeaderView(title: "Settings")
+            TabHeaderView(title: L10n.Settings.title)
         }
     }
 
@@ -82,6 +84,7 @@ struct SettingsView: View {
         // MARK: - Properties. Public
 
         let settingsVM: SettingsManaging
+        let languageVM: LanguageManaging
         let rootTabsVM: RootTabsManaging
         @Binding var isSleepTimerPresented: Bool
         @Binding var path: [SettingsRoute]
@@ -91,16 +94,23 @@ struct SettingsView: View {
         var body: some View {
             VStack(spacing: .zero) {
                 Form {
-                    Section(header: Text("Appearance")) {
+                    Section(header: Text(L10n.Settings.appearance)) {
                         SettingsRow(
-                            title: "Theme",
+                            title: L10n.Settings.theme,
                             trailingText: themeManager.preset.displayName,
                             selection: themeBinding,
                             options: ThemePreset.allCases.map { ($0, $0.displayName) }
                         )
 
                         SettingsRow(
-                            title: "Default Tab",
+                            title: L10n.Settings.language,
+                            trailingText: languageVM.language.menuTitle,
+                            selection: languageBinding,
+                            options: languageVM.menuOptions
+                        )
+
+                        SettingsRow(
+                            title: L10n.Settings.defaultTab,
                             trailingText: defaultTab.title,
                             isDisabled: tabsMode == .import,
                             selection: defaultTabBinding,
@@ -108,16 +118,16 @@ struct SettingsView: View {
                         )
 
                         SettingsRow(
-                            title: "Visible Tabs",
+                            title: L10n.Settings.visibleTabs,
                             trailingText: tabsMode.title,
                             selection: tabsModeBinding,
                             options: TabsMode.allCases.map { ($0, $0.title) }
                         )
                     }
 
-                    Section(header: Text("Playback")) {
+                    Section(header: Text(L10n.Settings.playback)) {
                         SettingsRow(
-                            title: "Sleep Timer",
+                            title: L10n.Settings.sleepTimer,
                             value: settingsVM.sleepTimerTrailingText,
                             showsSystemImage: false
                         ) {
@@ -125,13 +135,14 @@ struct SettingsView: View {
                         }
                     }
 
-                    Section(header: Text("About")) {
-                        SettingsRow(title: "App Info") {
+                    Section(header: Text(L10n.Settings.about)) {
+                        SettingsRow(title: L10n.Settings.appInfo) {
                             path.append(.about)
                         }
                     }
                 }
                 .listSectionSpacing(.compact)
+                .id(languageVM.refreshID)
             }
             .padding(.top, 10)
             .onAppear {
@@ -150,6 +161,13 @@ struct SettingsView: View {
             Binding(
                 get: { themeManager.preset },
                 set: { themeManager.setPreset($0) }
+            )
+        }
+
+        private var languageBinding: Binding<AppLanguage> {
+            Binding(
+                get: { languageVM.language },
+                set: { languageVM.setLanguage($0) }
             )
         }
 

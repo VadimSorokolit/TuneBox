@@ -17,7 +17,16 @@ enum ThemePreset: String, CaseIterable, Identifiable {
     }
 
     var displayName: String {
-        rawValue.capitalized
+        switch self {
+            case .system:
+                L10n.Settings.themeSystem
+
+            case .light:
+                L10n.Settings.themeLight
+
+            case .dark:
+                L10n.Settings.themeDark
+        }
     }
 }
 
@@ -58,7 +67,7 @@ extension ThemeTokens {
     static let dark = Self(
         appBackground: Color(hex: 0x121212),
         tabBarBackground: Color(hex: 0x0A0A0A),
-        tabIconActive: Color(hex: 0x4F6EF7),
+        tabIconActive: Color(hex: 0x007AFF),
         tabIconInactive: Color.white.opacity(0.45),
         browseHeaderText: Color(hex: 0x787878),
         clearAllDownloadsActive: Color(hex: 0xFFA633),

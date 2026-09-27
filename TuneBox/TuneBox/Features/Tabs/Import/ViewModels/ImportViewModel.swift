@@ -20,6 +20,16 @@ enum ImageFileExtension: String {
 enum ImportSection: String, Hashable {
     case library
     case sources
+
+    var localizedTitle: String {
+        switch self {
+            case .library:
+                L10n.Import.library
+
+            case .sources:
+                L10n.Import.sources
+        }
+    }
 }
 
 enum LibraryItem: String, Hashable {
@@ -27,6 +37,22 @@ enum LibraryItem: String, Hashable {
     case artists
     case tracks
     case playlists
+
+    var localizedTitle: String {
+        switch self {
+            case .albums:
+                L10n.Library.albums
+
+            case .artists:
+                L10n.Library.artists
+
+            case .tracks:
+                L10n.Library.tracks
+
+            case .playlists:
+                L10n.Library.playlists
+        }
+    }
 
     var systemImage: String {
         switch self {
@@ -776,7 +802,7 @@ final class ImportViewModel: ImportManaging {
         static let selectedSourceIDs = "importSelectedSourceIDs"
         static let libraryItemsOrder = "importLibraryItemsOrder"
         static let importSources = "importSources"
-        static let downloadsSourceTitle = "Downloads"
+        static var downloadsSourceTitle: String { L10n.Import.downloadsSource }
     }
 
     // MARK: - Methods. Private
@@ -948,8 +974,8 @@ final class ImportViewModel: ImportManaging {
                 image: artworkPath,
                 songName: metadata?.title ?? fileBase,
                 duration: duration,
-                artistName: metadata?.artist ?? "Nonamed Artist",
-                albumName: metadata?.album ?? "Nonamed Album",
+                artistName: metadata?.artist ?? L10n.Library.fallbackArtist,
+                albumName: metadata?.album ?? L10n.Library.fallbackAlbum,
                 releaseDate: metadata?.date ?? nil,
                 download: nil,
                 waveformData: nil,

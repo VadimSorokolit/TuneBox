@@ -29,8 +29,8 @@ class DownloadsViewModel: DownloadsPresenting {
 
     var sectionTitleSuffix: String {
         self.selectedTracksType == .downloaded
-        ? "(downloaded)"
-        : "(in progress)"
+        ? L10n.Library.suffixDownloaded
+        : L10n.Library.suffixInProgress
     }
 
     var showsEmptyState: Bool {

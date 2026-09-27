@@ -74,19 +74,19 @@ struct BrowseView: View {
         // MARK: - Body
 
         var body: some View {
-            TabHeaderView(title: "Discover") {
+            TabHeaderView(title: L10n.Tab.discover) {
                 Menu {
                     Button(action: {
                         transferManagingVM.cancelAllActiveDownloads()
                     }, label: {
-                        Label("Remove all active tracks", systemImage: "")
+                        Label(L10n.Discover.removeActive, systemImage: "")
                     })
                     .disabled(transferManagingVM.inProgressActiveTracksCount == .zero)
 
                     Button(action: {
                         transferManagingVM.cancelAllPausedDownloads()
                     }, label: {
-                        Label("Remove all paused tracks", systemImage: "")
+                        Label(L10n.Discover.removePaused, systemImage: "")
                     })
                     .disabled(transferManagingVM.inProgressPausedTracksCount == .zero)
                 } label: {

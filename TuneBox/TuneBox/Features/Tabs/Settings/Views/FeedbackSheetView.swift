@@ -82,19 +82,19 @@ struct FeedbackSheetView: View {
         var label: String {
             switch self {
                 case .veryUnhappy:
-                    "Very Unhappy"
+                    L10n.Feedback.veryUnhappy
 
                 case .unhappy:
-                    "Unhappy"
+                    L10n.Feedback.unhappy
 
                 case .neutral:
-                    "Neutral"
+                    L10n.Feedback.neutral
 
                 case .happy:
-                    "Happy"
+                    L10n.Feedback.happy
 
                 case .veryHappy:
-                    "Very Happy"
+                    L10n.Feedback.veryHappy
             }
         }
     }
@@ -105,21 +105,20 @@ struct FeedbackSheetView: View {
         static let ratingEmojiSize: CGFloat = 42
         static let ratingButtonSize: CGFloat = 52
         static let successDisplayDuration: Duration = .milliseconds(1500)
-        static let commentPlaceholder = "Write your feedback"
     }
 
     private var formContent: some View {
         VStack(alignment: .leading, spacing: 20) {
             header
 
-            Text("How satisfied are you with TuneBox?")
+            Text(L10n.Feedback.prompt)
                 .font(.body)
                 .foregroundStyle(.primary)
 
             ratingRow
 
             TextField(
-                Constants.commentPlaceholder,
+                L10n.Feedback.placeholder,
                 text: $comment,
                 axis: .vertical
             )
@@ -145,7 +144,7 @@ struct FeedbackSheetView: View {
                     if isSubmitting {
                         ProgressView()
                     } else {
-                        Text("Send Feedback")
+                        Text(L10n.Feedback.send)
                             .fontWeight(.medium)
                     }
                 }
@@ -171,10 +170,10 @@ struct FeedbackSheetView: View {
                 .foregroundStyle(.green)
                 .symbolRenderingMode(.hierarchical)
 
-            Text("Thanks!")
+            Text(L10n.Feedback.thanks)
                 .font(.title2.weight(.semibold))
 
-            Text("Your feedback helps make TuneBox better.")
+            Text(L10n.Feedback.thanksMessage)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -186,7 +185,7 @@ struct FeedbackSheetView: View {
 
     private var header: some View {
         HStack {
-            Text("SHARE YOUR FEEDBACK")
+            Text(L10n.Feedback.title)
                 .font(.headline)
                 .fontWeight(.medium)
 
@@ -251,7 +250,7 @@ struct FeedbackSheetView: View {
             try? await Task.sleep(for: Constants.successDisplayDuration)
             onClose()
         } catch {
-            errorMessage = "Couldn't send feedback. Try again."
+            errorMessage = L10n.Feedback.sendError
         }
     }
 }

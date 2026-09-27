@@ -34,8 +34,8 @@ struct SourceView: View {
                 let tracks = importManagingVM.tracks(for: sourceID)
                 LibrarySummaryFooter(
                     count: tracks.count,
-                    unitSingular: String(LibraryItem.tracks.rawValue.dropLast()),
-                    unitPlural: LibraryItem.tracks.rawValue,
+                    unitSingular: L10n.Library.unitTrack,
+                    unitPlural: L10n.Library.unitTracks,
                     duration: importManagingVM.tracksDuration(tracks),
                     size: importManagingVM.tracksSize(tracks)
                 )
@@ -73,7 +73,7 @@ struct SourceView: View {
 
     private var navigationTitle: String {
         path?.components(separatedBy: "/").last
-        ?? importManagingVM.source(for: sourceID)?.title ?? ImportSection.sources.rawValue.capitalized
+        ?? importManagingVM.source(for: sourceID)?.title ?? ImportSection.sources.localizedTitle
     }
 
     private var trackScrollIDs: [String] {

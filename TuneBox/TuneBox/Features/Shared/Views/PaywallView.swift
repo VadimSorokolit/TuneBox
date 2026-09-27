@@ -48,14 +48,15 @@ struct PaywallView: View {
             }
             .padding(.horizontal, 24)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(theme.tokens.appBackground)
             .glassEffect(
-                .regular.tint(.white.opacity(0.35)),
+                .regular.tint(sheetGlassTint),
                 in: .rect(cornerRadius: 28)
             )
+            .presentationBackground(theme.tokens.appBackground)
             .ignoresSafeArea()
             .task {
                 await settingsVM.preparePaywall()
-                await refreshStoreIntroEligibility()
             }
         }
 
@@ -65,8 +66,25 @@ struct PaywallView: View {
         @Environment(\.dismiss) private var dismiss
         @Environment(\.openURL) private var openURL
         @State private var purchasingProductID: String?
-        @State private var isEligibleForStoreIntro = false
 
+        private var isDarkAppearance: Bool {
+            switch theme.preset {
+                case .dark:
+                    true
+
+                case .light:
+                    false
+
+                case .system:
+                    theme.systemColorScheme == .dark
+            }
+        }
+
+        private var sheetGlassTint: Color {
+            isDarkAppearance
+                ? Color.white.opacity(0.08)
+                : Color.white.opacity(0.35)
+        }
         private var lifetimeProduct: Product? {
             settingsVM.products.first { $0.id == ProductID.lifetime }
         }
@@ -85,25 +103,9 @@ struct PaywallView: View {
             guard let monthlyProduct else { return "" }
 
             let price = monthlyProduct.displayPrice
-            var text =
-                "TuneBox Monthly is an auto-renewable subscription. "
-                + "Payment will be charged to your Apple ID account at confirmation of purchase. "
-                + "Subscription automatically renews unless canceled at least 24 hours before the end of the current period. "
-                + "Your account will be charged \(price) for renewal within 24 hours prior to the end of the current period. "
-
-            if isEligibleForStoreIntro,
-               let offer = monthlyProduct.subscription?.introductoryOffer,
-               offer.paymentMode == .freeTrial {
-                let trialPeriod = Self.formattedSubscriptionPeriod(offer.period)
-                text +=
-                    "If you start with a free trial, \(price) will be charged when the \(trialPeriod) trial ends "
-                    + "unless you cancel at least 24 hours before it ends. "
-            }
-
-            text +=
-                "Manage or cancel anytime in Settings → Apple ID → Subscriptions."
-
-            return text
+            return L10n.Paywall.disclosureBase(price: price)
+                + " "
+                + L10n.Paywall.disclosureManage
         }
 
         // MARK: - Subviews. Private
@@ -127,7 +129,7 @@ struct PaywallView: View {
 
                 if settingsVM.hasLifetimePurchase {
                     VStack(spacing: 65) {
-                        Text("Thank you for supporting TuneBox!")
+                        Text(L10n.Paywall.thanks)
                             .font(.satoshi.medium.size(18))
                             .foregroundStyle(theme.tokens.primaryText)
                             .multilineTextAlignment(.center)
@@ -148,48 +150,13 @@ struct PaywallView: View {
                 .frame(size: 50)
         }
 
-        private func monthlySubscriptionSubtitle(for product: Product) -> String {
-            if isEligibleForStoreIntro,
-               let offer = product.subscription?.introductoryOffer,
-               offer.paymentMode == .freeTrial {
-                let period = Self.formattedSubscriptionPeriod(offer.period)
-                return "\(period) free trial via subscription, then unlocks all playback functionality."
-            }
-
-            return "Unlocks all playback functionality."
-        }
-
-        private func refreshStoreIntroEligibility() async {
-            guard let subscription = monthlyProduct?.subscription else {
-                isEligibleForStoreIntro = false
-                return
-            }
-
-            isEligibleForStoreIntro = await subscription.isEligibleForIntroOffer
-        }
-
-        private static func formattedSubscriptionPeriod(_ period: Product.SubscriptionPeriod) -> String {
-            switch period.unit {
-                case .day:
-                    period.value == 1 ? "1 day" : "\(period.value) days"
-                case .week:
-                    period.value == 1 ? "1 week" : "\(period.value) weeks"
-                case .month:
-                    period.value == 1 ? "1 month" : "\(period.value) months"
-                case .year:
-                    period.value == 1 ? "1 year" : "\(period.value) years"
-                @unknown default:
-                    "trial"
-            }
-        }
-
         private var purchaseOptions: some View {
             VStack(spacing: 24) {
                 if let lifetimeProduct,
                    settingsVM.hasLifetimePurchase.isFalse {
                     purchaseRow(
-                        title: "Lifetime License",
-                        subtitle: "Unlocks all playback functionality.",
+                        title: L10n.Paywall.productLifetime,
+                        subtitle: L10n.Paywall.subtitleUnlock,
                         price: lifetimeProduct.displayPrice,
                         periodLabel: nil,
                         product: lifetimeProduct
@@ -200,10 +167,10 @@ struct PaywallView: View {
                    settingsVM.hasMonthlyPurchase.isFalse,
                    settingsVM.hasLifetimePurchase.isFalse {
                     purchaseRow(
-                        title: "Monthly Subscription",
-                        subtitle: monthlySubscriptionSubtitle(for: monthlyProduct),
+                        title: L10n.Paywall.productMonthly,
+                        subtitle: L10n.Paywall.subtitleUnlock,
                         price: monthlyProduct.displayPrice,
-                        periodLabel: "Every Month",
+                        periodLabel: L10n.Paywall.everyMonth,
                         product: monthlyProduct
                     )
                 }
@@ -290,50 +257,152 @@ struct PaywallView: View {
         }
 
         private var footerButtons: some View {
-            HStack {
-                footerButton(
-                    action: settingsVM.restorePurchase,
-                    title: "Restore"
+            HStack(spacing: 0) {
+                FooterCapsuleButton(
+                    title: L10n.Paywall.restore,
+                    foreground: theme.tokens.primaryText,
+                    action: settingsVM.restorePurchase
                 )
 
-                Spacer()
+                Spacer(minLength: 8)
 
-                footerButton(
-                    action: { openURL(settingsVM.termsOfUseURL) },
-                    title: "Terms"
+                FooterCapsuleButton(
+                    title: L10n.Paywall.terms,
+                    foreground: theme.tokens.primaryText,
+                    action: { openURL(settingsVM.termsOfUseURL) }
                 )
 
-                Spacer()
+                Spacer(minLength: 8)
 
-                footerButton(
+                FooterCapsuleButton(
+                    title: L10n.Paywall.privacy,
+                    foreground: theme.tokens.primaryText,
                     action: {
                         if let url = settingsVM.privacyPolicyURL {
                             openURL(url)
                         }
-                    },
-                    title: "Privacy"
+                    }
                 )
             }
+            .footerEqualButtonLayout()
             .padding(.bottom, 38)
-        }
-
-        private func footerButton(
-            action: @escaping () -> Void,
-            title: String
-        ) -> some View {
-            Button(action: {
-                action()
-            }, label: {
-                Text(title)
-                    .font(.satoshi.medium.size(14))
-                    .foregroundStyle(theme.tokens.primaryText)
-                    .frame(width: 60)
-                    .padding(.vertical, 4)
-            })
-            .buttonStyle(.glass)
         }
     }
 
+}
+
+// MARK: - Footer Buttons
+
+private struct FooterCapsuleButton: View {
+    let title: String
+    let foreground: Color
+    let action: () -> Void
+
+    @Environment(\.footerMaxButtonWidth) private var maxButtonWidth
+    @Environment(\.footerEqualButtonHeight) private var equalHeight
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.satoshi.medium.size(14))
+                .foregroundStyle(foreground)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.75)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .frame(maxWidth: maxButtonWidth > 0 ? maxButtonWidth : nil)
+                .background {
+                    Color.clear.footerEqualHeightReader()
+                }
+                .frame(height: equalHeight > 0 ? equalHeight : nil)
+        }
+        .buttonStyle(.plain)
+        .glassEffect(.regular.interactive(), in: .capsule)
+    }
+}
+
+private struct FooterEqualHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
+}
+
+private struct FooterContainerWidthKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
+}
+
+private extension View {
+    func footerEqualHeightReader() -> some View {
+        GeometryReader { proxy in
+            Color.clear.preference(
+                key: FooterEqualHeightKey.self,
+                value: proxy.size.height
+            )
+        }
+    }
+
+    func footerEqualButtonLayout() -> some View {
+        modifier(FooterEqualButtonLayoutModifier())
+    }
+}
+
+private struct FooterEqualButtonLayoutModifier: ViewModifier {
+    private static let spacing: CGFloat = 8
+    private static let buttonCount: CGFloat = 3
+
+    @State private var containerWidth: CGFloat = 0
+    @State private var equalHeight: CGFloat = 0
+
+    private var maxButtonWidth: CGFloat {
+        guard containerWidth > 0 else { return 0 }
+        return max(
+            0,
+            (containerWidth - Self.spacing * (Self.buttonCount - 1)) / Self.buttonCount
+        )
+    }
+
+    func body(content: Content) -> some View {
+        content
+            .background {
+                GeometryReader { proxy in
+                    Color.clear.preference(
+                        key: FooterContainerWidthKey.self,
+                        value: proxy.size.width
+                    )
+                }
+            }
+            .onPreferenceChange(FooterContainerWidthKey.self) { containerWidth = $0 }
+            .onPreferenceChange(FooterEqualHeightKey.self) { equalHeight = $0 }
+            .environment(\.footerMaxButtonWidth, maxButtonWidth)
+            .environment(\.footerEqualButtonHeight, equalHeight)
+    }
+}
+
+private struct FooterMaxButtonWidthKey: EnvironmentKey {
+    static let defaultValue: CGFloat = 0
+}
+
+private struct FooterEqualButtonHeightKey: EnvironmentKey {
+    static let defaultValue: CGFloat = 0
+}
+
+private extension EnvironmentValues {
+    var footerMaxButtonWidth: CGFloat {
+        get { self[FooterMaxButtonWidthKey.self] }
+        set { self[FooterMaxButtonWidthKey.self] = newValue }
+    }
+
+    var footerEqualButtonHeight: CGFloat {
+        get { self[FooterEqualButtonHeightKey.self] }
+        set { self[FooterEqualButtonHeightKey.self] = newValue }
+    }
 }
 
 #Preview {

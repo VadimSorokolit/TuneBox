@@ -21,7 +21,7 @@ struct SearchBarView: View {
             Image(systemName: "magnifyingglass")
                 .foregroundStyle(.secondary)
 
-            TextField("Search...", text: $searchQuery)
+            TextField(L10n.Common.searchPlaceholder, text: $searchQuery)
                 .font(.satoshi.medium.size(14))
                 .submitLabel(.search)
                 .focused(isFocused)

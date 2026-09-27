@@ -1,0 +1,199 @@
+/* Common */
+"common.error" = "Помилка";
+"common.ok" = "OK";
+"common.cancel" = "Скасувати";
+"common.delete" = "Видалити";
+"common.apply" = "Застосувати";
+"common.search_placeholder" = "Пошук...";
+"common.duration.hms" = "%d год %d хв %d с";
+"common.duration.ms" = "%d хв %d с";
+
+/* Tabs */
+"tab.import" = "Імпорт";
+"tab.discover" = "Огляд";
+"tab.library" = "Бібліотека";
+"tab.settings" = "Налаштування";
+"tabs.mode.all" = "Усі вкладки";
+"tabs.mode.import" = "Імпорт";
+
+/* Settings */
+"settings.title" = "Налаштування";
+"settings.section.appearance" = "Вигляд";
+"settings.section.playback" = "Відтворення";
+"settings.section.about" = "Про додаток";
+"settings.theme" = "Тема";
+"settings.theme.system" = "Системна";
+"settings.theme.light" = "Світла";
+"settings.theme.dark" = "Темна";
+"settings.language" = "Мова";
+"settings.language.system" = "Системна";
+"settings.default_tab" = "Вкладка за замовчуванням";
+"settings.visible_tabs" = "Видимі вкладки";
+"settings.sleep_timer" = "Таймер сну";
+"settings.sleep_timer.off" = "Вимк.";
+"settings.sleep_timer.hint" = "Додаток закриється після закінчення таймера";
+"settings.sleep_timer.hours" = "%d год";
+"settings.sleep_timer.minutes" = "%d хв";
+"settings.sleep_timer.hours_label" = "Години";
+"settings.sleep_timer.minutes_label" = "Хвилини";
+"settings.sleep_timer.cancel" = "Скасувати";
+"settings.sleep_timer.start" = "Старт";
+"settings.app_info" = "Про додаток";
+"settings.about.title" = "Про додаток";
+"settings.about.license" = "Ліцензія";
+"settings.about.share_feedback" = "Надіслати відгук";
+"settings.about.share" = "Поділитися";
+"settings.about.privacy" = "Політика конфіденційності";
+"settings.about.terms" = "Умови використання";
+"settings.about.version" = "Версія";
+"settings.share.message" = "Спробуй TuneBox — офлайн-плеєр музики для iPhone.";
+
+/* Import */
+"import.section.library" = "Бібліотека";
+"import.section.sources" = "Джерела";
+"import.empty.title" = "Немає що показати";
+"import.empty.message" = "Увімкни розділи, щоб переглядати бібліотеку";
+"import.empty.edit_sections" = "Редагувати розділи";
+"import.empty.no_tracks" = "Немає треків";
+"import.empty.sources_message" = "Твоя музична бібліотека з’явиться тут,\nколи додаси папки";
+"import.add_folder" = "Додати папку";
+"import.delete_folder.title" = "Видалити папку?";
+"import.delete_folder.message" = "Це джерело буде прибрано з бібліотеки, але оригінальний файл залишиться на пристрої.";
+"import.source.downloads" = "Завантаження";
+
+/* Library */
+"library.item.albums" = "Альбоми";
+"library.item.artists" = "Виконавці";
+"library.item.tracks" = "Треки";
+"library.item.playlists" = "Плейлисти";
+"library.unit.album" = "альбом";
+"library.unit.albums" = "альбоми";
+"library.unit.artist" = "виконавець";
+"library.unit.artists" = "виконавці";
+"library.unit.track" = "трек";
+"library.unit.tracks" = "треки";
+"library.unit.playlist" = "плейлист";
+"library.unit.playlists" = "плейлисти";
+"library.unit.tracks_count" = "%d треків";
+"library.segment.albums" = "Альбоми";
+"library.segment.tracks" = "Треки";
+"library.empty.suffix" = "які ти додаєш до бібліотеки, з’являться тут.";
+"library.empty.tracks" = "%@ які ти додаєш до бібліотеки, з’являться тут.";
+"library.empty.playlists_prefix" = "Твої";
+"library.empty.playlists_suffix" = "з’являться тут.";
+"library.artist.not_found" = "Виконавця не знайдено";
+"library.artist.unavailable" = "Вибраний виконавець недоступний";
+"library.fallback.artist" = "Невідомий виконавець";
+"library.fallback.album" = "Невідомий альбом";
+"library.covers.title" = "Обкладинки";
+"library.covers.page" = "%d з %d";
+"library.filter.active" = "Активні завантаження";
+"library.filter.downloaded" = "Завантажені";
+"library.section.suffix.downloaded" = "(завантажено)";
+"library.section.suffix.in_progress" = "(триває)";
+"library.playlist.downloaded" = "Завантажені";
+"library.playlist.new" = "Новий плейлист";
+
+/* Discover */
+"discover.menu.remove_active" = "Видалити всі активні треки";
+"discover.menu.remove_paused" = "Видалити всі призупинені треки";
+"discover.section.featured" = "Рекомендовані";
+"discover.section.popular" = "Популярні";
+"discover.section.search" = "Пошук";
+"discover.section.recents" = "Нещодавні";
+"discover.section.all" = "Усі";
+"discover.section.imported" = "Імпортовані";
+"discover.pagination.end" = "Більше треків немає";
+
+/* Genre */
+"genre.all" = "Усі";
+"genre.pop" = "Поп";
+"genre.rock" = "Рок";
+"genre.jazz" = "Джаз";
+"genre.classic" = "Класика";
+"genre.electronic" = "Електроніка";
+
+/* Player */
+"player.empty.title" = "Немає треку";
+"player.empty.message" = "Почни відтворення, щоб відкрити розширений плеєр.";
+"player.repeat" = "Повтор";
+"player.repeat.off" = "Без повтору";
+"player.repeat.all" = "Повторювати все";
+"player.repeat.one" = "Повторювати один";
+"player.shuffle" = "Перемішати";
+"player.queue" = "Черга";
+"player.route.speaker" = "Динамік";
+"player.format.audio" = "AUDIO";
+"player.format.bit" = "%d біт";
+"player.format.kbps" = "%d кбіт/с";
+"player.format.khz" = "%d кГц";
+
+/* Track */
+"track.menu.edit_tags" = "Редагувати теги";
+"track.menu.delete_from_playlist" = "Видалити з плейлиста";
+"track.menu.delete_from_device" = "Видалити з iPhone";
+"track.a11y.start_download" = "Почати завантаження треку";
+"track.a11y.cancel_download" = "Скасувати завантаження";
+"track.a11y.pause_download" = "Призупинити завантаження";
+"track.a11y.resume_download" = "Продовжити завантаження";
+"track.a11y.delete" = "Видалити трек";
+"track.a11y.retry" = "Повторити завантаження";
+
+/* Paywall */
+"paywall.status.unlock" = "Розблокуй повний доступ до відтворення";
+"paywall.status.lifetime_active" = "Довічна ліцензія активна";
+"paywall.status.subscription_until" = "Підписка активна до %@";
+"paywall.status.premium_active" = "Premium активний";
+"paywall.status.trial_ends" = "Пробний період закінчується %@";
+"paywall.status.trial_ended" = "Пробний період закінчився %@";
+"paywall.header.lifetime" = "Довічний план";
+"paywall.header.premium" = "TuneBox Premium";
+"paywall.header.purchase" = "Придбати TuneBox";
+"paywall.thanks" = "Дякуємо за підтримку TuneBox!";
+"paywall.subtitle.unlock" = "Розблоковує все відтворення.";
+"paywall.product.lifetime" = "Довічна ліцензія";
+"paywall.product.monthly" = "Щомісячна підписка";
+"paywall.period.every_month" = "Щомісяця";
+"paywall.restore" = "Відновити";
+"paywall.terms" = "Умови";
+"paywall.privacy" = "Конфіденційність";
+"paywall.disclosure.base" = "TuneBox Monthly — підписка з автопродовженням. Оплата списується з Apple ID під час підтвердження покупки. Підписка поновлюється автоматично, якщо її не скасувати щонайменше за 24 години до кінця періоду. З вашого рахунку буде списано %@ за поновлення протягом 24 годин до кінця поточного періоду.";
+"paywall.disclosure.manage" = "Керувати або скасувати можна в Налаштування → Apple ID → Підписки.";
+
+/* Feedback */
+"feedback.title" = "ВАШ ВІДГУК";
+"feedback.prompt" = "Наскільки ви задоволені TuneBox?";
+"feedback.rating.very_unhappy" = "Дуже незадоволений";
+"feedback.rating.unhappy" = "Незадоволений";
+"feedback.rating.neutral" = "Нейтрально";
+"feedback.rating.happy" = "Задоволений";
+"feedback.rating.very_happy" = "Дуже задоволений";
+"feedback.placeholder" = "Напишіть свій відгук";
+"feedback.send" = "Надіслати відгук";
+"feedback.thanks" = "Дякуємо!";
+"feedback.thanks_message" = "Ваш відгук допомагає покращити TuneBox.";
+"feedback.error.send" = "Не вдалося надіслати відгук. Спробуйте ще раз.";
+
+/* Errors */
+"error.api.no_internet" = "Немає з’єднання з інтернетом";
+"error.api.network" = "Помилка мережі: %@";
+"error.api.decoding" = "Помилка декодування: %@";
+"error.api.encoding" = "Помилка кодування запиту: %@";
+"error.api.server_code" = "Помилка сервера (код: %d)";
+"error.api.invalid_url" = "Недійсна URL-адреса";
+"error.api.not_found" = "Запитуваний ресурс не знайдено";
+"error.api.missing_content_length" = "Відсутній заголовок Content-Length";
+"error.api.invalid_content_length" = "Недійсне значення Content-Length";
+"error.api.unknown" = "Невідома помилка";
+"error.api.server_unavailable" = "Сервер недоступний";
+"error.file.unavailable" = "Не вдалося визначити вільне місце.";
+"error.file.not_enough_space" = "Недостатньо вільного місця. Потрібно: %g ГБ, доступно: %g ГБ.";
+"error.storage.reserved_playlist" = "Назва «Завантажені» зарезервована";
+"error.storage.playlist_exists" = "Плейлист із такою назвою вже існує";
+"error.storage.not_enough_space" = "Недостатньо вільного місця на пристрої";
+"error.storage.reserved_policy" = "Завантаження порушить політику резерву місця (резерв: %@ ГБ)";
+"error.playlist.empty_title" = "Назва плейлиста не може бути порожньою";
+"error.playlist.same_title" = "Плейлист уже має цю назву";
+"error.source.network_unavailable" = "Мережева папка недоступна. Перевірте з’єднання і спробуйте знову.";
+"error.source.access_denied" = "Немає доступу до цієї папки";
+"error.source.bookmark_invalid" = "Збережене посилання на папку недійсне. Додайте папку знову.";

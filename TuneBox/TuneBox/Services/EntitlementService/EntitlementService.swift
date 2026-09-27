@@ -16,7 +16,7 @@ final class EntitlementService: EntitlementServicing {
 
     private(set) var hasPremium: Bool = false
     private(set) var localTrialStatus: LocalTrialStatus?
-    private(set) var paywallStatusMessage: String = "Unlock full playback access"
+    private(set) var paywallStatusMessage: String = L10n.Paywall.statusUnlock
     private(set) var subscriptionExpirationDate: Date?
 
     // MARK: - Initializer
@@ -141,25 +141,25 @@ final class EntitlementService: EntitlementServicing {
     private func makePaywallStatusMessage() -> String {
         if self.hasPurchasedPremium {
             if self.purchasedProductIDs.contains(ProductID.lifetime) {
-                return "Lifetime license active"
+                return L10n.Paywall.statusLifetimeActive
             }
 
             if let subscriptionExpirationDate = self.subscriptionExpirationDate {
-                return "Your subscription is active until \(Self.formatted(subscriptionExpirationDate))"
+                return L10n.Paywall.statusSubscriptionUntil(Self.formatted(subscriptionExpirationDate))
             }
 
-            return "Premium active"
+            return L10n.Paywall.statusPremiumActive
         }
 
         switch self.localTrialStatus {
             case .active(until: let endDate):
-                return "Your trial ends on \(Self.formatted(endDate))"
+                return L10n.Paywall.statusTrialEnds(Self.formatted(endDate))
 
             case .expired(since: let endDate):
-                return "Your trial ended on \(Self.formatted(endDate))"
+                return L10n.Paywall.statusTrialEnded(Self.formatted(endDate))
 
             case nil:
-                return "Unlock full playback access"
+                return L10n.Paywall.statusUnlock
         }
     }
 

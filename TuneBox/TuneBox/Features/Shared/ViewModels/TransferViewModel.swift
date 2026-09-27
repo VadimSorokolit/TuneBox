@@ -30,7 +30,20 @@ enum Genre: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 
     var displayName: String {
-        rawValue.capitalized
+        switch self {
+            case .all:
+                L10n.Genre.all
+            case .pop:
+                L10n.Genre.pop
+            case .rock:
+                L10n.Genre.rock
+            case .jazz:
+                L10n.Genre.jazz
+            case .classic:
+                L10n.Genre.classic
+            case .electronic:
+                L10n.Genre.electronic
+        }
     }
 }
 
@@ -1348,14 +1361,14 @@ final class TransferViewModel: TransferManaging {
         let reserved = self.reservedSpace.gigabytes
 
         guard available >= requiredGB else {
-            let message = "Not enough free space on device"
+            let message = L10n.Error.storageNotEnoughSpace
             self.error = message
             self.logTransferWarning(message)
             return false
         }
 
         guard (available - requiredGB) >= reserved else {
-            let message = "Download would violate reserved space policy (reserved: \(reserved) GB)"
+            let message = L10n.Error.reservedPolicy(String(reserved))
             self.error = message
             self.logTransferWarning(message)
             return false

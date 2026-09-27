@@ -16,15 +16,28 @@ struct TracksSection: Hashable, Identifiable {
     }
 
     var title: String {
-        type.rawValue
+        switch type {
+            case .genre:
+                L10n.Discover.featured
+            case .popular:
+                L10n.Discover.popular
+            case .search:
+                L10n.Discover.search
+            case .recents:
+                L10n.Discover.recents
+            case .all:
+                L10n.Discover.all
+            case .imported:
+                L10n.Discover.imported
+        }
     }
 
     enum SectionType: String, Hashable {
-        case genre = "Featured"
-        case popular = "Popular"
-        case search = "Search"
-        case recents = "Recents"
-        case all = "All"
-        case imported = "Imported"
+        case genre
+        case popular
+        case search
+        case recents
+        case all
+        case imported
     }
 }

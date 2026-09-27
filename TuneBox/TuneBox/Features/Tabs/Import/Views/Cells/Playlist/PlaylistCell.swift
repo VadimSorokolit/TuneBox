@@ -38,7 +38,7 @@ struct PlaylistCell: View {
                                 .foregroundStyle(.black.opacity(0.8))
                         }
 
-                        Text("\(playlist.tracks.count) \(playlist.tracks.count == 1 ? "track" : "tracks")")
+                        Text("\(playlist.tracks.count) \(playlist.tracks.count == 1 ? L10n.Library.unitTrack : L10n.Library.unitTracks)")
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .lineLimit(GlobalConstants.Cell.textLineLimit)
                             .font(GlobalConstants.Cell.subtitleFont)

@@ -28,8 +28,8 @@ struct ArtistsView: View {
 
                         LibrarySummaryFooter(
                             count: library.artists.count,
-                            unitSingular: String(LibraryItem.artists.rawValue.dropLast()),
-                            unitPlural: LibraryItem.artists.rawValue,
+                            unitSingular: L10n.Library.unitArtist,
+                            unitPlural: L10n.Library.unitArtists,
                             duration: importManagingVM.tracksDuration(library.artists.flatMap(\.tracks)),
                             size: importManagingVM.tracksSize(library.artists.flatMap(\.tracks))
                         )
@@ -46,7 +46,7 @@ struct ArtistsView: View {
                 LibraryEmptyStateView(item: LibraryItem.artists)
             }
         }
-        .libraryMenuNavigationTitle(LibraryItem.artists.rawValue.capitalized)
+        .libraryMenuNavigationTitle(LibraryItem.artists.localizedTitle)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 

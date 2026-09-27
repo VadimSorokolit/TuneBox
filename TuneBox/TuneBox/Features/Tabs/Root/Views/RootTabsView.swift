@@ -10,7 +10,7 @@ import Resolver
 
 private enum Constants {
     enum Title {
-        static let defaultNavigationTitle = "Tracks"
+        static var defaultNavigationTitle: String { L10n.Library.tracks }
     }
 
     enum Icons {
@@ -41,10 +41,10 @@ enum TabsMode: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
             case .allTabs:
-                "All Tabs"
+                L10n.TabsMode.all
 
             case .import:
-                "Import"
+                L10n.TabsMode.import
         }
     }
 }
@@ -62,16 +62,16 @@ enum CustomTab: String, Hashable, Identifiable, CaseIterable {
     var title: String {
         switch self {
             case .importFiles:
-                "Import"
+                L10n.Tab.import
 
             case .browse:
-                "Discover"
+                L10n.Tab.discover
 
             case .downloads:
-                "Library"
+                L10n.Tab.library
 
             case .settings:
-                "Settings"
+                L10n.Tab.settings
         }
     }
 
@@ -101,6 +101,7 @@ struct RootTabsView: View {
             content
                 // Keep tab screens still — only the glass pill should leap.
                 .animation(nil, value: coordinator.selectedTab)
+                .id(languageRefreshID)
 
             if playerVM.isPlayerVisible {
                 CompactPlayerView(
@@ -151,10 +152,12 @@ struct RootTabsView: View {
                     : -18
                 )
                 .animation(.easeInOut(duration: 0.35), value: playerVM.isPlaying)
+                .id(languageRefreshID)
             }
 
             if rootTabsVM.isTabBarVisible {
                 tabBar
+                    .id(languageRefreshID)
             }
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
@@ -171,7 +174,7 @@ struct RootTabsView: View {
         }
         .sheet(isPresented: $isPaywallPresented) {
             PaywallView()
-                .presentationDetents([.fraction(0.58)])
+                .presentationDetents([paywallPresentationDetent])
         }
         .onChange(of: isPaywallPresented) { _, presented in
             settingsVM.isPaywallPresented = presented
@@ -206,6 +209,7 @@ struct RootTabsView: View {
     // MARK: - Properties. Private
 
     @Environment(\.screenHeight) private var screenHeight
+    @Environment(\.languageRefreshID) private var languageRefreshID
     @Injected private var rootTabsVM: RootTabsManaging
     @Injected private var playerVM: PlayerManaging
     @Injected private var importManagingVM: ImportManaging
@@ -215,6 +219,10 @@ struct RootTabsView: View {
     @Environment(AppCoordinator.self) private var coordinator
     @State private var isPaywallPresented: Bool = false
     @State private var isExpandedPlayerPresented: Bool = false
+
+    private var paywallPresentationDetent: PresentationDetent {
+        .fraction(screenHeight > GlobalConstants.Screen.seHeight ? 0.58 : 0.78)
+    }
 
     private var content: some View {
         Group {

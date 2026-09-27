@@ -72,17 +72,6 @@ struct DownloadsView: View {
     @FocusState private var isSearchFieldFocused: Bool
     @State private var searchQuery: String = ""
 
-    private enum Constants {
-        enum Header {
-            static let title = "Library"
-            static let menuLabelImage = "line.3.horizontal.decrease.circle"
-            static let activeButtonImage = "checkmark"
-            static let inactiveButtonImage = ""
-            static let menuButtonDownloadedTitle = "Downloaded"
-            static let menuButtonActiveTitle = "Active Downloads"
-        }
-    }
-
     // MARK: - Subviews. Private
 
     private struct HeaderView: View {
@@ -96,19 +85,19 @@ struct DownloadsView: View {
         // MARK: - Body
 
         var body: some View {
-            TabHeaderView(title: "Library") {
+            TabHeaderView(title: L10n.Tab.library) {
                 Menu {
                     Picker(
-                        "Library",
+                        L10n.Tab.library,
                         selection: Binding(
                             get: { transferManagingVM.selectedTracksType },
                             set: { transferManagingVM.setType($0) }
                         )
                     ) {
-                        Text("Active Downloads")
+                        Text(L10n.Library.filterActive)
                             .tag(TracksType.active)
 
-                        Text("Downloaded")
+                        Text(L10n.Library.filterDownloaded)
                             .tag(TracksType.downloaded)
                     }
                 } label: {

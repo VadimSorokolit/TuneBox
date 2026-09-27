@@ -29,7 +29,7 @@ struct TracksView: View {
                 ContentUnavailableView {
                     Image(systemName: LibraryItem.tracks.systemImage)
                 } description: {
-                    Text("\(LibraryItem.tracks.rawValue.capitalized) you add to your library will appear here.")
+                    Text(L10n.Library.emptyTracks(LibraryItem.tracks.localizedTitle))
                 }
             } else {
                 ScrollViewReader { proxy in
@@ -75,8 +75,8 @@ struct TracksView: View {
                         Section {
                             LibrarySummaryFooter(
                                 count: tracks.count,
-                                unitSingular: "track",
-                                unitPlural: "tracks",
+                                unitSingular: L10n.Library.unitTrack,
+                                unitPlural: L10n.Library.unitTracks,
                                 duration: importManagingVM.tracksDuration(tracks),
                                 size: importManagingVM.tracksSize(tracks)
                             )

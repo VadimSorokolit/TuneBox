@@ -52,9 +52,9 @@ struct AlbumCoversView: View {
 
     private var navigationTitle: String {
         if let selectedIndex {
-            return "\(selectedIndex + 1) of \(coverPaths.count)"
+            return L10n.Library.coversPage(current: selectedIndex + 1, total: coverPaths.count)
         }
-        return "Covers"
+        return L10n.Library.coversTitle
     }
 
     private var gridContent: some View {
@@ -86,7 +86,7 @@ struct AlbumCoversView: View {
                     if isApplying {
                         ProgressView()
                     } else {
-                        Text("Apply")
+                        Text(L10n.Common.apply)
                             .foregroundStyle(Color(.label))
                             .font(.body.weight(.semibold))
                     }

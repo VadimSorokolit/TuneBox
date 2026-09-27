@@ -13,7 +13,7 @@ struct EmptyTracksStateModifier: ViewModifier {
     func body(content: Content) -> some View {
         if showsEmptyState {
             ContentUnavailableView(
-                "No Tracks",
+                L10n.Import.noTracks,
                 systemImage: "music.note"
             )
         } else {

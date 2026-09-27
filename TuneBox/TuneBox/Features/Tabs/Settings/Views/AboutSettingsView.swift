@@ -21,45 +21,45 @@ struct AboutSettingsView: View {
         Form {
             Section {
                 SettingsRow(
-                    title: "License",
+                    title: L10n.Settings.license,
                     systemImage: "checkmark.seal.fill"
                 ) {
                     settingsVM.presentPaywall()
                 }
 
                 SettingsRow(
-                    title: "Share Feedback",
+                    title: L10n.Settings.shareFeedback,
                     systemImage: "square.and.pencil"
                 ) {
                     isFeedbackPresented = true
                 }
 
                 SettingsRow(
-                    title: "Share",
+                    title: L10n.Settings.share,
                     systemImage: "square.and.arrow.up"
                 ) {
                     isSharePresented = true
                 }
 
-                SettingsRow(title: "Privacy Policy") {
+                SettingsRow(title: L10n.Settings.privacy) {
                     if let url = settingsVM.privacyPolicyURL {
                         openURL(url)
                     }
                 }
 
-                SettingsRow(title: "Terms of Use") {
+                SettingsRow(title: L10n.Settings.terms) {
                     openURL(settingsVM.termsOfUseURL)
                 }
 
                 SettingsRow(
-                    title: "Version",
+                    title: L10n.Settings.version,
                     value: settingsVM.marketingVersion,
                     showsSystemImage: false
                 )
             }
         }
         .listSectionSpacing(.compact)
-        .customNavigationTitle("About")
+        .customNavigationTitle(L10n.Settings.aboutTitle)
     }
 
     // MARK: - Properties. Private

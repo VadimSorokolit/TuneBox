@@ -151,9 +151,9 @@ struct ExpandedPlayerView: View {
                 }
             } else {
                 ContentUnavailableView(
-                    "No Track",
+                    L10n.Player.emptyTitle,
                     systemImage: "music.note",
-                    description: Text("Start playback to use the expanded player.")
+                    description: Text(L10n.Player.emptyMessage)
                 )
             }
         }

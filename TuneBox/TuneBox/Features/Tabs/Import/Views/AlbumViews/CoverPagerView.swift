@@ -83,7 +83,7 @@ struct CoverPagerView: View {
                     onApplyBtnTap?(currentIndex)
                     dismiss()
                 }, label: {
-                    Text("Apply")
+                    Text(L10n.Common.apply)
                         .font(.body.weight(.semibold))
                         .padding(.horizontal, 16)
                         .padding(.vertical, 10)
@@ -92,12 +92,12 @@ struct CoverPagerView: View {
             }
             .overlay {
                 ZStack {
-                    Text("\(currentIndex + 1) of \(coverPaths.count)")
+                    Text(L10n.Library.coversPage(current: currentIndex + 1, total: coverPaths.count))
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.white)
                         .offset(x: -1, y: 0)
 
-                    Text("\(currentIndex + 1) of \(coverPaths.count)")
+                    Text(L10n.Library.coversPage(current: currentIndex + 1, total: coverPaths.count))
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.white)
                         .offset(x: 1, y: 0)

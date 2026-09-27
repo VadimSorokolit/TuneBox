@@ -13,8 +13,8 @@ extension Int {
         let seconds = self % 60
 
         return hours > 0
-        ? "\(hours) h \(minutes) m \(seconds) s"
-        : "\(minutes) m \(seconds) s"
+        ? L10n.Common.durationHMS(hours: hours, minutes: minutes, seconds: seconds)
+        : L10n.Common.durationMS(minutes: minutes, seconds: seconds)
     }
 
 }

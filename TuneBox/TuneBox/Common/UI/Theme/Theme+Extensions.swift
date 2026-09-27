@@ -69,5 +69,6 @@ extension EnvironmentValues {
     }
 
     @Entry var screenHeight: CGFloat = 0
+    @Entry var languageRefreshID: UUID = UUID()
 
 }

@@ -445,8 +445,8 @@ final class PersistenceService: PersistenceServicing {
     // MARK: - Properties. Private
 
     private enum Constants {
-        static let systemPlaylistTitle = "Downloaded"
-        static let defaultPlaylistTitle = "New Playlist"
+        static var systemPlaylistTitle: String { L10n.Library.playlistDownloaded }
+        static var defaultPlaylistTitle: String { L10n.Library.playlistNew }
     }
     private let storageDidChangeSubject = PassthroughSubject<Void, Never>()
     private var cancellables = Set<AnyCancellable>()

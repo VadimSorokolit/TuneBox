@@ -18,11 +18,29 @@ struct HeaderGlassButton: View {
     var body: some View {
         Image(systemName: systemName)
             .font(GlobalConstants.HeaderButton.font)
-            .foregroundStyle(GlobalConstants.HeaderButton.foregroundStyle)
+            .foregroundStyle(iconColor)
             .frame(size: GlobalConstants.HeaderButton.size)
             .contentShape(Circle())
     }
 
+    // MARK: - Properties. Private
+
+    @Environment(\.themeManager) private var theme
+
+    private var iconColor: Color {
+        switch theme.preset {
+            case .light:
+                GlobalConstants.HeaderButton.foregroundStyle
+
+            case .dark:
+                theme.tokens.browseHeaderText
+
+            case .system:
+                theme.systemColorScheme == .dark
+                    ? theme.tokens.browseHeaderText
+                    : GlobalConstants.HeaderButton.foregroundStyle
+        }
+    }
 }
 
 extension View {

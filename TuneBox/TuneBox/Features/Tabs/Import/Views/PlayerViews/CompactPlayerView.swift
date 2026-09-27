@@ -562,25 +562,25 @@ struct CompactPlayerView: View {
         @ViewBuilder
         private var menuContent: some View {
             Picker(
-                "Repeat",
+                L10n.Player.repeat,
                 selection: Binding(
                     get: { repeatMode },
                     set: onRepeatModeChange
                 )
             ) {
-                Text("No Repeat").tag(RepeatMode.off)
+                Text(L10n.Player.repeatOff).tag(RepeatMode.off)
 
-                Text("Repeat All")
+                Text(L10n.Player.repeatAll)
                     .tag(RepeatMode.all)
 
-                Text("Repeat One")
+                Text(L10n.Player.repeatOne)
                     .tag(RepeatMode.one)
             }
 
             Divider()
 
             Toggle(
-                "Shuffle",
+                L10n.Player.shuffle,
                 isOn: Binding(
                     get: { isShuffleEnabled },
                     set: { _ in onShuffleToggle() }

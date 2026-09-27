@@ -15,9 +15,9 @@ enum LibrarySegment: Int, CaseIterable, SegmentedItem {
     var title: String {
         switch self {
             case .albums:
-                "Albums"
+                L10n.Library.segmentAlbums
             case .tracks:
-                "Tracks"
+                L10n.Library.segmentTracks
         }
     }
 }
@@ -69,9 +69,9 @@ struct ArtistDetailsView: View {
             .customNavigationTitle(artist.name)
         } else {
             ContentUnavailableView(
-                "Artist not found",
+                L10n.Library.artistNotFound,
                 systemImage: "person.crop.circle.badge.exclamationmark",
-                description: Text("The selected artist is unavailable")
+                description: Text(L10n.Library.artistUnavailable)
             )
         }
     }
@@ -205,8 +205,8 @@ struct ArtistDetailsView: View {
 
                 LibrarySummaryFooter(
                     count: albums.count,
-                    unitSingular: "album",
-                    unitPlural: "albums",
+                    unitSingular: L10n.Library.unitAlbum,
+                    unitPlural: L10n.Library.unitAlbums,
                     duration: importManagingVM.tracksDuration(albums.flatMap(\.tracks)),
                     size: importManagingVM.tracksSize(albums.flatMap(\.tracks))
                 )
@@ -247,8 +247,8 @@ struct ArtistDetailsView: View {
 
                 LibrarySummaryFooter(
                     count: tracks.count,
-                    unitSingular: "track",
-                    unitPlural: "tracks",
+                    unitSingular: L10n.Library.unitTrack,
+                    unitPlural: L10n.Library.unitTracks,
                     duration: importManagingVM.tracksDuration(tracks),
                     size: importManagingVM.tracksSize(tracks)
                 )

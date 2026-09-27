@@ -188,7 +188,7 @@ final class PlayerViewModel: PlayerManaging {
 
         let tracks = queue.isEmpty ? [track] : queue
         let queueChanged = self.playlist?.tracks.map(\.id) != tracks.map(\.id)
-        self.playlist = PlaylistEntity(title: "Queue", tracks: tracks)
+        self.playlist = PlaylistEntity(title: L10n.Player.queue, tracks: tracks)
 
         if self.isShuffleEnabled, queueChanged || self.shuffleOrder == nil {
             self.rebuildShuffleOrder(startingWith: track)
@@ -245,7 +245,7 @@ final class PlayerViewModel: PlayerManaging {
         }
 
         self.track = track
-        self.playlist = PlaylistEntity(title: "Queue", tracks: tracks)
+        self.playlist = PlaylistEntity(title: L10n.Player.queue, tracks: tracks)
         self.progress = min(max(snapshot.progress, 0), 1)
         self.isPlaying = false
         self.playbackOrigin = snapshot.origin
@@ -445,7 +445,7 @@ final class PlayerViewModel: PlayerManaging {
         let added = tracks.filter { existing.contains($0.id) == false }
         guard added.isNotEmpty else { return }
 
-        self.playlist = PlaylistEntity(title: "Queue", tracks: currentTracks + added)
+        self.playlist = PlaylistEntity(title: L10n.Player.queue, tracks: currentTracks + added)
 
         if self.isShuffleEnabled, var order = self.shuffleOrder {
             order.append(contentsOf: added.map(\.id))
