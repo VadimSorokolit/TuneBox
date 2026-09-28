@@ -163,11 +163,12 @@
 /* Feedback */
 "feedback.title" = "ВАШ ВІДГУК";
 "feedback.prompt" = "Наскільки ви задоволені TuneBox?";
-"feedback.rating.very_unhappy" = "Дуже незадоволений";
 "feedback.rating.unhappy" = "Незадоволений";
-"feedback.rating.neutral" = "Нейтрально";
+"feedback.rating.meh" = "Може бути краще";
+"feedback.rating.okay" = "Нормально";
 "feedback.rating.happy" = "Задоволений";
 "feedback.rating.very_happy" = "Дуже задоволений";
+"feedback.rating.love_it" = "Супер";
 "feedback.placeholder" = "Напишіть свій відгук";
 "feedback.send" = "Надіслати відгук";
 "feedback.thanks" = "Дякуємо!";

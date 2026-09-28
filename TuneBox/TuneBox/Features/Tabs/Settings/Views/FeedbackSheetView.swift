@@ -45,65 +45,81 @@ struct FeedbackSheetView: View {
     // MARK: - Properties. Private
 
     @FocusState private var isCommentFocused: Bool
-    @State private var selectedRating: Satisfaction = .neutral
+    @State private var selectedRating: Satisfaction?
     @State private var comment = ""
     @State private var isSubmitting = false
     @State private var didSubmit = false
     @State private var errorMessage: String?
 
+    private var canSubmit: Bool {
+        selectedRating != nil
+            && !comment.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && !isSubmitting
+    }
+
     private enum Satisfaction: Int, CaseIterable, Identifiable {
-        case veryUnhappy = 1
-        case unhappy
-        case neutral
+        case unhappy = 1
+        case meh
+        case okay
         case happy
         case veryHappy
+        case loveIt
 
         var id: Int { rawValue }
 
         var emoji: String {
             switch self {
-                case .veryUnhappy:
-                    "😠"
-
                 case .unhappy:
                     "😕"
 
-                case .neutral:
-                    "😐"
+                case .meh:
+                    "🙁"
+
+                case .okay:
+                    "🙂"
 
                 case .happy:
-                    "🙂"
+                    "😊"
 
                 case .veryHappy:
                     "😄"
+
+                case .loveIt:
+                    "🤩"
             }
         }
 
         var label: String {
             switch self {
-                case .veryUnhappy:
-                    L10n.Feedback.veryUnhappy
-
                 case .unhappy:
                     L10n.Feedback.unhappy
 
-                case .neutral:
-                    L10n.Feedback.neutral
+                case .meh:
+                    L10n.Feedback.meh
+
+                case .okay:
+                    L10n.Feedback.okay
 
                 case .happy:
                     L10n.Feedback.happy
 
                 case .veryHappy:
                     L10n.Feedback.veryHappy
+
+                case .loveIt:
+                    L10n.Feedback.loveIt
             }
         }
     }
 
     private enum Constants {
-        static let selectedScale: CGFloat = 1.18
+        static let selectedScale: CGFloat = 1.16
         static let ringLineWidth: CGFloat = 1.5
-        static let ratingEmojiSize: CGFloat = 42
-        static let ratingButtonSize: CGFloat = 52
+        static let ratingEmojiSize: CGFloat = 34
+        static let ratingButtonSize: CGFloat = 44
+        static let ratingSpacing: CGFloat = 8
+        static let unselectedOpacity: Double = 0.45
+        static let disabledButtonOpacity: Double = 0.8
         static let successDisplayDuration: Duration = .milliseconds(1500)
     }
 
@@ -154,10 +170,11 @@ struct FeedbackSheetView: View {
             }
             .buttonStyle(.plain)
             .glassEffect(
-                .regular.tint(Color.blue.opacity(0.28)).interactive(),
+                .regular.tint(Color.blue.opacity(canSubmit ? 0.28 : 0.12)).interactive(),
                 in: .capsule
             )
-            .disabled(isSubmitting)
+            .disabled(!canSubmit)
+            .opacity(canSubmit ? 1 : Constants.disabledButtonOpacity)
         }
     }
 
@@ -203,37 +220,52 @@ struct FeedbackSheetView: View {
     }
 
     private var ratingRow: some View {
-        HStack(spacing: 12) {
-            ForEach(Satisfaction.allCases) { rating in
-                let isSelected = selectedRating == rating
+        VStack(spacing: 10) {
+            HStack(spacing: Constants.ratingSpacing) {
+                ForEach(Satisfaction.allCases) { rating in
+                    let isSelected = selectedRating == rating
 
-                Button {
-                    withAnimation(.spring(response: 0.28, dampingFraction: 0.72)) {
-                        selectedRating = rating
-                    }
-                } label: {
-                    Text(rating.emoji)
-                        .font(.system(size: Constants.ratingEmojiSize))
-                        .frame(size: Constants.ratingButtonSize)
-                        .scaleEffect(isSelected ? Constants.selectedScale : 1)
-                        .overlay {
-                            Circle()
-                                .strokeBorder(
-                                    isSelected ? Color.primary.opacity(0.35) : Color.clear,
-                                    lineWidth: Constants.ringLineWidth
-                                )
+                    Button {
+                        withAnimation(.spring(response: 0.28, dampingFraction: 0.72)) {
+                            selectedRating = rating
                         }
+                    } label: {
+                        Text(rating.emoji)
+                            .font(.system(size: Constants.ratingEmojiSize))
+                            .grayscale(isSelected ? 0 : 1)
+                            .opacity(isSelected ? 1 : Constants.unselectedOpacity)
+                            .frame(size: Constants.ratingButtonSize)
+                            .scaleEffect(isSelected ? Constants.selectedScale : 1)
+                            .overlay {
+                                Circle()
+                                    .strokeBorder(
+                                        isSelected ? Color.primary.opacity(0.35) : Color.clear,
+                                        lineWidth: Constants.ringLineWidth
+                                    )
+                            }
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(rating.label)
+                    .accessibilityAddTraits(isSelected ? .isSelected : [])
                 }
-                .buttonStyle(.plain)
             }
+            .frame(maxWidth: .infinity)
+
+            Text(selectedRating?.label ?? " ")
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(.primary)
+                .opacity(selectedRating == nil ? 0 : 1)
+                .frame(maxWidth: .infinity)
+                .animation(.easeInOut(duration: 0.2), value: selectedRating)
         }
-        .frame(maxWidth: .infinity)
     }
 
     // MARK: - Methods. Private
 
     @MainActor
     private func submit() async {
+        guard canSubmit, let selectedRating else { return }
+
         errorMessage = nil
         isSubmitting = true
         defer { isSubmitting = false }

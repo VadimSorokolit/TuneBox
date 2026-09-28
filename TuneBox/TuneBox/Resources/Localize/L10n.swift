@@ -274,11 +274,12 @@ enum L10n {
     enum Feedback {
         static var title: String { text("feedback.title") }
         static var prompt: String { text("feedback.prompt") }
-        static var veryUnhappy: String { text("feedback.rating.very_unhappy") }
         static var unhappy: String { text("feedback.rating.unhappy") }
-        static var neutral: String { text("feedback.rating.neutral") }
+        static var meh: String { text("feedback.rating.meh") }
+        static var okay: String { text("feedback.rating.okay") }
         static var happy: String { text("feedback.rating.happy") }
         static var veryHappy: String { text("feedback.rating.very_happy") }
+        static var loveIt: String { text("feedback.rating.love_it") }
         static var placeholder: String { text("feedback.placeholder") }
         static var send: String { text("feedback.send") }
         static var thanks: String { text("feedback.thanks") }

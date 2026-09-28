@@ -163,11 +163,12 @@
 /* Feedback */
 "feedback.title" = "SHARE YOUR FEEDBACK";
 "feedback.prompt" = "How satisfied are you with TuneBox?";
-"feedback.rating.very_unhappy" = "Very Unhappy";
 "feedback.rating.unhappy" = "Unhappy";
-"feedback.rating.neutral" = "Neutral";
+"feedback.rating.meh" = "Could be better";
+"feedback.rating.okay" = "Okay";
 "feedback.rating.happy" = "Happy";
 "feedback.rating.very_happy" = "Very Happy";
+"feedback.rating.love_it" = "Love it";
 "feedback.placeholder" = "Write your feedback";
 "feedback.send" = "Send Feedback";
 "feedback.thanks" = "Thanks!";
