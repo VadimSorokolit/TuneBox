@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import UIKit
 
 struct AboutSettingsView: View {
 
@@ -34,14 +33,21 @@ struct AboutSettingsView: View {
                     isFeedbackPresented = true
                 }
 
-                SettingsRow(
-                    title: L10n.Settings.share,
-                    systemImage: "square.and.arrow.up"
+                ShareLink(
+                    item: Constants.shareAppURL,
+                    subject: Text(Constants.shareAppTitle),
+                    message: Text(L10n.Settings.shareMessage),
+                    preview: SharePreview(
+                        Constants.shareAppTitle,
+                        image: Image(Constants.shareAppImageName)
+                    )
                 ) {
-                    ActivitySharePresenter.present(
-                        activityItems: settingsVM.shareActivityItems
+                    SettingsRow(
+                        title: L10n.Settings.share,
+                        systemImage: "square.and.arrow.up"
                     )
                 }
+                .buttonStyle(.plain)
 
                 SettingsRow(title: L10n.Settings.privacy) {
                     if let url = settingsVM.privacyPolicyURL {
@@ -68,6 +74,13 @@ struct AboutSettingsView: View {
     // MARK: - Properties. Private
 
     @Environment(\.openURL) private var openURL
+
+    private enum Constants {
+        static let shareAppTitle = "TuneBox"
+        static let shareAppImageName = "Paywall"
+        /// Replace with the real App Store ID when available.
+        static let shareAppURL = URL(string: "https://apps.apple.com/app/tunebox/id000000000")!
+    }
 }
 
 #Preview {
@@ -76,55 +89,5 @@ struct AboutSettingsView: View {
             settingsVM: SettingsViewModel(),
             isFeedbackPresented: .constant(false)
         )
-    }
-}
-
-@MainActor
-private enum ActivitySharePresenter {
-
-    static func present(activityItems: [Any]) {
-        let controller = UIActivityViewController(
-            activityItems: activityItems,
-            applicationActivities: nil
-        )
-
-        guard let presenter = topViewController() else { return }
-
-        if let popover = controller.popoverPresentationController {
-            popover.sourceView = presenter.view
-            popover.sourceRect = CGRect(
-                x: presenter.view.bounds.midX,
-                y: presenter.view.bounds.midY,
-                width: 0,
-                height: 0
-            )
-            popover.permittedArrowDirections = []
-        }
-
-        presenter.present(controller, animated: true)
-    }
-
-    private static func topViewController(
-        base: UIViewController? = nil
-    ) -> UIViewController? {
-        let root = base ?? UIApplication.shared.connectedScenes
-            .compactMap { $0 as? UIWindowScene }
-            .flatMap(\.windows)
-            .first(where: \.isKeyWindow)?
-            .rootViewController
-
-        if let navigation = root as? UINavigationController {
-            return topViewController(base: navigation.visibleViewController)
-        }
-
-        if let tabBar = root as? UITabBarController {
-            return topViewController(base: tabBar.selectedViewController)
-        }
-
-        if let presented = root?.presentedViewController {
-            return topViewController(base: presented)
-        }
-
-        return root
     }
 }

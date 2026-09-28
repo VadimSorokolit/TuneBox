@@ -9,8 +9,6 @@ import Foundation
 import Observation
 import StoreKit
 import Resolver
-import UIKit
-import LinkPresentation
 
 @MainActor
 @Observable
@@ -144,14 +142,6 @@ final class SettingsViewModel: SettingsManaging {
         URL(string: Constants.privacyPolicyURL)
     }
 
-    var shareActivityItems: [Any] {
-        [AppShareItem(
-            title: Constants.shareAppTitle,
-            message: L10n.Settings.shareMessage,
-            image: UIImage(named: Constants.shareAppImageName)
-        )]
-    }
-
     func startSleepTimer(hours: Int, minutes: Int) {
         let duration = TimeInterval((hours * 60) + minutes) * 60
         guard duration > 0 else { return }
@@ -238,8 +228,6 @@ final class SettingsViewModel: SettingsManaging {
             "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
         static let privacyPolicyURL =
             "https://sites.google.com/view/tunebox-privacy-policy/privacy"
-        static let shareAppTitle = "TuneBox"
-        static let shareAppImageName = "Paywall"
     }
 
     @ObservationIgnored
@@ -327,53 +315,5 @@ final class SettingsViewModel: SettingsManaging {
         }
 
         return String(format: "%d:%02d", minutes, seconds)
-    }
-}
-
-// MARK: - AppShareItem
-
-private final class AppShareItem: NSObject, UIActivityItemSource {
-
-    // MARK: - Properties. Private
-
-    private let title: String
-    private let message: String
-    private let image: UIImage?
-
-    // MARK: - Initializer
-
-    init(title: String, message: String, image: UIImage?) {
-        self.title = title
-        self.message = message
-        self.image = image
-    }
-
-    // MARK: - Methods. Public
-
-    func activityViewControllerPlaceholderItem(
-        _ activityViewController: UIActivityViewController
-    ) -> Any {
-        message
-    }
-
-    func activityViewController(
-        _ activityViewController: UIActivityViewController,
-        itemForActivityType activityType: UIActivity.ActivityType?
-    ) -> Any? {
-        message
-    }
-
-    func activityViewControllerLinkMetadata(
-        _ activityViewController: UIActivityViewController
-    ) -> LPLinkMetadata? {
-        let metadata = LPLinkMetadata()
-        metadata.originalURL = URL(fileURLWithPath: title)
-
-        if let image {
-            metadata.iconProvider = NSItemProvider(object: image)
-            metadata.imageProvider = NSItemProvider(object: image)
-        }
-
-        return metadata
     }
 }

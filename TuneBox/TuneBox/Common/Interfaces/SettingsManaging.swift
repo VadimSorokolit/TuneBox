@@ -32,7 +32,6 @@ protocol SettingsManaging: LoadStateManaging {
     func dismissPaywall()
     var termsOfUseURL: URL { get }
     var privacyPolicyURL: URL? { get }
-    var shareActivityItems: [Any] { get }
     var isSleepTimerActive: Bool { get }
     var sleepTimerTrailingText: String { get }
     func startSleepTimer(hours: Int, minutes: Int)
