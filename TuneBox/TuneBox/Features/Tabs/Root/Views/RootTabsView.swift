@@ -15,11 +15,11 @@ private enum Constants {
 
     enum Icons {
         enum Browse {
-            static let asset = "TabSearch"
+            static let asset = "TabDiscover"
         }
 
         enum Downloads {
-            static let asset = "TabDownload"
+            static let asset = "TabLibrary"
         }
 
         enum ImportFiles {
