@@ -237,6 +237,7 @@ struct FeedbackSheetView: View {
                             }
                     }
                     .buttonStyle(.plain)
+                    .frame(maxWidth: .infinity)
                     .accessibilityLabel(rating.label)
                     .accessibilityAddTraits(isSelected ? .isSelected : [])
                 }
