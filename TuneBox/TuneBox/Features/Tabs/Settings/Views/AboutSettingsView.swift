@@ -59,6 +59,7 @@ struct AboutSettingsView: View {
             }
         }
         .listSectionSpacing(.compact)
+        .environment(\.defaultMinListRowHeight, 1)
         .customNavigationTitle(L10n.Settings.aboutTitle)
     }
 

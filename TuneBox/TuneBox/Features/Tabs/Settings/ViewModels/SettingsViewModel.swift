@@ -26,7 +26,12 @@ final class SettingsViewModel: SettingsManaging {
     private(set) var isLoading = false
     private(set) var error: String?
     private(set) var isSleepTimerActive = false
-    private(set) var sleepTimerTrailingText = L10n.Settings.sleepTimerOff
+
+    var sleepTimerTrailingText: String {
+        self.isSleepTimerActive
+            ? self.sleepTimerCountdownText
+            : L10n.Settings.sleepTimerOff
+    }
 
     var paywallHeaderTitle: String {
         self.purchasedProductIDs.isNotEmpty
@@ -156,7 +161,7 @@ final class SettingsViewModel: SettingsManaging {
         let endDate = Date().addingTimeInterval(duration)
         self.sleepTimerEndDate = endDate
         self.isSleepTimerActive = true
-        self.sleepTimerTrailingText = Self.formattedRemaining(
+        self.sleepTimerCountdownText = Self.formattedRemaining(
             endDate.timeIntervalSinceNow
         )
 
@@ -190,7 +195,7 @@ final class SettingsViewModel: SettingsManaging {
         self.sleepTimerDisplayTimer = nil
         self.sleepTimerEndDate = nil
         self.isSleepTimerActive = false
-        self.sleepTimerTrailingText = L10n.Settings.sleepTimerOff
+        self.sleepTimerCountdownText = ""
     }
 
     func submitFeedback(
@@ -264,6 +269,8 @@ final class SettingsViewModel: SettingsManaging {
     @ObservationIgnored
     private var sleepTimerEndDate: Date?
 
+    private var sleepTimerCountdownText = ""
+
     // MARK: - Methods. Private
 
     private static func analyticsProductName(for product: Product) -> String {
@@ -290,8 +297,8 @@ final class SettingsViewModel: SettingsManaging {
 
     private func refreshSleepTimerDisplay() {
         guard let endDate = self.sleepTimerEndDate else {
-            self.sleepTimerTrailingText = L10n.Settings.sleepTimerOff
             self.isSleepTimerActive = false
+            self.sleepTimerCountdownText = ""
             return
         }
 
@@ -301,7 +308,7 @@ final class SettingsViewModel: SettingsManaging {
             return
         }
 
-        self.sleepTimerTrailingText = Self.formattedRemaining(remaining)
+        self.sleepTimerCountdownText = Self.formattedRemaining(remaining)
     }
 
     private func fireSleepTimer() {

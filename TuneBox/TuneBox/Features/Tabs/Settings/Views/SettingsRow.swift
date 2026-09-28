@@ -79,6 +79,22 @@ struct SettingsRow: View {
     // MARK: - Main Body
 
     var body: some View {
+        row
+            .modifier(SettingsRowLayoutModifier(isCompactSE: isCompactSE, hasMenu: menu != nil))
+    }
+
+    // MARK: - Properties. Private
+
+    @Environment(\.screenHeight) private var screenHeight
+
+    private let menu: UIMenu?
+
+    private var isCompactSE: Bool {
+        screenHeight > 0 && screenHeight <= GlobalConstants.Screen.seHeight
+    }
+
+    @ViewBuilder
+    private var row: some View {
         if let menu {
             ZStack {
                 // Hit target under the label so menu dismiss can't flash the title.
@@ -93,16 +109,7 @@ struct SettingsRow: View {
                     .opacity(isDisabled ? 0.45 : 1)
                     .compositingGroup()
             }
-            .frame(
-                maxWidth: .infinity,
-                minHeight: screenHeight > GlobalConstants.Screen.seHeight
-                ? 44
-                : 34
-            )
             .contentShape(Rectangle())
-            // Match leading title inset with trailing icon inset.
-            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-            .listRowBackground(Color(.secondarySystemGroupedBackground))
             .transaction { $0.animation = nil }
             .animation(nil, value: trailingText)
             .animation(nil, value: isDisabled)
@@ -116,12 +123,6 @@ struct SettingsRow: View {
             rowContent
         }
     }
-
-    // MARK: - Properties. Private
-
-    @Environment(\.screenHeight) private var screenHeight
-
-    private let menu: UIMenu?
 
     private var rowContent: some View {
         HStack(spacing: 8) {
@@ -156,6 +157,31 @@ struct SettingsRow: View {
         }
         .frame(maxWidth: .infinity, minHeight: 22, alignment: .leading)
         .contentShape(Rectangle())
+    }
+}
+
+// MARK: - SettingsRowLayoutModifier
+
+private struct SettingsRowLayoutModifier: ViewModifier {
+
+    let isCompactSE: Bool
+    let hasMenu: Bool
+
+    func body(content: Content) -> some View {
+        if isCompactSE {
+            content
+                .frame(maxWidth: .infinity, minHeight: 30)
+                .listRowInsets(EdgeInsets(top: 2, leading: 16, bottom: 2, trailing: 16))
+                .listRowBackground(Color(.secondarySystemGroupedBackground))
+        } else if hasMenu {
+            content
+                .frame(maxWidth: .infinity, minHeight: 44)
+                // Match leading title inset with trailing icon inset.
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                .listRowBackground(Color(.secondarySystemGroupedBackground))
+        } else {
+            content
+        }
     }
 }
 
