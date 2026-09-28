@@ -7,7 +7,6 @@
 
 import SwiftUI
 import Resolver
-import UIKit
 
 private enum SettingsRoute: Hashable {
     case about
@@ -36,8 +35,7 @@ struct SettingsView: View {
                     case .about:
                         AboutSettingsView(
                             settingsVM: settingsVM,
-                            isFeedbackPresented: $isFeedbackPresented,
-                            isSharePresented: $isSharePresented
+                            isFeedbackPresented: $isFeedbackPresented
                         )
                 }
             }
@@ -46,10 +44,6 @@ struct SettingsView: View {
             FeedbackSheetView(settingsVM: settingsVM) {
                 isFeedbackPresented = false
             }
-        }
-        .sheet(isPresented: $isSharePresented) {
-            ActivityView(activityItems: settingsVM.shareActivityItems)
-                .ignoresSafeArea()
         }
         .sheet(isPresented: $isSleepTimerPresented) {
             SleepTimerSheetView(settingsVM: settingsVM) {
@@ -65,7 +59,6 @@ struct SettingsView: View {
     @Injected private var rootTabsVM: RootTabsManaging
     @State private var path = [SettingsRoute]()
     @State private var isFeedbackPresented = false
-    @State private var isSharePresented = false
     @State private var isSleepTimerPresented = false
 
     // MARK: - Objects. Private
@@ -210,25 +203,6 @@ struct SettingsView: View {
                 }
             )
         }
-    }
-
-    private struct ActivityView: UIViewControllerRepresentable {
-
-        let activityItems: [Any]
-
-        func makeUIViewController(
-            context: Context
-        ) -> UIActivityViewController {
-            UIActivityViewController(
-                activityItems: activityItems,
-                applicationActivities: nil
-            )
-        }
-
-        func updateUIViewController(
-            _ uiViewController: UIActivityViewController,
-            context: Context
-        ) {}
     }
 }
 

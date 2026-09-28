@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct AboutSettingsView: View {
 
@@ -13,7 +14,6 @@ struct AboutSettingsView: View {
 
     let settingsVM: SettingsManaging
     @Binding var isFeedbackPresented: Bool
-    @Binding var isSharePresented: Bool
 
     // MARK: - Main Body
 
@@ -38,7 +38,9 @@ struct AboutSettingsView: View {
                     title: L10n.Settings.share,
                     systemImage: "square.and.arrow.up"
                 ) {
-                    isSharePresented = true
+                    ActivitySharePresenter.present(
+                        activityItems: settingsVM.shareActivityItems
+                    )
                 }
 
                 SettingsRow(title: L10n.Settings.privacy) {
@@ -72,8 +74,57 @@ struct AboutSettingsView: View {
     NavigationStack {
         AboutSettingsView(
             settingsVM: SettingsViewModel(),
-            isFeedbackPresented: .constant(false),
-            isSharePresented: .constant(false)
+            isFeedbackPresented: .constant(false)
         )
+    }
+}
+
+@MainActor
+private enum ActivitySharePresenter {
+
+    static func present(activityItems: [Any]) {
+        let controller = UIActivityViewController(
+            activityItems: activityItems,
+            applicationActivities: nil
+        )
+
+        guard let presenter = topViewController() else { return }
+
+        if let popover = controller.popoverPresentationController {
+            popover.sourceView = presenter.view
+            popover.sourceRect = CGRect(
+                x: presenter.view.bounds.midX,
+                y: presenter.view.bounds.midY,
+                width: 0,
+                height: 0
+            )
+            popover.permittedArrowDirections = []
+        }
+
+        presenter.present(controller, animated: true)
+    }
+
+    private static func topViewController(
+        base: UIViewController? = nil
+    ) -> UIViewController? {
+        let root = base ?? UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap(\.windows)
+            .first(where: \.isKeyWindow)?
+            .rootViewController
+
+        if let navigation = root as? UINavigationController {
+            return topViewController(base: navigation.visibleViewController)
+        }
+
+        if let tabBar = root as? UITabBarController {
+            return topViewController(base: tabBar.selectedViewController)
+        }
+
+        if let presented = root?.presentedViewController {
+            return topViewController(base: presented)
+        }
+
+        return root
     }
 }
