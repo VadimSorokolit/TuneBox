@@ -97,11 +97,12 @@ struct RootTabsView: View {
     // MARK: - Main Body
 
     var body: some View {
+        let _ = languageRefreshID
+
         ZStack(alignment: .bottom) {
             content
                 // Keep tab screens still — only the glass pill should leap.
                 .animation(nil, value: coordinator.selectedTab)
-                .id(languageRefreshID)
 
             if playerVM.isPlayerVisible {
                 CompactPlayerView(
@@ -152,12 +153,10 @@ struct RootTabsView: View {
                     : -18
                 )
                 .animation(.easeInOut(duration: 0.35), value: playerVM.isPlaying)
-                .id(languageRefreshID)
             }
 
             if rootTabsVM.isTabBarVisible {
                 tabBar
-                    .id(languageRefreshID)
             }
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
@@ -172,15 +171,9 @@ struct RootTabsView: View {
                 )
             }
         }
-        .sheet(isPresented: $isPaywallPresented) {
+        .sheet(isPresented: paywallPresented) {
             PaywallView()
                 .presentationDetents([paywallPresentationDetent])
-        }
-        .onChange(of: isPaywallPresented) { _, presented in
-            settingsVM.isPaywallPresented = presented
-        }
-        .onChange(of: settingsVM.isPaywallPresented) { _, presented in
-            isPaywallPresented = presented
         }
         .animation(
             .easeInOut(duration: 0.25),
@@ -217,8 +210,14 @@ struct RootTabsView: View {
     @Injected private var settingsVM: SettingsManaging
     @Environment(\.themeManager) private var theme
     @Environment(AppCoordinator.self) private var coordinator
-    @State private var isPaywallPresented: Bool = false
     @State private var isExpandedPlayerPresented: Bool = false
+
+    private var paywallPresented: Binding<Bool> {
+        Binding(
+            get: { settingsVM.isPaywallPresented },
+            set: { settingsVM.isPaywallPresented = $0 }
+        )
+    }
 
     private var paywallPresentationDetent: PresentationDetent {
         .fraction(screenHeight > GlobalConstants.Screen.seHeight ? 0.58 : 0.78)

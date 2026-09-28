@@ -150,7 +150,6 @@ struct SettingsView: View {
                 }
                 .listSectionSpacing(.compact)
                 .environment(\.defaultMinListRowHeight, 1)
-                .id(languageVM.refreshID)
             }
             .padding(
                 .top,
