@@ -113,6 +113,7 @@ struct FeedbackSheetView: View {
         static let ratingEmojiSize: CGFloat = 34
         static let ratingButtonSize: CGFloat = 44
         static let ratingSpacing: CGFloat = 8
+        static let commentFontSize: CGFloat = 18
         static let disabledButtonOpacity: Double = 0.8
         static let successDisplayDuration: Duration = .milliseconds(1500)
     }
@@ -135,7 +136,7 @@ struct FeedbackSheetView: View {
             .focused($isCommentFocused)
             .lineLimit(4 ... 8)
             .padding(12)
-            .font(.system(size: 20))
+            .font(.satoshi.regular.size(Constants.commentFontSize))
             .background(
                 RoundedRectangle(cornerRadius: 10)
                     .strokeBorder(Color.secondary.opacity(0.35), lineWidth: 1)
