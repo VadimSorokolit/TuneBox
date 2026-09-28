@@ -55,10 +55,17 @@ final class FeedbackService: FeedbackServicing {
             .collection(Constants.collectionName)
             .addDocument(data: firestoreData)
 
+        let ratingLine: String = {
+            if rating > 0 || !ratingLabel.isEmpty || !emoji.isEmpty {
+                return "- Rating: \(rating) \(ratingLabel) \(emoji)".trimmingCharacters(in: .whitespaces)
+            }
+            return "- Rating: —"
+        }()
+
         // Email notify — best effort; never fail the user flow.
         let message = """
         Feedback
-        - Rating: \(rating) \(ratingLabel) \(emoji)
+        \(ratingLine)
         - Comment: \(trimmedComment.isEmpty ? "—" : trimmedComment)
 
         App
@@ -73,9 +80,15 @@ final class FeedbackService: FeedbackServicing {
         - Time Zone: \(displayOrDash(timeZoneIdentifier))
         """
 
+        let ratingDisplay = [emoji, ratingLabel]
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+        let subjectSuffix = ratingDisplay.isEmpty ? "Comment" : ratingDisplay
+
         await sendWeb3FormsEmail(
             message: message,
-            subject: "TuneBox Feedback — \(emoji) \(ratingLabel)"
+            subject: "TuneBox Feedback — \(subjectSuffix)"
         )
     }
 

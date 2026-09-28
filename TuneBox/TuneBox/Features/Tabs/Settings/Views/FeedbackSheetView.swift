@@ -51,10 +51,12 @@ struct FeedbackSheetView: View {
     @State private var didSubmit = false
     @State private var errorMessage: String?
 
+    private var trimmedComment: String {
+        comment.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     private var canSubmit: Bool {
-        selectedRating != nil
-            && !comment.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-            && !isSubmitting
+        (selectedRating != nil || !trimmedComment.isEmpty) && !isSubmitting
     }
 
     private enum Satisfaction: Int, CaseIterable, Identifiable {
@@ -62,7 +64,6 @@ struct FeedbackSheetView: View {
         case meh
         case okay
         case happy
-        case veryHappy
         case loveIt
 
         var id: Int { rawValue }
@@ -70,19 +71,16 @@ struct FeedbackSheetView: View {
         var emoji: String {
             switch self {
                 case .unhappy:
-                    "😕"
+                    "🙁"
 
                 case .meh:
-                    "🙁"
+                    "😐"
 
                 case .okay:
                     "🙂"
 
                 case .happy:
                     "😊"
-
-                case .veryHappy:
-                    "😄"
 
                 case .loveIt:
                     "🤩"
@@ -103,9 +101,6 @@ struct FeedbackSheetView: View {
                 case .happy:
                     L10n.Feedback.happy
 
-                case .veryHappy:
-                    L10n.Feedback.veryHappy
-
                 case .loveIt:
                     L10n.Feedback.loveIt
             }
@@ -118,7 +113,6 @@ struct FeedbackSheetView: View {
         static let ratingEmojiSize: CGFloat = 34
         static let ratingButtonSize: CGFloat = 44
         static let ratingSpacing: CGFloat = 8
-        static let unselectedOpacity: Double = 0.45
         static let disabledButtonOpacity: Double = 0.8
         static let successDisplayDuration: Duration = .milliseconds(1500)
     }
@@ -232,8 +226,6 @@ struct FeedbackSheetView: View {
                     } label: {
                         Text(rating.emoji)
                             .font(.system(size: Constants.ratingEmojiSize))
-                            .grayscale(isSelected ? 0 : 1)
-                            .opacity(isSelected ? 1 : Constants.unselectedOpacity)
                             .frame(size: Constants.ratingButtonSize)
                             .scaleEffect(isSelected ? Constants.selectedScale : 1)
                             .overlay {
@@ -264,7 +256,7 @@ struct FeedbackSheetView: View {
 
     @MainActor
     private func submit() async {
-        guard canSubmit, let selectedRating else { return }
+        guard canSubmit else { return }
 
         errorMessage = nil
         isSubmitting = true
@@ -272,9 +264,9 @@ struct FeedbackSheetView: View {
 
         do {
             try await settingsVM.submitFeedback(
-                rating: selectedRating.rawValue,
-                ratingLabel: selectedRating.label,
-                emoji: selectedRating.emoji,
+                rating: selectedRating?.rawValue ?? 0,
+                ratingLabel: selectedRating?.label ?? "",
+                emoji: selectedRating?.emoji ?? "",
                 comment: comment
             )
             didSubmit = true
