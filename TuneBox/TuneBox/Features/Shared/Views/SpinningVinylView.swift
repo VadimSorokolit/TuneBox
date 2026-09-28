@@ -129,8 +129,12 @@ struct SpinningVinylView: View, Equatable {
             onTap?()
         }
         .task(id: track.imagePath) {
-            self.coverImage = nil
-            self.coverImage = await CoverImageLoader.image(for: track.imagePath)
+            guard let path = track.imagePath else {
+                self.coverImage = nil
+                return
+            }
+
+            self.coverImage = await CoverImageLoader.image(for: path)
         }
     }
 
