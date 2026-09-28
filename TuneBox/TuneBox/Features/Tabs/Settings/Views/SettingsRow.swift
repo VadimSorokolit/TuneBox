@@ -17,6 +17,7 @@ struct SettingsRow: View {
     var value: String?
     var trailingText: String?
     var systemImage = "chevron.right"
+    var systemImageSize: CGFloat = 13
     var showsSystemImage: Bool = true
     var isDisabled: Bool = false
     var action: (() -> Void)?
@@ -29,6 +30,7 @@ struct SettingsRow: View {
         value: String? = nil,
         trailingText: String? = nil,
         systemImage: String = "chevron.right",
+        systemImageSize: CGFloat = 13,
         showsSystemImage: Bool = true,
         isDisabled: Bool = false,
         action: (() -> Void)? = nil
@@ -38,6 +40,7 @@ struct SettingsRow: View {
         self.value = value
         self.trailingText = trailingText
         self.systemImage = systemImage
+        self.systemImageSize = systemImageSize
         self.showsSystemImage = showsSystemImage
         self.isDisabled = isDisabled
         self.action = action
@@ -60,6 +63,7 @@ struct SettingsRow: View {
         self.showsSystemImage = true
         self.isDisabled = isDisabled
         self.action = nil
+        self.systemImageSize = 13
         self.menu = UIMenu(
             children: options.map { value, title in
                 UIAction(
@@ -150,7 +154,7 @@ struct SettingsRow: View {
                 }
 
                 Image(systemName: systemImage)
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.system(size: systemImageSize, weight: .semibold))
                     .foregroundStyle(.tertiary)
                     .fixedSize()
             }

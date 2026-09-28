@@ -241,7 +241,7 @@ struct ImportsView: View {
                                         font: .system(size: 14, weight: .bold),
                                         background: .clear,
                                         foregroundStyle: .gray,
-                                        topPadding: 20,
+                                        topPadding: Constants.sectionHeaderTopPadding,
                                         bottomPadding: 0
                                     )
                                 }
@@ -277,6 +277,10 @@ struct ImportsView: View {
 
         @State private var dragStartIndex: Int?
         @State private var dragSectionKind: ImportSection?
+
+        private enum Constants {
+            static let sectionHeaderTopPadding: CGFloat = 30
+        }
 
         // MARK: - Private. Methods
 

@@ -134,12 +134,16 @@ final class SettingsViewModel: SettingsManaging {
         self.isPaywallPresented = false
     }
 
-    var termsOfUseURL: URL {
-        URL(string: Constants.termsOfUseURL)!
+    var shareURL: URL? {
+        Constants.appStoreURL ?? privacyPolicyURL
+    }
+
+    var termsOfUseURL: URL? {
+        URL(string: Constants.termsOfUseURL) ?? Constants.fallbackURL
     }
 
     var privacyPolicyURL: URL? {
-        URL(string: Constants.privacyPolicyURL)
+        URL(string: Constants.privacyPolicyURL) ?? Constants.fallbackURL
     }
 
     func startSleepTimer(hours: Int, minutes: Int) {
@@ -228,6 +232,9 @@ final class SettingsViewModel: SettingsManaging {
             "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
         static let privacyPolicyURL =
             "https://sites.google.com/view/tunebox-privacy-policy/privacy"
+        /// Set when App Store page exists.
+        static let appStoreURL: URL? = nil
+        static let fallbackURL = URL(string: "https://www.google.com.ua")
     }
 
     @ObservationIgnored

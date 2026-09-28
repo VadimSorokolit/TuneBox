@@ -150,7 +150,7 @@ struct PaywallView: View {
                     }
                 }
             }
-            .padding(.top, 20)
+            .padding(.top, 40)
         }
 
         private var appIcon: some View {
@@ -270,8 +270,8 @@ struct PaywallView: View {
         }
 
         private var footerButtons: some View {
-            HStack(spacing: 0) {
-                FooterCapsuleButton(
+            FooterButtonsRow(
+                restore: FooterCapsuleButton(
                     title: L10n.Paywall.restore,
                     foreground: theme.tokens.primaryText,
                     action: {
@@ -282,29 +282,22 @@ struct PaywallView: View {
                             }
                         }
                     }
-                )
-
-                Spacer(minLength: 8)
-
-                FooterCapsuleButton(
+                ),
+                terms: FooterCapsuleButton(
                     title: L10n.Paywall.terms,
                     foreground: theme.tokens.primaryText,
-                    action: { openURL(settingsVM.termsOfUseURL) }
-                )
-
-                Spacer(minLength: 8)
-
-                FooterCapsuleButton(
+                    action: {
+                        settingsVM.termsOfUseURL.map { openURL($0) }
+                    }
+                ),
+                privacy: FooterCapsuleButton(
                     title: L10n.Paywall.privacy,
                     foreground: theme.tokens.primaryText,
                     action: {
-                        if let url = settingsVM.privacyPolicyURL {
-                            openURL(url)
-                        }
+                        settingsVM.privacyPolicyURL.map { openURL($0) }
                     }
                 )
-            }
-            .footerEqualButtonLayout()
+            )
             .padding(.bottom, 38)
         }
     }
@@ -312,6 +305,66 @@ struct PaywallView: View {
 }
 
 // MARK: - Footer Buttons
+
+private enum FooterButtonsMetrics {
+    static let spacing: CGFloat = 8
+}
+
+private struct FooterButtonsRow<Restore: View, Terms: View, Privacy: View>: View {
+    let restore: Restore
+    let terms: Terms
+    let privacy: Privacy
+
+    @State private var containerWidth: CGFloat = 0
+    @State private var maxNaturalWidth: CGFloat = 0
+    @State private var equalHeight: CGFloat = 0
+
+    private var fitsNaturally: Bool {
+        guard containerWidth > 0, maxNaturalWidth > 0 else { return true }
+        return maxNaturalWidth * 3 + FooterButtonsMetrics.spacing * 2 <= containerWidth
+    }
+
+    private var maxButtonWidth: CGFloat {
+        guard containerWidth > 0, maxNaturalWidth > 0 else { return 0 }
+        if fitsNaturally {
+            return maxNaturalWidth
+        }
+        return max(0, (containerWidth - FooterButtonsMetrics.spacing * 2) / 3)
+    }
+
+    var body: some View {
+        Group {
+            if fitsNaturally {
+                HStack(spacing: 0) {
+                    restore
+                    Spacer(minLength: FooterButtonsMetrics.spacing)
+                    terms
+                    Spacer(minLength: FooterButtonsMetrics.spacing)
+                    privacy
+                }
+            } else {
+                HStack(spacing: FooterButtonsMetrics.spacing) {
+                    restore
+                    terms
+                    privacy
+                }
+            }
+        }
+        .background {
+            GeometryReader { proxy in
+                Color.clear.preference(
+                    key: FooterContainerWidthKey.self,
+                    value: proxy.size.width
+                )
+            }
+        }
+        .onPreferenceChange(FooterContainerWidthKey.self) { containerWidth = $0 }
+        .onPreferenceChange(FooterNaturalWidthKey.self) { maxNaturalWidth = $0 }
+        .onPreferenceChange(FooterEqualHeightKey.self) { equalHeight = $0 }
+        .environment(\.footerMaxButtonWidth, maxButtonWidth)
+        .environment(\.footerEqualButtonHeight, equalHeight)
+    }
+}
 
 private struct FooterCapsuleButton: View {
     let title: String
@@ -330,12 +383,29 @@ private struct FooterCapsuleButton: View {
                 .lineLimit(2)
                 .minimumScaleFactor(0.75)
                 .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .frame(maxWidth: maxButtonWidth > 0 ? maxButtonWidth : nil)
+                .padding(.vertical, 12)
+                .frame(width: maxButtonWidth > 0 ? maxButtonWidth : nil)
+                .frame(height: equalHeight > 0 ? equalHeight : nil)
                 .background {
                     Color.clear.footerEqualHeightReader()
                 }
-                .frame(height: equalHeight > 0 ? equalHeight : nil)
+                .background(alignment: .leading) {
+                    Text(title)
+                        .font(.satoshi.medium.size(14))
+                        .lineLimit(1)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 12)
+                        .fixedSize(horizontal: true, vertical: false)
+                        .hidden()
+                        .overlay {
+                            GeometryReader { proxy in
+                                Color.clear.preference(
+                                    key: FooterNaturalWidthKey.self,
+                                    value: proxy.size.width
+                                )
+                            }
+                        }
+                }
         }
         .buttonStyle(.plain)
         .glassEffect(.regular.interactive(), in: .capsule)
@@ -343,6 +413,14 @@ private struct FooterCapsuleButton: View {
 }
 
 private struct FooterEqualHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
+}
+
+private struct FooterNaturalWidthKey: PreferenceKey {
     static var defaultValue: CGFloat = 0
 
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
@@ -366,42 +444,6 @@ private extension View {
                 value: proxy.size.height
             )
         }
-    }
-
-    func footerEqualButtonLayout() -> some View {
-        modifier(FooterEqualButtonLayoutModifier())
-    }
-}
-
-private struct FooterEqualButtonLayoutModifier: ViewModifier {
-    private static let spacing: CGFloat = 8
-    private static let buttonCount: CGFloat = 3
-
-    @State private var containerWidth: CGFloat = 0
-    @State private var equalHeight: CGFloat = 0
-
-    private var maxButtonWidth: CGFloat {
-        guard containerWidth > 0 else { return 0 }
-        return max(
-            0,
-            (containerWidth - Self.spacing * (Self.buttonCount - 1)) / Self.buttonCount
-        )
-    }
-
-    func body(content: Content) -> some View {
-        content
-            .background {
-                GeometryReader { proxy in
-                    Color.clear.preference(
-                        key: FooterContainerWidthKey.self,
-                        value: proxy.size.width
-                    )
-                }
-            }
-            .onPreferenceChange(FooterContainerWidthKey.self) { containerWidth = $0 }
-            .onPreferenceChange(FooterEqualHeightKey.self) { equalHeight = $0 }
-            .environment(\.footerMaxButtonWidth, maxButtonWidth)
-            .environment(\.footerEqualButtonHeight, equalHeight)
     }
 }
 

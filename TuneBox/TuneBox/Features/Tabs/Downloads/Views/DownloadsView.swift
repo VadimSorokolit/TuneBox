@@ -72,6 +72,10 @@ struct DownloadsView: View {
     @FocusState private var isSearchFieldFocused: Bool
     @State private var searchQuery: String = ""
 
+    private enum Constants {
+        static let sectionHeaderTopPadding: CGFloat = 20
+    }
+
     // MARK: - Subviews. Private
 
     private struct HeaderView: View {
@@ -169,7 +173,10 @@ struct DownloadsView: View {
                         }
                     }
                 } header: {
-                    sectionTracksTitle(section.title)
+                    sectionTracksTitle(
+                        section.title,
+                        topPadding: Constants.sectionHeaderTopPadding
+                    )
                 }
             }
         }
@@ -195,7 +202,10 @@ struct DownloadsView: View {
                         .padding(.horizontal)
                     }
                 } header: {
-                    sectionTracksTitle(section.title)
+                    sectionTracksTitle(
+                        section.title,
+                        topPadding: Constants.sectionHeaderTopPadding
+                    )
                 }
             }
         }
@@ -222,7 +232,11 @@ struct DownloadsView: View {
                         .scrollTargetLayout()
                     },
                     header: {
-                        sectionTracksTitle(section.title, suffix: transferManagingVM.sectionTitleSuffix)
+                        sectionTracksTitle(
+                            section.title,
+                            suffix: transferManagingVM.sectionTitleSuffix,
+                            topPadding: Constants.sectionHeaderTopPadding
+                        )
                     }
                 )
             }

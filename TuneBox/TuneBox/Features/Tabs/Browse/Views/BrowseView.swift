@@ -26,6 +26,7 @@ struct BrowseView: View {
                     transferManagingVM.clearSearchState()
                 }
             )
+            .padding(.bottom, Constants.searchToChipsSpacing)
 
             ContentView(
                 slideDirection: $slideDirection,
@@ -62,6 +63,12 @@ struct BrowseView: View {
     @FocusState private var isSearchFieldFocused: Bool
     @State private var slideDirection: SlideDirection = .forward
     @State private var searchQuery: String = ""
+
+    private enum Constants {
+        static let searchToChipsSpacing: CGFloat = 8
+        static let featuredSectionHeaderTopPadding: CGFloat = 32
+        static let featuredCarouselBottomPadding: CGFloat = 22
+    }
 
     // MARK: - Subviews. Private
 
@@ -257,7 +264,7 @@ struct BrowseView: View {
                                         style: .carousel
                                     )
                                 }
-                                .padding(.bottom, 12)
+                                .padding(.bottom, Constants.featuredCarouselBottomPadding)
                                 .padding(.horizontal)
                                 .id("featuredLeft")
                             }
@@ -270,7 +277,10 @@ struct BrowseView: View {
                         }
                     },
                     header: {
-                        sectionTracksTitle(section.title)
+                        sectionTracksTitle(
+                            section.title,
+                            topPadding: Constants.featuredSectionHeaderTopPadding
+                        )
                     }
                 )
             }

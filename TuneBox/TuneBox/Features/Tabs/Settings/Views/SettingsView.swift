@@ -61,6 +61,11 @@ struct SettingsView: View {
     @State private var isFeedbackPresented = false
     @State private var isSleepTimerPresented = false
 
+    private enum Constants {
+        static let formTopPadding: CGFloat = 16
+        static let subsequentSectionHeaderTopPadding: CGFloat = 10
+    }
+
     // MARK: - Objects. Private
 
     private struct HeaderView: View {
@@ -118,7 +123,10 @@ struct SettingsView: View {
                         )
                     }
 
-                    Section(header: Text(L10n.Settings.playback)) {
+                    Section(
+                        header: Text(L10n.Settings.playback)
+                            .padding(.top, Constants.subsequentSectionHeaderTopPadding)
+                    ) {
                         SettingsRow(
                             title: L10n.Settings.sleepTimer,
                             value: settingsVM.sleepTimerTrailingText,
@@ -128,7 +136,10 @@ struct SettingsView: View {
                         }
                     }
 
-                    Section(header: Text(L10n.Settings.about)) {
+                    Section(
+                        header: Text(L10n.Settings.about)
+                            .padding(.top, Constants.subsequentSectionHeaderTopPadding)
+                    ) {
                         SettingsRow(title: L10n.Settings.appInfo) {
                             path.append(.about)
                         }
@@ -138,7 +149,7 @@ struct SettingsView: View {
                 .environment(\.defaultMinListRowHeight, 1)
                 .id(languageVM.refreshID)
             }
-            .padding(.top, 10)
+            .padding(.top, Constants.formTopPadding)
             .onAppear {
                 tabsMode = rootTabsVM.tabsMode
                 defaultTab = rootTabsVM.defaultTab

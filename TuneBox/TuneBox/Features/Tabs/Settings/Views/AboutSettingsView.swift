@@ -21,42 +21,45 @@ struct AboutSettingsView: View {
             Section {
                 SettingsRow(
                     title: L10n.Settings.license,
-                    systemImage: "checkmark.seal.fill"
+                    systemImage: "checkmark.seal.fill",
+                    systemImageSize: Constants.rowIconSize
                 ) {
                     settingsVM.presentPaywall()
                 }
 
                 SettingsRow(
                     title: L10n.Settings.shareFeedback,
-                    systemImage: "square.and.pencil"
+                    systemImage: "square.and.pencil",
+                    systemImageSize: Constants.rowIconSize
                 ) {
                     isFeedbackPresented = true
                 }
 
-                ShareLink(
-                    item: Constants.shareAppURL,
-                    subject: Text(Constants.shareAppTitle),
-                    message: Text(L10n.Settings.shareMessage),
-                    preview: SharePreview(
-                        Constants.shareAppTitle,
-                        image: Image(Constants.shareAppImageName)
-                    )
-                ) {
-                    SettingsRow(
-                        title: L10n.Settings.share,
-                        systemImage: "square.and.arrow.up"
-                    )
+                settingsVM.shareURL.map { shareURL in
+                    ShareLink(
+                        item: shareURL,
+                        subject: Text(Constants.shareAppTitle),
+                        message: Text(L10n.Settings.shareMessage),
+                        preview: SharePreview(
+                            Constants.shareAppTitle,
+                            image: Image(Constants.shareAppImageName)
+                        )
+                    ) {
+                        SettingsRow(
+                            title: L10n.Settings.share,
+                            systemImage: "square.and.arrow.up",
+                            systemImageSize: Constants.rowIconSize
+                        )
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
 
                 SettingsRow(title: L10n.Settings.privacy) {
-                    if let url = settingsVM.privacyPolicyURL {
-                        openURL(url)
-                    }
+                    settingsVM.privacyPolicyURL.map { openURL($0) }
                 }
 
                 SettingsRow(title: L10n.Settings.terms) {
-                    openURL(settingsVM.termsOfUseURL)
+                    settingsVM.termsOfUseURL.map { openURL($0) }
                 }
 
                 SettingsRow(
@@ -78,8 +81,7 @@ struct AboutSettingsView: View {
     private enum Constants {
         static let shareAppTitle = "TuneBox"
         static let shareAppImageName = "Paywall"
-        /// Replace with the real App Store ID when available.
-        static let shareAppURL = URL(string: "https://apps.apple.com/app/tunebox/id000000000")!
+        static let rowIconSize: CGFloat = 19.5
     }
 }
 

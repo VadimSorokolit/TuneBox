@@ -30,7 +30,8 @@ protocol SettingsManaging: LoadStateManaging {
     func dismissError()
     func presentPaywall()
     func dismissPaywall()
-    var termsOfUseURL: URL { get }
+    var shareURL: URL? { get }
+    var termsOfUseURL: URL? { get }
     var privacyPolicyURL: URL? { get }
     var isSleepTimerActive: Bool { get }
     var sleepTimerTrailingText: String { get }
