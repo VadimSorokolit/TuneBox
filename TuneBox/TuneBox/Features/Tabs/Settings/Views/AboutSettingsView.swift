@@ -35,24 +35,7 @@ struct AboutSettingsView: View {
                     isFeedbackPresented = true
                 }
 
-                settingsVM.shareURL.map { shareURL in
-                    ShareLink(
-                        item: shareURL,
-                        subject: Text(Constants.shareAppTitle),
-                        message: Text(L10n.Settings.shareMessage),
-                        preview: SharePreview(
-                            Constants.shareAppTitle,
-                            image: Image(Constants.shareAppImageName)
-                        )
-                    ) {
-                        SettingsRow(
-                            title: L10n.Settings.share,
-                            systemImage: "square.and.arrow.up",
-                            systemImageSize: Constants.rowIconSize
-                        )
-                    }
-                    .buttonStyle(.plain)
-                }
+                shareRow
 
                 SettingsRow(title: L10n.Settings.privacy) {
                     settingsVM.privacyPolicyURL.map { openURL($0) }
@@ -78,9 +61,37 @@ struct AboutSettingsView: View {
 
     @Environment(\.openURL) private var openURL
 
+    @ViewBuilder
+    private var shareRow: some View {
+        if let appStoreURL = settingsVM.shareURL {
+            ShareLink(
+                item: appStoreURL,
+                subject: Text(Constants.shareAppTitle),
+                message: Text(L10n.Settings.shareMessage)
+            ) {
+                shareSettingsRow
+            }
+            .buttonStyle(.plain)
+        } else if let privacyURL = settingsVM.privacyPolicyURL {
+            ShareLink(
+                item: "\(L10n.Settings.shareMessage)\n\(privacyURL.absoluteString)"
+            ) {
+                shareSettingsRow
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private var shareSettingsRow: some View {
+        SettingsRow(
+            title: L10n.Settings.share,
+            systemImage: "square.and.arrow.up",
+            systemImageSize: Constants.rowIconSize
+        )
+    }
+
     private enum Constants {
         static let shareAppTitle = "TuneBox"
-        static let shareAppImageName = "Paywall"
         static let rowIconSize: CGFloat = 19.5
     }
 }

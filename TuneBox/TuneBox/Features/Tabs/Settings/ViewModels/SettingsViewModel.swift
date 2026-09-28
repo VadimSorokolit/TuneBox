@@ -135,7 +135,7 @@ final class SettingsViewModel: SettingsManaging {
     }
 
     var shareURL: URL? {
-        Constants.appStoreURL ?? privacyPolicyURL
+        Constants.appStoreURL
     }
 
     var termsOfUseURL: URL? {
