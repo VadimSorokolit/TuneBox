@@ -236,7 +236,7 @@ struct BrowseView: View {
                     content: {
                         ScrollViewReader { horizontalProxy in
                             ScrollView(.horizontal, showsIndicators: true) {
-                                LazyHStack(spacing: 8) {
+                                LazyHStack(alignment: .top, spacing: 8) {
                                     ForEach(section.tracks, id: \.id) { track in
                                         GenreCell(
                                             track: track,

@@ -14,7 +14,7 @@ struct EmptyGenreCell: View {
     var body: some View {
         RoundedRectangle(cornerRadius: cornerRadius)
             .fill(Color(.secondarySystemBackground))
-            .frame(width: 100, height: 200)
+            .frame(width: 110, height: 230)
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius)
                     .stroke(Color(.separator), lineWidth: borderWidth)

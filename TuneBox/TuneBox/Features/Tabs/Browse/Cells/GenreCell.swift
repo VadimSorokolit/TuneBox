@@ -16,8 +16,8 @@ struct GenreCellConfiguration {
     var padding: CGFloat = 8
     var showDuration: Bool = true
     var showDownloadButton: Bool = true
-    var titleLineLimit: Int = 1
-    var subtitleLineLimit: Int = 1
+    var titleLineLimit: Int = 2
+    var subtitleLineLimit: Int = 2
     var showSubtitle: Bool = true
 }
 
@@ -26,29 +26,59 @@ struct GenreCell: View {
     let onButtonTap: () -> Void
     var configuration: GenreCellConfiguration = .init()
 
+    private enum Constants {
+        static let width: CGFloat = 110
+        static let height: CGFloat = 230
+        static let textLineHeight: CGFloat = 17
+        static let textBlockSpacing: CGFloat = 2
+    }
+
+    private var imageSide: CGFloat {
+        Constants.width - configuration.padding * 2
+    }
+
+    /// Fixed slot for title + subtitle so covers/bottom stay aligned.
+    /// Short title lets subtitle sit higher inside the same block.
+    private var textBlockHeight: CGFloat {
+        let titleHeight = Constants.textLineHeight * CGFloat(configuration.titleLineLimit)
+        guard configuration.showSubtitle else { return titleHeight }
+        let subtitleHeight = Constants.textLineHeight * CGFloat(configuration.subtitleLineLimit)
+        return titleHeight + Constants.textBlockSpacing + subtitleHeight
+    }
+
     var body: some View {
         ZStack {
             EmptyGenreCell()
 
             VStack(alignment: .leading, spacing: configuration.spacing) {
                 trackImage
-                    .aspectRatio(configuration.imageAspectRatio, contentMode: .fill)
-                    .frame(maxWidth: .infinity)
+                    .frame(width: imageSide, height: imageSide)
+                    .clipped()
                     .clipShape(RoundedRectangle(cornerRadius: configuration.imageCornerRadius))
 
-                Text(track.songName)
-                    .font(.satoshi.medium.size(14))
-                    .foregroundStyle(.primary)
-                    .lineLimit(configuration.titleLineLimit)
+                VStack(alignment: .leading, spacing: Constants.textBlockSpacing) {
+                    Text(track.songName)
+                        .font(.satoshi.medium.size(GlobalConstants.TrackCell.primaryTextSize))
+                        .foregroundStyle(.primary)
+                        .lineLimit(configuration.titleLineLimit)
+                        .multilineTextAlignment(.leading)
 
-                if configuration.showSubtitle {
-                    Text(track.albumName)
-                        .font(.satoshi.medium.size(12))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(configuration.subtitleLineLimit)
+                    if configuration.showSubtitle {
+                        Text(track.albumName)
+                            .font(.satoshi.medium.size(GlobalConstants.TrackCell.primaryTextSize))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(configuration.subtitleLineLimit)
+                            .multilineTextAlignment(.leading)
+                    }
                 }
+                .frame(
+                    maxWidth: .infinity,
+                    minHeight: textBlockHeight,
+                    maxHeight: textBlockHeight,
+                    alignment: .topLeading
+                )
 
-                Spacer()
+                Spacer(minLength: 0)
 
                 if configuration.showDuration || configuration.showDownloadButton {
                     bottomRow
@@ -56,7 +86,7 @@ struct GenreCell: View {
             }
             .padding(configuration.padding)
         }
-        .frame(width: 100, height: 200)
+        .frame(width: Constants.width, height: Constants.height, alignment: .top)
     }
 
     private var cellBackground: some View {
@@ -72,7 +102,7 @@ struct GenreCell: View {
         HStack {
             if configuration.showDuration {
                 Text(track.formattedDuration)
-                    .font(.jetBrainsMono.regular.size(10))
+                    .font(.jetBrainsMono.regular.size(GlobalConstants.TrackCell.durationTextSize))
                     .foregroundStyle(.secondary)
             }
 
@@ -90,7 +120,6 @@ struct GenreCell: View {
 
     private var downloadButton: some View {
         let progress = min(max(track.downloadingProgress, 0), 1)
-        let buttonSize: CGFloat = 25
 
         return ZStack {
             if track.downloadState != .completed,
@@ -108,11 +137,11 @@ struct GenreCell: View {
             }
 
             stateImage
-                .font(.system(size: 14, weight: .medium))
+                .font(.system(size: GlobalConstants.TrackCell.actionButtonIconSize, weight: .medium))
                 .foregroundStyle(iconColor)
-                .frame(size: buttonSize)
+                .frame(size: GlobalConstants.TrackCell.actionButtonSize)
         }
-        .frame(size: buttonSize)
+        .frame(size: GlobalConstants.TrackCell.actionButtonSize)
     }
 
     private var accessibilityLabel: String {
@@ -181,7 +210,9 @@ struct GenreCell: View {
     private var trackImage: some View {
         if let url = track.imageURL {
             WebImage(url: url) { image in
-                image.resizable().scaledToFill()
+                image
+                    .resizable()
+                    .scaledToFill()
             } placeholder: {
                 placeholder
             }

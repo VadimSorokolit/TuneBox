@@ -51,7 +51,7 @@ struct TrackCell: View {
                             text: track.songName,
                             searchQuery: searchQuery
                         )
-                        .font(.satoshi.medium.size(12))
+                        .font(.satoshi.medium.size(GlobalConstants.TrackCell.primaryTextSize))
                         .lineLimit(2)
 
                         HStack(spacing: 6) {
@@ -59,17 +59,17 @@ struct TrackCell: View {
                                 text: track.artistName,
                                 searchQuery: searchQuery
                             )
-                            .font(.satoshi.medium.size(12))
+                            .font(.satoshi.medium.size(GlobalConstants.TrackCell.primaryTextSize))
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
 
                             Text("•")
-                                .font(.satoshi.medium.size(12))
+                                .font(.satoshi.medium.size(GlobalConstants.TrackCell.primaryTextSize))
                                 .foregroundStyle(.secondary)
                                 .lineLimit(1)
 
                             Text("\(track.formattedDuration)")
-                                .font(.jetBrainsMono.regular.size(10))
+                                .font(.jetBrainsMono.regular.size(GlobalConstants.TrackCell.durationTextSize))
                                 .foregroundStyle(.secondary)
                                 .lineLimit(1)
                         }
@@ -110,10 +110,10 @@ struct TrackCell: View {
                     } label: {
                         Circle()
                             .fill(.clear)
-                            .frame(width: 24, height: 24)
+                            .frame(size: Constants.menuButtonSize)
                             .overlay {
                                 Image(systemName: "ellipsis")
-                                    .font(.system(size: 20, weight: .regular))
+                                    .font(.system(size: Constants.menuIconSize, weight: .regular))
                                     .foregroundColor(.black)
                             }
                     }
@@ -151,10 +151,10 @@ struct TrackCell: View {
                                 }
 
                                 buttonImage
-                                    .font(.system(size: 14, weight: .medium))
-                                    .frame(size: 25)
+                                    .font(.system(size: GlobalConstants.TrackCell.actionButtonIconSize, weight: .medium))
+                                    .frame(size: GlobalConstants.TrackCell.actionButtonSize)
                             }
-                            .frame(size: 25)
+                            .frame(size: GlobalConstants.TrackCell.actionButtonSize)
                         }
                     )
                     .accessibilityHint(accessibilityLabel)
@@ -184,9 +184,14 @@ struct TrackCell: View {
     private let onEditAudioTagsTap: (() -> Void)?
     private let onDeleteFromPlaylistTap: (() -> Void)?
     private let onDeleteFromDeviceTap: () -> Void
-    private let cellCornerRadius: CGFloat = 10
-    private let imageSize: CGFloat = 45
-    private let imageCornerRadius: CGFloat = 10
+
+    private enum Constants {
+        static let cellCornerRadius: CGFloat = 10
+        static let imageSize: CGFloat = 45
+        static let imageCornerRadius: CGFloat = 10
+        static let menuIconSize: CGFloat = 20
+        static let menuButtonSize: CGFloat = 26
+    }
 
     private var accessibilityLabel: String {
         switch track.downloadState {
@@ -221,8 +226,8 @@ struct TrackCell: View {
             Image(uiImage: image)
                 .resizable()
                 .scaledToFit()
-                .frame(size: imageSize)
-                .clipShape(RoundedRectangle(cornerRadius: imageCornerRadius))
+                .frame(size: Constants.imageSize)
+                .clipShape(RoundedRectangle(cornerRadius: Constants.imageCornerRadius))
         } else if let url = track.imageURL {
             WebImage(
                 url: url,
@@ -235,11 +240,11 @@ struct TrackCell: View {
                     customPlaceholder
                 }
             )
-            .frame(size: imageSize)
-            .clipShape(RoundedRectangle(cornerRadius: imageCornerRadius))
+            .frame(size: Constants.imageSize)
+            .clipShape(RoundedRectangle(cornerRadius: Constants.imageCornerRadius))
         } else {
             customPlaceholder
-                .clipShape(RoundedRectangle(cornerRadius: imageCornerRadius))
+                .clipShape(RoundedRectangle(cornerRadius: Constants.imageCornerRadius))
         }
     }
 
@@ -249,7 +254,7 @@ struct TrackCell: View {
             .scaledToFit()
             .padding(16)
             .foregroundStyle(.secondary)
-            .frame(size: imageSize)
+            .frame(size: Constants.imageSize)
             .background(Color.gray.opacity(0.1))
     }
 

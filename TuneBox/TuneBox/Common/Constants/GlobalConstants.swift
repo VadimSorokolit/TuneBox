@@ -65,4 +65,11 @@ enum GlobalConstants {
         static let titleFont: Font = .system(size: 16, weight: .medium)
         static let subtitleFont: Font = .system(size: 10, weight: .regular)
     }
+
+    enum TrackCell {
+        static let primaryTextSize: CGFloat = 13
+        static let durationTextSize: CGFloat = 11
+        static let actionButtonIconSize: CGFloat = 16
+        static let actionButtonSize: CGFloat = 28
+    }
 }

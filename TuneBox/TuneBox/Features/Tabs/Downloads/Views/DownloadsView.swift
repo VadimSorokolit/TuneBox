@@ -187,7 +187,7 @@ struct DownloadsView: View {
                transferManagingVM.isSearchMode.isFalse {
                 Section {
                     ScrollView(.horizontal, showsIndicators: false) {
-                        LazyHStack(spacing: 4) {
+                        LazyHStack(alignment: .top, spacing: 4) {
                             ForEach(section.tracks, id: \.id) { track in
                                 GenreCell(
                                     track: track,

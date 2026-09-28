@@ -44,7 +44,7 @@ struct PaginationFooterView: View {
                         .multilineTextAlignment(.center)
                 }
                 .foregroundStyle(.secondary)
-                .frame(width: 100, height: 200)
+                .frame(width: 110, height: 230)
                 .background(
                     RoundedRectangle(cornerRadius: 10)
                         .fill(Color(.secondarySystemBackground))
