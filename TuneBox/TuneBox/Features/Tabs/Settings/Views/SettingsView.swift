@@ -62,7 +62,7 @@ struct SettingsView: View {
     @State private var isSleepTimerPresented = false
 
     private enum Constants {
-        static let formTopPadding: CGFloat = 16
+        static let formTopPadding: CGFloat = 12
         static let subsequentSectionHeaderTopPadding: CGFloat = 10
     }
 
@@ -92,7 +92,10 @@ struct SettingsView: View {
         var body: some View {
             VStack(spacing: .zero) {
                 Form {
-                    Section(header: Text(L10n.Settings.appearance)) {
+                    Section(
+                        header: Text(L10n.Settings.appearance)
+                            .padding(.top, Constants.subsequentSectionHeaderTopPadding)
+                    ) {
                         SettingsRow(
                             title: L10n.Settings.theme,
                             trailingText: themeManager.preset.displayName,
@@ -149,7 +152,12 @@ struct SettingsView: View {
                 .environment(\.defaultMinListRowHeight, 1)
                 .id(languageVM.refreshID)
             }
-            .padding(.top, Constants.formTopPadding)
+            .padding(
+                .top,
+                colorScheme == .dark
+                ? 0
+                : Constants.formTopPadding
+            )
             .onAppear {
                 tabsMode = rootTabsVM.tabsMode
                 defaultTab = rootTabsVM.defaultTab
@@ -159,6 +167,7 @@ struct SettingsView: View {
         // MARK: - Properties. Private
 
         @Environment(\.themeManager) private var themeManager
+        @Environment(\.colorScheme) private var colorScheme
         @State private var tabsMode: TabsMode = .allTabs
         @State private var defaultTab: CustomTab = .default
 
