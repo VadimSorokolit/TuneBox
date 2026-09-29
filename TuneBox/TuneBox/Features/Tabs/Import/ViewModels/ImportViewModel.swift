@@ -141,6 +141,11 @@ private struct DeduplicationKey: Hashable {
     let artistName: String
 }
 
+private struct ImportedTrackKey: Hashable {
+    let sourceID: String
+    let relativePath: String
+}
+
 enum ImportItem: Hashable {
     case library(LibraryItem)
     case source(ImportSource.ID)
@@ -164,6 +169,7 @@ final class ImportViewModel: ImportManaging {
     private(set) var sources: [ImportSource] = []
     private(set) var error: String?
     private(set) var isLoading: Bool = false
+    private(set) var importProgress: ImportProgress?
     private(set) var selectedLibraryItems: Set<LibraryItem> = []
     private(set) var selectedSourceIDs: Set<ImportSource.ID> = []
     private(set) var libraryItemsOrder: [LibraryItem] = [.albums, .artists, .tracks, .playlists]
@@ -313,8 +319,14 @@ final class ImportViewModel: ImportManaging {
             return
         }
 
+        let folderTitle = url.lastPathComponent
+        let shownAt = ContinuousClock.now
+        self.isLoading = true
+        self.importProgress = ImportProgress(completed: 0, total: 0, title: folderTitle)
+
         defer {
             url.stopAccessingSecurityScopedResource()
+            self.importedTracksByPath = [:]
         }
 
         do {
@@ -328,15 +340,19 @@ final class ImportViewModel: ImportManaging {
                 ? .sync
                 : .local
 
-            let source = ImportSource(
-                id: UUID(),
-                kind: kind,
-                title: url.lastPathComponent,
-                bookmarkData: bookmarkData
+            let source = self.addOrUpdateSource(
+                ImportSource(
+                    id: UUID(),
+                    kind: kind,
+                    title: folderTitle,
+                    bookmarkData: bookmarkData
+                )
             )
-            self.addOrUpdateSource(source)
+            try self.loadImportedTrackIndex()
 
-            let fileURLs = try self.collectFiles(from: url)
+            let fileURLs = try await Task.detached {
+                try Self.collectFiles(from: url)
+            }.value
 
             let trackFiles = fileURLs.filter { url in
                 guard let ext = AudioFileExtension(rawValue: url.pathExtension.lowercased()) else { return false }
@@ -350,6 +366,15 @@ final class ImportViewModel: ImportManaging {
                 return self.supportedPlaylistExtensions.contains(ext)
             }
 
+            let playlistImports = playlistFiles.compactMap { file -> (url: URL, tracks: [URL])? in
+                let tracks = self.loadPlaylist(from: file)
+                guard tracks.isNotEmpty else { return nil }
+                return (file, tracks)
+            }
+
+            let total = trackFiles.count + playlistImports.reduce(0) { $0 + $1.tracks.count }
+            self.importProgress = ImportProgress(completed: 0, total: total, title: folderTitle)
+
             let sourceID = source.id.uuidString
 
             for file in trackFiles {
@@ -358,10 +383,19 @@ final class ImportViewModel: ImportManaging {
                     importSourceID: sourceID,
                     sourceRootURL: url
                 )
+                self.advanceImportProgress(total: total, title: folderTitle)
             }
 
-            for playlistFile in playlistFiles {
-                await self.importPlaylist(from: playlistFile, importSourceID: sourceID)
+            for playlistImport in playlistImports {
+                await self.importPlaylist(
+                    from: playlistImport.url,
+                    trackURLs: playlistImport.tracks,
+                    importSourceID: sourceID,
+                    sourceRootURL: url,
+                    onTrackImported: {
+                        self.advanceImportProgress(total: total, title: folderTitle)
+                    }
+                )
             }
 
             await self.refreshLibrary()
@@ -371,6 +405,8 @@ final class ImportViewModel: ImportManaging {
             self.analytics.log(.importFolder(success: false, trackCount: 0))
             self.handleError(error)
         }
+
+        await self.dismissImportOverlay(shownAt: shownAt)
     }
 
     func source(for id: ImportSource.ID) -> ImportSource? {
@@ -790,6 +826,7 @@ final class ImportViewModel: ImportManaging {
     private var crashlytics: CrashlyticsServicing
     private var tracksObservationTask: Task<Void, Never>?
     private var tracksChangedObserverID: UUID?
+    private var importedTracksByPath: [ImportedTrackKey: TrackEntity] = [:]
     private let supportedPlaylistExtensions: Set<PlaylistExtension> = [.m3u, .m3u8]
     private let supportedImageExtensions: Set<ImageFileExtension> = [.jpg, .jpeg, .png, .webp, .heic]
     private let supportedTrackExtensions: Set<AudioFileExtension> = [
@@ -938,6 +975,20 @@ final class ImportViewModel: ImportManaging {
             return
         }
 
+        if let relativePath, let importSourceID,
+           let existing = self.importedTracksByPath[
+               ImportedTrackKey(sourceID: importSourceID, relativePath: relativePath)
+           ] {
+            if let playlist {
+                do {
+                    try self.persistenceService.addTrack(existing, to: playlist)
+                } catch {
+                    self.handleError(error)
+                }
+            }
+            return
+        }
+
         do {
             let id = UUID().uuidString
 
@@ -991,6 +1042,12 @@ final class ImportViewModel: ImportManaging {
 
             try self.persistenceService.insert(tracks: [track])
 
+            if let relativePath, let importSourceID {
+                self.importedTracksByPath[
+                    ImportedTrackKey(sourceID: importSourceID, relativePath: relativePath)
+                ] = track
+            }
+
             if let playlist {
                 try self.persistenceService.addTrack(track, to: playlist)
             }
@@ -999,21 +1056,78 @@ final class ImportViewModel: ImportManaging {
         }
     }
 
-    private func importPlaylist(from url: URL, importSourceID: String?) async {
+    private func dismissImportOverlay(shownAt: ContinuousClock.Instant) async {
+        let minimum = Duration.milliseconds(450)
+        let elapsed = shownAt.duration(to: .now)
+        if elapsed < minimum {
+            try? await Task.sleep(for: minimum - elapsed)
+        }
+        self.isLoading = false
+        self.importProgress = nil
+    }
+
+    private func advanceImportProgress(total: Int, title: String) {
+        let completed = (self.importProgress?.completed ?? 0) + 1
+        self.importProgress = ImportProgress(completed: completed, total: total, title: title)
+    }
+
+    private func importPlaylist(
+        from url: URL,
+        trackURLs: [URL],
+        importSourceID: String?,
+        sourceRootURL: URL?,
+        onTrackImported: @escaping () -> Void
+    ) async {
         let title = url.deletingPathExtension().lastPathComponent
-        let trackURLs = self.loadPlaylist(from: url)
 
         guard trackURLs.isNotEmpty else { return }
 
         do {
-            let playlist = try self.persistenceService.createPlaylist(title: title, importSourceID: importSourceID)
+            let playlist = try self.playlistForImport(title: title, importSourceID: importSourceID)
 
             for trackURL in trackURLs {
-                await self.importTrack(from: trackURL, importSourceID: importSourceID, into: playlist)
+                await self.importTrack(
+                    from: trackURL,
+                    importSourceID: importSourceID,
+                    sourceRootURL: sourceRootURL,
+                    into: playlist
+                )
+                onTrackImported()
             }
         } catch {
             self.handleError(error)
         }
+    }
+
+    private func playlistForImport(title: String, importSourceID: String?) throws -> PlaylistEntity {
+        let normalized = title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        let playlists = try self.persistenceService.fetchPlaylists()
+
+        if let existing = playlists.first(where: { playlist in
+            playlist.type != .system
+                && playlist.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == normalized
+        }) {
+            return existing
+        }
+
+        return try self.persistenceService.createPlaylist(title: title, importSourceID: importSourceID)
+    }
+
+    private func loadImportedTrackIndex() throws {
+        var index: [ImportedTrackKey: TrackEntity] = [:]
+
+        for track in try self.persistenceService.getImportTracks() {
+            guard
+                let sourceID = track.importSourceID,
+                let relativePath = track.originalRelativePath
+            else {
+                continue
+            }
+
+            index[ImportedTrackKey(sourceID: sourceID, relativePath: relativePath)] = track
+        }
+
+        self.importedTracksByPath = index
     }
 
     private func loadPlaylist(from url: URL) -> [URL] {
@@ -1089,7 +1203,7 @@ final class ImportViewModel: ImportManaging {
             .lowercased()
     }
 
-    private func collectFiles(from url: URL) throws -> [URL] {
+    nonisolated private static func collectFiles(from url: URL) throws -> [URL] {
         guard let enumerator = FileManager.default.enumerator(
             at: url,
             includingPropertiesForKeys: [.isDirectoryKey]
@@ -1217,18 +1331,28 @@ final class ImportViewModel: ImportManaging {
         self.selectedSourceIDs = self.selectedSourceIDs.intersection(existing)
     }
 
-    private func addOrUpdateSource(_ source: ImportSource) {
+    private func addOrUpdateSource(_ source: ImportSource) -> ImportSource {
         if let index = self.sources.firstIndex(where: {
             $0.kind == source.kind && $0.title == source.title
         }) {
-            self.sources[index] = source
-        } else {
-            self.sources.append(source)
-            self.selectedSourceIDs.insert(source.id)
-            self.saveSelectedSourceIDs()
+            let updated = ImportSource(
+                id: self.sources[index].id,
+                kind: source.kind,
+                title: source.title,
+                bookmarkData: source.bookmarkData
+            )
+            self.sources[index] = updated
+            self.saveSources()
+            self.ensureSections()
+            return updated
         }
+
+        self.sources.append(source)
+        self.selectedSourceIDs.insert(source.id)
+        self.saveSelectedSourceIDs()
         self.saveSources()
         self.ensureSections()
+        return source
     }
 
     private func saveSources() {

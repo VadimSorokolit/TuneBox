@@ -97,7 +97,15 @@ struct ImportsView: View {
         } message: {
             Text(importManagingVM.error ?? "")
         }
-        .modifier(CentralSpinnerModifier(isVisible: importManagingVM.isLoading))
+        .overlay {
+            ZStack {
+                if let progress = importManagingVM.importProgress {
+                    ImportProgressOverlay(progress: progress)
+                        .transition(.opacity)
+                }
+            }
+            .animation(.easeInOut(duration: 0.25), value: importManagingVM.importProgress != nil)
+        }
     }
 
     // MARK: - Properties. Private
@@ -116,6 +124,53 @@ struct ImportsView: View {
     }
 
     // MARK: - Objects. Private
+
+    private struct ImportProgressOverlay: View {
+
+        // MARK: - Properties. Public
+
+        let progress: ImportProgress
+
+        // MARK: - Body
+
+        var body: some View {
+            ZStack {
+                Color.black.opacity(0.28)
+                    .ignoresSafeArea()
+
+                VStack(spacing: 14) {
+                    SpinnerView(size: .large)
+
+                    Text(L10n.Import.addingTracks)
+                        .font(.system(size: 17, weight: .semibold))
+
+                    if progress.title.isEmpty.isFalse {
+                        Text(progress.title)
+                            .font(.system(size: 14))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+
+                    ProgressView(value: progress.total > 0 ? progress.fraction : 0)
+                        .tint(.primary)
+                        .frame(maxWidth: .infinity)
+                        .opacity(progress.total > 0 ? 1 : 0)
+
+                    Text(progress.total > 0
+                         ? L10n.Import.progressCount(progress.completed, progress.total)
+                         : " ")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(.secondary)
+                        .monospacedDigit()
+                        .opacity(progress.total > 0 ? 1 : 0)
+                }
+                .padding(24)
+                .frame(maxWidth: 280)
+                .glassEffect(.regular, in: .rect(cornerRadius: 24))
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
 
     private struct HeaderView: View {
 

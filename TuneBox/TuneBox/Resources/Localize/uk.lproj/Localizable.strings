@@ -57,6 +57,8 @@
 "import.empty.no_tracks" = "Немає треків";
 "import.empty.sources_message" = "Твоя музична бібліотека з’явиться тут,\nколи додаси папки";
 "import.add_folder" = "Додати папку";
+"import.progress.title" = "Додавання треків";
+"import.progress.count" = "%d з %d";
 "import.delete_folder.title" = "Видалити папку?";
 "import.delete_folder.message" = "Це джерело буде прибрано з бібліотеки, але оригінальний файл залишиться на пристрої.";
 "import.source.downloads" = "Завантаження";

@@ -124,6 +124,12 @@ enum L10n {
         static var noTracks: String { text("import.empty.no_tracks") }
         static var sourcesMessage: String { text("import.empty.sources_message") }
         static var addFolder: String { text("import.add_folder") }
+        static var addingTracks: String { text("import.progress.title") }
+
+        static func progressCount(_ completed: Int, _ total: Int) -> String {
+            String(format: text("import.progress.count"), completed, total)
+        }
+
         static var deleteFolderTitle: String { text("import.delete_folder.title") }
         static var deleteFolderMessage: String { text("import.delete_folder.message") }
         static var downloadsSource: String { text("import.source.downloads") }

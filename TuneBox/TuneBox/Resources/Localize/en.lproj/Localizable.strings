@@ -57,6 +57,8 @@
 "import.empty.no_tracks" = "No Tracks";
 "import.empty.sources_message" = "Your music library will appear here\n once you add some folders";
 "import.add_folder" = "Add Folder";
+"import.progress.title" = "Adding tracks";
+"import.progress.count" = "%d of %d";
 "import.delete_folder.title" = "Delete Folder?";
 "import.delete_folder.message" = "This source will be removed from your library, but the original file will remain on your device.";
 "import.source.downloads" = "Downloads";

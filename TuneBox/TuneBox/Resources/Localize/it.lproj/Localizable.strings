@@ -57,6 +57,8 @@
 "import.empty.no_tracks" = "Nessun brano";
 "import.empty.sources_message" = "La tua libreria musicale apparirà qui\n dopo aver aggiunto delle cartelle";
 "import.add_folder" = "Aggiungi cartella";
+"import.progress.title" = "Aggiunta brani";
+"import.progress.count" = "%d di %d";
 "import.delete_folder.title" = "Eliminare la cartella?";
 "import.delete_folder.message" = "Questa fonte verrà rimossa dalla libreria, ma il file originale resterà sul dispositivo.";
 "import.source.downloads" = "Download";

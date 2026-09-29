@@ -57,6 +57,8 @@
 "import.empty.no_tracks" = "Keine Titel";
 "import.empty.sources_message" = "Deine Musikbibliothek erscheint hier,\nsobald du Ordner hinzufügst";
 "import.add_folder" = "Ordner hinzufügen";
+"import.progress.title" = "Titel werden hinzugefügt";
+"import.progress.count" = "%d von %d";
 "import.delete_folder.title" = "Ordner löschen?";
 "import.delete_folder.message" = "Diese Quelle wird aus deiner Mediathek entfernt, die Originaldatei bleibt auf dem Gerät.";
 "import.source.downloads" = "Downloads";

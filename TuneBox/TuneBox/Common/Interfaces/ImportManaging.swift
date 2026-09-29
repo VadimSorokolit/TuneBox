@@ -7,6 +7,17 @@
 
 import Foundation
 
+struct ImportProgress: Equatable {
+    var completed: Int
+    var total: Int
+    var title: String
+
+    var fraction: Double {
+        guard self.total > 0 else { return 0 }
+        return min(Double(self.completed) / Double(self.total), 1)
+    }
+}
+
 protocol ImportManaging: LoadStateManaging {
     var isEditSectionModeEnabled: Bool { get }
     var draggingItem: ImportItem? { get set }
@@ -15,6 +26,7 @@ protocol ImportManaging: LoadStateManaging {
     var library: MusicLibrary? { get }
     var sections: [ImportSectionModel] { get }
     var sources: [ImportSource] { get }
+    var importProgress: ImportProgress? { get }
 
     func refreshLibrary() async
     func sortedTracksAlphabetically(_ tracks: [TrackEntity]) -> [TrackEntity]

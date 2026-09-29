@@ -57,6 +57,8 @@
 "import.empty.no_tracks" = "Brak utworów";
 "import.empty.sources_message" = "Twoja biblioteka muzyczna pojawi się tutaj,\n gdy dodasz foldery";
 "import.add_folder" = "Dodaj folder";
+"import.progress.title" = "Dodawanie utworów";
+"import.progress.count" = "%d z %d";
 "import.delete_folder.title" = "Usunąć folder?";
 "import.delete_folder.message" = "To źródło zostanie usunięte z biblioteki, ale oryginalny plik pozostanie na urządzeniu.";
 "import.source.downloads" = "Pobrane";

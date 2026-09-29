@@ -57,6 +57,8 @@
 "import.empty.no_tracks" = "Aucun titre";
 "import.empty.sources_message" = "Ta bibliothèque musicale apparaîtra ici\n une fois des dossiers ajoutés";
 "import.add_folder" = "Ajouter un dossier";
+"import.progress.title" = "Ajout des titres";
+"import.progress.count" = "%d sur %d";
 "import.delete_folder.title" = "Supprimer le dossier ?";
 "import.delete_folder.message" = "Cette source sera retirée de ta bibliothèque, mais le fichier d’origine restera sur l’appareil.";
 "import.source.downloads" = "Téléchargements";

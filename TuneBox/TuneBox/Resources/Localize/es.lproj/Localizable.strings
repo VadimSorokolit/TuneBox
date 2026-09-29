@@ -57,6 +57,8 @@
 "import.empty.no_tracks" = "Sin pistas";
 "import.empty.sources_message" = "Tu biblioteca de música aparecerá aquí\n cuando añadas carpetas";
 "import.add_folder" = "Añadir carpeta";
+"import.progress.title" = "Añadiendo pistas";
+"import.progress.count" = "%d de %d";
 "import.delete_folder.title" = "¿Eliminar carpeta?";
 "import.delete_folder.message" = "Esta fuente se quitará de tu biblioteca, pero el archivo original permanecerá en el dispositivo.";
 "import.source.downloads" = "Descargas";
