@@ -97,11 +97,12 @@ struct RootTabsView: View {
     // MARK: - Main Body
 
     var body: some View {
+        // swiftlint:disable:next redundant_discardable_let
         let _ = languageRefreshID
 
         ZStack(alignment: .bottom) {
             content
-                // Keep tab screens still — only the glass pill should leap.
+                // Keep tab screens still — only the glass pill should leap
                 .animation(nil, value: coordinator.selectedTab)
 
             if playerVM.isPlayerVisible {

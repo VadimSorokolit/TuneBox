@@ -34,6 +34,7 @@ struct DownloadsView: View {
             )
 
             ContentView(
+                isSearchFieldFocused: isSearchFieldFocused,
                 rootTabsVM: rootTabsVM,
                 transferManagingVM: transferManagingVM,
                 playerVM: playerVM
@@ -116,6 +117,7 @@ struct DownloadsView: View {
 
         // MARK: - Properties. Public
 
+        let isSearchFieldFocused: Bool
         let rootTabsVM: RootTabsManaging
         let transferManagingVM: DownloadsPresenting
         let playerVM: PlayerManaging
@@ -142,6 +144,12 @@ struct DownloadsView: View {
                     }
                 }
             }
+            .modifier(
+                EmptyTracksStateModifier(
+                    showsEmptyState: transferManagingVM.showsEmptyState,
+                    isKeyboardVisible: isSearchFieldFocused
+                )
+            )
             .padding(.top, 5)
             .bottomContentMargin(
                 10,
@@ -150,7 +158,6 @@ struct DownloadsView: View {
                 isPlaying: playerVM.isPlaying,
                 isTabBarVisible: rootTabsVM.isTabBarVisible
             )
-            .modifier(EmptyTracksStateModifier(showsEmptyState: transferManagingVM.showsEmptyState))
         }
 
         // MARK: - Private. Methods

@@ -30,6 +30,7 @@ struct BrowseView: View {
 
             ContentView(
                 slideDirection: $slideDirection,
+                isSearchFieldFocused: isSearchFieldFocused,
                 rootTabsVM: rootTabsVM,
                 transferManagingVM: transferManagingVM,
                 playerVM: playerVM,
@@ -120,6 +121,7 @@ struct BrowseView: View {
 
         @Binding var slideDirection: SlideDirection
 
+        let isSearchFieldFocused: Bool
         let rootTabsVM: RootTabsManaging
         let transferManagingVM: TransferManaging
         let playerVM: PlayerManaging
@@ -159,9 +161,14 @@ struct BrowseView: View {
                             }
                         }
                     }
-                    .modifier(EmptyTracksStateModifier(showsEmptyState: transferManagingVM.showsEmptyState))
                 }
             }
+            .modifier(
+                EmptyTracksStateModifier(
+                    showsEmptyState: transferManagingVM.showsEmptyState,
+                    isKeyboardVisible: isSearchFieldFocused
+                )
+            )
             .padding(.top, 10)
             .bottomContentMargin(
                 0,
@@ -186,7 +193,6 @@ struct BrowseView: View {
             if section.tracks.isNotEmpty,
                transferManagingVM.completedSearchQuery.isNotEmpty,
                transferManagingVM.shouldShowCentralSpinner.isFalse {
-
                 Section(
                     content: {
                         LazyVStack(spacing: 8) {
