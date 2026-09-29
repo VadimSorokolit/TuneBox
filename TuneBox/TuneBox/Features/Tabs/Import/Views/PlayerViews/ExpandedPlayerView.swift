@@ -53,8 +53,8 @@ struct ExpandedPlayerView: View {
         // MARK: - Properties. Private
 
         @State private var sliderValue = 0.0
+        @State private var metadataReveal: CGFloat = 0
         @State private var isSliding = false
-        /// Blocks 1→0 sync on the same slider while the queue advances after release.
         @State private var ignoreProgressSync = false
 
         private var displayedSliderValue: Double {
@@ -98,12 +98,12 @@ struct ExpandedPlayerView: View {
                     .padding(.top, 8)
                     .shadow(color: .black.opacity(0.35), radius: 24, y: 12)
 
-                    VStack(spacing: 6) {
+                    VStack(spacing: Constants.metadataSpacing) {
                         Text(track.songName)
                             .font(.title2.weight(.semibold))
                             .multilineTextAlignment(.center)
                             .lineLimit(2)
-                            .fixedSize(horizontal: false, vertical: true)
+                            .truncationMode(.tail)
                             .frame(maxWidth: .infinity)
                             .foregroundStyle(titleColor)
                             .shadow(color: .black.opacity(0.55), radius: 2, y: 1)
@@ -112,12 +112,23 @@ struct ExpandedPlayerView: View {
                             .font(.subheadline)
                             .multilineTextAlignment(.center)
                             .lineLimit(2)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .frame(maxWidth: .infinity)
+                            .truncationMode(.tail)
+                            .frame(
+                                maxWidth: .infinity,
+                                maxHeight: Constants.artistMaxHeight,
+                                alignment: .top
+                            )
                             .foregroundStyle(subtitleColor)
                             .shadow(color: .black.opacity(0.5), radius: 1.5, y: 1)
                     }
-                    .opacity(playerVM.isPlaying ? 1 : 0.45)
+                    .frame(
+                        maxWidth: .infinity,
+                        minHeight: Constants.metadataBlockHeight,
+                        maxHeight: Constants.metadataBlockHeight,
+                        alignment: .top
+                    )
+                    .scaleEffect(metadataReveal, anchor: .center)
+                    .opacity(metadataReveal * (playerVM.isPlaying ? 1 : 0.45))
                     .animation(.easeInOut(duration: 0.35), value: playerVM.isPlaying)
                     .padding(.horizontal, 24)
 
@@ -140,10 +151,12 @@ struct ExpandedPlayerView: View {
                 }
                 .onAppear {
                     sliderValue = playerVM.progress
+                    revealMetadata(animated: true)
                 }
                 .onChange(of: track.id) { _, _ in
                     ignoreProgressSync = false
                     sliderValue = playerVM.progress
+                    revealMetadata(animated: true)
                 }
                 .onChange(of: playerVM.progress) { _, progress in
                     guard isSliding.isFalse, ignoreProgressSync.isFalse else { return }
@@ -160,10 +173,37 @@ struct ExpandedPlayerView: View {
 
         // MARK: - Properties .Private
 
+        private enum Constants {
+            static let titleMaxHeight: CGFloat = 56
+            static let artistMaxHeight: CGFloat = 40
+            static let metadataSpacing: CGFloat = 6
+            static let metadataBlockHeight =
+                titleMaxHeight + artistMaxHeight + metadataSpacing
+        }
+
         private let titleColor = Color.white.mix(with: .primary, by: 0.12)
         private let subtitleColor = Color.white.mix(with: .secondary, by: 0.25)
         private let chromeColor = Color.white.mix(with: .primary, by: 0.18)
         private let accentColor = Color.orange.mix(with: .white, by: 0.35)
+
+        private func revealMetadata(animated: Bool) {
+            var reset = Transaction()
+            reset.disablesAnimations = true
+            withTransaction(reset) {
+                metadataReveal = 0
+            }
+
+            guard animated else {
+                metadataReveal = 1
+                return
+            }
+
+            Task { @MainActor in
+                withAnimation(.spring(response: 0.38, dampingFraction: 0.84)) {
+                    metadataReveal = 1
+                }
+            }
+        }
 
         private var header: some View {
             ZStack {
