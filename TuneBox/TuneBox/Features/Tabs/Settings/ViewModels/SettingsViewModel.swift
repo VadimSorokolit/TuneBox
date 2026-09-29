@@ -154,21 +154,11 @@ final class SettingsViewModel: SettingsManaging {
 
         let endDate = Date().addingTimeInterval(duration)
         self.sleepTimerEndDate = endDate
+        self.sleepTimerZeroShown = false
         self.isSleepTimerActive = true
         self.sleepTimerCountdownText = Self.formattedRemaining(
             endDate.timeIntervalSinceNow
         )
-
-        let fireTimer = Timer(
-            timeInterval: duration,
-            repeats: false
-        ) { [weak self] _ in
-            MainActor.assumeIsolated {
-                self?.fireSleepTimer()
-            }
-        }
-        RunLoop.main.add(fireTimer, forMode: .common)
-        self.sleepTimer = fireTimer
 
         let tickTimer = Timer(
             timeInterval: 1,
@@ -183,11 +173,12 @@ final class SettingsViewModel: SettingsManaging {
     }
 
     func cancelSleepTimer() {
-        self.sleepTimer?.invalidate()
-        self.sleepTimer = nil
         self.sleepTimerDisplayTimer?.invalidate()
         self.sleepTimerDisplayTimer = nil
+        self.sleepTimerZeroHold?.invalidate()
+        self.sleepTimerZeroHold = nil
         self.sleepTimerEndDate = nil
+        self.sleepTimerZeroShown = false
         self.isSleepTimerActive = false
         self.sleepTimerCountdownText = ""
     }
@@ -256,13 +247,16 @@ final class SettingsViewModel: SettingsManaging {
     @Injected private var audioService: AudioServicing
 
     @ObservationIgnored
-    private var sleepTimer: Timer?
-
-    @ObservationIgnored
     private var sleepTimerDisplayTimer: Timer?
 
     @ObservationIgnored
+    private var sleepTimerZeroHold: Timer?
+
+    @ObservationIgnored
     private var sleepTimerEndDate: Date?
+
+    @ObservationIgnored
+    private var sleepTimerZeroShown = false
 
     private var sleepTimerCountdownText = ""
 
@@ -298,12 +292,23 @@ final class SettingsViewModel: SettingsManaging {
         }
 
         let remaining = endDate.timeIntervalSinceNow
-        guard remaining > 0 else {
-            self.fireSleepTimer()
+        if remaining > 0 {
+            self.sleepTimerCountdownText = Self.formattedRemaining(remaining)
             return
         }
 
-        self.sleepTimerCountdownText = Self.formattedRemaining(remaining)
+        guard self.sleepTimerZeroShown.isFalse else { return }
+
+        self.sleepTimerZeroShown = true
+        self.sleepTimerCountdownText = Self.formattedRemaining(0)
+
+        let hold = Timer(timeInterval: 0.15, repeats: false) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.fireSleepTimer()
+            }
+        }
+        RunLoop.main.add(hold, forMode: .common)
+        self.sleepTimerZeroHold = hold
     }
 
     private func fireSleepTimer() {
