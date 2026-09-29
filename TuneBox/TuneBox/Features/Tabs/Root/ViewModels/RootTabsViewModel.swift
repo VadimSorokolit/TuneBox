@@ -82,19 +82,32 @@ final class RootTabsViewModel: RootTabsManaging {
         )
     }
 
+    func markBackgrounded() {
+        AppResume.markBackgrounded(defaults: self.userDefaults)
+    }
+
     func restoreSelectedTab() -> CustomTab {
         self.reloadTabsMode()
         self.defaultTab = Self.readDefaultTab(from: self.userDefaults)
+        return Self.configuredDefaultTab(from: self.userDefaults)
+    }
 
-        switch self.tabsMode {
-            case .import:
-                return .importFiles
-
-            case .allTabs:
-                return self.visibleTabs.contains(self.defaultTab)
-                    ? self.defaultTab
-                    : .default
+    static func startupSelectedTab(
+        from defaults: UserDefaults = .standard
+    ) -> CustomTab {
+        if AppResume.isQuickResume(defaults: defaults),
+           let last = Self.readLastSelectedTab(from: defaults),
+           Self.isTabAvailable(last, in: defaults) {
+            return last
         }
+
+        return Self.configuredDefaultTab(from: defaults)
+    }
+
+    static func isQuickResume(
+        from defaults: UserDefaults = .standard
+    ) -> Bool {
+        AppResume.isQuickResume(defaults: defaults)
     }
 
     func bottomInset(base: CGFloat, isPlayerVisible: Bool, isPlaying: Bool) -> CGFloat {
@@ -139,6 +152,32 @@ final class RootTabsViewModel: RootTabsManaging {
         }
     }
 
+    private static func configuredDefaultTab(
+        from defaults: UserDefaults
+    ) -> CustomTab {
+        switch Self.readTabsMode(from: defaults) {
+            case .import:
+                return .importFiles
+
+            case .allTabs:
+                let tab = Self.readDefaultTab(from: defaults)
+                return Self.isTabAvailable(tab, in: defaults) ? tab : .default
+        }
+    }
+
+    private static func isTabAvailable(
+        _ tab: CustomTab,
+        in defaults: UserDefaults
+    ) -> Bool {
+        switch Self.readTabsMode(from: defaults) {
+            case .import:
+                return tab == .importFiles
+
+            case .allTabs:
+                return CustomTab.allCases.contains(tab)
+        }
+    }
+
     private static func readTabsMode(from defaults: UserDefaults) -> TabsMode {
         let raw = defaults.string(forKey: Constants.Keys.tabsMode) ?? TabsMode.allTabs.rawValue
 
@@ -151,12 +190,16 @@ final class RootTabsViewModel: RootTabsManaging {
             return tab
         }
 
-        // Migrate from previous last-selected key when present.
-        if let raw = defaults.string(forKey: Constants.Keys.lastSelectedTab),
-           let tab = CustomTab(rawValue: raw) {
-            return tab
+        return .default
+    }
+
+    private static func readLastSelectedTab(
+        from defaults: UserDefaults
+    ) -> CustomTab? {
+        guard let raw = defaults.string(forKey: Constants.Keys.lastSelectedTab) else {
+            return nil
         }
 
-        return .default
+        return CustomTab(rawValue: raw)
     }
 }

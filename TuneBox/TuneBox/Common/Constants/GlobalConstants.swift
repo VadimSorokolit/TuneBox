@@ -51,6 +51,7 @@ enum GlobalConstants {
 
     enum UserDefaultsKey {
         static let playlistID: String = "UserDefaultsPlaylistIdKey"
+        static let lastBackgroundedAt = "lastBackgroundedAt"
     }
 
     enum AppColor {

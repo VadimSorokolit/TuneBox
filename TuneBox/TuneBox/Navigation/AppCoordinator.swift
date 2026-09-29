@@ -76,11 +76,14 @@ final class AppCoordinator {
 
     // MARK: - Init
 
-    init(root: AppRoute = .launch) {
+    init(
+        root: AppRoute = .launch,
+        selectedTab: CustomTab? = nil
+    ) {
         self.root = root
 
         if root == .main {
-            self.selectedTab = .default
+            self.selectedTab = selectedTab ?? .default
             self.path = [.importHome]
         }
     }

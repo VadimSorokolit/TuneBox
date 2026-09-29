@@ -49,13 +49,13 @@ enum TabsMode: String, CaseIterable, Identifiable {
     }
 }
 
-enum CustomTab: String, Hashable, Identifiable, CaseIterable {
+enum CustomTab: String, Hashable, Identifiable, CaseIterable, Sendable {
     case importFiles
     case browse
     case downloads
     case settings
 
-    static let `default`: Self = .importFiles
+    nonisolated static let `default`: Self = .importFiles
 
     var id: Self { self }
 
@@ -186,10 +186,6 @@ struct RootTabsView: View {
             alignment: .bottom
         )
         .onAppear {
-            restoreSelectedTab()
-            playerVM.restoreLastPlaybackSession()
-        }
-        .task {
             playerVM.restoreLastPlaybackSession()
         }
         .onChange(of: rootTabsVM.tabsMode) { _, _ in

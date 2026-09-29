@@ -140,7 +140,6 @@ final class AudioService: NSObject, AudioServicing {
         self.allowEnginePlaybackRestore()
         self.endSeekScrubbingIfNeeded()
         self.activateAudioSession(forceCategory: true)
-        self.silenceOutput()
 
         if self.player.isPlaying {
             if self.isPinnedToStart {
@@ -148,9 +147,13 @@ final class AudioService: NSObject, AudioServicing {
             } else {
                 self.restoreProgressIfNeeded()
             }
-            self.scheduleUnmute()
+            self.applyVolume()
+            self.notifyStateChange(true)
+            self.refreshNowPlayingElapsed()
             return
         }
+
+        self.silenceOutput()
 
         if self.needsEngineRebuild.isFalse, self.player.resume() {
             self.attachSpectrumIfNeeded()
@@ -593,6 +596,23 @@ final class AudioService: NSObject, AudioServicing {
         )
     }
 
+    /// If UI thinks we're playing but output was left muted (e.g. play mashed
+    /// during silence/unmute), restore volume or drop back to paused UI.
+    private func reconcileAudiblePlayback() {
+        guard self.isSeekScrubbing.isFalse, self.isRestoringPlayback.isFalse else { return }
+
+        if self.player.isPlaying {
+            if self.stateChangeSubject.value, self.unmuteWorkItem == nil {
+                self.applyVolume()
+            }
+            return
+        }
+
+        if self.stateChangeSubject.value {
+            self.notifyStateChange(false)
+        }
+    }
+
     private func attachSpectrumIfNeeded() {
         guard self.isDoPPlayback.isFalse else { return }
 
@@ -635,7 +655,9 @@ final class AudioService: NSObject, AudioServicing {
         self.stopProgressTimer()
         self.startRouteWatch()
         let timer = Timer(timeInterval: Self.progressInterval, repeats: true) { [weak self] _ in
-            guard let self, self.player.isPlaying, self.duration > 0 else { return }
+            guard let self, self.duration > 0 else { return }
+            self.reconcileAudiblePlayback()
+            guard self.player.isPlaying else { return }
             guard self.isRestoringPlayback.isFalse else { return }
             self.notifyProgress(self.progressValue)
             self.refreshNowPlayingElapsed()

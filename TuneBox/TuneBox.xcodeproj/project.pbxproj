@@ -116,6 +116,7 @@
 		5B8382B82FC5AEA9003625CD /* Notification+value.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382B72FC5AEA8003625CD /* Notification+value.swift */; };
 		5B8382BC2FC5D97F003625CD /* PlayerManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8382BB2FC5D97E003625CD /* PlayerManaging.swift */; };
 		5B84A1C0305E4A0100C0DE02 /* VinylSpinGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B84A1C0305E4A0100C0DE01 /* VinylSpinGate.swift */; };
+		5B84A1C0305E4A0100C0DE06 /* AppResume.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B84A1C0305E4A0100C0DE05 /* AppResume.swift */; };
 		5B84A1C0305E4A0100C0DE04 /* CoverImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B84A1C0305E4A0100C0DE03 /* CoverImageLoader.swift */; };
 		5B84C01C2FAB353200ACE75A /* CustomAlerts in Frameworks */ = {isa = PBXBuildFile; productRef = 5B84C01B2FAB353200ACE75A /* CustomAlerts */; };
 		5B84C0252FAB368D00ACE75A /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 5B84C0242FAB367B00ACE75A /* .swiftlint.yml */; };
@@ -358,6 +359,7 @@
 		5B8382B72FC5AEA8003625CD /* Notification+value.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notification+value.swift"; sourceTree = "<group>"; };
 		5B8382BB2FC5D97E003625CD /* PlayerManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerManaging.swift; sourceTree = "<group>"; };
 		5B84A1C0305E4A0100C0DE01 /* VinylSpinGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VinylSpinGate.swift; sourceTree = "<group>"; };
+		5B84A1C0305E4A0100C0DE05 /* AppResume.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppResume.swift; sourceTree = "<group>"; };
 		5B84A1C0305E4A0100C0DE03 /* CoverImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoverImageLoader.swift; sourceTree = "<group>"; };
 		5B84C0242FAB367B00ACE75A /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		5B8787903059A6CB00A9BBFA /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -696,6 +698,7 @@
 		5B2EAF19305846FC0054C503 /* Coordination */ = {
 			isa = PBXGroup;
 			children = (
+				5B84A1C0305E4A0100C0DE05 /* AppResume.swift */,
 				5B84A1C0305E4A0100C0DE01 /* VinylSpinGate.swift */,
 			);
 			path = Coordination;
@@ -1869,6 +1872,7 @@
 				5BC5EED530388ABA001A16A9 /* VinylPlateView.swift in Sources */,
 				C403EB9385FB43DFBFD3CD50 /* SpinningVinylView.swift in Sources */,
 				5B84A1C0305E4A0100C0DE02 /* VinylSpinGate.swift in Sources */,
+				5B84A1C0305E4A0100C0DE06 /* AppResume.swift in Sources */,
 				5B6B8CD32FED1D9400C23D3E /* DismissKeyboardOnTapModifier.swift in Sources */,
 				5B40F3FB302D0D2D0025693E /* CoverRouter.swift in Sources */,
 				5B88609E2FAE184C0056BE9A /* GlobalConstants.swift in Sources */,

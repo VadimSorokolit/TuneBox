@@ -105,8 +105,7 @@ final class PlayerViewModel: PlayerManaging {
             .sink { [weak self] value in
                 guard let self else { return }
                 guard self.isSeekScrubbing.isFalse else { return }
-                // After next/previous the engine can briefly report the old
-                // position. Don't let that overwrite a reset-to-zero.
+
                 if self.progress <= 0, value > 0, self.isPlaying.isFalse {
                     return
                 }
@@ -205,15 +204,20 @@ final class PlayerViewModel: PlayerManaging {
 
     func togglePlayPause() {
         guard let track = self.track else { return }
+        guard self.isPlayToggleInFlight.isFalse else { return }
+
+        self.isPlayToggleInFlight = true
         self.clearSeekScrubbing()
 
         if self.playFromPausedTrackEnd() {
             self.persistPlaybackSession()
+            self.schedulePlayToggleUnlock()
             return
         }
 
         self.toggle(track)
         self.persistPlaybackSession()
+        self.schedulePlayToggleUnlock()
     }
 
     func restoreLastPlaybackSession() {
@@ -310,7 +314,6 @@ final class PlayerViewModel: PlayerManaging {
     }
 
     func seek(by deltaSeconds: TimeInterval) {
-        // Hold-scrub can run after session restore before the engine has duration.
         if self.isSeekScrubbing {
             self.applySeekHoldProgress(deltaSeconds: deltaSeconds)
             return
@@ -331,7 +334,7 @@ final class PlayerViewModel: PlayerManaging {
             self.updateVinylScrubSpin(for: delta)
             self.lastSeekProgress = clamped
             self.progress = clamped
-            // Slider (and any scrub): finish-per-mode only if released at end while playing.
+
             self.pendingFinishOnRelease = self.isPlaying && self.isAtTrackEnd
         }
 
@@ -366,8 +369,6 @@ final class PlayerViewModel: PlayerManaging {
             self.audioService.setSeekScrubbing(false, direction: direction)
             self.isSeekScrubbing = false
 
-            // Playing + released at end (hold or slider) → apply repeat mode.
-            // Defer so SwiftUI Slider can leave the drag gesture before progress jumps.
             guard shouldFinishPerMode else { return }
             Task { @MainActor in
                 await Task.yield()
@@ -542,6 +543,7 @@ final class PlayerViewModel: PlayerManaging {
     private var needsNavigationPathRebuild = false
     private var vinylTapSpinTask: Task<Void, Never>?
     private var vinylScrubIdleTask: Task<Void, Never>?
+    private var playToggleUnlockTask: Task<Void, Never>?
     @ObservationIgnored
     private var lastSeekProgress: Double?
     @ObservationIgnored
@@ -550,10 +552,13 @@ final class PlayerViewModel: PlayerManaging {
     private var pendingScrubDirectionCount = 0
     @ObservationIgnored
     private var pendingFinishOnRelease = false
+    @ObservationIgnored
+    private var isPlayToggleInFlight = false
 
     private static let trackEndSlop: TimeInterval = 0.05
     private static let restartThreshold: TimeInterval = 5
     private static let persistProgressInterval: TimeInterval = 5
+    private static let playToggleCooldownNanoseconds: UInt64 = 200_000_000
     private static let vinylScrubSpinSpeed: Double = 2.5
     private static let vinylScrubDirectionThreshold: Double = 0.0001
     private static let vinylScrubIdleFreezeNanoseconds: UInt64 = 150_000_000
@@ -918,9 +923,7 @@ final class PlayerViewModel: PlayerManaging {
     }
 
     private func play(_ track: TrackEntity, autoplay: Bool = true) {
-        if autoplay {
-            VinylSpinGate.allow()
-        } else {
+        if autoplay.isFalse {
             self.equalizerService.reset()
         }
 
@@ -934,13 +937,27 @@ final class PlayerViewModel: PlayerManaging {
     }
 
     private func toggle(_ track: TrackEntity) {
-        if self.isPlaying.isFalse {
-            VinylSpinGate.allow()
+        let needsFullPlay = self.pendingRestoreProgress != nil
+            || self.audioService.currentTrackId != track.id
+
+        if needsFullPlay {
+            self.play(track, autoplay: true)
+            return
         }
 
         self.start(track, using: { trackId, url, _ in
             self.audioService.toggle(trackId: trackId, url: url, loop: false)
         })
+    }
+
+    private func schedulePlayToggleUnlock() {
+        self.playToggleUnlockTask?.cancel()
+        self.playToggleUnlockTask = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: Self.playToggleCooldownNanoseconds)
+            guard !Task.isCancelled else { return }
+            self.isPlayToggleInFlight = false
+            self.playToggleUnlockTask = nil
+        }
     }
 
     private func start(
