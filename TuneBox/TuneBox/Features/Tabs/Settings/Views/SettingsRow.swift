@@ -21,6 +21,8 @@ struct SettingsRow: View {
     var showsSystemImage: Bool = true
     var isDisabled: Bool = false
     var action: (() -> Void)?
+    var titleLineLimitRange: ClosedRange<Int>?
+    var trailingTextLineLimitRange: ClosedRange<Int>?
 
     // MARK: - Initializers
 
@@ -33,6 +35,8 @@ struct SettingsRow: View {
         systemImageSize: CGFloat = 13,
         showsSystemImage: Bool = true,
         isDisabled: Bool = false,
+        titleLineLimitRange: ClosedRange<Int>? = nil,
+        trailingTextLineLimitRange: ClosedRange<Int>? = nil,
         action: (() -> Void)? = nil
     ) {
         self.title = title
@@ -43,6 +47,8 @@ struct SettingsRow: View {
         self.systemImageSize = systemImageSize
         self.showsSystemImage = showsSystemImage
         self.isDisabled = isDisabled
+        self.titleLineLimitRange = titleLineLimitRange
+        self.trailingTextLineLimitRange = trailingTextLineLimitRange
         self.action = action
         self.menu = nil
     }
@@ -52,6 +58,8 @@ struct SettingsRow: View {
         trailingText: String,
         systemImage: String = "chevron.up.chevron.down",
         isDisabled: Bool = false,
+        titleLineLimitRange: ClosedRange<Int>? = nil,
+        trailingTextLineLimitRange: ClosedRange<Int>? = nil,
         selection: Binding<Selection>,
         options: [(Selection, String)]
     ) {
@@ -64,6 +72,8 @@ struct SettingsRow: View {
         self.isDisabled = isDisabled
         self.action = nil
         self.systemImageSize = 13
+        self.titleLineLimitRange = titleLineLimitRange
+        self.trailingTextLineLimitRange = trailingTextLineLimitRange
         self.menu = UIMenu(
             children: options.map { value, title in
                 UIAction(
@@ -129,11 +139,8 @@ struct SettingsRow: View {
     }
 
     private var rowContent: some View {
-        HStack(spacing: 8) {
-            Text(title)
-                .foregroundStyle(.primary)
-                .lineLimit(1)
-                .transaction { $0.animation = nil }
+        HStack(alignment: .center, spacing: 8) {
+            titleLabel
 
             Spacer(minLength: 8)
 
@@ -146,11 +153,7 @@ struct SettingsRow: View {
 
             if showsSystemImage {
                 if let trailingText, trailingText.isNotEmpty {
-                    Text(trailingText)
-                        .lineLimit(1)
-                        .foregroundStyle(.secondary)
-                        .fixedSize()
-                        .transaction { $0.animation = nil }
+                    trailingTextLabel(trailingText)
                 }
 
                 Image(systemName: systemImage)
@@ -161,6 +164,40 @@ struct SettingsRow: View {
         }
         .frame(maxWidth: .infinity, minHeight: 22, alignment: .leading)
         .contentShape(Rectangle())
+    }
+
+    @ViewBuilder
+    private var titleLabel: some View {
+        let text = Text(title)
+            .foregroundStyle(.primary)
+            .transaction { $0.animation = nil }
+
+        if let titleLineLimitRange {
+            text
+                .lineLimit(titleLineLimitRange)
+                .multilineTextAlignment(.leading)
+                .fixedSize(horizontal: false, vertical: true)
+        } else {
+            text.lineLimit(1)
+        }
+    }
+
+    @ViewBuilder
+    private func trailingTextLabel(_ trailingText: String) -> some View {
+        let text = Text(trailingText)
+            .foregroundStyle(.secondary)
+            .transaction { $0.animation = nil }
+
+        if let trailingTextLineLimitRange {
+            text
+                .lineLimit(trailingTextLineLimitRange)
+                .multilineTextAlignment(.trailing)
+                .fixedSize(horizontal: false, vertical: true)
+        } else {
+            text
+                .lineLimit(1)
+                .fixedSize()
+        }
     }
 }
 

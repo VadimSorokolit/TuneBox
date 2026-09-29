@@ -20,13 +20,17 @@ struct SettingsView: View {
         NavigationStack(path: $path) {
             VStack(spacing: 0) {
                 HeaderView()
+                    .id(headerLocalizationID)
 
                 SectionsView(
                     settingsVM: settingsVM,
                     languageVM: languageVM,
                     rootTabsVM: rootTabsVM,
                     isSleepTimerPresented: $isSleepTimerPresented,
-                    path: $path
+                    path: $path,
+                    onLanguageChanged: {
+                        headerLocalizationID = UUID()
+                    }
                 )
             }
             .toolbar(.hidden, for: .navigationBar)
@@ -60,6 +64,7 @@ struct SettingsView: View {
     @State private var path = [SettingsRoute]()
     @State private var isFeedbackPresented = false
     @State private var isSleepTimerPresented = false
+    @State private var headerLocalizationID = UUID()
 
     private enum Constants {
         static let formTopPadding: CGFloat = 12
@@ -86,6 +91,7 @@ struct SettingsView: View {
         let rootTabsVM: RootTabsManaging
         @Binding var isSleepTimerPresented: Bool
         @Binding var path: [SettingsRoute]
+        let onLanguageChanged: () -> Void
 
         // MARK: - Body
 
@@ -114,6 +120,8 @@ struct SettingsView: View {
                             title: L10n.Settings.defaultTab,
                             trailingText: defaultTab.title,
                             isDisabled: tabsMode == .import,
+                            titleLineLimitRange: 1 ... 2,
+                            trailingTextLineLimitRange: 1 ... 2,
                             selection: defaultTabBinding,
                             options: defaultTabOptions.map { ($0, $0.title) }
                         )
@@ -180,7 +188,10 @@ struct SettingsView: View {
         private var languageBinding: Binding<AppLanguage> {
             Binding(
                 get: { languageVM.language },
-                set: { languageVM.setLanguage($0) }
+                set: { language in
+                    languageVM.setLanguage(language)
+                    onLanguageChanged()
+                }
             )
         }
 
