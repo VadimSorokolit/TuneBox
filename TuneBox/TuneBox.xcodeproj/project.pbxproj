@@ -73,6 +73,7 @@
 		5B4762852FAB5C570069E41A /* ReactiveMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5B4762842FAB5C570069E41A /* ReactiveMoya */; };
 		5B4762872FAB5C570069E41A /* RxMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5B4762862FAB5C570069E41A /* RxMoya */; };
 		5B4D22932FF8C202004B8356 /* HeaderGlassButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4D22922FF8C201004B8356 /* HeaderGlassButton.swift */; };
+		5B4D22972FF8C206004B8356 /* SleepTimerHeaderButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4D22962FF8C205004B8356 /* SleepTimerHeaderButton.swift */; };
 		5B586CB12FAB98EE00BCEAD2 /* JamendoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB02FAB98EE00BCEAD2 /* JamendoService.swift */; };
 		5B586CB52FAC618500BCEAD2 /* FileManagerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB42FAC618400BCEAD2 /* FileManagerService.swift */; };
 		5B586CB72FAC678700BCEAD2 /* TrackDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B586CB62FAC678600BCEAD2 /* TrackDTO.swift */; };
@@ -322,6 +323,7 @@
 		5B4762792FAB3DB80069E41A /* JamendoRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JamendoRouter.swift; sourceTree = "<group>"; };
 		5B47627D2FAB49AF0069E41A /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
 		5B4D22922FF8C201004B8356 /* HeaderGlassButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderGlassButton.swift; sourceTree = "<group>"; };
+		5B4D22962FF8C205004B8356 /* SleepTimerHeaderButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepTimerHeaderButton.swift; sourceTree = "<group>"; };
 		5B586CB02FAB98EE00BCEAD2 /* JamendoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JamendoService.swift; sourceTree = "<group>"; };
 		5B586CB42FAC618400BCEAD2 /* FileManagerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerService.swift; sourceTree = "<group>"; };
 		5B586CB62FAC678600BCEAD2 /* TrackDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackDTO.swift; sourceTree = "<group>"; };
@@ -640,6 +642,7 @@
 				5B600F2F30631FB700B83729 /* СustomSheet */,
 				5BA581912FD7055B00B498D7 /* EmptyTrackCell.swift */,
 				5B4D22922FF8C201004B8356 /* HeaderGlassButton.swift */,
+				5B4D22962FF8C205004B8356 /* SleepTimerHeaderButton.swift */,
 				5BA581952FD8603400B498D7 /* HighlightedText.swift */,
 				5BECD77B3010E0740028FC67 /* LibrarySummaryFooter.swift */,
 				5BA1F0002FE1000000503BA2 /* PaginationFooterView.swift */,
@@ -1879,6 +1882,7 @@
 				5B1875C62FD06EBD00D8A042 /* SearchBarView.swift in Sources */,
 				5B061DB330597400005C6603 /* TabHeaderView.swift in Sources */,
 				5B4D22932FF8C202004B8356 /* HeaderGlassButton.swift in Sources */,
+				5B4D22972FF8C206004B8356 /* SleepTimerHeaderButton.swift in Sources */,
 				5BE1C0023052000100BC9C3C /* СustomSheet.swift in Sources */,
 				5BEC058D30487B4E00BFC3FA /* PlaybackPCMMonitoring.swift in Sources */,
 				5B40F405302DFC240025693E /* CoverViewModel.swift in Sources */,

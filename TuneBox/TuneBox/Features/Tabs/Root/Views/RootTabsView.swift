@@ -160,6 +160,10 @@ struct RootTabsView: View {
                 tabBar
             }
         }
+        .overlay(alignment: .topTrailing) {
+            SleepTimerHeaderButton()
+                .padding(.trailing, GlobalConstants.Screen.horizontalInset)
+        }
         .ignoresSafeArea(.keyboard, edges: .bottom)
         .background {
             СustomSheet(
@@ -221,61 +225,77 @@ struct RootTabsView: View {
     }
 
     private var content: some View {
-        Group {
-            switch coordinator.selectedTab {
-                case .browse:
-                    BrowseView()
+        ZStack {
+            keptAliveTab(.browse) {
+                BrowseView()
+            }
 
-                case .downloads:
-                    DownloadsView()
+            keptAliveTab(.downloads) {
+                DownloadsView()
+            }
 
-                case .importFiles:
-                    NavigationStack(path: coordinator.pathBinding) {
-                        Color.clear
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .toolbar(.hidden, for: .navigationBar)
-                            .navigationBarBackButtonHidden(true)
-                            .navigationDestination(for: AppRoute.self) { route in
-                                switch route {
-                                    case .importHome:
-                                        ImportsView()
+            keptAliveTab(.importFiles) {
+                NavigationStack(path: coordinator.pathBinding) {
+                    Color.clear
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .toolbar(.hidden, for: .navigationBar)
+                        .navigationBarBackButtonHidden(true)
+                        .navigationDestination(for: AppRoute.self) { route in
+                            switch route {
+                                case .importHome:
+                                    ImportsView()
 
-                                    case .album(let album):
-                                        AlbumDetailsView(album: album)
+                                case .album(let album):
+                                    AlbumDetailsView(album: album)
 
-                                    case .albums:
-                                        AlbumsView()
+                                case .albums:
+                                    AlbumsView()
 
-                                    case .artist(let artist, let segment):
-                                        ArtistDetailsView(artist: artist, initialSegment: segment)
+                                case .artist(let artist, let segment):
+                                    ArtistDetailsView(artist: artist, initialSegment: segment)
 
-                                    case .artists:
-                                        ArtistsView()
+                                case .artists:
+                                    ArtistsView()
 
-                                    case .covers(let album):
-                                        AlbumCoversView(album: album)
+                                case .covers(let album):
+                                    AlbumCoversView(album: album)
 
-                                    case .tracks(let title, let content):
-                                        TracksView(
-                                            navigationTitle: title ?? Constants.Title.defaultNavigationTitle,
-                                            content: content
-                                        )
+                                case .tracks(let title, let content):
+                                    TracksView(
+                                        navigationTitle: title ?? Constants.Title.defaultNavigationTitle,
+                                        content: content
+                                    )
 
-                                    case .playlists:
-                                        PlaylistsView()
+                                case .playlists:
+                                    PlaylistsView()
 
-                                    case .sourceFolder(let sourceID, let path):
-                                        SourceView(sourceID: sourceID, path: path)
+                                case .sourceFolder(let sourceID, let path):
+                                    SourceView(sourceID: sourceID, path: path)
 
-                                    default: EmptyView()
-                                }
+                                default: EmptyView()
                             }
-                    }
+                        }
+                }
+            }
 
-                case .settings:
-                    SettingsView()
+            keptAliveTab(.settings) {
+                SettingsView()
             }
         }
+    }
+
+    @ViewBuilder
+    private func keptAliveTab<Content: View>(
+        _ tab: CustomTab,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        let isSelected = coordinator.selectedTab == tab
+
+        content()
+            .opacity(isSelected ? 1 : 0)
+            .allowsHitTesting(isSelected)
+            .accessibilityHidden(!isSelected)
+            .zIndex(isSelected ? 1 : 0)
     }
 
     private var tabBar: some View {

@@ -45,6 +45,7 @@ struct AlbumCoversView: View {
     @Injected private var importManagingVM: ImportManaging
     @Injected private var playerVM: PlayerManaging
     @Injected private var rootTabsVM: RootTabsManaging
+    @Injected private var settingsVM: SettingsManaging
     @State private var coverPaths: [String] = []
     @State private var selectedIndex: Int?
     @State private var isPagerPresented = false
@@ -92,6 +93,13 @@ struct AlbumCoversView: View {
                     }
                 })
                 .disabled(isApplying)
+                // Keep Apply clear of the root sleep-timer overlay.
+                .padding(
+                    .trailing,
+                    settingsVM.isSleepTimerActive
+                    ? GlobalConstants.HeaderButton.size + 8
+                    : 0
+                )
             }
         }
     }

@@ -166,22 +166,30 @@ struct ExpandedPlayerView: View {
         private let accentColor = Color.orange.mix(with: .white, by: 0.35)
 
         private var header: some View {
-            HStack {
-                Spacer()
+            ZStack {
+                HStack {
+                    Spacer()
 
-                Button {
-                    onClose()
-                } label: {
-                    Image(systemName: "chevron.compact.down")
-                        .font(.title3.weight(.semibold))
-                        .foregroundStyle(chromeColor)
-                        .shadow(color: .black.opacity(0.45), radius: 1.5, y: 1)
-                        .frame(width: 44, height: 28)
-                        .contentShape(Rectangle())
+                    Button {
+                        onClose()
+                    } label: {
+                        Image(systemName: "chevron.compact.down")
+                            .font(.title3.weight(.semibold))
+                            .foregroundStyle(chromeColor)
+                            .shadow(color: .black.opacity(0.45), radius: 1.5, y: 1)
+                            .frame(width: 44, height: 28)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+
+                    Spacer()
                 }
-                .buttonStyle(.plain)
 
-                Spacer()
+                HStack {
+                    Spacer()
+
+                    SleepTimerHeaderButton()
+                }
             }
             .padding(
                 .top,

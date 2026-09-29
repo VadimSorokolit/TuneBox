@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Resolver
 
 struct TabHeaderView<Trailing: View>: View {
 
@@ -33,7 +34,15 @@ struct TabHeaderView<Trailing: View>: View {
 
             Spacer()
 
-            trailing
+            HStack(spacing: 8) {
+                trailing
+
+                // Keep trailing actions clear of the root sleep-timer overlay.
+                if settingsVM.isSleepTimerActive {
+                    Color.clear
+                        .frame(size: GlobalConstants.HeaderButton.size)
+                }
+            }
         }
         .padding(.horizontal, GlobalConstants.Screen.horizontalInset)
     }
@@ -41,6 +50,7 @@ struct TabHeaderView<Trailing: View>: View {
     // MARK: - Properties. Private
 
     @Environment(\.themeManager) private var theme
+    @Injected private var settingsVM: SettingsManaging
 
     private let trailing: Trailing
 }

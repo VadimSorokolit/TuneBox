@@ -35,6 +35,10 @@ protocol SettingsManaging: LoadStateManaging {
     var privacyPolicyURL: URL? { get }
     var isSleepTimerActive: Bool { get }
     var sleepTimerTrailingText: String { get }
+    /// Remaining fraction `1 → 0` while the sleep timer runs; `0` when inactive.
+    var sleepTimerProgress: Double { get }
+    /// Compact countdown for the header control (fits inside a 44pt circle).
+    var sleepTimerHeaderText: String { get }
     func startSleepTimer(hours: Int, minutes: Int)
     func cancelSleepTimer()
     func submitFeedback(

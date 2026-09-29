@@ -31,6 +31,13 @@ final class SettingsViewModel: SettingsManaging {
             : L10n.Settings.sleepTimerOff
     }
 
+    private(set) var sleepTimerProgress: Double = 0
+
+    var sleepTimerHeaderText: String {
+        guard self.isSleepTimerActive else { return "" }
+        return self.sleepTimerHeaderCountdownText
+    }
+
     var paywallHeaderTitle: String {
         self.purchasedProductIDs.isNotEmpty
         ? self.hasLifetimePurchase
@@ -154,11 +161,10 @@ final class SettingsViewModel: SettingsManaging {
 
         let endDate = Date().addingTimeInterval(duration)
         self.sleepTimerEndDate = endDate
+        self.sleepTimerTotalDuration = duration
         self.sleepTimerZeroShown = false
         self.isSleepTimerActive = true
-        self.sleepTimerCountdownText = Self.formattedRemaining(
-            endDate.timeIntervalSinceNow
-        )
+        self.updateSleepTimerTexts(remaining: endDate.timeIntervalSinceNow)
 
         let tickTimer = Timer(
             timeInterval: 1,
@@ -178,9 +184,12 @@ final class SettingsViewModel: SettingsManaging {
         self.sleepTimerZeroHold?.invalidate()
         self.sleepTimerZeroHold = nil
         self.sleepTimerEndDate = nil
+        self.sleepTimerTotalDuration = 0
         self.sleepTimerZeroShown = false
         self.isSleepTimerActive = false
+        self.sleepTimerProgress = 0
         self.sleepTimerCountdownText = ""
+        self.sleepTimerHeaderCountdownText = ""
     }
 
     func submitFeedback(
@@ -256,9 +265,13 @@ final class SettingsViewModel: SettingsManaging {
     private var sleepTimerEndDate: Date?
 
     @ObservationIgnored
+    private var sleepTimerTotalDuration: TimeInterval = 0
+
+    @ObservationIgnored
     private var sleepTimerZeroShown = false
 
     private var sleepTimerCountdownText = ""
+    private var sleepTimerHeaderCountdownText = ""
 
     // MARK: - Methods. Private
 
@@ -287,20 +300,22 @@ final class SettingsViewModel: SettingsManaging {
     private func refreshSleepTimerDisplay() {
         guard let endDate = self.sleepTimerEndDate else {
             self.isSleepTimerActive = false
+            self.sleepTimerProgress = 0
             self.sleepTimerCountdownText = ""
+            self.sleepTimerHeaderCountdownText = ""
             return
         }
 
         let remaining = endDate.timeIntervalSinceNow
         if remaining > 0 {
-            self.sleepTimerCountdownText = Self.formattedRemaining(remaining)
+            self.updateSleepTimerTexts(remaining: remaining)
             return
         }
 
         guard self.sleepTimerZeroShown.isFalse else { return }
 
         self.sleepTimerZeroShown = true
-        self.sleepTimerCountdownText = Self.formattedRemaining(0)
+        self.updateSleepTimerTexts(remaining: 0)
 
         let hold = Timer(timeInterval: 0.15, repeats: false) { [weak self] _ in
             MainActor.assumeIsolated {
@@ -309,6 +324,17 @@ final class SettingsViewModel: SettingsManaging {
         }
         RunLoop.main.add(hold, forMode: .common)
         self.sleepTimerZeroHold = hold
+    }
+
+    private func updateSleepTimerTexts(remaining: TimeInterval) {
+        self.sleepTimerCountdownText = Self.formattedRemaining(remaining)
+        self.sleepTimerHeaderCountdownText = Self.formattedHeaderRemaining(remaining)
+
+        if self.sleepTimerTotalDuration > 0 {
+            self.sleepTimerProgress = min(1, max(0, remaining) / self.sleepTimerTotalDuration)
+        } else {
+            self.sleepTimerProgress = 0
+        }
     }
 
     private func fireSleepTimer() {
@@ -324,6 +350,20 @@ final class SettingsViewModel: SettingsManaging {
 
         if hours > 0 {
             return String(format: "%d:%02d:%02d", hours, minutes, seconds)
+        }
+
+        return String(format: "%d:%02d", minutes, seconds)
+    }
+
+    /// Fits the 44pt header control: `h:mm` over an hour, otherwise `m:ss`.
+    private static func formattedHeaderRemaining(_ interval: TimeInterval) -> String {
+        let totalSeconds = max(0, Int(interval.rounded(.up)))
+        let hours = totalSeconds / 3600
+        let minutes = (totalSeconds % 3600) / 60
+        let seconds = totalSeconds % 60
+
+        if hours > 0 {
+            return String(format: "%d:%02d", hours, minutes)
         }
 
         return String(format: "%d:%02d", minutes, seconds)
