@@ -1532,9 +1532,9 @@ final class AudioService: NSObject, AudioServicing {
                 break
         }
     }
-    
-    // MARK: -  Private. Events
-    
+
+    // MARK: - Private. Events
+
     @objc
     private func handleAppLanguageChange() {
         // Rebuild cached, localized format/route labels (e.g. "Speaker", kHz) so

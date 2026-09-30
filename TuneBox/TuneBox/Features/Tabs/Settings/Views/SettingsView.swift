@@ -64,6 +64,7 @@ struct SettingsView: View {
     private enum Constants {
         static let formTopPadding: CGFloat = 12
         static let subsequentSectionHeaderTopPadding: CGFloat = 10
+        static let sectionHeaderFont: Font = .system(size: 17, weight: .bold)
     }
 
     // MARK: - Objects. Private
@@ -94,7 +95,7 @@ struct SettingsView: View {
                 Form {
                     Section(
                         header: Text(L10n.Settings.appearance)
-                            .padding(.top, Constants.subsequentSectionHeaderTopPadding)
+                            .modifier(SettingsSectionHeaderStyle())
                     ) {
                         SettingsRow(
                             title: L10n.Settings.theme,
@@ -130,7 +131,7 @@ struct SettingsView: View {
 
                     Section(
                         header: Text(L10n.Settings.playback)
-                            .padding(.top, Constants.subsequentSectionHeaderTopPadding)
+                            .modifier(SettingsSectionHeaderStyle())
                     ) {
                         SettingsRow(
                             title: L10n.Settings.sleepTimer,
@@ -143,7 +144,7 @@ struct SettingsView: View {
 
                     Section(
                         header: Text(L10n.Settings.about)
-                            .padding(.top, Constants.subsequentSectionHeaderTopPadding)
+                            .modifier(SettingsSectionHeaderStyle())
                     ) {
                         SettingsRow(title: L10n.Settings.appInfo) {
                             path.append(.about)
@@ -225,6 +226,17 @@ struct SettingsView: View {
                     }
                 }
             )
+        }
+    }
+
+    // MARK: - SettingsSectionHeaderStyle
+
+    private struct SettingsSectionHeaderStyle: ViewModifier {
+
+        func body(content: Content) -> some View {
+            content
+                .font(Constants.sectionHeaderFont)
+                .padding(.top, Constants.subsequentSectionHeaderTopPadding)
         }
     }
 }

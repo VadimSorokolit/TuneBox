@@ -305,7 +305,7 @@ struct ImportsView: View {
                                 } header: {
                                     sectionTracksTitle(
                                         section.kind.localizedTitle,
-                                        font: .system(size: 14, weight: .bold),
+                                        font: .system(size: 15, weight: .bold),
                                         background: .clear,
                                         foregroundStyle: .gray,
                                         topPadding: Constants.sectionHeaderTopPadding,

@@ -94,7 +94,10 @@ struct SettingsRow: View {
 
     var body: some View {
         row
-            .modifier(SettingsRowLayoutModifier(isCompactSE: isCompactSE, hasMenu: menu != nil))
+            .modifier(
+                SettingsRowLayoutModifier(isCompactSE: isCompactSE,
+                                          hasMenu: menu != nil)
+            )
     }
 
     // MARK: - Properties. Private
@@ -102,6 +105,10 @@ struct SettingsRow: View {
     @Environment(\.screenHeight) private var screenHeight
 
     private let menu: UIMenu?
+
+    private enum Constants {
+        static let rowFont: Font = .system(size: 17, weight: .regular)
+    }
 
     private var isCompactSE: Bool {
         screenHeight > 0 && screenHeight <= GlobalConstants.Screen.seHeight
@@ -147,6 +154,7 @@ struct SettingsRow: View {
             if let value, value.isNotEmpty {
                 Text(value)
                     .lineLimit(1)
+                    .font(Constants.rowFont)
                     .foregroundStyle(.secondary)
                     .fixedSize()
             }
@@ -169,6 +177,7 @@ struct SettingsRow: View {
     @ViewBuilder
     private var titleLabel: some View {
         let text = Text(title)
+            .font(Constants.rowFont)
             .foregroundStyle(.primary)
             .transaction { $0.animation = nil }
 
@@ -186,6 +195,7 @@ struct SettingsRow: View {
     private func trailingTextLabel(_ trailingText: String) -> some View {
         let text = Text(trailingText)
             .foregroundStyle(.secondary)
+            .font(Constants.rowFont)
             .transaction { $0.animation = nil }
 
         if let trailingTextLineLimitRange {
