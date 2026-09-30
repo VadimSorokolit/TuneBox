@@ -97,7 +97,7 @@
 "library.playlist.new" = "Новий плейлист";
 
 /* Discover */
-"discover.menu.remove_active" = "Видалити всі активні треки";
+"discover.menu.remove_active" = "Видалити всі треки, що тривають";
 "discover.menu.remove_paused" = "Видалити всі призупинені треки";
 "discover.section.featured" = "Рекомендовані";
 "discover.section.popular" = "Популярні";

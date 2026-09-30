@@ -97,7 +97,7 @@
 "library.playlist.new" = "Neue Playlist";
 
 /* Discover */
-"discover.menu.remove_active" = "Alle aktiven Titel entfernen";
+"discover.menu.remove_active" = "Alle Titel in Bearbeitung entfernen";
 "discover.menu.remove_paused" = "Alle pausierten Titel entfernen";
 "discover.section.featured" = "Empfohlen";
 "discover.section.popular" = "Beliebt";
