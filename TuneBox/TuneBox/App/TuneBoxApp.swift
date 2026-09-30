@@ -33,8 +33,6 @@ struct TuneBoxApp: App {
                 .environment(\.screenHeight, screenHeight)
                 .applyTheme(themeManager)
                 .environment(coordinator)
-                // Keep identity stable so the selected tab (e.g. Settings) is preserved.
-                .environment(\.languageRefreshID, languageVM.refreshID)
                 .onGeometryChange(for: CGFloat.self) { proxy in
                     proxy.size.height
                 } action: { _, height in

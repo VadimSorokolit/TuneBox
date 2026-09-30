@@ -1002,6 +1002,13 @@ final class AudioService: NSObject, AudioServicing {
             name: UIApplication.didBecomeActiveNotification,
             object: nil
         )
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(self.handleAppLanguageChange),
+            name: .appLanguageDidChange,
+            object: nil
+        )
     }
 
     private func activateAudioSession(forceCategory: Bool = false) {
@@ -1392,7 +1399,12 @@ final class AudioService: NSObject, AudioServicing {
 
     private func updateOutputRoute() {
         let session = AVAudioSession.sharedInstance()
-        let name = session.currentRoute.outputs.first?.portName ?? L10n.Player.speaker
+        let output = session.currentRoute.outputs.first
+        // Built-in speaker: use our localized label instead of the system name.
+        // Real devices (AirPods, Bluetooth, etc.) keep their system-provided name.
+        let name = output?.portType == .builtInSpeaker
+            ? L10n.Player.speaker
+            : output?.portName ?? L10n.Player.speaker
         let kHz = Int((session.sampleRate / 1000).rounded())
         self.outputRouteText = "\(name) • \(L10n.Player.formatKhz(kHz))"
         self.publishFormatInfo()
@@ -1492,6 +1504,47 @@ final class AudioService: NSObject, AudioServicing {
         }
     }
 
+    private func handleAudioRouteChangeOnMain(
+        reason: AVAudioSession.RouteChangeReason,
+        notification: Notification,
+        shouldPause: Bool
+    ) {
+        AppLogger.audio.info(
+            "Audio route changed: \(reason.rawValue), headphones: \(self.headphonesConnected), stopped: \(self.player.isStopped)"
+        )
+
+        switch reason {
+            case .newDeviceAvailable,
+                    .oldDeviceUnavailable,
+                    .routeConfigurationChange:
+                self.checkHeadphonesConnection(
+                    outputs: AVAudioSession.sharedInstance().currentRoute.outputs
+                )
+                self.supportsDoP = nil
+                self.needsEngineRebuild = true
+                self.updateOutputRoute()
+
+                if shouldPause {
+                    self.pauseForRouteChange()
+                }
+
+            default:
+                break
+        }
+    }
+    
+    // MARK: -  Private. Events
+    
+    @objc
+    private func handleAppLanguageChange() {
+        // Rebuild cached, localized format/route labels (e.g. "Speaker", kHz) so
+        // the player reflects the new language without needing a new track.
+        if let url = self.currentURL {
+            self.updateSourceFormat(for: url)
+        }
+        self.updateOutputRoute()
+    }
+
     @objc
     private func handleAppDidBecomeActive(_ notification: Notification) {
         DispatchQueue.main.async { [weak self] in
@@ -1538,35 +1591,6 @@ final class AudioService: NSObject, AudioServicing {
                 notification: notification,
                 shouldPause: shouldPause
             )
-        }
-    }
-
-    private func handleAudioRouteChangeOnMain(
-        reason: AVAudioSession.RouteChangeReason,
-        notification: Notification,
-        shouldPause: Bool
-    ) {
-        AppLogger.audio.info(
-            "Audio route changed: \(reason.rawValue), headphones: \(self.headphonesConnected), stopped: \(self.player.isStopped)"
-        )
-
-        switch reason {
-            case .newDeviceAvailable,
-                    .oldDeviceUnavailable,
-                    .routeConfigurationChange:
-                self.checkHeadphonesConnection(
-                    outputs: AVAudioSession.sharedInstance().currentRoute.outputs
-                )
-                self.supportsDoP = nil
-                self.needsEngineRebuild = true
-                self.updateOutputRoute()
-
-                if shouldPause {
-                    self.pauseForRouteChange()
-                }
-
-            default:
-                break
         }
     }
 }

@@ -47,11 +47,4 @@ protocol SettingsManaging: LoadStateManaging {
         emoji: String,
         comment: String
     ) async throws
-
-    #if DEBUG
-    var localTrialStatus: LocalTrialStatus? { get }
-
-    func debugExpireTrial()
-    func debugResetTrial()
-    #endif
 }

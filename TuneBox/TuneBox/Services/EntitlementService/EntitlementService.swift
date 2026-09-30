@@ -16,8 +16,11 @@ final class EntitlementService: EntitlementServicing {
 
     private(set) var hasPremium: Bool = false
     private(set) var localTrialStatus: LocalTrialStatus?
-    private(set) var paywallStatusMessage: String = L10n.Paywall.statusUnlock
     private(set) var subscriptionExpirationDate: Date?
+
+    var paywallStatusMessage: String {
+        self.makePaywallStatusMessage()
+    }
 
     // MARK: - Initializer
 
@@ -59,7 +62,6 @@ final class EntitlementService: EntitlementServicing {
     func refreshAccessState() {
         self.localTrialStatus = self.makeLocalTrialStatus()
         self.hasPremium = self.hasPurchasedPremium || (self.localTrialStatus?.isActive ?? false)
-        self.paywallStatusMessage = self.makePaywallStatusMessage()
     }
 
     func updatePurchasedProducts(
@@ -164,30 +166,22 @@ final class EntitlementService: EntitlementServicing {
     }
 
     private static func formatted(_ date: Date) -> String {
-        date.formatted(date: .abbreviated, time: .omitted)
+        date.formatted(
+            .dateTime
+                .day()
+                .month(.abbreviated)
+                .year()
+                .locale(Self.appLocale)
+        )
+        .replacingOccurrences(of: ".", with: "")
     }
 
-    #if DEBUG
+    private static var appLocale: Locale {
+        let raw = UserDefaults.standard.string(
+            forKey: LanguageService.Constants.userDefaultsLanguageKey
+        )
+        let language = raw.flatMap(AppLanguage.init(rawValue:)) ?? .system
 
-    func debugExpireTrial() {
-        let expiredStartDate = Date().addingTimeInterval(-(TrialConfiguration.duration + 86_400))
-        self.userDefaults.set(expiredStartDate, forKey: Constants.trialStartDateKey)
-        self.hasPurchasedPremium = false
-        self.userDefaults.set(false, forKey: Constants.hasPurchasedPremiumKey)
-        self.purchasedProductIDs = []
-        self.subscriptionExpirationDate = nil
-        self.persistPurchaseState()
-        self.refreshAccessState()
+        return Locale(identifier: language.resolvedCode)
     }
-
-    func debugResetTrial() {
-        self.userDefaults.removeObject(forKey: Constants.trialStartDateKey)
-        self.hasPurchasedPremium = false
-        self.purchasedProductIDs = []
-        self.subscriptionExpirationDate = nil
-        self.persistPurchaseState()
-        self.bootstrapLocalTrialIfNeeded()
-    }
-
-    #endif
 }

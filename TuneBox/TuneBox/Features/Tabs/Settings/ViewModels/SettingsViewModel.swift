@@ -19,7 +19,6 @@ final class SettingsViewModel: SettingsManaging {
     private(set) var purchasedProductIDs = Set<String>()
     var isPaywallPresented = false
     private(set) var hasPremium: Bool = false
-    private(set) var paywallStatusMessage: String = L10n.Paywall.statusUnlock
     private(set) var products: [Product] = []
     private(set) var isLoading = false
     private(set) var error: String?
@@ -44,6 +43,11 @@ final class SettingsViewModel: SettingsManaging {
         ? L10n.Paywall.headerLifetime
         : L10n.Paywall.headerPremium
         : L10n.Paywall.headerPurchase
+    }
+
+    var paywallStatusMessage: String {
+        _ = self.hasPremium
+        return self.entitlementService.paywallStatusMessage
     }
 
     var hasLifetimePurchase: Bool {
@@ -206,24 +210,6 @@ final class SettingsViewModel: SettingsManaging {
         )
     }
 
-    #if DEBUG
-
-    var localTrialStatus: LocalTrialStatus? {
-        self.entitlementService.localTrialStatus
-    }
-
-    func debugExpireTrial() {
-        self.entitlementService.debugExpireTrial()
-        self.syncFromServices()
-    }
-
-    func debugResetTrial() {
-        self.entitlementService.debugResetTrial()
-        self.syncFromServices()
-    }
-
-    #endif
-
     // MARK: - Properties. Private
 
     private enum Constants {
@@ -294,7 +280,6 @@ final class SettingsViewModel: SettingsManaging {
         self.isLoading = self.purchaseService.isLoading
         self.error = self.purchaseService.error
         self.hasPremium = self.entitlementService.hasPremium
-        self.paywallStatusMessage = self.entitlementService.paywallStatusMessage
     }
 
     private func refreshSleepTimerDisplay() {

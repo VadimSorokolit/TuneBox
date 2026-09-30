@@ -20,17 +20,13 @@ struct SettingsView: View {
         NavigationStack(path: $path) {
             VStack(spacing: 0) {
                 HeaderView()
-                    .id(headerLocalizationID)
 
                 SectionsView(
                     settingsVM: settingsVM,
                     languageVM: languageVM,
                     rootTabsVM: rootTabsVM,
                     isSleepTimerPresented: $isSleepTimerPresented,
-                    path: $path,
-                    onLanguageChanged: {
-                        headerLocalizationID = UUID()
-                    }
+                    path: $path
                 )
             }
             .toolbar(.hidden, for: .navigationBar)
@@ -64,7 +60,6 @@ struct SettingsView: View {
     @State private var path = [SettingsRoute]()
     @State private var isFeedbackPresented = false
     @State private var isSleepTimerPresented = false
-    @State private var headerLocalizationID = UUID()
 
     private enum Constants {
         static let formTopPadding: CGFloat = 12
@@ -91,7 +86,6 @@ struct SettingsView: View {
         let rootTabsVM: RootTabsManaging
         @Binding var isSleepTimerPresented: Bool
         @Binding var path: [SettingsRoute]
-        let onLanguageChanged: () -> Void
 
         // MARK: - Body
 
@@ -190,7 +184,6 @@ struct SettingsView: View {
                 get: { languageVM.language },
                 set: { language in
                     languageVM.setLanguage(language)
-                    onLanguageChanged()
                 }
             )
         }

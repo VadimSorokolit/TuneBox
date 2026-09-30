@@ -6,42 +6,11 @@
 //
 
 import Foundation
+import Resolver
 
 enum L10n {
 
-    private static var language: AppLanguage {
-        guard let raw = UserDefaults.standard.string(
-            forKey: LanguageService.Constants.userDefaultsLanguageKey
-        ),
-              let saved = AppLanguage(rawValue: raw) else {
-            return .system
-        }
-
-        return saved
-    }
-
-    private static var bundle: Bundle {
-        let code = language.resolvedCode
-
-        guard let path = Bundle.main.path(forResource: code, ofType: "lproj"),
-              let bundle = Bundle(path: path) else {
-            if let fallbackPath = Bundle.main.path(
-                forResource: AppLanguage.fallbackCode,
-                ofType: "lproj"
-            ),
-               let fallbackBundle = Bundle(path: fallbackPath) {
-                return fallbackBundle
-            }
-
-            return .main
-        }
-
-        return bundle
-    }
-
-    private static func text(_ key: String) -> String {
-        NSLocalizedString(key, bundle: bundle, comment: "")
-    }
+    // MARK: - Common
 
     enum Common {
         static var error: String { text("common.error") }
@@ -60,6 +29,8 @@ enum L10n {
         }
     }
 
+    // MARK: - Tab
+
     enum Tab {
         static var `import`: String { text("tab.import") }
         static var discover: String { text("tab.discover") }
@@ -67,10 +38,14 @@ enum L10n {
         static var settings: String { text("tab.settings") }
     }
 
+    // MARK: - TabsMode
+
     enum TabsMode {
         static var all: String { text("tabs.mode.all") }
         static var `import`: String { text("tabs.mode.import") }
     }
+
+    // MARK: - Settings
 
     enum Settings {
         static var title: String { text("settings.title") }
@@ -115,6 +90,8 @@ enum L10n {
         static var shareMessage: String { text("settings.share.message") }
     }
 
+    // MARK: - Import
+
     enum Import {
         static var library: String { text("import.section.library") }
         static var sources: String { text("import.section.sources") }
@@ -134,6 +111,8 @@ enum L10n {
         static var deleteFolderMessage: String { text("import.delete_folder.message") }
         static var downloadsSource: String { text("import.source.downloads") }
     }
+
+    // MARK: - Library
 
     enum Library {
         static var albums: String { text("library.item.albums") }
@@ -182,6 +161,8 @@ enum L10n {
         static var playlistNew: String { text("library.playlist.new") }
     }
 
+    // MARK: - Discover
+
     enum Discover {
         static var removeActive: String { text("discover.menu.remove_active") }
         static var removePaused: String { text("discover.menu.remove_paused") }
@@ -194,6 +175,8 @@ enum L10n {
         static var paginationEnd: String { text("discover.pagination.end") }
     }
 
+    // MARK: - Genre
+
     enum Genre {
         static var all: String { text("genre.all") }
         static var pop: String { text("genre.pop") }
@@ -202,6 +185,8 @@ enum L10n {
         static var classic: String { text("genre.classic") }
         static var electronic: String { text("genre.electronic") }
     }
+
+    // MARK: - Player
 
     enum Player {
         static var emptyTitle: String { text("player.empty.title") }
@@ -228,6 +213,8 @@ enum L10n {
         }
     }
 
+    // MARK: - Track
+
     enum Track {
         static var editTags: String { text("track.menu.edit_tags") }
         static var deleteFromPlaylist: String { text("track.menu.delete_from_playlist") }
@@ -239,6 +226,8 @@ enum L10n {
         static var a11yDelete: String { text("track.a11y.delete") }
         static var a11yRetry: String { text("track.a11y.retry") }
     }
+
+    // MARK: - Paywall
 
     enum Paywall {
         static var statusUnlock: String { text("paywall.status.unlock") }
@@ -277,6 +266,8 @@ enum L10n {
         static var disclosureManage: String { text("paywall.disclosure.manage") }
     }
 
+    // MARK: - Feedback
+
     enum Feedback {
         static var title: String { text("feedback.title") }
         static var prompt: String { text("feedback.prompt") }
@@ -292,6 +283,8 @@ enum L10n {
         static var thanksMessage: String { text("feedback.thanks_message") }
         static var sendError: String { text("feedback.error.send") }
     }
+
+    // MARK: - Error
 
     enum Error {
         static var noInternet: String { text("error.api.no_internet") }
@@ -337,5 +330,21 @@ enum L10n {
         static var sourceNetworkUnavailable: String { text("error.source.network_unavailable") }
         static var sourceAccessDenied: String { text("error.source.access_denied") }
         static var sourceBookmarkInvalid: String { text("error.source.bookmark_invalid") }
+    }
+
+    // MARK: - Methods. Private
+
+    private static func text(_ key: String) -> String {
+        holder.languageVM.localizedString(key)
+    }
+
+    // MARK: - Properties. Private
+
+    private static let holder = Holder()
+
+    // MARK: - Objects. Private
+
+    private struct Holder {
+        @Injected var languageVM: LanguageManaging
     }
 }

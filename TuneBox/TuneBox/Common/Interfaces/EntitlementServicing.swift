@@ -22,9 +22,4 @@ protocol EntitlementServicing: AnyObject {
         allowClearing: Bool
     )
     func isPurchaseStatusReady(for productID: String) -> Bool
-
-    #if DEBUG
-    func debugExpireTrial()
-    func debugResetTrial()
-    #endif
 }

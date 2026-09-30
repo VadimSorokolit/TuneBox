@@ -16,5 +16,6 @@ extension Notification.Name {
     static let playbackDidPauseForRouteChange = Notification.Name("playbackDidPauseForRouteChange")
     static let playbackOutputDropoutDetected = Notification.Name("playbackOutputDropoutDetected")
     static let vinylSpinGateDidAllow = Notification.Name("vinylSpinGateDidAllow")
+    static let appLanguageDidChange = Notification.Name("appLanguageDidChange")
 
 }
