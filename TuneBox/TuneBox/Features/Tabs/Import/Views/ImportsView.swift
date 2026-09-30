@@ -123,6 +123,18 @@ struct ImportsView: View {
         coordinator.canPop.isFalse
     }
 
+    private enum Constants {
+        static let doneSystemImage = "checkmark"
+        static let addFolderSystemImage = "plus"
+        static let editSectionsSystemImage = "slider.horizontal.3"
+        static let licenseSystemImage = "checkmark.seal.fill"
+        static let menuSystemImage = "ellipsis"
+        static let emptySystemImage = "music.note.list"
+        static let deleteSystemImage = "trash"
+        static let fallbackSourceSystemImage = "folder"
+        static let sectionHeaderTopPadding: CGFloat = 30
+    }
+
     // MARK: - Objects. Private
 
     private struct ImportProgressOverlay: View {
@@ -187,7 +199,7 @@ struct ImportsView: View {
                 Button(action: {
                     importManagingVM.finishEditSections()
                 }, label: {
-                    HeaderGlassButton(systemName: "checkmark")
+                    HeaderGlassButton(systemName: Constants.doneSystemImage)
                 })
                 .headerGlassChrome()
             } else {
@@ -195,24 +207,24 @@ struct ImportsView: View {
                     Button(action: {
                             isFileImporterPresented = true
                         }, label: {
-                            Label(L10n.Import.addFolder, systemImage: "plus")
+                            Label(L10n.Import.addFolder, systemImage: Constants.addFolderSystemImage)
                         }
                     )
 
                     Button(action: {
                         importManagingVM.beginEditSections()
                         }, label: {
-                            Label(L10n.Import.editSections, systemImage: "slider.horizontal.3")
+                            Label(L10n.Import.editSections, systemImage: Constants.editSectionsSystemImage)
                         }
                     )
 
                     Button(action: {
                         settingsVM.presentPaywall()
                     }, label: {
-                        Label(L10n.Settings.license, systemImage: "checkmark.seal.fill")
+                        Label(L10n.Settings.license, systemImage: Constants.licenseSystemImage)
                     })
                 } label: {
-                    HeaderGlassButton(systemName: "ellipsis")
+                    HeaderGlassButton(systemName: Constants.menuSystemImage)
                 }
                 .headerGlassChrome()
                 .disabled(isMenuButtonDisabled)
@@ -237,7 +249,7 @@ struct ImportsView: View {
 
         var body: some View {
             ContentUnavailableView {
-                Label(L10n.Import.noTracks, systemImage: "music.note.list")
+                Label(L10n.Import.noTracks, systemImage: Constants.emptySystemImage)
             } description: {
                 Text(L10n.Import.sourcesMessage)
             } actions: {
@@ -246,7 +258,7 @@ struct ImportsView: View {
                         isFileImporterPresented = true
                     }, label: {
                         HStack {
-                            Image(systemName: "plus")
+                            Image(systemName: Constants.addFolderSystemImage)
 
                             Text(L10n.Import.addFolder)
                         }
@@ -333,10 +345,6 @@ struct ImportsView: View {
         @State private var dragStartIndex: Int?
         @State private var dragSectionKind: ImportSection?
 
-        private enum Constants {
-            static let sectionHeaderTopPadding: CGFloat = 30
-        }
-
         // MARK: - Private. Methods
 
         private func menuCell(
@@ -381,7 +389,7 @@ struct ImportsView: View {
                     Button(role: .destructive) {
                         sourceIDToDelete = id
                     } label: {
-                        Label(L10n.Common.delete, systemImage: "trash")
+                        Label(L10n.Common.delete, systemImage: Constants.deleteSystemImage)
                     }
                 }
             }
@@ -533,7 +541,8 @@ struct ImportsView: View {
                     return libraryItem.systemImage
 
                 case .source(let id):
-                    return importManagingVM.source(for: id)?.kind.systemImage ?? "folder"
+                    return importManagingVM.source(for: id)?.kind.systemImage
+                        ?? Constants.fallbackSourceSystemImage
             }
         }
     }
@@ -541,4 +550,5 @@ struct ImportsView: View {
 
 #Preview {
     ImportsView()
+        .environment(AppCoordinator(root: .main))
 }
