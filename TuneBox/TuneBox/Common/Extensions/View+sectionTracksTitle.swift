@@ -12,7 +12,7 @@ extension View {
     func sectionTracksTitle(
         _ title: String,
         suffix: String? = nil,
-        font: Font = .headline,
+        font: Font = .satoshi.bold.size(17),
         background: Color = Color(.systemBackground),
         foregroundStyle: Color = Color(.label),
         topPadding: CGFloat = 10,

@@ -1,5 +1,5 @@
 //
-//  BrowsView.swift
+//  DiscoverView.swift
 //  TuneBox
 //
 //  Created by Vadim Sorokolit on 13.05.2026.
@@ -8,7 +8,7 @@
 import Resolver
 import SwiftUI
 
-struct BrowseView: View {
+struct DiscoverView: View {
 
     // MARK: - Main Body
 
@@ -69,6 +69,7 @@ struct BrowseView: View {
         static let searchToChipsSpacing: CGFloat = 8
         static let featuredSectionHeaderTopPadding: CGFloat = 32
         static let featuredCarouselBottomPadding: CGFloat = 22
+        static let cellSpacing: CGFloat = 16
     }
 
     // MARK: - Subviews. Private
@@ -195,7 +196,7 @@ struct BrowseView: View {
                transferManagingVM.shouldShowCentralSpinner.isFalse {
                 Section(
                     content: {
-                        LazyVStack(spacing: 8) {
+                        LazyVStack(spacing: Constants.cellSpacing / 2) {
                             ForEach(section.tracks, id: \.id) { track in
                                 TrackCell(
                                     track: track,
@@ -226,7 +227,10 @@ struct BrowseView: View {
                         }
                     },
                     header: {
-                        sectionTracksTitle(section.title)
+                        sectionTracksTitle(
+                            section.title,
+                            topPadding: 30
+                        )
                     }
                 )
             }
@@ -300,7 +304,7 @@ struct BrowseView: View {
 
                 Section(
                     content: {
-                        LazyVStack(spacing: 4) {
+                        LazyVStack(spacing: Constants.cellSpacing / 2) {
                             ForEach(section.tracks, id: \.id) { track in
                                 TrackCell(
                                     track: track,
@@ -349,5 +353,5 @@ struct BrowseView: View {
 }
 
 #Preview {
-    BrowseView()
+    DiscoverView()
 }

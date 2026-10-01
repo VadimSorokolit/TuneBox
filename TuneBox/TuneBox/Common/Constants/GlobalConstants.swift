@@ -12,46 +12,9 @@ enum GlobalConstants {
     static let bytesInGigabyte: Double = 1e9
     static let downloadedFilePrefix = "track"
 
-    enum Device {
-        static var isPad: Bool {
-            UIDevice.current.model.contains("iPad")
-        }
-    }
-
     enum API {
         static let fallbackBaseURL = "google.com"
         static let invalidURLMessage = "Invalid baseURL:"
-    }
-
-    enum Screen {
-        static let regularWidth: CGFloat = 393
-        static let seHeight: CGFloat = 667
-        static let defaultHeight: CGFloat = 60
-        static let horizontalInset: CGFloat = 26
-    }
-
-    enum HeaderButton {
-        static let size: CGFloat = 44
-        static let fontSize: CGFloat = 20
-        static let foregroundOpacity: Double = 0.6
-
-        static let font: Font = .system(size: fontSize, weight: .medium)
-        static let foregroundStyle = Color.black.opacity(foregroundOpacity)
-    }
-
-    enum CompactPlayer {
-        static let height: CGFloat = 106
-        static let pausedHeight: CGFloat = 86
-        static let bottomPadding: CGFloat = 20
-
-        static func height(isPlaying: Bool) -> CGFloat {
-            isPlaying ? height : pausedHeight
-        }
-    }
-
-    enum UserDefaultsKey {
-        static let playlistID: String = "UserDefaultsPlaylistIdKey"
-        static let lastBackgroundedAt = "lastBackgroundedAt"
     }
 
     enum AppColor {
@@ -67,10 +30,54 @@ enum GlobalConstants {
         static let subtitleFont: Font = .system(size: 10, weight: .regular)
     }
 
+    enum CompactPlayer {
+        static let height: CGFloat = 106
+        static let pausedHeight: CGFloat = 86
+        static let bottomPadding: CGFloat = 20
+
+        static func height(isPlaying: Bool) -> CGFloat {
+            isPlaying ? height : pausedHeight
+        }
+    }
+
+    enum Device {
+        static var isPad: Bool {
+            UIDevice.current.model.contains("iPad")
+        }
+    }
+
+    enum GenreCell {
+        static let width: CGFloat = 150
+        static let height: CGFloat = 290
+        static let cornerRadius: CGFloat = 10
+        static let borderWidth: CGFloat = 0.5
+    }
+
+    enum HeaderButton {
+        static let size: CGFloat = 44
+        static let fontSize: CGFloat = 20
+        static let foregroundOpacity: Double = 0.6
+        static let font: Font = .system(size: fontSize, weight: .medium)
+        static let foregroundStyle = Color.black.opacity(foregroundOpacity)
+    }
+
+    enum Screen {
+        static let regularWidth: CGFloat = 393
+        static let seHeight: CGFloat = 667
+        static let defaultHeight: CGFloat = 60
+        static let horizontalInset: CGFloat = 26
+    }
+
     enum TrackCell {
-        static let primaryTextSize: CGFloat = 13
-        static let durationTextSize: CGFloat = 11
+        static let primaryTextSize: CGFloat = 15
+        static let durationTextSize: CGFloat = 13
         static let actionButtonIconSize: CGFloat = 16
         static let actionButtonSize: CGFloat = 28
     }
+
+    enum UserDefaultsKey {
+        static let playlistID: String = "UserDefaultsPlaylistIdKey"
+        static let lastBackgroundedAt = "lastBackgroundedAt"
+    }
+
 }

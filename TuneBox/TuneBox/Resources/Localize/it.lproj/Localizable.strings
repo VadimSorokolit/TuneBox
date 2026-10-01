@@ -134,12 +134,6 @@
 "track.menu.edit_tags" = "Modifica tag audio";
 "track.menu.delete_from_playlist" = "Elimina dalla playlist";
 "track.menu.delete_from_device" = "Elimina da iPhone";
-"track.a11y.start_download" = "Avvia download";
-"track.a11y.cancel_download" = "Annulla download";
-"track.a11y.pause_download" = "Metti in pausa download";
-"track.a11y.resume_download" = "Riprendi download";
-"track.a11y.delete" = "Elimina brano";
-"track.a11y.retry" = "Riprova download";
 
 /* Paywall */
 "paywall.status.unlock" = "Sblocca l’accesso completo alla riproduzione";

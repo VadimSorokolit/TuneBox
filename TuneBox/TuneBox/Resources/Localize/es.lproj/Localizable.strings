@@ -134,12 +134,6 @@
 "track.menu.edit_tags" = "Editar etiquetas de audio";
 "track.menu.delete_from_playlist" = "Eliminar de la lista";
 "track.menu.delete_from_device" = "Eliminar del iPhone";
-"track.a11y.start_download" = "Iniciar descarga";
-"track.a11y.cancel_download" = "Cancelar descarga";
-"track.a11y.pause_download" = "Pausar descarga";
-"track.a11y.resume_download" = "Reanudar descarga";
-"track.a11y.delete" = "Eliminar pista";
-"track.a11y.retry" = "Reintentar descarga";
 
 /* Paywall */
 "paywall.status.unlock" = "Desbloquea el acceso completo a la reproducción";

@@ -27,14 +27,12 @@ struct GenreCell: View {
     var configuration: GenreCellConfiguration = .init()
 
     private enum Constants {
-        static let width: CGFloat = 110
-        static let height: CGFloat = 230
-        static let textLineHeight: CGFloat = 17
+        static let textLineHeight: CGFloat = 20
         static let textBlockSpacing: CGFloat = 2
     }
 
     private var imageSide: CGFloat {
-        Constants.width - configuration.padding * 2
+        GlobalConstants.GenreCell.width - configuration.padding * 2
     }
 
     /// Fixed slot for title + subtitle so covers/bottom stay aligned.
@@ -80,13 +78,18 @@ struct GenreCell: View {
 
                 Spacer(minLength: 0)
 
-                if configuration.showDuration || configuration.showDownloadButton {
+                if configuration.showDuration
+                    || configuration.showDownloadButton {
                     bottomRow
                 }
             }
             .padding(configuration.padding)
         }
-        .frame(width: Constants.width, height: Constants.height, alignment: .top)
+        .frame(
+            width: GlobalConstants.GenreCell.width,
+            height: GlobalConstants.GenreCell.height,
+            alignment: .top
+        )
     }
 
     private var cellBackground: some View {
@@ -109,100 +112,12 @@ struct GenreCell: View {
             Spacer()
 
             if configuration.showDownloadButton {
-                Button(action: onButtonTap) {
-                    downloadButton
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(accessibilityLabel)
+                TrackDownloadButton(
+                    track: track,
+                    idleColor: .primary,
+                    action: onButtonTap
+                )
             }
-        }
-    }
-
-    private var downloadButton: some View {
-        let progress = min(max(track.downloadingProgress, 0), 1)
-
-        return ZStack {
-            if track.downloadState != .completed,
-               track.downloadState != .idle {
-                Circle()
-                    .stroke(Color.white, lineWidth: 0.8)
-
-                Circle()
-                    .trim(from: 0, to: progress)
-                    .stroke(
-                        Color.green,
-                        style: StrokeStyle(lineWidth: 1, lineCap: .round)
-                    )
-                    .rotationEffect(.degrees(-90))
-            }
-
-            stateImage
-                .font(.system(size: GlobalConstants.TrackCell.actionButtonIconSize, weight: .medium))
-                .foregroundStyle(iconColor)
-                .frame(size: GlobalConstants.TrackCell.actionButtonSize)
-        }
-        .frame(size: GlobalConstants.TrackCell.actionButtonSize)
-    }
-
-    private var accessibilityLabel: String {
-        switch track.downloadState {
-            case .idle:
-                L10n.Track.a11yStartDownload
-
-            case .queued:
-                L10n.Track.a11yCancelDownload
-
-            case .downloading:
-                L10n.Track.a11yPauseDownload
-
-            case .paused:
-                L10n.Track.a11yResumeDownload
-
-            case .completed:
-                L10n.Track.a11yDelete
-
-            case .failed:
-                L10n.Track.a11yRetry
-        }
-    }
-
-    @ViewBuilder
-    private var stateImage: some View {
-        switch track.downloadState {
-            case .idle:
-                Image(systemName: track.fileState == .removed ? "cloud" : "arrow.down")
-
-            case .queued:
-                Image(systemName: "clock")
-
-            case .downloading:
-                Image(systemName: "pause.fill")
-
-            case .paused:
-                Image(systemName: "play.fill")
-
-            case .completed:
-                Image(systemName: "trash.fill")
-
-            case .failed:
-                Image(systemName: "exclamationmark.circle")
-        }
-    }
-
-    private var iconColor: Color {
-        switch track.downloadState {
-            case .idle:
-                return .primary
-            case .queued:
-                return .yellow
-            case .downloading:
-                return .red
-            case .paused:
-                return .blue
-            case .completed:
-                return .red
-            case .failed:
-                return .orange
         }
     }
 
@@ -237,7 +152,7 @@ struct GenreCell: View {
         track: makePreviewTrack(),
         onButtonTap: {}
     )
-    .frame(width: 120, height: 180)
+    .frame(width: 150, height: 280)
     .padding()
 }
 
@@ -245,10 +160,10 @@ private func makePreviewTrack() -> TrackEntity {
     let track = TrackEntity(
         id: "1",
         image: "https://usercontent.jamendo.com/?type=album&id=24&width=300&trackid=168",
-        songName: "Believer",
+        songName: "Believer Believer Believer Believer Believer Believer",
         duration: 200,
-        artistName: "Imagine Dragons",
-        albumName: "Evolve",
+        artistName: "Imagine Dragons Imagine Dragons Imagine Dragons Imagine Dragons Imagine Dragons",
+        albumName: "Evolve Evolve Evolve",
         releaseDate: "2017-02-01",
         download: nil,
         waveformData: nil,
@@ -256,5 +171,6 @@ private func makePreviewTrack() -> TrackEntity {
     )
 
     track.downloadState = .downloading
+
     return track
 }

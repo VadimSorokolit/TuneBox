@@ -223,7 +223,7 @@ struct RootTabsView: View {
     private var content: some View {
         ZStack {
             keptAliveTab(.browse) {
-                BrowseView()
+                DiscoverView()
             }
 
             keptAliveTab(.downloads) {

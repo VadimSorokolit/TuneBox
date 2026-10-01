@@ -115,7 +115,7 @@ private struct ChipButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.satoshi.medium.size(12))
+                .font(.satoshi.medium.size(15))
                 .foregroundStyle(isSelected ? Color.white : color)
                 .padding(.horizontal, 14)
                 .frame(height: SegmentedChipConstants.chipHeight)

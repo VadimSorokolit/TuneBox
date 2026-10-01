@@ -35,20 +35,18 @@ struct PaginationFooterView: View {
                     .padding(.bottom, 10)
 
             case .carousel:
-                VStack(spacing: 6) {
-                    Image(systemName: "music.note.list")
-                        .font(.system(size: 20, weight: .light))
+                ZStack {
+                    EmptyGenreCell()
 
-                    Text(L10n.Discover.paginationEnd)
-                        .font(.satoshi.medium.size(12))
-                        .multilineTextAlignment(.center)
+                    VStack(spacing: 6) {
+                        Image(systemName: "music.note.list")
+                            .font(.system(size: 30, weight: .light))
+
+                        Text(L10n.Discover.paginationEnd)
+                            .font(.satoshi.medium.size(15))
+                            .multilineTextAlignment(.center)
+                    }
                 }
-                .foregroundStyle(.secondary)
-                .frame(width: 110, height: 230)
-                .background(
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(Color(.secondarySystemBackground))
-                )
         }
     }
 }

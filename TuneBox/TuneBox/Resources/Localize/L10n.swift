@@ -219,12 +219,6 @@ enum L10n {
         static var editTags: String { text("track.menu.edit_tags") }
         static var deleteFromPlaylist: String { text("track.menu.delete_from_playlist") }
         static var deleteFromDevice: String { text("track.menu.delete_from_device") }
-        static var a11yStartDownload: String { text("track.a11y.start_download") }
-        static var a11yCancelDownload: String { text("track.a11y.cancel_download") }
-        static var a11yPauseDownload: String { text("track.a11y.pause_download") }
-        static var a11yResumeDownload: String { text("track.a11y.resume_download") }
-        static var a11yDelete: String { text("track.a11y.delete") }
-        static var a11yRetry: String { text("track.a11y.retry") }
     }
 
     // MARK: - Paywall

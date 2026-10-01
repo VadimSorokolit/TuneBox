@@ -121,43 +121,9 @@ struct TrackCell: View {
                     .opacity(editMode == .active ? 0.0 : 1)
                     .padding(.leading, 5)
                 } else {
-                    Button(
-                        action: {
-                            onButtonTap?()
-                        },
-                        label: {
-                            ZStack {
-                                if track.downloadState != .completed,
-                                   track.downloadState != .idle {
-                                    Circle()
-                                        .foregroundStyle(.clear)
-                                        .overlay(
-                                            content: {
-                                                Circle()
-                                                    .stroke(Color.white, lineWidth: 0.8)
-                                            }
-                                        )
-
-                                    Circle()
-                                        .trim(from: 0, to: track.downloadingProgress)
-                                        .stroke(
-                                            Color.green,
-                                            style: StrokeStyle(
-                                                lineWidth: 1,
-                                                lineCap: .round
-                                            )
-                                        )
-                                        .rotationEffect(.degrees(-90))
-                                }
-
-                                buttonImage
-                                    .font(.system(size: GlobalConstants.TrackCell.actionButtonIconSize, weight: .medium))
-                                    .frame(size: GlobalConstants.TrackCell.actionButtonSize)
-                            }
-                            .frame(size: GlobalConstants.TrackCell.actionButtonSize)
-                        }
-                    )
-                    .accessibilityHint(accessibilityLabel)
+                    TrackDownloadButton(track: track) {
+                        onButtonTap?()
+                    }
                 }
             }
             .padding(.horizontal)
@@ -166,7 +132,7 @@ struct TrackCell: View {
         .onTapGesture {
             onCellTap?()
         }
-        .frame(height: 60)
+        .frame(height: 80)
         .frame(maxWidth: .infinity)
         .padding(.horizontal)
     }
@@ -187,32 +153,10 @@ struct TrackCell: View {
 
     private enum Constants {
         static let cellCornerRadius: CGFloat = 10
-        static let imageSize: CGFloat = 45
+        static let imageSize: CGFloat = 60
         static let imageCornerRadius: CGFloat = 10
         static let menuIconSize: CGFloat = 20
         static let menuButtonSize: CGFloat = 26
-    }
-
-    private var accessibilityLabel: String {
-        switch track.downloadState {
-            case .idle:
-                L10n.Track.a11yStartDownload
-
-            case .queued:
-                L10n.Track.a11yCancelDownload
-
-            case .downloading:
-                L10n.Track.a11yPauseDownload
-
-            case .paused:
-                L10n.Track.a11yResumeDownload
-
-            case .completed:
-                L10n.Track.a11yDelete
-
-            case .failed:
-                L10n.Track.a11yRetry
-        }
     }
 
     @ViewBuilder
@@ -256,40 +200,6 @@ struct TrackCell: View {
             .foregroundStyle(.secondary)
             .frame(size: Constants.imageSize)
             .background(Color.gray.opacity(0.1))
-    }
-
-    @ViewBuilder
-    private var buttonImage: some View {
-        switch track.downloadState {
-            case .idle:
-                if track.fileState == .removed {
-                    Image(systemName: "cloud")
-                        .foregroundStyle(.black)
-                } else {
-                    Image(systemName: "arrow.down")
-                        .foregroundStyle(.black)
-                }
-
-            case .queued:
-                Image(systemName: "clock")
-                    .foregroundStyle(Color.yellow)
-
-            case .downloading:
-                Image(systemName: "pause.fill")
-                    .foregroundStyle(Color.red)
-
-            case .paused:
-                Image(systemName: "play.fill")
-                    .foregroundStyle(Color.blue)
-
-            case .completed:
-                Image(systemName: "trash.fill")
-                    .foregroundStyle(Color.red)
-
-            case .failed:
-                Image(systemName: "exclamationmark.circle")
-                    .foregroundStyle(Color.orange)
-        }
     }
 }
 

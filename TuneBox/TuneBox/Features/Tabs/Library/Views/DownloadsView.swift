@@ -167,7 +167,7 @@ struct DownloadsView: View {
             if section.tracks.isNotEmpty,
                transferManagingVM.isSearchMode {
                 Section {
-                    LazyVStack(spacing: 4) {
+                    LazyVStack(spacing: 8) {
                         ForEach(section.tracks, id: \.id) { track in
                             TrackCell(
                                 track: track,
@@ -194,7 +194,7 @@ struct DownloadsView: View {
                transferManagingVM.isSearchMode.isFalse {
                 Section {
                     ScrollView(.horizontal, showsIndicators: false) {
-                        LazyHStack(alignment: .top, spacing: 4) {
+                        LazyHStack(alignment: .top, spacing: 8) {
                             ForEach(section.tracks, id: \.id) { track in
                                 GenreCell(
                                     track: track,
@@ -224,7 +224,7 @@ struct DownloadsView: View {
 
                 Section(
                     content: {
-                        LazyVStack(spacing: 4) {
+                        LazyVStack(spacing: 8) {
                             ForEach(section.tracks, id: \.id) { track in
                                 TrackCell(
                                     track: track,

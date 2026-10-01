@@ -22,7 +22,7 @@ struct SearchBarView: View {
                 .foregroundStyle(.secondary)
 
             TextField(L10n.Common.searchPlaceholder, text: $searchQuery)
-                .font(.satoshi.medium.size(14))
+                .font(.satoshi.medium.size(17))
                 .submitLabel(.search)
                 .focused(isFocused)
                 .onSubmit {
@@ -41,14 +41,10 @@ struct SearchBarView: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
-        .background {
-            RoundedRectangle(cornerRadius: 14)
-                .fill(Color.gray.opacity(0.12))
-        }
-        .overlay {
-            RoundedRectangle(cornerRadius: 14)
-                .stroke(Color.gray.opacity(0.25), lineWidth: 0.5)
-        }
+        .glassEffect(
+            .regular.tint(.gray.opacity(0.18)),
+            in: RoundedRectangle(cornerRadius: 14)
+        )
         .padding(.top, 15)
         .padding(.horizontal)
     }

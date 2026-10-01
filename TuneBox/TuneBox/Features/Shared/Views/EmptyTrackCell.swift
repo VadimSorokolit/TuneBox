@@ -17,11 +17,15 @@ struct EmptyTrackCell: View {
     var body: some View {
         RoundedRectangle(cornerRadius: cornerRadius)
             .fill(background)
+            .frame(maxWidth: .infinity)
+            .glassEffect(
+                .regular.tint(background),
+                in: RoundedRectangle(cornerRadius: cornerRadius)
+            )
             .overlay {
                 RoundedRectangle(cornerRadius: cornerRadius)
                     .stroke(borderColor, lineWidth: borderWidth)
             }
-            .frame(maxWidth: .infinity)
     }
 
     private var background: Color {

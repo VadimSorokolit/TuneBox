@@ -134,12 +134,6 @@
 "track.menu.edit_tags" = "Редагувати теги";
 "track.menu.delete_from_playlist" = "Видалити з плейлиста";
 "track.menu.delete_from_device" = "Видалити з iPhone";
-"track.a11y.start_download" = "Почати завантаження треку";
-"track.a11y.cancel_download" = "Скасувати завантаження";
-"track.a11y.pause_download" = "Призупинити завантаження";
-"track.a11y.resume_download" = "Продовжити завантаження";
-"track.a11y.delete" = "Видалити трек";
-"track.a11y.retry" = "Повторити завантаження";
 
 /* Paywall */
 "paywall.status.unlock" = "Розблокуй повний доступ до відтворення";
