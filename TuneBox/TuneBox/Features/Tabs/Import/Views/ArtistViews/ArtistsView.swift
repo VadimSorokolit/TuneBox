@@ -46,7 +46,7 @@ struct ArtistsView: View {
                 LibraryEmptyStateView(item: LibraryItem.artists)
             }
         }
-        .libraryMenuNavigationTitle(LibraryItem.artists.localizedTitle)
+        .customNavigationTitle(LibraryItem.artists.localizedTitle)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 

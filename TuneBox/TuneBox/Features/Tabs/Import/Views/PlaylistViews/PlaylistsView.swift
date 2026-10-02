@@ -51,7 +51,7 @@ struct PlaylistsView: View {
                 )
             }
         }
-        .libraryMenuNavigationTitle(LibraryItem.playlists.localizedTitle)
+        .customNavigationTitle(LibraryItem.playlists.localizedTitle)
     }
 
     // MARK: - Properties. Private

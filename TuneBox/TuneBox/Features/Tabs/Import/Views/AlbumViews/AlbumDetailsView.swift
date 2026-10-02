@@ -108,11 +108,11 @@ struct AlbumDetailsView: View {
                 ToolbarItem(placement: .principal) {
                     VStack(spacing: 2) {
                         Text(album.name)
-                            .font(.headline)
+                            .font(.satoshi.bold.size(17))
                             .lineLimit(1)
 
                         Text(album.artist)
-                            .font(.caption)
+                            .font(.satoshi.medium.size(14))
                             .lineLimit(1)
                     }
                     .multilineTextAlignment(.center)

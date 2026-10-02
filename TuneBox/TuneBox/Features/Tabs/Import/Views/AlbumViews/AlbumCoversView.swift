@@ -19,8 +19,7 @@ struct AlbumCoversView: View {
     var body: some View {
         gridContent
             .background(Color.black.opacity(0.0))
-            .navigationTitle(navigationTitle)
-            .navigationBarTitleDisplayMode(.inline)
+            .customNavigationTitle(navigationTitle)
             .toolbar { trailingToolbar }
             .animation(.easeInOut(duration: 0.2), value: selectedIndex)
             .bottomContentMargin(

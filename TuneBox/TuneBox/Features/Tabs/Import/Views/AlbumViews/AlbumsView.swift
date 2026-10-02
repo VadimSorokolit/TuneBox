@@ -47,7 +47,7 @@ struct AlbumsView: View {
                 LibraryEmptyStateView(item: LibraryItem.albums)
             }
         }
-        .libraryMenuNavigationTitle(LibraryItem.albums.localizedTitle)
+        .customNavigationTitle(LibraryItem.albums.localizedTitle)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 

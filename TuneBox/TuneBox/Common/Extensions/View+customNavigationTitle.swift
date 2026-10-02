@@ -19,17 +19,12 @@ extension View {
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text(title)
-                        .font(.headline)
+                        .font(.satoshi.bold.size(17))
                         .lineLimit(lineLimit)
                         .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity, alignment: .center)
                 }
             }
-    }
-
-    func libraryMenuNavigationTitle(_ title: String) -> some View {
-        navigationTitle(title)
-            .toolbarTitleDisplayMode(.inline)
     }
 
     func importHomeNavigationChrome(isHomeTop: Bool) -> some View {
