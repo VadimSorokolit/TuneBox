@@ -67,7 +67,7 @@ struct DiscoverView: View {
 
     private enum Constants {
         static let searchToChipsSpacing: CGFloat = 8
-        static let featuredSectionHeaderTopPadding: CGFloat = 32
+        static let chipsToFeaturedSpacing: CGFloat = 22
         static let featuredCarouselBottomPadding: CGFloat = 22
         static let cellSpacing: CGFloat = 16
     }
@@ -144,6 +144,7 @@ struct DiscoverView: View {
                         direction: $slideDirection,
                         items: Genre.allCases
                     )
+                    .padding(.bottom, Constants.chipsToFeaturedSpacing)
 
                     Group {
                         ForEach(transferManagingVM.sections) { section in
@@ -287,10 +288,7 @@ struct DiscoverView: View {
                         }
                     },
                     header: {
-                        sectionTracksTitle(
-                            section.title,
-                            topPadding: Constants.featuredSectionHeaderTopPadding
-                        )
+                        sectionTracksTitle(section.title)
                     }
                 )
             }
