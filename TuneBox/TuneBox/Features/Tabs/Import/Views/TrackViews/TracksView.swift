@@ -120,14 +120,6 @@ struct TracksView: View {
         }
         .customNavigationTitle(navigationTitle)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .onAppear {
-            Task {
-                importManagingVM.startObservingTracksChanges()
-            }
-        }
-        .onDisappear {
-            importManagingVM.stopObservingTracksChanges()
-        }
     }
 
     // MARK: - Properties. Private

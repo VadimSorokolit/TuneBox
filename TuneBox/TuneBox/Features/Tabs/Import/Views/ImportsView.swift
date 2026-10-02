@@ -52,20 +52,8 @@ struct ImportsView: View {
             isPlaying: playerVM.isPlaying,
             isTabBarVisible: rootTabsVM.isTabBarVisible
         )
-        .onAppear {
-            Task {
-                importManagingVM.startObservingTracksChanges()
-                await importManagingVM.refreshLibrary()
-                playerVM.refreshPlaybackNavigationPath(library: importManagingVM.library)
-            }
-        }
-        .onDisappear {
-            importManagingVM.stopObservingTracksChanges()
-        }
         .task {
-            if importManagingVM.hasLibrary.isFalse {
-                await importManagingVM.refreshLibrary()
-            }
+            await importManagingVM.refreshLibrary()
             playerVM.refreshPlaybackNavigationPath(library: importManagingVM.library)
         }
         .onChange(of: importManagingVM.hasLibrary) { _, hasLibrary in

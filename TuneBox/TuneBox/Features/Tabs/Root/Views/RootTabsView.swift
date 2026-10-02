@@ -188,12 +188,26 @@ struct RootTabsView: View {
         )
         .onAppear {
             playerVM.restoreLastPlaybackSession()
+
+            if coordinator.selectedTab == .importFiles {
+                importManagingVM.startObservingTracksChanges()
+            }
         }
         .onChange(of: rootTabsVM.tabsMode) { _, _ in
             restoreSelectedTab()
         }
         .onChange(of: coordinator.selectedTab) { _, newTab in
             rootTabsVM.rememberSelectedTab(newTab)
+
+            if newTab == .importFiles {
+                importManagingVM.startObservingTracksChanges()
+                Task {
+                    await importManagingVM.refreshLibrary()
+                    playerVM.refreshPlaybackNavigationPath(library: importManagingVM.library)
+                }
+            } else {
+                importManagingVM.stopObservingTracksChanges()
+            }
         }
     }
 
