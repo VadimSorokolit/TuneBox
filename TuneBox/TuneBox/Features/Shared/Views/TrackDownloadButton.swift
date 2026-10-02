@@ -14,7 +14,6 @@ struct TrackDownloadButton: View {
     let track: TrackEntity
     var size: CGFloat = GlobalConstants.TrackCell.actionButtonSize
     var iconSize: CGFloat = GlobalConstants.TrackCell.actionButtonIconSize
-    var idleColor: Color = .black
     let action: () -> Void
 
     // MARK: - Main Body
@@ -41,7 +40,7 @@ struct TrackDownloadButton: View {
             .frame(size: size)
             .contentShape(Circle())
         }
-        .buttonStyle(.borderless)
+        .buttonStyle(.plain)
     }
 
     // MARK: - Properties. Private
@@ -56,10 +55,10 @@ struct TrackDownloadButton: View {
             case .idle:
                 if track.fileState == .removed {
                     Image(systemName: "cloud")
-                        .foregroundStyle(idleColor)
+                        .foregroundStyle(Color.primary)
                 } else {
                     Image(systemName: "arrow.down")
-                        .foregroundStyle(idleColor)
+                        .foregroundStyle(Color.primary)
                 }
 
             case .queued:

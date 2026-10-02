@@ -114,7 +114,6 @@ struct GenreCell: View {
             if configuration.showDownloadButton {
                 TrackDownloadButton(
                     track: track,
-                    idleColor: .primary,
                     action: onButtonTap
                 )
             }
