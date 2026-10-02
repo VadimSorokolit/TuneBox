@@ -95,6 +95,7 @@
 		5B6B8CD32FED1D9400C23D3E /* DismissKeyboardOnTapModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6B8CD22FED1D9200C23D3E /* DismissKeyboardOnTapModifier.swift */; };
 		5B6B8CD52FED1DED00C23D3E /* View+dismissKeyboardOnTap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6B8CD42FED1DEC00C23D3E /* View+dismissKeyboardOnTap.swift */; };
 		5B6B8CD72FED326800C23D3E /* View+sectionTracksTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6B8CD62FED326700C23D3E /* View+sectionTracksTitle.swift */; };
+		5BF1D0A33060A00300C0FFEE /* View+backgroundPlayingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF1D0A23060A00200C0FFEE /* View+backgroundPlayingCell.swift */; };
 		5B6E4DBF2FD17B9000B4E663 /* SegmentedItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6E4DBE2FD17B8F00B4E663 /* SegmentedItem.swift */; };
 		5B74DF9D2FF444BE007EB36D /* AudioMetadataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B74DF9C2FF444BD007EB36D /* AudioMetadataService.swift */; };
 		5B74DF9F2FF4452B007EB36D /* AudioMetadataServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B74DF9E2FF4452A007EB36D /* AudioMetadataServicing.swift */; };
@@ -343,6 +344,7 @@
 		5B6B8CD22FED1D9200C23D3E /* DismissKeyboardOnTapModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DismissKeyboardOnTapModifier.swift; sourceTree = "<group>"; };
 		5B6B8CD42FED1DEC00C23D3E /* View+dismissKeyboardOnTap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+dismissKeyboardOnTap.swift"; sourceTree = "<group>"; };
 		5B6B8CD62FED326700C23D3E /* View+sectionTracksTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+sectionTracksTitle.swift"; sourceTree = "<group>"; };
+		5BF1D0A23060A00200C0FFEE /* View+backgroundPlayingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+backgroundPlayingCell.swift"; sourceTree = "<group>"; };
 		5B6E4DBE2FD17B8F00B4E663 /* SegmentedItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedItem.swift; sourceTree = "<group>"; };
 		5B74DF9C2FF444BD007EB36D /* AudioMetadataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioMetadataService.swift; sourceTree = "<group>"; };
 		5B74DF9E2FF4452A007EB36D /* AudioMetadataServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioMetadataServicing.swift; sourceTree = "<group>"; };
@@ -884,6 +886,7 @@
 				5BB4B42830543E4200AB949F /* View+leadingTapArea.swift */,
 				5B1A9C013091A10000276008 /* View+playbackAnimation.swift */,
 				5B6B8CD62FED326700C23D3E /* View+sectionTracksTitle.swift */,
+				5BF1D0A23060A00200C0FFEE /* View+backgroundPlayingCell.swift */,
 				5B992F53300913E700276008 /* View+segmentTransition.swift */,
 			);
 			path = Extensions;
@@ -1742,6 +1745,7 @@
 				5B8382912FC495F9003625CD /* PlayerViewModel.swift in Sources */,
 				5B0BC2C33007905C00E8F2A5 /* FolderDisplayable.swift in Sources */,
 				5B6B8CD72FED326800C23D3E /* View+sectionTracksTitle.swift in Sources */,
+				5BF1D0A33060A00300C0FFEE /* View+backgroundPlayingCell.swift in Sources */,
 				5B8382992FC4C9EE003625CD /* SpinnerView.swift in Sources */,
 				5BFCA84D2FCEE5D4009C6AD9 /* Onboarding.swift in Sources */,
 				5B601ECD302B0D05005D7548 /* AlbumCoversView.swift in Sources */,

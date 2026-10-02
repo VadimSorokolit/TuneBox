@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-private struct BackgroundPlayingCellModifier: ViewModifier {
+struct BackgroundPlayingCellModifier: ViewModifier {
 
     let isPlaying: Bool
 
@@ -20,19 +20,25 @@ private struct BackgroundPlayingCellModifier: ViewModifier {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(.gray.opacity(0.1))
                         .overlay {
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(
-                                    AngularGradient(
-                                        colors: [
-                                            .clear,
-                                            .primary.opacity(0.45),
-                                            .clear
-                                        ],
-                                        center: .center,
-                                        angle: .degrees(rotation)
-                                    ),
-                                    lineWidth: 0.35
+                            GeometryReader { proxy in
+                                let side = hypot(proxy.size.width, proxy.size.height)
+
+                                AngularGradient(
+                                    colors: [
+                                        .clear,
+                                        .primary.opacity(0.45),
+                                        .clear
+                                    ],
+                                    center: .center
                                 )
+                                .frame(width: side, height: side)
+                                .rotationEffect(.degrees(rotation))
+                                .frame(width: proxy.size.width, height: proxy.size.height)
+                            }
+                            .mask {
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(lineWidth: 0.35)
+                            }
                         }
                         .padding(.horizontal, 8)
                         .onAppear {
@@ -46,12 +52,5 @@ private struct BackgroundPlayingCellModifier: ViewModifier {
                         }
                 }
             }
-    }
-}
-
-extension View {
-
-    func backgroundPlayingCell(isPlaying: Bool) -> some View {
-        modifier(BackgroundPlayingCellModifier(isPlaying: isPlaying))
     }
 }
