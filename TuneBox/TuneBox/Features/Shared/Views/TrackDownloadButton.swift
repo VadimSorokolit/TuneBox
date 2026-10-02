@@ -23,19 +23,31 @@ struct TrackDownloadButton: View {
             ZStack {
                 if showsProgress {
                     Circle()
-                        .stroke(Color.white, lineWidth: 0.8)
+                        .stroke(
+                            Color(.systemGray4),
+                            lineWidth: GlobalConstants.ProgressRing.lineWidth
+                        )
 
                     Circle()
-                        .trim(from: 0, to: track.downloadingProgress)
+                        .trim(
+                            from: 0,
+                            to: track.downloadingProgress
+                        )
                         .stroke(
                             Color.green,
-                            style: StrokeStyle(lineWidth: 1.5, lineCap: .round)
+                            style: StrokeStyle(
+                                lineWidth: GlobalConstants.ProgressRing.lineWidth,
+                                lineCap: .round
+                            )
                         )
                         .rotationEffect(.degrees(-90))
                 }
 
                 buttonImage
-                    .font(.system(size: iconSize, weight: .medium))
+                    .font(
+                        .system(size: iconSize,
+                                weight: .medium)
+                    )
             }
             .frame(size: size)
             .contentShape(Circle())

@@ -226,13 +226,13 @@ final class AudioService: NSObject, AudioServicing {
 
         if self.player.isPlaying {
             self.pause()
+
             return
         }
 
-        // After a headphone/route teardown the engine reports stopped, but this is
-        // still the same track — resume from the saved position instead of restarting.
         if self.player.isStopped.isFalse, self.isNearEnd {
             self.stop()
+
             return
         }
 
@@ -552,10 +552,25 @@ final class AudioService: NSObject, AudioServicing {
     }
 
     private func startPCMFile(_ url: URL) throws {
-        if self.isRestoringPlayback {
-            try self.player.enqueue(url, immediate: true)
-        } else {
-            try self.player.play(url)
+        try self.startDecoder(self.openPCMDecoder(url: url))
+    }
+
+    /// Opens the decoder up front: the player opens enqueued decoders asynchronously,
+    /// so open errors would otherwise never reach the Core Audio fallback.
+    private func openPCMDecoder(url: URL) throws -> AudioDecoder {
+        do {
+            let decoder = try AudioDecoder(url: url)
+            try decoder.open()
+            return decoder
+        } catch {
+            // Core Audio skips leading garbage (e.g. padded MP3s) that the default decoders reject
+            AppLogger.audio.warning(
+                "Default decoder failed, retrying with Core Audio: \(error.localizedDescription)"
+            )
+
+            let decoder = try AudioDecoder(url: url, decoderName: .coreAudio)
+            try decoder.open()
+            return decoder
         }
     }
 

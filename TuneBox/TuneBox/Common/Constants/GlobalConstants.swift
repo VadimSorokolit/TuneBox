@@ -22,7 +22,7 @@ enum GlobalConstants {
     }
 
     enum Cell {
-        static let imageSize: CGFloat = 46
+        static let imageSize: CGFloat = 60
         static let imageCornerRadius: CGFloat = 8
         static let textLineLimit: Int = 4
         static let defaultPadding: CGFloat = 19
@@ -61,6 +61,10 @@ enum GlobalConstants {
         static let foregroundStyle = Color.black.opacity(foregroundOpacity)
     }
 
+    enum ProgressRing {
+        static let lineWidth: CGFloat = 2.5
+    }
+
     enum Screen {
         static let regularWidth: CGFloat = 393
         static let seHeight: CGFloat = 667
@@ -69,10 +73,14 @@ enum GlobalConstants {
     }
 
     enum TrackCell {
-        static let primaryTextSize: CGFloat = 15
+        static let primaryTextSize: CGFloat = 16
+        static let secondaryTextSize: CGFloat = 12
         static let durationTextSize: CGFloat = 13
+        static let cornerRadius: CGFloat = 10
+        static let imageSize: CGFloat = 60
+        static let imageCornerRadius: CGFloat = 10
         static let actionButtonIconSize: CGFloat = 16
-        static let actionButtonSize: CGFloat = 28
+        static let actionButtonSize: CGFloat = 34
     }
 
     enum UserDefaultsKey {

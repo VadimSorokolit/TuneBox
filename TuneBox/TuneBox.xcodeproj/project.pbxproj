@@ -37,6 +37,7 @@
 		5B0FD0C22FD2B18600753D3A /* GenreCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0FD0C12FD2B18500753D3A /* GenreCell.swift */; };
 		5B0FD0C42FD2FAD200753D3A /* Bool+extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0FD0C32FD2FAD100753D3A /* Bool+extensions.swift */; };
 		5B0FD0C62FD2FD0600753D3A /* Collection+isNotEmpty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0FD0C52FD2FD0500753D3A /* Collection+isNotEmpty.swift */; };
+		5BF1D0A73060A00700C0FFEE /* String+containsCyrillic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF1D0A63060A00600C0FFEE /* String+containsCyrillic.swift */; };
 		5B11C3372FB500AC0089BAD2 /* DownloadStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11C3362FB500AB0089BAD2 /* DownloadStore.swift */; };
 		5B11C33B2FB719A80089BAD2 /* TrackEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11C33A2FB719A60089BAD2 /* TrackEntity.swift */; };
 		5B11C3412FB728390089BAD2 /* PersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11C3402FB728380089BAD2 /* PersistenceService.swift */; };
@@ -196,6 +197,7 @@
 		5BFCA7E62FCED3C9009C6AD9 /* Satoshi-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA7DB2FCED3C9009C6AD9 /* Satoshi-Bold.otf */; };
 		5BFCA7E82FCED3C9009C6AD9 /* Satoshi-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA7E02FCED3C9009C6AD9 /* Satoshi-Medium.otf */; };
 		5BFCA7E92FCED3C9009C6AD9 /* Satoshi-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA7DE2FCED3C9009C6AD9 /* Satoshi-Light.otf */; };
+		5BF1D0A53060A00500C0FFEE /* Satoshi-Variable.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5BF1D0A43060A00400C0FFEE /* Satoshi-Variable.ttf */; };
 		5BFCA7EB2FCED3C9009C6AD9 /* Satoshi-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA7E22FCED3C9009C6AD9 /* Satoshi-Regular.otf */; };
 		5BFCA8122FCED45F009C6AD9 /* JetBrainsMono-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA7F02FCED45F009C6AD9 /* JetBrainsMono-ExtraBold.ttf */; };
 		5BFCA8152FCED45F009C6AD9 /* JetBrainsMono-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5BFCA7F52FCED45F009C6AD9 /* JetBrainsMono-Light.ttf */; };
@@ -291,6 +293,7 @@
 		5B0FD0C12FD2B18500753D3A /* GenreCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreCell.swift; sourceTree = "<group>"; };
 		5B0FD0C32FD2FAD100753D3A /* Bool+extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bool+extensions.swift"; sourceTree = "<group>"; };
 		5B0FD0C52FD2FD0500753D3A /* Collection+isNotEmpty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+isNotEmpty.swift"; sourceTree = "<group>"; };
+		5BF1D0A63060A00600C0FFEE /* String+containsCyrillic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+containsCyrillic.swift"; sourceTree = "<group>"; };
 		5B10EECD7FD3D24FBCBAC56F /* Array+trackPlaybackRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+trackPlaybackRow.swift"; sourceTree = "<group>"; };
 		5B11C3362FB500AB0089BAD2 /* DownloadStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadStore.swift; sourceTree = "<group>"; };
 		5B11C33A2FB719A60089BAD2 /* TrackEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackEntity.swift; sourceTree = "<group>"; };
@@ -445,6 +448,7 @@
 		5BFCA7D92FCED3C9009C6AD9 /* Satoshi-Black.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Satoshi-Black.otf"; sourceTree = "<group>"; };
 		5BFCA7DB2FCED3C9009C6AD9 /* Satoshi-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Satoshi-Bold.otf"; sourceTree = "<group>"; };
 		5BFCA7DE2FCED3C9009C6AD9 /* Satoshi-Light.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Satoshi-Light.otf"; sourceTree = "<group>"; };
+		5BF1D0A43060A00400C0FFEE /* Satoshi-Variable.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Satoshi-Variable.ttf"; sourceTree = "<group>"; };
 		5BFCA7E02FCED3C9009C6AD9 /* Satoshi-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Satoshi-Medium.otf"; sourceTree = "<group>"; };
 		5BFCA7E22FCED3C9009C6AD9 /* Satoshi-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Satoshi-Regular.otf"; sourceTree = "<group>"; };
 		5BFCA7EE2FCED45F009C6AD9 /* JetBrainsMono-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "JetBrainsMono-Bold.ttf"; sourceTree = "<group>"; };
@@ -867,6 +871,7 @@
 				5B10EECD7FD3D24FBCBAC56F /* Array+trackPlaybackRow.swift */,
 				5B0FD0C32FD2FAD100753D3A /* Bool+extensions.swift */,
 				5B0FD0C52FD2FD0500753D3A /* Collection+isNotEmpty.swift */,
+				5BF1D0A63060A00600C0FFEE /* String+containsCyrillic.swift */,
 				5BFCA8392FCED71E009C6AD9 /* Color+hex.swift */,
 				5BFCA83B2FCED7BE009C6AD9 /* Font+family.swift */,
 				5B89C77930694DA700BB3854 /* Genre+chipColor.swift */,
@@ -1411,6 +1416,7 @@
 				5BFCA7E02FCED3C9009C6AD9 /* Satoshi-Medium.otf */,
 				5BFCA7E22FCED3C9009C6AD9 /* Satoshi-Regular.otf */,
 				5BFCA7DE2FCED3C9009C6AD9 /* Satoshi-Light.otf */,
+				5BF1D0A43060A00400C0FFEE /* Satoshi-Variable.ttf */,
 			);
 			path = Satoshi;
 			sourceTree = "<group>";
@@ -1639,6 +1645,7 @@
 				5BFCA7E62FCED3C9009C6AD9 /* Satoshi-Bold.otf in Resources */,
 				5BFCA7E82FCED3C9009C6AD9 /* Satoshi-Medium.otf in Resources */,
 				5BFCA7E92FCED3C9009C6AD9 /* Satoshi-Light.otf in Resources */,
+				5BF1D0A53060A00500C0FFEE /* Satoshi-Variable.ttf in Resources */,
 				5BFCA7EB2FCED3C9009C6AD9 /* Satoshi-Regular.otf in Resources */,
 				5BD579A02FAB25E300503BA2 /* Assets.xcassets in Resources */,
 				5BFCA8122FCED45F009C6AD9 /* JetBrainsMono-ExtraBold.ttf in Resources */,
@@ -1712,6 +1719,7 @@
 				5B1214283017505A00987F16 /* TrackAlphabetSection.swift in Sources */,
 				5BECD77E301380E10028FC67 /* TrackCoverCell.swift in Sources */,
 				5B0FD0C62FD2FD0600753D3A /* Collection+isNotEmpty.swift in Sources */,
+				5BF1D0A73060A00700C0FFEE /* String+containsCyrillic.swift in Sources */,
 				5BC5EED1303846DB001A16A9 /* NetworkMonitorService.swift in Sources */,
 				5B1875C92FD084CB00D8A042 /* SegmentedChipControl.swift in Sources */,
 				5B979119304EA8F900A58C89 /* BackgroundPlayingCellModifier.swift in Sources */,

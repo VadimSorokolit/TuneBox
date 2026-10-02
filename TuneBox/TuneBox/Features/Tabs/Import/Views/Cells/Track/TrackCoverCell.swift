@@ -26,20 +26,37 @@ struct TrackCoverCell: View {
                 HStack(spacing: 10) {
                     CoverView(
                         coverPath: track.imagePath,
-                        size: GlobalConstants.Cell.imageSize,
-                        cornerRadius: GlobalConstants.Cell.imageCornerRadius
+                        size: GlobalConstants.TrackCell.imageSize,
+                        cornerRadius: GlobalConstants.TrackCell.imageCornerRadius
                     )
 
-                    VStack(alignment: .leading, spacing: track.artistName.isNotEmpty ? 4 : 0) {
+                    VStack(
+                        alignment: .leading,
+                        spacing: track.artistName.isNotEmpty
+                        ? 4
+                        : 0
+                    ) {
                         Text("\(track.songName)")
                             .lineLimit(GlobalConstants.Cell.textLineLimit)
-                            .font(GlobalConstants.Cell.titleFont)
+                            .font(
+                                .satoshi.semiBold.size(
+                                    GlobalConstants.TrackCell.primaryTextSize,
+                                    for: track.songName,
+                                    .medium
+                                )
+                            )
 
                         if track.artistName.isNotEmpty {
                             Text("\(track.artistName)")
                                 .lineLimit(GlobalConstants.Cell.textLineLimit)
-                                .font(GlobalConstants.Cell.subtitleFont)
-                                .foregroundStyle(.gray)
+                                .font(
+                                    .satoshi.medium.size(
+                                        GlobalConstants.TrackCell.secondaryTextSize,
+                                        for: track.artistName,
+                                        .medium
+                                    )
+                                )
+                                .foregroundStyle(.secondary)
                         }
                     }
                 }
@@ -47,7 +64,7 @@ struct TrackCoverCell: View {
                 Spacer()
 
                 Text(track.formattedDuration)
-                    .font(.system(size: 12, weight: .light))
+                    .font(.jetBrainsMono.regular.size(GlobalConstants.TrackCell.durationTextSize))
                     .foregroundStyle(.gray)
             }
             .padding(.horizontal, defaultPadding)

@@ -42,7 +42,7 @@ struct SleepTimerHeaderButton: View {
 
     private var activeLabel: some View {
         let size = GlobalConstants.HeaderButton.size
-        let lineWidth: CGFloat = 2.5
+        let lineWidth = GlobalConstants.ProgressRing.lineWidth
         let ringInset: CGFloat = 1
         let progress = settingsVM.sleepTimerProgress
 
@@ -62,7 +62,7 @@ struct SleepTimerHeaderButton: View {
                 .animation(.linear(duration: 0.25), value: progress)
 
             Image(systemName: "timer")
-                .font(.system(size: 15, weight: .semibold))
+                .font(.system(size: 25, weight: .semibold))
                 .foregroundStyle(labelColor)
         }
         .frame(size: size)

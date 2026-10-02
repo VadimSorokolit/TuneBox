@@ -152,9 +152,6 @@ struct TrackCell: View {
     private let onDeleteFromDeviceTap: () -> Void
 
     private enum Constants {
-        static let cellCornerRadius: CGFloat = 10
-        static let imageSize: CGFloat = 60
-        static let imageCornerRadius: CGFloat = 10
         static let menuIconSize: CGFloat = 20
         static let menuButtonSize: CGFloat = 26
     }
@@ -170,8 +167,8 @@ struct TrackCell: View {
             Image(uiImage: image)
                 .resizable()
                 .scaledToFit()
-                .frame(size: Constants.imageSize)
-                .clipShape(RoundedRectangle(cornerRadius: Constants.imageCornerRadius))
+                .frame(size: GlobalConstants.TrackCell.imageSize)
+                .clipShape(RoundedRectangle(cornerRadius: GlobalConstants.TrackCell.imageCornerRadius))
         } else if let url = track.imageURL {
             WebImage(
                 url: url,
@@ -184,11 +181,11 @@ struct TrackCell: View {
                     customPlaceholder
                 }
             )
-            .frame(size: Constants.imageSize)
-            .clipShape(RoundedRectangle(cornerRadius: Constants.imageCornerRadius))
+            .frame(size: GlobalConstants.TrackCell.imageSize)
+            .clipShape(RoundedRectangle(cornerRadius: GlobalConstants.TrackCell.imageCornerRadius))
         } else {
             customPlaceholder
-                .clipShape(RoundedRectangle(cornerRadius: Constants.imageCornerRadius))
+                .clipShape(RoundedRectangle(cornerRadius: GlobalConstants.TrackCell.imageCornerRadius))
         }
     }
 
@@ -198,7 +195,7 @@ struct TrackCell: View {
             .scaledToFit()
             .padding(16)
             .foregroundStyle(.secondary)
-            .frame(size: Constants.imageSize)
+            .frame(size: GlobalConstants.TrackCell.imageSize)
             .background(Color.gray.opacity(0.1))
     }
 }

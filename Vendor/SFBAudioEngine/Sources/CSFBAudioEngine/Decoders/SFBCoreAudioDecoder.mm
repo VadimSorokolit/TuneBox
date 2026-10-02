@@ -94,6 +94,32 @@ NSError *formatNotRecognizedError(NSURL *_Nullable url, OSStatus result) noexcep
                            userInfo:userInfo];
 }
 
+/// Returns the Core Audio file type matching the URL's extension, or 0 if unknown.
+/// Without a hint Core Audio sniffs the leading bytes and rejects files that start with garbage.
+AudioFileTypeID fileTypeHintForURL(NSURL *_Nullable url) noexcept {
+    NSString *extension = url.pathExtension.lowercaseString;
+    if (extension.length == 0) {
+        return 0;
+    }
+
+    CFStringRef cfExtension = (__bridge CFStringRef)extension;
+    UInt32 size = 0;
+    if (AudioFileGetGlobalInfoSize(kAudioFileGlobalInfo_TypesForExtension, sizeof cfExtension, &cfExtension,
+                                   &size) != noErr ||
+        size < sizeof(AudioFileTypeID)) {
+        return 0;
+    }
+
+    std::vector<AudioFileTypeID> types(size / sizeof(AudioFileTypeID));
+    if (AudioFileGetGlobalInfo(kAudioFileGlobalInfo_TypesForExtension, sizeof cfExtension, &cfExtension, &size,
+                               types.data()) != noErr ||
+        types.empty()) {
+        return 0;
+    }
+
+    return types.front();
+}
+
 } /* namespace */
 
 @interface SFBCoreAudioDecoder () {
@@ -267,8 +293,8 @@ NSError *formatNotRecognizedError(NSURL *_Nullable url, OSStatus result) noexcep
 
     // Open the input file
     AudioFileID audioFile;
-    auto result = AudioFileOpenWithCallbacks((__bridge void *)self, readCallback, nullptr, getSizeCallback, nullptr, 0,
-                                             &audioFile);
+    auto result = AudioFileOpenWithCallbacks((__bridge void *)self, readCallback, nullptr, getSizeCallback, nullptr,
+                                             fileTypeHintForURL(_inputSource.url), &audioFile);
     if (result != noErr) {
         os_log_error(gSFBAudioDecoderLog, "AudioFileOpenWithCallbacks failed: %d '%{public}.4s'", result,
                      SFBCStringForOSType(result));
